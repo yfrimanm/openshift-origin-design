@@ -15,6 +15,8 @@ Access design documentation for features coming in future releases, post OpenShi
 - [Taints and Tolerations](http://openshift.github.io/openshift-origin-design/web-console/future-openshift/taints-tolerations/taints-tolerations)
 - [YAML Editor Updates](http://openshift.github.io/openshift-origin-design/web-console/future-openshift/code-editor-updates/code-editor-updates)
 
+
+
 ## Developer Perspective
 Access future design documentation specific to the developer perspective of OpenShift.
 
@@ -32,7 +34,7 @@ Access design documentation specific to the KNI and KubeVirt features in OpenShi
 ### KubeVirt (Virtualization in OpenShift)
 - Create VM
 - Clone VM
-- Migrate VM
+- [Migrate VM](http://openshift.github.io/openshift-origin-design/web-console/knikubevirt/migrate-vm/migrate-vm)
 - [VM List](http://openshift.github.io/openshift-origin-design/web-console/knikubevirt/vm-list/vm-list)
 - VM Details
 - VM Console
