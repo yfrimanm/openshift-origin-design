@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenShift Virtualization – Settings · Memory sharing policy</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      font-family: var(--pf-t--global--font--family--body);
+      color: var(--pf-t--global--text--color--regular);
+    }
+    /* Simulates OCP console main content pane (nav excluded) */
+    .console-main {
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .page-wrap {
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 8px 32px 48px;
+      background: #fff;
+    }
+
+    /* Settings page shell */
+    .settings-page__breadcrumb {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .settings-page__breadcrumb ol {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .settings-page__breadcrumb a {
+      color: var(--pf-t--global--color--brand--default);
+      text-decoration: none;
+    }
+    .settings-page__breadcrumb a:hover { text-decoration: underline; }
+    .settings-page__breadcrumb li:not(:last-child)::after {
+      content: '>';
+      margin-left: 8px;
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .settings-page__breadcrumb li:last-child {
+      color: var(--pf-t--global--text--color--regular);
+      font-weight: 400;
+    }
+    .settings-page__header { margin-bottom: 24px; }
+    .settings-page__header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      line-height: 1.2;
+    }
+    .settings-page__header p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--pf-t--global--text--color--regular);
+      max-width: none;
+      line-height: 1.5;
+    }
+    .settings-page__search {
+      margin-bottom: 24px;
+      max-width: 100%;
+    }
+    .settings-page__search .pf-v6-c-text-input-group {
+      width: 100%;
+    }
+    .settings-page__tabs {
+      margin-bottom: 0;
+    }
+    .settings-page__tabs.pf-v6-c-tabs {
+      background: transparent;
+      box-shadow: none;
+    }
+    .settings-tab-panel {
+      margin-top: -1px;
+    }
+    .settings-panel.pf-v6-c-card {
+      --pf-v6-c-card--BorderRadius: var(--pf-t--global--border--radius--medium);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      box-shadow: none;
+      overflow: hidden;
+    }
+    .settings-panel__body {
+      padding: 32px;
+    }
+    .settings-card__version {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      padding: 16px 24px;
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
+      .settings-card__version { grid-template-columns: 1fr; gap: 16px; }
+      .settings-card__version-col { border-right: 0 !important; padding: 0 !important; }
+    }
+    .settings-card__version-col {
+      padding: 0 24px;
+      border-right: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .settings-card__version-col:first-child { padding-left: 0; }
+    .settings-card__version-col:last-child {
+      border-right: 0;
+      padding-right: 0;
+    }
+    .settings-card__version-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .settings-card__version-label--channel {
+      border-bottom: 1px dashed var(--pf-t--global--border--color--default);
+      display: inline-block;
+      padding-bottom: 1px;
+    }
+    .settings-card__version-value {
+      display: block;
+      margin: 0;
+      font-size: 14px;
+      color: var(--pf-t--global--text--color--subtle);
+      line-height: 1.4;
+    }
+    .settings-card__version-value.pf-m-success {
+      color: #3e8635;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .settings-card__version-value.pf-m-success i {
+      font-size: 16px;
+    }
+    .settings-card__version-link {
+      color: var(--pf-t--global--color--brand--default);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .settings-card__version-link:hover { text-decoration: underline; }
+    .settings-feature-section {
+      border-top: 1px solid var(--pf-t--global--border--color--default);
+      margin-top: 24px;
+      padding-top: 8px;
+    }
+    .settings-card__version + .settings-feature-section {
+      border-top: 0;
+      margin-top: 24px;
+      padding-top: 0;
+    }
+    .settings-feature-section__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0;
+      background: transparent;
+    }
+    .settings-feature-section__trigger {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+    }
+    .settings-feature-section__trigger:hover,
+    .settings-feature-section__trigger:focus-visible {
+      background: transparent;
+    }
+    .settings-feature-section__trigger:focus-visible {
+      outline: 2px solid var(--pf-t--global--color--brand--default, #0066cc);
+      outline-offset: 2px;
+    }
+    .settings-feature-section__title {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--pf-t--global--color--brand--default);
+    }
+    .settings-feature-section__title i.chevron {
+      font-size: 12px;
+      color: var(--pf-t--global--text--color--subtle);
+      transition: transform .15s;
+      width: 12px;
+    }
+    .settings-feature-section.pf-m-expanded .settings-feature-section__title i.chevron {
+      transform: rotate(90deg);
+    }
+    .settings-feature-section__panel {
+      display: none;
+      padding: 0 0 8px;
+      background: transparent;
+    }
+    .settings-feature-section.pf-m-expanded .settings-feature-section__panel { display: block; }
+    .settings-feature-section__configure {
+      flex-shrink: 0;
+      border-radius: 9999px !important;
+    }
+    .settings-feature-section--guest {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .settings-feature-section--guest .settings-feature-section__header {
+      padding: 0;
+    }
+
+    /* Memory sharing form — consistent vertical rhythm */
+    .memory-policy-helper {
+      margin: 0 0 12px;
+    }
+    .memory-policy-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    /* Memory policy cards — horizontal layout */
+    .memory-policy {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 0;
+      border: 0;
+      padding: 0;
+      min-width: 0;
+    }
+    @media (max-width: 960px) {
+      .memory-policy { grid-template-columns: 1fr; }
+    }
+    .memory-policy legend.memory-policy__legend {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .memory-policy__option {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 8px 10px;
+      align-content: start;
+      padding: 14px;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+      cursor: pointer;
+      transition: border-color .12s, box-shadow .12s;
+      min-height: 100%;
+    }
+    .memory-policy__option:hover { border-color: var(--pf-t--global--color--brand--default, #0066cc); }
+    .memory-policy__option.pf-m-selected {
+      border-color: var(--pf-t--global--color--brand--default, #0066cc);
+      box-shadow: 0 0 0 1px var(--pf-t--global--color--brand--default, #0066cc);
+    }
+    .memory-policy__option input {
+      grid-row: 1;
+      grid-column: 1;
+      margin: 2px 0 0;
+      flex-shrink: 0;
+      accent-color: var(--pf-t--global--color--brand--default);
+    }
+    .memory-policy__title {
+      grid-row: 1;
+      grid-column: 2;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      line-height: 1.35;
+    }
+    .memory-policy__default {
+      font-weight: 400;
+    }
+    .memory-policy__desc {
+      grid-row: 2;
+      grid-column: 2;
+      font-size: 13px;
+      color: var(--pf-t--global--text--color--subtle);
+      margin: 0;
+      line-height: 1.45;
+    }
+    .custom-reserve-wrap {
+      margin: 0;
+      padding: 12px 14px;
+      border: 1px dashed var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+    }
+    .custom-reserve-wrap .input-with-unit {
+      margin-top: 8px;
+    }
+    .custom-reserve-wrap .pf-v6-c-form__helper-text {
+      margin-top: 8px;
+    }
+    .custom-reserve-wrap .pf-v6-c-form__helper-text.minimum-reserved-error {
+      color: var(--pf-t--global--text--color--status--danger--default, #c9190b);
+    }
+    .custom-reserve-wrap .pf-v6-c-form-control.pf-m-error .pf-v6-c-form-control__input {
+      border-color: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+    }
+    #alert-error {
+      margin: 0;
+    }
+
+    .input-with-unit { display: flex; align-items: stretch; gap: 8px; max-width: 280px; }
+    .input-with-unit .pf-v6-c-form-control { flex: 1; }
+    .input-with-unit .pf-v6-c-form-control.pf-m-select { flex: 0 0 80px; }
+    .hidden { display: none !important; }
+
+    /* Cluster settings accordion */
+    .cluster-settings { margin-bottom: 0; }
+    .cluster-settings__nav {
+      margin: 0 0 12px;
+      padding: 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .cluster-settings .settings-accordion {
+      margin-left: 28px;
+      padding-left: 0;
+      border-top: 0;
+      padding-top: 0;
+    }
+    .settings-accordion {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      overflow: visible;
+      border-top: 0;
+      padding-top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .settings-accordion__item { border: none; }
+    .settings-accordion__item:last-child { border-bottom: 0; }
+    .settings-accordion__item.is-expanded {
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      overflow: hidden;
+    }
+    .settings-accordion__trigger {
+      width: 100%; display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border: 0; border-radius: var(--pf-t--global--border--radius--small); background: transparent; cursor: pointer;
+      font: inherit; font-size: 14px; font-weight: 600;
+      color: var(--pf-t--global--color--brand--default); text-align: left;
+    }
+    .settings-accordion__trigger:hover,
+    .settings-accordion__trigger:focus-visible {
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+    }
+    .settings-accordion__item.is-expanded > .settings-accordion__trigger,
+    .settings-accordion__item.is-expanded > .settings-accordion__trigger:hover,
+    .settings-accordion__item.is-expanded > .settings-accordion__trigger:focus-visible {
+      background: transparent;
+      border-radius: 0;
+      padding: 12px 16px;
+    }
+    .settings-accordion__trigger i.chevron { font-size: 11px; color: var(--pf-t--global--text--color--subtle); transition: transform .15s; }
+    .settings-accordion__item.is-expanded .settings-accordion__trigger i.chevron { transform: rotate(90deg); }
+    .settings-accordion__panel {
+      display: none; padding: 0 16px 16px;
+      border-top: 0;
+      background: transparent;
+      overflow: visible;
+    }
+    .settings-accordion__item.is-expanded .settings-accordion__panel { display: block; }
+    .settings-row {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .settings-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    #memory-sharing-section .settings-accordion__panel > .settings-row {
+      border-bottom: 0;
+    }
+    .settings-row__label {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      font-size: 14px; font-weight: 600; margin: 0 0 4px;
+    }
+    .settings-row__help {
+      color: var(--pf-t--global--text--color--subtle); font-size: 13px; cursor: help;
+    }
+    .help-popover-wrap { position: relative; display: inline-flex; vertical-align: middle; z-index: 1; }
+    .settings-row__help-btn {
+      padding: 0 2px;
+      font-size: 13px;
+      color: var(--pf-t--global--text--color--subtle);
+      line-height: 1;
+      position: relative;
+      z-index: 2;
+    }
+    .rh-ui-icon-question-mark-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      color: inherit;
+    }
+    .rh-ui-icon-question-mark-circle svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+    .help-popover {
+      display: none;
+      position: fixed;
+      width: min(360px, calc(100vw - 32px));
+      background: #fff;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+      z-index: 10000;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+    .help-popover.pf-m-open { display: block; }
+    .help-popover::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 7px solid transparent;
+      border-bottom-color: #fff;
+      filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, .12));
+    }
+    .help-popover__body {
+      padding: 12px 14px;
+      margin: 0;
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .settings-row__badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+      color: var(--pf-t--global--color--brand--default);
+      border: 1px solid var(--pf-t--global--color--brand--default);
+      border-radius: 999px; padding: 1px 6px;
+    }
+    .settings-row__desc {
+      margin: 0; font-size: 13px; color: var(--pf-t--global--text--color--subtle); line-height: 1.45; max-width: 520px;
+    }
+    .settings-row.pf-m-disabled { opacity: .55; }
+    .settings-row.pf-m-disabled .settings-row__desc { font-style: italic; }
+
+    .settings-subsection {
+      margin-top: 4px;
+      padding: 16px 0 0;
+      border-top: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .sharing-enabled-panel .settings-subsection:not(.kernel-subsection) {
+      border-top: 0;
+      margin-top: 0;
+    }
+    .settings-subsection__title {
+      font-size: 14px; font-weight: 600; margin: 0 0 16px;
+    }
+    .sharing-enabled-panel { padding-top: 0; }
+    .sharing-enabled-panel .kernel-subsection {
+      padding-top: 16px;
+      border-top: 1px solid var(--pf-t--global--border--color--default);
+      margin-top: 16px;
+    }
+    .kernel-subsection .settings-row {
+      padding-top: 0;
+      border-bottom: 0;
+    }
+
+    /* PatternFly-style switch */
+    .pf-switch {
+      position: relative; display: inline-block; width: 44px; height: 22px; flex-shrink: 0;
+    }
+    .pf-switch input { opacity: 0; width: 0; height: 0; }
+    .pf-switch__slider {
+      position: absolute; inset: 0; cursor: pointer;
+      background: #b8bbbe; border-radius: 999px; transition: background .15s;
+    }
+    .pf-switch__slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px; left: 2px; bottom: 2px;
+      background: #fff; border-radius: 50%; transition: transform .15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    }
+    .pf-switch input:checked + .pf-switch__slider { background: var(--pf-t--global--color--brand--default, #0066cc); }
+    .pf-switch input:checked + .pf-switch__slider::before { transform: translateX(22px); }
+    .pf-switch input:disabled + .pf-switch__slider { cursor: not-allowed; opacity: .6; }
+
+    .designer-doc-link {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--pf-t--global--border--color--default);
+      font-size: 12px;
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .designer-doc-link a {
+      color: var(--pf-t--global--color--brand--default);
+      text-decoration: none;
+    }
+    .designer-doc-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="console-main">
+  <div class="page-wrap">
+    <nav class="settings-page__breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="#" onclick="return false;">Virtualization</a></li>
+        <li>Settings</li>
+      </ol>
+    </nav>
+
+    <header class="settings-page__header">
+      <h1>Settings</h1>
+      <p>Manage configurations at both the cluster and user levels, or opt-in to experimental features.</p>
+    </header>
+
+    <div class="settings-page__search">
+      <div class="pf-v6-c-text-input-group">
+        <div class="pf-v6-c-text-input-group__main pf-m-icon">
+          <span class="pf-v6-c-text-input-group__text">
+            <span class="pf-v6-c-text-input-group__icon">
+              <i class="fas fa-search" aria-hidden="true"></i>
+            </span>
+            <input class="pf-v6-c-text-input-group__text-input" type="search" placeholder="Find settings" aria-label="Find settings" />
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-v6-c-tabs pf-m-box settings-page__tabs">
+      <ul class="pf-v6-c-tabs__list" role="tablist">
+        <li class="pf-v6-c-tabs__item pf-m-current" role="presentation">
+          <button type="button" class="pf-v6-c-tabs__link" role="tab" aria-selected="true">Cluster</button>
+        </li>
+        <li class="pf-v6-c-tabs__item" role="presentation">
+          <button type="button" class="pf-v6-c-tabs__link" role="tab" aria-selected="false">User</button>
+        </li>
+        <li class="pf-v6-c-tabs__item" role="presentation">
+          <button type="button" class="pf-v6-c-tabs__link" role="tab" aria-selected="false">Preview features</button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="settings-tab-panel">
+    <div class="pf-v6-c-card settings-panel">
+      <div class="settings-panel__body">
+      <div class="settings-card__version">
+        <div class="settings-card__version-col">
+          <span class="settings-card__version-label">Installed version</span>
+          <span class="settings-card__version-value">4.99.0-0.1781381638</span>
+        </div>
+        <div class="settings-card__version-col">
+          <span class="settings-card__version-label">Update status</span>
+          <span class="settings-card__version-value pf-m-success"><i class="fas fa-check-circle" aria-hidden="true"></i> Up to date</span>
+        </div>
+        <div class="settings-card__version-col">
+          <span class="settings-card__version-label settings-card__version-label--channel">Channel</span>
+          <a class="settings-card__version-link" href="#" onclick="return false;">dev-preview</a>
+        </div>
+      </div>
+
+      <div class="settings-feature-section pf-m-expanded" id="virt-features-section">
+        <div class="settings-feature-section__header">
+          <button type="button" class="settings-feature-section__trigger" aria-expanded="true">
+            <span class="settings-feature-section__title">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i>
+              Virtualization features
+            </span>
+          </button>
+          <button type="button" class="pf-v6-c-button pf-m-secondary settings-feature-section__configure">Configure features</button>
+        </div>
+        <div class="settings-feature-section__panel">
+          <div class="cluster-settings">
+            <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline cluster-settings__nav">
+              <span class="pf-v6-c-button__icon pf-m-start">
+                <i class="fas fa-angle-left" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-button__text">General settings</span>
+            </button>
+
+            <div class="settings-accordion" role="presentation">
+          <div class="settings-accordion__item">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="false">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Live migration
+            </button>
+          </div>
+
+          <div class="settings-accordion__item is-expanded" id="memory-sharing-section">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="true">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Memory sharing policy
+            </button>
+            <div class="settings-accordion__panel">
+              <div class="settings-row">
+                <div>
+                  <p class="settings-row__label">
+                    Enable for this cluster
+                    <span class="settings-row__badge">New</span>
+                    <span class="help-popover-wrap">
+                      <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="enable-help-btn"
+                        aria-label="Enable memory sharing help" aria-expanded="false" aria-haspopup="dialog">
+                        <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
+                            <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
+                          </svg>
+                        </span>
+                      </button>
+                      <div class="help-popover" id="enable-help-popover" role="dialog" aria-label="Enable memory sharing">
+                        <p class="help-popover__body">When enabled, unused memory can be shared across VMs in this cluster. Disabling turns off sharing for the entire cluster. Under <em>memory pressure</em>, physical memory that is not reserved may be reclaimed.</p>
+                      </div>
+                    </span>
+                  </p>
+                  <p class="settings-row__desc">
+                    Turns memory sharing on or off for this cluster.
+                  </p>
+                </div>
+                <label class="pf-switch" aria-label="Enable memory sharing for this cluster">
+                  <input type="checkbox" id="cluster-sharing-toggle" checked />
+                  <span class="pf-switch__slider"></span>
+                </label>
+              </div>
+
+              <div class="sharing-enabled-panel" id="sharing-enabled-panel">
+              <div class="settings-subsection" id="memory-subsection">
+                <p class="pf-v6-c-form__helper-text memory-policy-helper" id="memory-policy-helper">
+                  Sets the cluster memory policy for all VMs. Running VMs apply the change after they reboot.
+                </p>
+                <form class="pf-v6-c-form" novalidate>
+
+                  <div class="memory-policy-stack">
+                  <fieldset class="memory-policy" id="memory-policy-fieldset" aria-labelledby="memory-policy-helper">
+                    <legend class="memory-policy__legend">Cluster memory policy</legend>
+
+                    <label class="memory-policy__option pf-m-selected" id="policy-shared-label">
+                      <input type="radio" name="memory-policy" value="shared" checked />
+                      <p class="memory-policy__title">Allow sharing <span class="memory-policy__default">(default)</span></p>
+                      <p class="memory-policy__desc">Unused memory can be shared across the cluster. Best for most workloads.</p>
+                    </label>
+
+                    <label class="memory-policy__option" id="policy-full-label">
+                      <input type="radio" name="memory-policy" value="full" />
+                      <p class="memory-policy__title">Reserve all memory</p>
+                      <p class="memory-policy__desc">Physical memory is held for each VM and not shared with others. For databases and latency-sensitive workloads.</p>
+                    </label>
+
+                    <label class="memory-policy__option" id="policy-custom-label">
+                      <input type="radio" name="memory-policy" value="custom" />
+                      <p class="memory-policy__title">Reserve a minimum</p>
+                      <p class="memory-policy__desc">A minimum amount is reserved for each VM; the rest may be shared under memory pressure.</p>
+                    </label>
+                  </fieldset>
+
+                  <div class="custom-reserve-wrap hidden" id="custom-reserve-wrap">
+                    <label class="pf-v6-c-form__label" for="vm-memory-reserved">
+                      <span class="pf-v6-c-form__label-text">Minimum reserved</span>
+                    </label>
+                    <div class="input-with-unit">
+                      <div class="pf-v6-c-form-control" id="vm-memory-reserved-control">
+                        <input class="pf-v6-c-form-control__input" type="number" id="vm-memory-reserved" value="8" min="0" aria-describedby="minimum-reserved-error" />
+                      </div>
+                      <div class="pf-v6-c-form-control pf-m-select">
+                        <select class="pf-v6-c-form-control__input" aria-label="Minimum reserved unit"><option>GiB</option></select>
+                      </div>
+                    </div>
+                    <p class="pf-v6-c-form__helper-text minimum-reserved-error hidden" id="minimum-reserved-error" role="alert">
+                      Exceeds available physical memory on eligible nodes.
+                    </p>
+                  </div>
+
+                  <div class="pf-v6-c-alert pf-m-danger pf-m-inline hidden" id="alert-error">
+                    <div class="pf-v6-c-alert__icon"><i class="fas fa-exclamation-circle" aria-hidden="true"></i></div>
+                    <div class="pf-v6-c-alert__content">
+                      <h4 class="pf-v6-c-alert__title">Exceeds available physical memory on eligible nodes</h4>
+                      <div class="pf-v6-c-alert__description" id="error-description"></div>
+                    </div>
+                  </div>
+                  </div>
+
+                </form>
+              </div>
+
+              <div class="settings-subsection kernel-subsection" id="kernel-subsection">
+                <div class="settings-row" id="ksm-row">
+                  <div>
+                    <p class="settings-row__label">
+                      Kernel Samepage Merging (KSM)
+                      <span class="settings-row__badge">New</span>
+                      <span class="help-popover-wrap">
+                        <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="ksm-help-btn"
+                          aria-label="Kernel Samepage Merging help" aria-expanded="false" aria-haspopup="dialog">
+                          <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
+                              <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
+                            </svg>
+                          </span>
+                        </button>
+                        <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
+                          <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
+                        </div>
+                      </span>
+                    </p>
+                    <p class="settings-row__desc" id="ksm-desc">
+                      Deduplicates identical memory pages across VMs to use physical memory more efficiently.
+                    </p>
+                  </div>
+                  <label class="pf-switch" aria-label="Kernel Samepage Merging">
+                    <input type="checkbox" id="cluster-ksm-toggle" />
+                    <span class="pf-switch__slider"></span>
+                  </label>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-accordion__item">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="false">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> SSH configurations
+            </button>
+          </div>
+          <div class="settings-accordion__item">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="false">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Templates and images management
+            </button>
+          </div>
+          <div class="settings-accordion__item">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="false">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> VirtualMachine actions confirmation
+            </button>
+          </div>
+          <div class="settings-accordion__item">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="false">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> YAML tab visibility
+            </button>
+          </div>
+          <div class="settings-accordion__item">
+            <button type="button" class="settings-accordion__trigger" aria-expanded="false">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Advanced CD-ROM features
+            </button>
+          </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-feature-section settings-feature-section--guest" id="guest-mgmt-section">
+        <div class="settings-feature-section__header">
+          <button type="button" class="settings-feature-section__trigger" aria-expanded="false">
+            <span class="settings-feature-section__title">
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i>
+              Guest management
+            </span>
+          </button>
+        </div>
+      </div>
+      </div>
+    </div>
+    </div>
+
+    <p class="designer-doc-link">
+      Designer reference: <a href="memory-overcommit-ux-doc.html">UX documentation</a> (not part of product UI)
+    </p>
+  </div>
+  </div>
+
+  <script>
+    const reserved = document.getElementById('vm-memory-reserved');
+    const reservedControl = document.getElementById('vm-memory-reserved-control');
+    const minimumReservedError = document.getElementById('minimum-reserved-error');
+    const policyRadios = document.querySelectorAll('input[name="memory-policy"]');
+    const customWrap = document.getElementById('custom-reserve-wrap');
+    const clusterSharingToggle = document.getElementById('cluster-sharing-toggle');
+    const clusterKsmToggle = document.getElementById('cluster-ksm-toggle');
+    const sharingEnabledPanel = document.getElementById('sharing-enabled-panel');
+    const policyLabels = {
+      shared: document.getElementById('policy-shared-label'),
+      full: document.getElementById('policy-full-label'),
+      custom: document.getElementById('policy-custom-label')
+    };
+
+    const AVAILABLE_RESERVED = 3;
+
+    let sharingEnabled = true;
+
+    function getPolicy() {
+      return document.querySelector('input[name="memory-policy"]:checked')?.value || 'shared';
+    }
+
+    function updateClusterSettingsState() {
+      sharingEnabled = clusterSharingToggle.checked;
+      sharingEnabledPanel.classList.toggle('hidden', !sharingEnabled);
+      if (!sharingEnabled) clusterKsmToggle.checked = false;
+
+      if (sharingEnabled) updateFormState();
+    }
+
+    function getDefaultMinimum() {
+      const policy = getPolicy();
+      if (policy === 'custom') return Number(reserved.value) || 0;
+      return 0;
+    }
+
+    function updateFormState() {
+      const policy = getPolicy();
+      const minRes = getDefaultMinimum();
+
+      Object.entries(policyLabels).forEach(([k, el]) => {
+        el.classList.toggle('pf-m-selected', k === policy);
+      });
+      customWrap.classList.toggle('hidden', policy !== 'custom');
+
+      const showError = policy === 'custom' && minRes > AVAILABLE_RESERVED;
+      document.getElementById('alert-error').classList.toggle('hidden', !showError);
+      minimumReservedError.classList.toggle('hidden', !showError);
+      reservedControl.classList.toggle('pf-m-error', showError);
+      reserved.setAttribute('aria-invalid', showError ? 'true' : 'false');
+
+      if (showError) {
+        document.getElementById('error-description').innerHTML =
+          'The minimum reserved (<strong>' + minRes + ' GiB</strong>) exceeds available physical memory (<strong>' +
+          AVAILABLE_RESERVED + ' GiB</strong>) on eligible nodes.';
+      }
+    }
+
+    reserved.addEventListener('input', updateFormState);
+    policyRadios.forEach(r => r.addEventListener('change', updateFormState));
+    clusterSharingToggle.addEventListener('change', updateClusterSettingsState);
+    clusterKsmToggle.addEventListener('change', () => {});
+
+    document.querySelectorAll('.settings-accordion__trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const item = trigger.closest('.settings-accordion__item');
+        const expanded = item.classList.toggle('is-expanded');
+        trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      });
+    });
+
+    document.querySelectorAll('.settings-feature-section__trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const section = trigger.closest('.settings-feature-section');
+        const expanded = section.classList.toggle('pf-m-expanded');
+        trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      });
+    });
+
+    function initHelpPopover(btnId, popoverId) {
+      const btn = document.getElementById(btnId);
+      const popover = document.getElementById(popoverId);
+      if (!btn || !popover) return;
+
+      function positionPopover() {
+        const rect = btn.getBoundingClientRect();
+        const popoverWidth = popover.offsetWidth || 360;
+        let left = rect.left + rect.width / 2 - popoverWidth / 2;
+        left = Math.max(16, Math.min(left, window.innerWidth - popoverWidth - 16));
+        popover.style.top = `${rect.bottom + 8}px`;
+        popover.style.left = `${left}px`;
+      }
+
+      function closePopover() {
+        popover.classList.remove('pf-m-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+
+      function openPopover() {
+        popover.classList.add('pf-m-open');
+        btn.setAttribute('aria-expanded', 'true');
+        requestAnimationFrame(positionPopover);
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        popover.classList.contains('pf-m-open') ? closePopover() : openPopover();
+      });
+    }
+
+    const helpPopovers = [
+      ['enable-help-btn', 'enable-help-popover'],
+      ['ksm-help-btn', 'ksm-help-popover']
+    ];
+    helpPopovers.forEach(([btnId, popoverId]) => initHelpPopover(btnId, popoverId));
+
+    document.addEventListener('click', (e) => {
+      helpPopovers.forEach(([btnId, popoverId]) => {
+        const btn = document.getElementById(btnId);
+        const popover = document.getElementById(popoverId);
+        if (!btn || !popover || !popover.classList.contains('pf-m-open')) return;
+        if (!popover.contains(e.target) && !btn.contains(e.target)) {
+          popover.classList.remove('pf-m-open');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      helpPopovers.forEach(([btnId, popoverId]) => {
+        const btn = document.getElementById(btnId);
+        const popover = document.getElementById(popoverId);
+        if (popover?.classList.contains('pf-m-open')) {
+          popover.classList.remove('pf-m-open');
+          btn?.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      helpPopovers.forEach(([btnId, popoverId]) => {
+        const btn = document.getElementById(btnId);
+        const popover = document.getElementById(popoverId);
+        if (popover?.classList.contains('pf-m-open')) {
+          const rect = btn.getBoundingClientRect();
+          const popoverWidth = popover.offsetWidth || 360;
+          let left = rect.left + rect.width / 2 - popoverWidth / 2;
+          left = Math.max(16, Math.min(left, window.innerWidth - popoverWidth - 16));
+          popover.style.top = `${rect.bottom + 8}px`;
+          popover.style.left = `${left}px`;
+        }
+      });
+    });
+
+    updateClusterSettingsState();
+  </script>
+</body>
+</html>
