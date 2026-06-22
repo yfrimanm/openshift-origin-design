@@ -234,10 +234,24 @@
       line-height: 1.5;
       max-width: 640px;
     }
-    .reservation-ratio-current {
-      margin: 0 0 16px;
+    .reservation-ratio-status {
+      margin: 0 0 8px;
       font-size: 14px;
-      font-weight: 600;
+      line-height: 1.5;
+    }
+    .reservation-ratio-status__target {
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .reservation-ratio-update-link {
+      margin: 0 0 16px;
+      padding: 0;
+      font-size: 14px;
+    }
+    .reservation-ratio-edit-panel {
+      max-width: 640px;
+      margin-top: 4px;
+      padding-top: 16px;
+      border-top: 1px solid var(--pf-t--global--border--color--default);
     }
     .reservation-ratio-form {
       max-width: 640px;
@@ -265,16 +279,11 @@
     .reservation-ratio-form .pf-v6-c-form-control.pf-m-error .pf-v6-c-form-control__input {
       border-color: var(--pf-t--global--border--color--status--danger--default, #c9190b);
     }
-    .reservation-ratio-applied {
-      margin: 16px 0 0;
-      font-size: 14px;
-      color: var(--pf-t--global--text--color--subtle);
-    }
-    .reservation-ratio-applied strong {
-      color: var(--pf-t--global--text--color--regular);
-    }
     .reservation-ratio-actions {
       margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .reservation-ratio-actions .pf-v6-c-button {
       border-radius: 9999px;
@@ -596,43 +605,50 @@
 
               <div class="reservation-config-panel" id="reservation-config-panel">
                 <p class="pf-v6-c-form__helper-text reservation-ratio-helper">
-                  <strong>Configured memory</strong> is what the guest OS sees. <strong>Reservation</strong> is the portion of configured memory reserved on the host. Applies to all VMs. Running VMs apply the change after they reboot.
+                  <strong>Configured memory</strong> is what the guest OS sees. <strong>Reservation</strong> is the portion of configured memory reserved on the host. Applies to all VMs. Running VMs apply the change after they reboot. Values are always <strong>0–100%</strong>.
                 </p>
 
-                <p class="reservation-ratio-current" id="current-ratio-label">
-                  Current reservation ratio: <strong id="current-ratio-value">25%</strong>
+                <p class="reservation-ratio-status" id="ratio-status-summary">
+                  Applied reservation ratio: <strong id="applied-ratio-value">20%</strong>
+                  <span class="reservation-ratio-status__target">(target <strong id="target-ratio-value">25%</strong>)</span>
+                </p>
+                <p class="pf-v6-c-form__helper-text reservation-ratio-helper" style="margin-top: -4px; margin-bottom: 12px;">
+                  When applied and target differ, the cluster is still rolling out the change — this is not an error.
                 </p>
 
-                <form class="pf-v6-c-form reservation-ratio-form" novalidate>
-                  <div class="pf-v6-c-form__group">
-                    <label class="pf-v6-c-form__label" for="reservation-ratio-input">
-                      <span class="pf-v6-c-form__label-text">Default reservation ratio</span>
-                    </label>
-                    <div class="input-with-unit">
-                      <div class="pf-v6-c-form-control" id="reservation-ratio-control">
-                        <input class="pf-v6-c-form-control__input" type="number" id="reservation-ratio-input"
-                          value="25" min="0" max="100" step="1" aria-describedby="ratio-field-helper ratio-field-error" />
+                <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline reservation-ratio-update-link" id="update-target-btn">
+                  Update target ratio
+                </button>
+
+                <div class="reservation-ratio-edit-panel hidden" id="ratio-edit-panel">
+                  <form class="pf-v6-c-form reservation-ratio-form" novalidate>
+                    <div class="pf-v6-c-form__group">
+                      <label class="pf-v6-c-form__label" for="reservation-ratio-input">
+                        <span class="pf-v6-c-form__label-text">Target reservation ratio</span>
+                      </label>
+                      <div class="input-with-unit">
+                        <div class="pf-v6-c-form-control" id="reservation-ratio-control">
+                          <input class="pf-v6-c-form-control__input" type="number" id="reservation-ratio-input"
+                            value="25" min="0" max="100" step="1" aria-describedby="ratio-field-helper ratio-field-error" />
+                        </div>
+                        <div class="pf-v6-c-form-control pf-m-unit">
+                          <span class="pf-v6-c-form-control__input">%</span>
+                        </div>
                       </div>
-                      <div class="pf-v6-c-form-control pf-m-unit">
-                        <span class="pf-v6-c-form-control__input">%</span>
-                      </div>
+                      <p class="pf-v6-c-form__helper-text" id="ratio-field-helper">
+                        Reservation as a percentage of configured memory. Enter a value from 0 to 100.
+                      </p>
+                      <p class="pf-v6-c-form__helper-text ratio-error hidden" id="ratio-field-error" role="alert">
+                        Enter a value from 0 to 100.
+                      </p>
                     </div>
-                    <p class="pf-v6-c-form__helper-text" id="ratio-field-helper">
-                      Reservation as a percentage of configured memory. Enter a value from 0 to 100.
-                    </p>
-                    <p class="pf-v6-c-form__helper-text ratio-error hidden" id="ratio-field-error" role="alert">
-                      Enter a value from 0 to 100.
-                    </p>
-                  </div>
 
-                  <p class="reservation-ratio-applied" id="applied-status">
-                    Reservation ratio applied: <strong id="applied-ratio-value">25%</strong> / <strong id="requested-ratio-value">25%</strong>
-                  </p>
-
-                  <div class="reservation-ratio-actions">
-                    <button type="button" class="pf-v6-c-button pf-m-primary" id="save-ratio-btn" disabled>Save</button>
-                  </div>
-                </form>
+                    <div class="reservation-ratio-actions">
+                      <button type="button" class="pf-v6-c-button pf-m-primary" id="save-ratio-btn" disabled>Save</button>
+                      <button type="button" class="pf-v6-c-button pf-m-secondary" id="cancel-ratio-btn">Cancel</button>
+                    </div>
+                  </form>
+                </div>
               </div>
 
               <div class="settings-subsection kernel-subsection" id="kernel-subsection">
@@ -726,14 +742,22 @@
     const ratioControl = document.getElementById('reservation-ratio-control');
     const ratioFieldError = document.getElementById('ratio-field-error');
     const saveRatioBtn = document.getElementById('save-ratio-btn');
+    const cancelRatioBtn = document.getElementById('cancel-ratio-btn');
+    const updateTargetBtn = document.getElementById('update-target-btn');
+    const ratioEditPanel = document.getElementById('ratio-edit-panel');
     const appliedRatioValue = document.getElementById('applied-ratio-value');
-    const requestedRatioValue = document.getElementById('requested-ratio-value');
-    const currentRatioValue = document.getElementById('current-ratio-value');
+    const targetRatioValue = document.getElementById('target-ratio-value');
 
-    let appliedRatio = 25;
+    let appliedRatio = 20;
+    let targetRatio = 25;
 
     function formatRatio(value) {
       return `${value}%`;
+    }
+
+    function renderRatioSummary() {
+      appliedRatioValue.textContent = formatRatio(appliedRatio);
+      targetRatioValue.textContent = formatRatio(targetRatio);
     }
 
     function getRequestedRatio() {
@@ -745,15 +769,23 @@
       return Number.isInteger(value) && value >= 0 && value <= 100;
     }
 
-    function updateReservationRatioState() {
-      const configureEnabled = configureRatioToggle.checked;
-      reservationConfigPanel.classList.toggle('hidden', !configureEnabled);
+    function openEditPanel() {
+      ratioInput.value = String(targetRatio);
+      ratioEditPanel.classList.remove('hidden');
+      updateTargetBtn.classList.add('hidden');
+      updateEditFormState();
+      ratioInput.focus();
+    }
 
-      if (!configureEnabled) {
-        saveRatioBtn.disabled = true;
-        return;
-      }
+    function closeEditPanel() {
+      ratioEditPanel.classList.add('hidden');
+      updateTargetBtn.classList.remove('hidden');
+      ratioFieldError.classList.add('hidden');
+      ratioControl.classList.remove('pf-m-error');
+      ratioInput.setAttribute('aria-invalid', 'false');
+    }
 
+    function updateEditFormState() {
       const requested = getRequestedRatio();
       const valid = isValidRatio(requested);
       const showError = ratioInput.value !== '' && !valid;
@@ -761,27 +793,38 @@
       ratioFieldError.classList.toggle('hidden', !showError);
       ratioControl.classList.toggle('pf-m-error', showError);
       ratioInput.setAttribute('aria-invalid', showError ? 'true' : 'false');
+      saveRatioBtn.disabled = !valid || requested === targetRatio;
+    }
 
-      if (valid) {
-        requestedRatioValue.textContent = formatRatio(requested);
+    function updateReservationRatioState() {
+      const configureEnabled = configureRatioToggle.checked;
+      reservationConfigPanel.classList.toggle('hidden', !configureEnabled);
+
+      if (!configureEnabled) {
+        closeEditPanel();
+        return;
       }
 
-      saveRatioBtn.disabled = !valid || requested === appliedRatio;
+      renderRatioSummary();
     }
 
     function saveReservationRatio() {
       const requested = getRequestedRatio();
       if (!isValidRatio(requested)) return;
-      appliedRatio = requested;
-      currentRatioValue.textContent = formatRatio(appliedRatio);
-      appliedRatioValue.textContent = formatRatio(appliedRatio);
-      requestedRatioValue.textContent = formatRatio(appliedRatio);
-      saveRatioBtn.disabled = true;
+      targetRatio = requested;
+      renderRatioSummary();
+      closeEditPanel();
+    }
+
+    function cancelEdit() {
+      closeEditPanel();
     }
 
     configureRatioToggle.addEventListener('change', updateReservationRatioState);
-    ratioInput.addEventListener('input', updateReservationRatioState);
+    ratioInput.addEventListener('input', updateEditFormState);
     saveRatioBtn.addEventListener('click', saveReservationRatio);
+    cancelRatioBtn.addEventListener('click', cancelEdit);
+    updateTargetBtn.addEventListener('click', openEditPanel);
     clusterKsmToggle.addEventListener('change', () => {});
 
     document.querySelectorAll('.settings-accordion__trigger').forEach(trigger => {
