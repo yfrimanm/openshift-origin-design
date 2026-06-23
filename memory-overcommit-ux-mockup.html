@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenShift Virtualization – Settings · Memory reservation ratio</title>
+  <title>OpenShift Virtualization – Settings · Memory request ratio</title>
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -227,7 +227,7 @@
       padding: 0;
     }
 
-    /* Reservation ratio — inline field + optional pending alert */
+    /* Request ratio — inline field */
     .reservation-config-panel {
       margin-top: 12px;
       max-width: 640px;
@@ -272,21 +272,29 @@
     .hidden { display: none !important; }
 
     .reservation-config-panel { padding-top: 0; }
-    .reservation-config-panel:not(.hidden) + .kernel-subsection,
-    .kernel-subsection {
-      padding-top: 16px;
-      border-top: 1px solid var(--pf-t--global--border--color--default);
-      margin-top: 16px;
+    #reservation-ratio-section.settings-accordion__item.is-expanded {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      overflow: visible;
+    }
+    #reservation-ratio-section .settings-accordion__panel {
+      padding-bottom: 8px;
     }
     #reservation-ratio-section .settings-accordion__panel > .settings-row {
       border-bottom: 0;
       padding-bottom: 0;
     }
-    .kernel-subsection .settings-row {
-      padding-top: 0;
+    .settings-standalone-row {
+      margin-left: 28px;
+      margin-top: 16px;
+      padding: 12px 16px 4px;
+      border-top: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .settings-standalone-row .settings-row {
+      padding: 14px 0;
       border-bottom: 0;
     }
-
     /* Cluster settings accordion */
     .cluster-settings { margin-bottom: 0; }
     .cluster-settings__nav {
@@ -352,13 +360,24 @@
     }
     .settings-row:last-child { border-bottom: 0; padding-bottom: 0; }
     .settings-row__label {
-      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-      font-size: 14px; font-weight: 600; margin: 0 0 4px;
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .settings-row__label-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+    .settings-row__label-text {
+      flex: 0 0 auto;
     }
     .settings-row__help {
       color: var(--pf-t--global--text--color--subtle); font-size: 13px; cursor: help;
     }
-    .help-popover-wrap { position: relative; display: inline-flex; vertical-align: middle; z-index: 1; }
     .settings-row__help-btn {
       padding: 0 2px;
       font-size: 13px;
@@ -366,6 +385,9 @@
       line-height: 1;
       position: relative;
       z-index: 2;
+      flex: 0 0 auto;
+      width: auto;
+      min-width: 0;
     }
     .rh-ui-icon-question-mark-circle {
       display: inline-flex;
@@ -408,11 +430,16 @@
       margin: 0;
       color: var(--pf-t--global--text--color--regular);
     }
+    .help-popover__body + .help-popover__body {
+      padding-top: 0;
+    }
     .settings-row__badge {
       font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
       color: var(--pf-t--global--color--brand--default);
       border: 1px solid var(--pf-t--global--color--brand--default);
       border-radius: 999px; padding: 1px 6px;
+      flex: 0 0 auto;
+      white-space: nowrap;
     }
     .settings-row__desc {
       margin: 0; font-size: 13px; color: var(--pf-t--global--text--color--subtle); line-height: 1.45; max-width: 520px;
@@ -426,24 +453,7 @@
       border-top: 1px solid var(--pf-t--global--border--color--default);
     }
 
-    /* PatternFly-style switch */
-    .pf-switch {
-      position: relative; display: inline-block; width: 44px; height: 22px; flex-shrink: 0;
-    }
-    .pf-switch input { opacity: 0; width: 0; height: 0; }
-    .pf-switch__slider {
-      position: absolute; inset: 0; cursor: pointer;
-      background: #b8bbbe; border-radius: 999px; transition: background .15s;
-    }
-    .pf-switch__slider::before {
-      content: ''; position: absolute; width: 18px; height: 18px; left: 2px; bottom: 2px;
-      background: #fff; border-radius: 50%; transition: transform .15s;
-      box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    }
-    .pf-switch input:checked + .pf-switch__slider { background: var(--pf-t--global--color--brand--default, #0066cc); }
-    .pf-switch input:checked + .pf-switch__slider::before { transform: translateX(22px); }
-    .pf-switch input:disabled + .pf-switch__slider { cursor: not-allowed; opacity: .6; }
-
+    /* PF6 switch — uses patternfly.min.css */
     .designer-doc-link {
       margin-top: 24px;
       padding-top: 16px;
@@ -546,32 +556,34 @@
 
           <div class="settings-accordion__item is-expanded" id="reservation-ratio-section">
             <button type="button" class="settings-accordion__trigger" aria-expanded="true">
-              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Memory reservation ratio
+              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Memory request ratio
             </button>
             <div class="settings-accordion__panel">
               <div class="settings-row">
                 <div>
-                  <p class="settings-row__label">
-                    Default reservation ratio
-                    <span class="settings-row__badge">New</span>
-                    <span class="help-popover-wrap">
+                  <div class="settings-row__label">
+                    <span class="settings-row__label-group">
+                      <span class="settings-row__label-text">Default request ratio</span>
                       <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="configure-help-btn"
-                        aria-label="Default reservation ratio help" aria-expanded="false" aria-haspopup="dialog">
+                        aria-label="Default request ratio help" aria-expanded="false" aria-haspopup="dialog">
                         <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
                             <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
                           </svg>
                         </span>
                       </button>
-                      <div class="help-popover" id="configure-help-popover" role="dialog" aria-label="Default reservation ratio">
-                        <p class="help-popover__body">The <strong>memory reservation ratio</strong> is the percentage of each VM's <strong>configured memory</strong> that is <strong>reserved</strong> on the cluster. This cluster-wide default applies to all VMs. Running VMs apply the change after they reboot.</p>
-                      </div>
+                      <span class="settings-row__badge">New</span>
                     </span>
-                  </p>
+                  </div>
                 </div>
-                <label class="pf-switch" aria-label="Enable custom reservation ratio for this cluster">
-                  <input type="checkbox" id="configure-ratio-toggle" checked />
-                  <span class="pf-switch__slider"></span>
+                <label class="pf-v6-c-switch" for="configure-ratio-toggle">
+                  <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="configure-ratio-toggle" checked
+                    aria-label="Enable custom request ratio for this cluster" />
+                  <span class="pf-v6-c-switch__toggle" aria-hidden="true">
+                    <span class="pf-v6-c-switch__toggle-icon">
+                      <i class="fas fa-check" aria-hidden="true"></i>
+                    </span>
+                  </span>
                 </label>
               </div>
 
@@ -590,7 +602,7 @@
                         <div class="pf-v6-c-input-group__item">
                           <span class="pf-v6-c-form-control" id="reservation-ratio-form-control">
                             <input class="pf-v6-c-form-control__input" type="number" id="reservation-ratio-input"
-                              value="25" min="0" max="100" step="1" aria-label="Default reservation ratio"
+                              value="25" min="0" max="100" step="1" aria-label="Default request ratio"
                               aria-describedby="ratio-field-error" />
                           </span>
                         </div>
@@ -613,37 +625,36 @@
                   </div>
                 </form>
               </div>
+            </div>
+          </div>
 
-              <div class="settings-subsection kernel-subsection" id="kernel-subsection">
-                <div class="settings-row" id="ksm-row">
-                  <div>
-                    <p class="settings-row__label">
-                      Kernel Samepage Merging (KSM)
-                      <span class="settings-row__badge">New</span>
-                      <span class="help-popover-wrap">
-                        <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="ksm-help-btn"
-                          aria-label="Kernel Samepage Merging help" aria-expanded="false" aria-haspopup="dialog">
-                          <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
-                              <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
-                            </svg>
-                          </span>
-                        </button>
-                        <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
-                          <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
-                        </div>
+          <div class="settings-standalone-row" id="ksm-section">
+            <div class="settings-row" id="ksm-row">
+              <div>
+                <div class="settings-row__label">
+                  <span class="settings-row__label-group">
+                    <span class="settings-row__label-text">Kernel Samepage Merging (KSM)</span>
+                    <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="ksm-help-btn"
+                      aria-label="Kernel Samepage Merging help" aria-expanded="false" aria-haspopup="dialog">
+                      <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
+                          <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
+                        </svg>
                       </span>
-                    </p>
-                    <p class="settings-row__desc" id="ksm-desc">
-                      Deduplicates identical memory pages across VMs to use physical memory more efficiently.
-                    </p>
-                  </div>
-                  <label class="pf-switch" aria-label="Kernel Samepage Merging">
-                    <input type="checkbox" id="cluster-ksm-toggle" />
-                    <span class="pf-switch__slider"></span>
-                  </label>
+                    </button>
+                    <span class="settings-row__badge">New</span>
+                  </span>
                 </div>
               </div>
+              <label class="pf-v6-c-switch" for="cluster-ksm-toggle">
+                <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="cluster-ksm-toggle"
+                  aria-label="Kernel Samepage Merging" />
+                <span class="pf-v6-c-switch__toggle" aria-hidden="true">
+                  <span class="pf-v6-c-switch__toggle-icon">
+                    <i class="fas fa-check" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
 
@@ -695,6 +706,15 @@
       Designer reference: <a href="memory-overcommit-ux-doc.html">UX documentation</a> (not part of product UI)
     </p>
   </div>
+  </div>
+
+  <div class="help-popover" id="configure-help-popover" role="dialog" aria-label="Default request ratio">
+    <p class="help-popover__body">The <strong>memory request ratio</strong> is how much of each VM's <strong>configured memory</strong> is <strong>requested</strong> on the cluster — <strong>requested ÷ configured</strong>, from <strong>0%</strong> to <strong>100%</strong>.</p>
+    <p class="help-popover__body"><strong>Configured memory</strong> is the VM's memory size. At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster; at <strong>100%</strong>, it requests the full configured amount.</p>
+    <p class="help-popover__body">This cluster-wide default applies to all VMs. Running VMs apply the change after they reboot.</p>
+  </div>
+  <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
+    <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
   </div>
 
   <script>
