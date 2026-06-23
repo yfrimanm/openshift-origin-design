@@ -262,6 +262,7 @@
     .reservation-ratio-actions {
       margin-top: 16px;
       display: flex;
+      align-items: center;
       gap: 12px;
       flex-wrap: wrap;
     }
@@ -280,19 +281,30 @@
     }
     #reservation-ratio-section .settings-accordion__panel {
       padding-bottom: 8px;
+      padding-top: 0;
     }
-    #reservation-ratio-section .settings-accordion__panel > .settings-row {
-      border-bottom: 0;
-      padding-bottom: 0;
+    .settings-accordion__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
     }
-    .settings-standalone-row {
-      margin-left: 28px;
-      margin-top: 16px;
-      padding: 12px 16px 4px;
-      border-top: 1px solid var(--pf-t--global--border--color--default);
+    .settings-accordion__header .settings-accordion__trigger {
+      flex: 0 1 auto;
+      width: auto;
+      padding: 0;
     }
-    .settings-standalone-row .settings-row {
-      padding: 14px 0;
+    .settings-accordion__header-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .settings-accordion__static-row {
+      padding: 10px 12px;
+    }
+    .settings-accordion__static-row .settings-row {
+      padding: 0;
       border-bottom: 0;
     }
     /* Cluster settings accordion */
@@ -344,6 +356,11 @@
       background: transparent;
       border-radius: 0;
       padding: 12px 16px;
+    }
+    #reservation-ratio-section.is-expanded > .settings-accordion__header .settings-accordion__trigger,
+    #reservation-ratio-section.is-expanded > .settings-accordion__header .settings-accordion__trigger:hover,
+    #reservation-ratio-section.is-expanded > .settings-accordion__header .settings-accordion__trigger:focus-visible {
+      padding: 0;
     }
     .settings-accordion__trigger i.chevron { font-size: 11px; color: var(--pf-t--global--text--color--subtle); transition: transform .15s; }
     .settings-accordion__item.is-expanded .settings-accordion__trigger i.chevron { transform: rotate(90deg); }
@@ -555,38 +572,23 @@
           </div>
 
           <div class="settings-accordion__item is-expanded" id="reservation-ratio-section">
-            <button type="button" class="settings-accordion__trigger" aria-expanded="true">
-              <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Memory request ratio
-            </button>
-            <div class="settings-accordion__panel">
-              <div class="settings-row">
-                <div>
-                  <div class="settings-row__label">
-                    <span class="settings-row__label-group">
-                      <span class="settings-row__label-text">Default request ratio</span>
-                      <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="configure-help-btn"
-                        aria-label="Default request ratio help" aria-expanded="false" aria-haspopup="dialog">
-                        <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
-                            <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
-                          </svg>
-                        </span>
-                      </button>
-                      <span class="settings-row__badge">New</span>
-                    </span>
-                  </div>
-                </div>
-                <label class="pf-v6-c-switch" for="configure-ratio-toggle">
-                  <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="configure-ratio-toggle" checked
-                    aria-label="Enable custom request ratio for this cluster" />
-                  <span class="pf-v6-c-switch__toggle" aria-hidden="true">
-                    <span class="pf-v6-c-switch__toggle-icon">
-                      <i class="fas fa-check" aria-hidden="true"></i>
-                    </span>
+            <div class="settings-accordion__header">
+              <button type="button" class="settings-accordion__trigger" aria-expanded="true">
+                <i class="fas fa-chevron-right chevron" aria-hidden="true"></i> Memory request ratio
+              </button>
+              <span class="settings-accordion__header-meta">
+                <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="configure-help-btn"
+                  aria-label="Memory request ratio help" aria-expanded="false" aria-haspopup="dialog">
+                  <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
+                      <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
+                    </svg>
                   </span>
-                </label>
-              </div>
-
+                </button>
+                <span class="settings-row__badge">New</span>
+              </span>
+            </div>
+            <div class="settings-accordion__panel">
               <div class="reservation-config-panel" id="reservation-config-panel">
                 <form class="pf-v6-c-form reservation-ratio-form" novalidate>
                   <div class="pf-v6-c-form__group">
@@ -602,7 +604,7 @@
                         <div class="pf-v6-c-input-group__item">
                           <span class="pf-v6-c-form-control" id="reservation-ratio-form-control">
                             <input class="pf-v6-c-form-control__input" type="number" id="reservation-ratio-input"
-                              value="25" min="0" max="100" step="1" aria-label="Default request ratio"
+                              value="97.5" min="0" max="100" step="0.1" aria-label="Memory request ratio"
                               aria-describedby="ratio-field-error" />
                           </span>
                         </div>
@@ -622,13 +624,14 @@
                   </div>
                   <div class="reservation-ratio-actions hidden" id="ratio-form-actions">
                     <button type="button" class="pf-v6-c-button pf-m-secondary" id="save-ratio-btn" disabled>Save</button>
+                    <button type="button" class="pf-v6-c-button pf-m-link" id="restore-ratio-default-btn">Restore default</button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
 
-          <div class="settings-standalone-row" id="ksm-section">
+          <div class="settings-accordion__static-row" id="ksm-section">
             <div class="settings-row" id="ksm-row">
               <div>
                 <div class="settings-row__label">
@@ -642,7 +645,6 @@
                         </svg>
                       </span>
                     </button>
-                    <span class="settings-row__badge">New</span>
                   </span>
                 </div>
               </div>
@@ -708,30 +710,30 @@
   </div>
   </div>
 
-  <div class="help-popover" id="configure-help-popover" role="dialog" aria-label="Default request ratio">
-    <p class="help-popover__body">The <strong>memory request ratio</strong> is how much of each VM's <strong>configured memory</strong> is <strong>requested</strong> on the cluster — <strong>requested ÷ configured</strong>, from <strong>0%</strong> to <strong>100%</strong>.</p>
+  <div class="help-popover" id="configure-help-popover" role="dialog" aria-label="Memory request ratio">
+    <p class="help-popover__body">The <strong>memory request ratio</strong> is the <strong>percentage of</strong> each VM's <strong>configured memory</strong> that is <strong>requested</strong> on the cluster (<strong>requested ÷ configured</strong>, <strong>0–100%</strong>).</p>
     <p class="help-popover__body"><strong>Configured memory</strong> is the VM's memory size. At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster; at <strong>100%</strong>, it requests the full configured amount.</p>
-    <p class="help-popover__body">This cluster-wide default applies to all VMs. Running VMs apply the change after they reboot.</p>
+    <p class="help-popover__body">This setting sets the cluster-wide default ratio for all VMs. Running VMs apply the change after they reboot.</p>
   </div>
   <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
     <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
   </div>
 
   <script>
-    const configureRatioToggle = document.getElementById('configure-ratio-toggle');
-    const reservationConfigPanel = document.getElementById('reservation-config-panel');
-    const clusterKsmToggle = document.getElementById('cluster-ksm-toggle');
     const ratioInput = document.getElementById('reservation-ratio-input');
+    const clusterKsmToggle = document.getElementById('cluster-ksm-toggle');
     const ratioControl = document.getElementById('reservation-ratio-control');
     const ratioFormControl = document.getElementById('reservation-ratio-form-control');
     const ratioMinusBtn = document.getElementById('ratio-minus-btn');
     const ratioPlusBtn = document.getElementById('ratio-plus-btn');
     const ratioFieldError = document.getElementById('ratio-field-error');
     const saveRatioBtn = document.getElementById('save-ratio-btn');
+    const restoreRatioDefaultBtn = document.getElementById('restore-ratio-default-btn');
     const ratioFormActions = document.getElementById('ratio-form-actions');
 
-    let targetRatio = 25;
-    let ratioDirty = false;
+    const RATIO_STEP = 0.1;
+    const DEFAULT_RATIO = 97.5;
+    let targetRatio = DEFAULT_RATIO;
 
     function getRequestedRatio() {
       const value = Number(ratioInput.value);
@@ -739,7 +741,8 @@
     }
 
     function isValidRatio(value) {
-      return Number.isInteger(value) && value >= 0 && value <= 100;
+      if (!Number.isFinite(value) || value < 0 || value > 100) return false;
+      return Math.abs(Math.round(value * 10) / 10 - value) < 1e-9;
     }
 
     function updateThresholdButtons() {
@@ -751,7 +754,7 @@
     }
 
     function setRatioInputValue(value) {
-      ratioInput.value = String(value);
+      ratioInput.value = String(Math.round(value * 10) / 10);
       updateRatioFormState();
     }
 
@@ -759,9 +762,7 @@
       const requested = getRequestedRatio();
       const valid = isValidRatio(requested);
       const showError = ratioInput.value !== '' && !valid;
-      const hasChanges = valid && requested !== targetRatio;
-
-      ratioDirty = ratioInput.value !== '' && requested !== targetRatio;
+      const hasChanges = valid && Math.abs(requested - targetRatio) > 1e-9;
 
       ratioFieldError.classList.toggle('hidden', !showError);
       ratioFormControl.classList.toggle('pf-m-error', showError);
@@ -772,49 +773,28 @@
       updateThresholdButtons();
     }
 
-    function updateReservationRatioState() {
-      const configureEnabled = configureRatioToggle.checked;
-      reservationConfigPanel.classList.toggle('hidden', !configureEnabled);
-      ratioInput.disabled = !configureEnabled;
-      ratioMinusBtn.disabled = !configureEnabled;
-      ratioPlusBtn.disabled = !configureEnabled;
-
-      if (!configureEnabled) {
-        ratioDirty = false;
-        ratioFormActions.classList.add('hidden');
-        ratioInput.value = String(targetRatio);
-        return;
-      }
-
-      if (!ratioDirty) {
-        ratioInput.value = String(targetRatio);
-      }
-      updateRatioFormState();
-    }
-
     function saveReservationRatio() {
       const requested = getRequestedRatio();
       if (!isValidRatio(requested)) return;
       targetRatio = requested;
-      ratioDirty = false;
       ratioFormActions.classList.add('hidden');
     }
 
-    configureRatioToggle.addEventListener('change', updateReservationRatioState);
     ratioInput.addEventListener('input', updateRatioFormState);
     ratioMinusBtn.addEventListener('click', () => {
       const current = getRequestedRatio();
       if (Number.isFinite(current) && current > 0) {
-        setRatioInputValue(current - 1);
+        setRatioInputValue(Math.max(0, Math.round((current - RATIO_STEP) * 10) / 10));
       }
     });
     ratioPlusBtn.addEventListener('click', () => {
       const current = getRequestedRatio();
       if (Number.isFinite(current) && current < 100) {
-        setRatioInputValue(current + 1);
+        setRatioInputValue(Math.min(100, Math.round((current + RATIO_STEP) * 10) / 10));
       }
     });
     saveRatioBtn.addEventListener('click', saveReservationRatio);
+    restoreRatioDefaultBtn.addEventListener('click', () => setRatioInputValue(DEFAULT_RATIO));
     clusterKsmToggle.addEventListener('change', () => {});
 
     document.querySelectorAll('.settings-accordion__trigger').forEach(trigger => {
@@ -910,7 +890,7 @@
       });
     });
 
-    updateReservationRatioState();
+    updateRatioFormState();
   </script>
 </body>
 </html>
