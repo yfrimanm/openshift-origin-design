@@ -839,8 +839,10 @@
       red: { label: 'High overcommit risk' },
     };
     let targetRatio = DEFAULT_RATIO;
+    let ratioFieldTouched = false;
 
     function getRequestedRatio() {
+      if (ratioInput.value.trim() === '') return NaN;
       const value = Number(ratioInput.value);
       return Number.isFinite(value) ? value : NaN;
     }
@@ -884,9 +886,10 @@
     }
 
     function updateRatioFormState() {
+      const isEmpty = ratioInput.value.trim() === '';
       const requested = getRequestedRatio();
       const valid = isValidRatio(requested);
-      const showError = ratioInput.value !== '' && !valid;
+      const showError = (isEmpty && ratioFieldTouched) || (!isEmpty && !valid);
       const hasChanges = valid && Math.abs(requested - targetRatio) > 1e-9;
 
       ratioFieldError.classList.toggle('hidden', !showError);
@@ -906,7 +909,10 @@
       ratioFormActions.classList.add('hidden');
     }
 
-    ratioInput.addEventListener('input', updateRatioFormState);
+    ratioInput.addEventListener('input', () => {
+      ratioFieldTouched = true;
+      updateRatioFormState();
+    });
     ratioMinusBtn.addEventListener('click', () => {
       const current = getRequestedRatio();
       if (Number.isFinite(current) && current > 0) {
