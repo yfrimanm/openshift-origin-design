@@ -259,8 +259,11 @@
     .reservation-ratio-form .pf-v6-c-form-control.pf-m-error .pf-v6-c-form-control__input {
       border-color: var(--pf-t--global--border--color--status--danger--default, #c9190b);
     }
+    .reservation-ratio-form .pf-v6-c-form__group {
+      margin-bottom: 0;
+    }
     .reservation-ratio-actions {
-      margin-top: 16px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -691,10 +694,10 @@
                       <span class="ratio-level-indicator__dot" aria-hidden="true"></span>
                       <span id="ratio-level-label">Recommended</span>
                     </p>
-                  </div>
-                  <div class="reservation-ratio-actions hidden" id="ratio-form-actions">
-                    <button type="button" class="pf-v6-c-button pf-m-secondary" id="save-ratio-btn" disabled>Save</button>
-                    <button type="button" class="pf-v6-c-button pf-m-link" id="restore-ratio-default-btn">Restore default</button>
+                    <div class="reservation-ratio-actions hidden" id="ratio-form-actions">
+                      <button type="button" class="pf-v6-c-button pf-m-secondary" id="save-ratio-btn" disabled>Save</button>
+                      <button type="button" class="pf-v6-c-button pf-m-link" id="restore-ratio-default-btn">Restore default</button>
+                    </div>
                   </div>
                 </form>
               </div>
