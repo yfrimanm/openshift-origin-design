@@ -439,7 +439,7 @@
     .help-popover {
       display: none;
       position: fixed;
-      width: min(360px, calc(100vw - 32px));
+      width: min(400px, calc(100vw - 32px));
       background: #fff;
       border: 1px solid var(--pf-t--global--border--color--default);
       border-radius: var(--pf-t--global--border--radius--medium);
@@ -448,6 +448,7 @@
       font-size: 13px;
       line-height: 1.5;
       font-weight: 400;
+      overflow: hidden;
     }
     .help-popover.pf-m-open { display: block; }
     .help-popover::after {
@@ -460,13 +461,64 @@
       border-bottom-color: #fff;
       filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, .12));
     }
-    .help-popover__body {
-      padding: 12px 14px;
+    .help-popover__section {
+      padding: 12px 16px;
+    }
+    .help-popover__heading {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .help-popover__text {
       margin: 0;
       color: var(--pf-t--global--text--color--regular);
     }
-    .help-popover__body + .help-popover__body {
-      padding-top: 0;
+    .help-popover__text + .help-popover__text {
+      margin-top: 12px;
+    }
+    .help-popover__levels-block {
+      margin-top: 16px;
+    }
+    .help-popover__levels {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .help-popover__level {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .help-popover__level-dot {
+      width: 10px;
+      height: 10px;
+      margin-top: 4px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .help-popover__level-dot--green { background: #3e8635; }
+    .help-popover__level-dot--yellow { background: #f0ab00; }
+    .help-popover__level-dot--red { background: #b1380b; }
+    .help-popover__level-title {
+      font-weight: 600;
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .help-popover__level-range {
+      font-weight: 400;
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .help-popover__level-desc {
+      margin: 2px 0 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .help-popover__body {
+      padding: 12px 16px;
+      margin: 0;
+      color: var(--pf-t--global--text--color--regular);
     }
     .help-popover__list {
       margin: 0;
@@ -726,15 +778,37 @@
   </div>
 
   <div class="help-popover" id="configure-help-popover" role="dialog" aria-label="Memory request ratio">
-    <p class="help-popover__body">The <strong>memory request ratio</strong> is the <strong>percentage of</strong> each VM's <strong>configured memory</strong> that is <strong>requested</strong> on the cluster (<strong>requested ÷ configured</strong>, <strong>0–100%</strong>).</p>
-    <p class="help-popover__body"><strong>Configured memory</strong> is the VM's memory size. At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster; at <strong>100%</strong>, it requests the full configured amount.</p>
-    <p class="help-popover__body">This setting sets the cluster-wide default ratio for all VMs. Running VMs apply the change after they reboot.</p>
-    <p class="help-popover__body"><strong>Ratio levels</strong> (shown below the field for valid values):</p>
-    <ul class="help-popover__list">
-      <li><strong>Green — 75% and above:</strong> Recommended. Requests most of each VM's configured memory on the cluster.</li>
-      <li><strong>Yellow — 50% to 74.9%:</strong> Use with caution. Moderate overcommit; monitor cluster memory pressure.</li>
-      <li><strong>Red — below 50%:</strong> High overcommit risk. Each VM requests less than half of its configured memory.</li>
-    </ul>
+    <div class="help-popover__section">
+      <p class="help-popover__text">The <strong>memory request ratio</strong> is the percentage of each VM's <strong>configured memory</strong> that is <strong>requested</strong> on the cluster (requested ÷ configured), on a 0–100% range.</p>
+      <p class="help-popover__text">At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster. At <strong>100%</strong>, it requests the full configured amount.</p>
+      <p class="help-popover__text">This setting is the cluster-wide default for all VMs. Running VMs apply the change after they reboot.</p>
+      <div class="help-popover__levels-block">
+        <h3 class="help-popover__heading">Ratio levels</h3>
+        <div class="help-popover__levels">
+          <div class="help-popover__level">
+            <span class="help-popover__level-dot help-popover__level-dot--green" aria-hidden="true"></span>
+            <div>
+              <div class="help-popover__level-title">Recommended <span class="help-popover__level-range">(75% and above)</span></div>
+              <p class="help-popover__level-desc">Requests most of each VM's configured memory on the cluster.</p>
+            </div>
+          </div>
+          <div class="help-popover__level">
+            <span class="help-popover__level-dot help-popover__level-dot--yellow" aria-hidden="true"></span>
+            <div>
+              <div class="help-popover__level-title">Use with caution <span class="help-popover__level-range">(50% to 74.9%)</span></div>
+              <p class="help-popover__level-desc">Moderate overcommit. Monitor cluster memory pressure.</p>
+            </div>
+          </div>
+          <div class="help-popover__level">
+            <span class="help-popover__level-dot help-popover__level-dot--red" aria-hidden="true"></span>
+            <div>
+              <div class="help-popover__level-title">High overcommit risk <span class="help-popover__level-range">(below 50%)</span></div>
+              <p class="help-popover__level-desc">Each VM requests less than half of its configured memory.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
     <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
@@ -870,7 +944,7 @@
 
       function positionPopover() {
         const rect = btn.getBoundingClientRect();
-        const popoverWidth = popover.offsetWidth || 360;
+        const popoverWidth = popover.offsetWidth || 400;
         let left = rect.left + rect.width / 2 - popoverWidth / 2;
         left = Math.max(16, Math.min(left, window.innerWidth - popoverWidth - 16));
         popover.style.top = `${rect.bottom + 8}px`;
@@ -931,7 +1005,7 @@
         const popover = document.getElementById(popoverId);
         if (popover?.classList.contains('pf-m-open')) {
           const rect = btn.getBoundingClientRect();
-          const popoverWidth = popover.offsetWidth || 360;
+          const popoverWidth = popover.offsetWidth || 400;
           let left = rect.left + rect.width / 2 - popoverWidth / 2;
           left = Math.max(16, Math.min(left, window.innerWidth - popoverWidth - 16));
           popover.style.top = `${rect.bottom + 8}px`;
