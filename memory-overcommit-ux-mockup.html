@@ -269,6 +269,24 @@
     .reservation-ratio-actions .pf-v6-c-button {
       border-radius: 9999px;
     }
+    .ratio-level-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .ratio-level-indicator.hidden { display: none; }
+    .ratio-level-indicator__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .ratio-level-indicator--green .ratio-level-indicator__dot { background: #3e8635; }
+    .ratio-level-indicator--yellow .ratio-level-indicator__dot { background: #f0ab00; }
+    .ratio-level-indicator--red .ratio-level-indicator__dot { background: #b1380b; }
 
     .hidden { display: none !important; }
 
@@ -450,6 +468,14 @@
     .help-popover__body + .help-popover__body {
       padding-top: 0;
     }
+    .help-popover__list {
+      margin: 0;
+      padding: 0 14px 12px 30px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .help-popover__list li + li { margin-top: 6px; }
     .settings-row__badge {
       font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
       color: var(--pf-t--global--color--brand--default);
@@ -609,6 +635,10 @@
                     <p class="pf-v6-c-form__helper-text ratio-error hidden" id="ratio-field-error" role="alert">
                       Enter a value from 0 to 100.
                     </p>
+                    <p class="ratio-level-indicator ratio-level-indicator--green hidden" id="ratio-level-indicator" aria-live="polite">
+                      <span class="ratio-level-indicator__dot" aria-hidden="true"></span>
+                      <span id="ratio-level-label">Recommended</span>
+                    </p>
                   </div>
                   <div class="reservation-ratio-actions hidden" id="ratio-form-actions">
                     <button type="button" class="pf-v6-c-button pf-m-secondary" id="save-ratio-btn" disabled>Save</button>
@@ -699,6 +729,12 @@
     <p class="help-popover__body">The <strong>memory request ratio</strong> is the <strong>percentage of</strong> each VM's <strong>configured memory</strong> that is <strong>requested</strong> on the cluster (<strong>requested ÷ configured</strong>, <strong>0–100%</strong>).</p>
     <p class="help-popover__body"><strong>Configured memory</strong> is the VM's memory size. At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster; at <strong>100%</strong>, it requests the full configured amount.</p>
     <p class="help-popover__body">This setting sets the cluster-wide default ratio for all VMs. Running VMs apply the change after they reboot.</p>
+    <p class="help-popover__body"><strong>Ratio levels</strong> (shown below the field for valid values):</p>
+    <ul class="help-popover__list">
+      <li><strong>Green — 75% and above:</strong> Recommended. Requests most of each VM's configured memory on the cluster.</li>
+      <li><strong>Yellow — 50% to 74.9%:</strong> Use with caution. Moderate overcommit; monitor cluster memory pressure.</li>
+      <li><strong>Red — below 50%:</strong> High overcommit risk. Each VM requests less than half of its configured memory.</li>
+    </ul>
   </div>
   <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
     <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
@@ -715,9 +751,16 @@
     const saveRatioBtn = document.getElementById('save-ratio-btn');
     const restoreRatioDefaultBtn = document.getElementById('restore-ratio-default-btn');
     const ratioFormActions = document.getElementById('ratio-form-actions');
+    const ratioLevelIndicator = document.getElementById('ratio-level-indicator');
+    const ratioLevelLabel = document.getElementById('ratio-level-label');
 
     const RATIO_STEP = 0.1;
     const DEFAULT_RATIO = 97.5;
+    const RATIO_LEVELS = {
+      green: { min: 75, label: 'Recommended' },
+      yellow: { min: 50, label: 'Use with caution' },
+      red: { label: 'High overcommit risk' },
+    };
     let targetRatio = DEFAULT_RATIO;
 
     function getRequestedRatio() {
@@ -728,6 +771,26 @@
     function isValidRatio(value) {
       if (!Number.isFinite(value) || value < 0 || value > 100) return false;
       return Math.abs(Math.round(value * 10) / 10 - value) < 1e-9;
+    }
+
+    function getRatioLevel(value) {
+      if (value >= RATIO_LEVELS.green.min) return 'green';
+      if (value >= RATIO_LEVELS.yellow.min) return 'yellow';
+      return 'red';
+    }
+
+    function updateRatioLevelIndicator() {
+      if (!ratioLevelIndicator || !ratioLevelLabel) return;
+      const requested = getRequestedRatio();
+      const valid = isValidRatio(requested);
+      if (!valid) {
+        ratioLevelIndicator.classList.add('hidden');
+        return;
+      }
+      const level = getRatioLevel(requested);
+      ratioLevelIndicator.classList.remove('hidden', 'ratio-level-indicator--green', 'ratio-level-indicator--yellow', 'ratio-level-indicator--red');
+      ratioLevelIndicator.classList.add(`ratio-level-indicator--${level}`);
+      ratioLevelLabel.textContent = RATIO_LEVELS[level].label;
     }
 
     function updateThresholdButtons() {
@@ -756,6 +819,7 @@
       ratioFormActions.classList.toggle('hidden', !hasChanges);
       saveRatioBtn.disabled = !hasChanges;
       updateThresholdButtons();
+      updateRatioLevelIndicator();
     }
 
     function saveReservationRatio() {
@@ -781,6 +845,7 @@
     saveRatioBtn.addEventListener('click', saveReservationRatio);
     restoreRatioDefaultBtn.addEventListener('click', () => setRatioInputValue(DEFAULT_RATIO));
     clusterKsmToggle.addEventListener('change', () => {});
+    updateRatioFormState();
 
     document.querySelectorAll('.settings-accordion__trigger').forEach(trigger => {
       trigger.addEventListener('click', () => {
