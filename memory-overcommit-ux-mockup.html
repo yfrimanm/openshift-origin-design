@@ -263,6 +263,10 @@
       margin-bottom: 0;
     }
     .ratio-current-setting {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
       margin: 0 0 12px;
       font-size: 13px;
       line-height: 1.4;
@@ -273,12 +277,6 @@
     }
     .ratio-current-setting__value {
       font-weight: 600;
-    }
-    .ratio-current-setting__note {
-      margin: 4px 0 0;
-      font-size: 12px;
-      line-height: 1.45;
-      color: var(--pf-t--global--text--color--subtle);
     }
     .reservation-ratio-actions {
       margin-top: 8px;
@@ -706,8 +704,15 @@
                     <p class="ratio-current-setting" id="ratio-current-setting">
                       <span class="ratio-current-setting__label">Current saved ratio:</span>
                       <span class="ratio-current-setting__value" id="ratio-current-value">97.5%</span>
+                      <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="saved-ratio-help-btn"
+                        aria-label="Current saved ratio help" aria-expanded="false" aria-haspopup="dialog">
+                        <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
+                            <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
+                          </svg>
+                        </span>
+                      </button>
                     </p>
-                    <p class="ratio-current-setting__note">Updates when you save. Running VMs apply the change after they reboot or migrate.</p>
                     <div class="pf-v6-c-number-input" id="reservation-ratio-control">
                       <div class="pf-v6-c-input-group">
                         <div class="pf-v6-c-input-group__item">
@@ -876,6 +881,9 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="help-popover" id="saved-ratio-help-popover" role="dialog" aria-label="Current saved ratio">
+    <p class="help-popover__body">Updates when you save. Running VMs apply the change after they reboot or migrate.</p>
   </div>
   <div class="help-popover" id="ksm-help-popover" role="dialog" aria-label="Kernel Samepage Merging">
     <p class="help-popover__body">KSM is a memory-saving deduplication feature designed to fit more VMs into physical memory by sharing the data common between them. It is specifically effective for similar VMs. KSM should only be used with trusted workloads. Turning this feature on enables it for all nodes in the cluster.</p>
@@ -1091,9 +1099,11 @@
 
     const helpPopovers = [
       ['configure-help-btn', 'configure-help-popover'],
+      ['saved-ratio-help-btn', 'saved-ratio-help-popover'],
       ['ksm-help-btn', 'ksm-help-popover']
     ];
     const positionConfigurePopover = initHelpPopover('configure-help-btn', 'configure-help-popover');
+    initHelpPopover('saved-ratio-help-btn', 'saved-ratio-help-popover');
     initHelpPopover('ksm-help-btn', 'ksm-help-popover');
     initRatioLevelsAccordion(positionConfigurePopover);
 
