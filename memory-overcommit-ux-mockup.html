@@ -262,6 +262,18 @@
     .reservation-ratio-form .pf-v6-c-form__group {
       margin-bottom: 0;
     }
+    .ratio-current-setting {
+      margin: 0 0 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .ratio-current-setting__label {
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .ratio-current-setting__value {
+      font-weight: 600;
+    }
     .reservation-ratio-actions {
       margin-top: 8px;
       display: flex;
@@ -685,6 +697,10 @@
               <div class="reservation-config-panel" id="reservation-config-panel">
                 <form class="pf-v6-c-form reservation-ratio-form" novalidate>
                   <div class="pf-v6-c-form__group">
+                    <p class="ratio-current-setting" id="ratio-current-setting">
+                      <span class="ratio-current-setting__label">Current setting:</span>
+                      <span class="ratio-current-setting__value" id="ratio-current-value">97.5%</span>
+                    </p>
                     <div class="pf-v6-c-number-input" id="reservation-ratio-control">
                       <div class="pf-v6-c-input-group">
                         <div class="pf-v6-c-input-group__item">
@@ -871,6 +887,7 @@
     const ratioFormActions = document.getElementById('ratio-form-actions');
     const ratioLevelIndicator = document.getElementById('ratio-level-indicator');
     const ratioLevelLabel = document.getElementById('ratio-level-label');
+    const ratioCurrentValue = document.getElementById('ratio-current-value');
 
     const RATIO_STEP = 0.1;
     const DEFAULT_RATIO = 97.5;
@@ -926,6 +943,16 @@
       updateRatioFormState();
     }
 
+    function formatRatioPercent(value) {
+      return `${Math.round(value * 10) / 10}%`;
+    }
+
+    function updateCurrentSettingDisplay() {
+      if (ratioCurrentValue) {
+        ratioCurrentValue.textContent = formatRatioPercent(targetRatio);
+      }
+    }
+
     function updateRatioFormState() {
       const isEmpty = ratioInput.value.trim() === '';
       const requested = getRequestedRatio();
@@ -947,7 +974,8 @@
       const requested = getRequestedRatio();
       if (!isValidRatio(requested)) return;
       targetRatio = requested;
-      ratioFormActions.classList.add('hidden');
+      updateCurrentSettingDisplay();
+      updateRatioFormState();
     }
 
     ratioInput.addEventListener('input', () => {
@@ -969,6 +997,7 @@
     saveRatioBtn.addEventListener('click', saveReservationRatio);
     restoreRatioDefaultBtn.addEventListener('click', () => setRatioInputValue(DEFAULT_RATIO));
     clusterKsmToggle.addEventListener('change', () => {});
+    updateCurrentSettingDisplay();
     updateRatioFormState();
 
     document.querySelectorAll('.settings-accordion__trigger').forEach(trigger => {
