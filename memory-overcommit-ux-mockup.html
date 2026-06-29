@@ -274,6 +274,12 @@
     .ratio-current-setting__value {
       font-weight: 600;
     }
+    .ratio-current-setting__note {
+      margin: 4px 0 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--pf-t--global--text--color--subtle);
+    }
     .reservation-ratio-actions {
       margin-top: 8px;
       display: flex;
@@ -701,6 +707,7 @@
                       <span class="ratio-current-setting__label">Current saved ratio:</span>
                       <span class="ratio-current-setting__value" id="ratio-current-value">97.5%</span>
                     </p>
+                    <p class="ratio-current-setting__note">Updates when you save. Running VMs apply the change after they reboot or migrate.</p>
                     <div class="pf-v6-c-number-input" id="reservation-ratio-control">
                       <div class="pf-v6-c-input-group">
                         <div class="pf-v6-c-input-group__item">
