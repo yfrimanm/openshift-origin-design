@@ -31,24 +31,24 @@ We are replacing the existing **Memory density** with **Memory request ratio**. 
 
 We are replacing the slider with a **PF6 Number input with unit** (− / numeric field / + / **%**). The ratio is always enabled — no on/off toggle. **?** and **New** appear on the accordion title (**Memory request ratio**). Two distinct values appear inside the accordion:
 
-1. **Applied ratio** — read-only, live cluster calculation (may differ from saved)
+1. **Active ratio** — read-only, live cluster calculation (may differ from saved)
 2. **Saved ratio** — editable cluster default (Save / Restore default)
 
 Full concept context is in the accordion **?** help popover.
 
-### Applied ratio
+### Active ratio
 
 Show the **live cluster ratio** above the saved-ratio control:
 
-**Applied ratio: 94.2%** **[?]**
+**Active ratio: 94.2%** **[?]**
 
 - **Read-only** — calculated across VMs on the cluster in real time
 - Reflects active workload and resource availability; may differ from **Saved ratio** when the cluster has headroom (overcommit behavior intensifies under load)
 - Updates from the backend (static **94.2%** in the mockup to show it can differ from saved **97.5%**)
 
-**Applied ratio ? popover:**
+**Active ratio ? popover:**
 
-> The actual real-time memory ratio currently calculated across all VMs on the cluster. This fluctuates based on active system load and resource availability.
+> The memory request ratio currently calculated across all VMs on this cluster. It reflects active workload and resource availability and may differ from your saved ratio.
 
 ### Saved ratio
 
@@ -103,7 +103,7 @@ When the value has been edited, **Restore default** (link button) appears to the
 | **?** mentions swap / higher density | **?** defines request ratio vs configured memory |
 | Percentage slider (can exceed 100%) | **PF6 Number input with unit**, **0–100%** only |
 | VMware-style *reservation* framing | Kubernetes-style **request** framing |
-| Opaque density percentage | **Applied ratio** readout + **Saved ratio** input; default **97.5%**; **Restore default** link; traffic-light ratio levels |
+| Opaque density percentage | **Active ratio** readout + **Saved ratio** input; default **97.5%**; **Restore default** link; traffic-light ratio levels |
 
 ## Why this terminology
 
@@ -130,7 +130,7 @@ Avoid *memory density*, *overcommit*, *reservation*, and swap/density framing in
 ### Minimal surface area
 
 - Accordion title **Memory request ratio** + **?** defines the concept
-- **Applied ratio** readout (live) and **Saved ratio** label + input (user setting) — two distinct values
+- **Active ratio** readout (live) and **Saved ratio** label + input (user setting) — two distinct values
 - No always-visible range helper under the input — the **%** unit and min/max imply the range
 - Colored **ratio level** indicator (dot + label) below the **Saved ratio** input for valid values
 - No rollout progress bar or per-VM applied-status dashboard
@@ -139,7 +139,7 @@ Avoid *memory density*, *overcommit*, *reservation*, and swap/density framing in
 
 ```
 Memory request ratio  [New] [?]               [accordion, expanded]
-└── Applied ratio: 94.2%  [?]                [read-only; live cluster value]
+└── Active ratio: 94.2%  [?]                [read-only; live cluster value]
     Saved ratio  [?]                           [label for editable control]
     [−] [ 97.5 ] [+] %                         [PF6 Number input with unit]
     ● Recommended                               [traffic-light level; valid values only]
@@ -153,7 +153,7 @@ Kernel Samepage Merging (KSM)  [?]            [toggle; left-aligned with accordi
 1. **Default** — mockup loads at **97.5%** (product default).
 2. **Edit value** — type or use **−** / **+** (**0.1%** steps, min **0**, max **100**).
 3. **Save** — secondary button appears only when **Saved ratio** differs from the last saved setting.
-4. **Rollout** — running VMs apply the saved ratio after reboot or migrate; **Applied ratio** may differ until load increases.
+4. **Rollout** — running VMs apply the saved ratio after reboot or migrate; **Active ratio** may differ until load increases.
 5. **Restore default** — link button appears with **Save**; resets the field to **97.5%**.
 
 ### Component
@@ -172,7 +172,7 @@ Use **PatternFly 6 Number input with unit** (`pf-v6-c-number-input`):
 | **Configured memory** | The VM's memory size |
 | **Memory request** | Portion of configured memory requested on the cluster |
 | **Memory request ratio** | Requested ÷ configured, on a 0–100% range (accordion / concept name) |
-| **Applied ratio** | Live ratio calculated across VMs on the cluster (read-only) |
+| **Active ratio** | Live ratio calculated across VMs on the cluster (read-only) |
 | **Saved ratio** | Cluster-wide default the admin sets and saves (editable) |
 | **Cluster default** | Same as saved ratio — applies to new VMs cluster-wide |
 | **Product default** | **97.5%** (mockup) |
@@ -182,8 +182,8 @@ Use **PatternFly 6 Number input with unit** (`pf-v6-c-number-input`):
 | Element | Copy |
 |---|---|
 | Accordion | **Memory request ratio** |
-| Applied ratio | **Applied ratio:** **94.2%** with **?** (read-only; live cluster value) |
-| Applied ratio **?** popover | The actual real-time memory ratio currently calculated across all VMs on the cluster. This fluctuates based on active system load and resource availability. |
+| Active ratio | **Active ratio:** **94.2%** with **?** (read-only; live cluster value) |
+| Active ratio **?** popover | The memory request ratio currently calculated across all VMs on this cluster. It reflects active workload and resource availability and may differ from your saved ratio. |
 | Saved ratio | **Saved ratio** label with **?** above number input |
 | Saved ratio **?** popover | After changes are saved, they apply cluster-wide: **New VMs:** Use the saved ratio immediately, unless they have a specific ratio set by the VM owner. **Running VMs:** Retain their current ratio until they reboot or migrate. |
 | Badge | **New** (accordion header only) |
@@ -208,6 +208,6 @@ Use **PatternFly 6 Number input with unit** (`pf-v6-c-number-input`):
 - Does **memory request ratio** (requested ÷ configured) match the HyperConverged / memory density API field?
 - Is **97.5%** the correct product default from the backend?
 - Is this the same as limit-to-request ratio, or a different metric?
-- **Applied ratio** — API source, refresh interval, and relationship to saved ratio under load
+- **Active ratio** — API source, refresh interval, and relationship to saved ratio under load
 - Legacy density **> 100%** — migration, read-only display, or hide?
 - **Ratio level thresholds (75% / 50%)** — confirm with engineering and PM

@@ -76,12 +76,12 @@
       <h3>Control</h3>
       <p>PF6 Number input with unit for <strong>Saved ratio</strong>. Two values inside the accordion:</p>
       <ul>
-        <li><strong>Applied ratio</strong> — read-only live cluster value (e.g. <strong>94.2%</strong>)</li>
+        <li><strong>Active ratio</strong> — read-only live cluster value (e.g. <strong>94.2%</strong>)</li>
         <li><strong>Saved ratio</strong> — editable cluster default with <strong>Save</strong> / <strong>Restore default</strong></li>
       </ul>
 
-      <h3>Applied ratio</h3>
-      <p><strong>Applied ratio: 94.2%</strong> with <strong>?</strong> — read-only. The actual real-time memory ratio currently calculated across all VMs on the cluster. This fluctuates based on active system load and resource availability.</p>
+      <h3>Active ratio</h3>
+      <p><strong>Active ratio: 94.2%</strong> with <strong>?</strong> — read-only. The memory request ratio currently calculated across all VMs on this cluster. It reflects active workload and resource availability and may differ from your saved ratio.</p>
 
       <h3>Saved ratio</h3>
       <p><strong>Saved ratio</strong> label with <strong>?</strong> above the number input. The cluster-wide default the admin sets. <strong>?</strong> popover — after changes are saved, they apply cluster-wide:</p>
@@ -121,13 +121,13 @@
           <tr><td><strong>?</strong> mentions swap / higher density</td><td><strong>?</strong> defines request vs configured memory</td></tr>
           <tr><td>Percentage slider (can exceed 100%)</td><td>PF6 Number input with unit, <strong>0–100%</strong> only</td></tr>
           <tr><td>VMware-style <em>reservation</em> framing</td><td>Kubernetes-style <strong>request</strong> framing</td></tr>
-          <tr><td>Opaque density percentage</td><td><strong>Applied ratio</strong> readout + <strong>Saved ratio</strong> input; default <strong>97.5%</strong>; <strong>Restore default</strong> link</td></tr>
+          <tr><td>Opaque density percentage</td><td><strong>Active ratio</strong> readout + <strong>Saved ratio</strong> input; default <strong>97.5%</strong>; <strong>Restore default</strong> link</td></tr>
         </tbody>
       </table>
 
       <h2>Layout</h2>
       <pre>Memory request ratio  [New] [?]               [accordion, expanded]
-└── Applied ratio: 94.2%  [?]                [read-only; live cluster value]
+└── Active ratio: 94.2%  [?]                [read-only; live cluster value]
     Saved ratio  [?]
     [−] [ 97.5 ] [+] %                         [PF6 Number input with unit]
     ● Recommended
@@ -149,8 +149,8 @@ Kernel Samepage Merging (KSM)  [?]</pre>
         <thead><tr><th>Element</th><th>Copy</th></tr></thead>
         <tbody>
           <tr><td>Accordion</td><td><strong>Memory request ratio</strong></td></tr>
-          <tr><td>Applied ratio</td><td><strong>Applied ratio:</strong> <strong>94.2%</strong> with <strong>?</strong> (read-only)</td></tr>
-          <tr><td>Applied ratio <strong>?</strong> popover</td><td>The actual real-time memory ratio currently calculated across all VMs on the cluster. This fluctuates based on active system load and resource availability.</td></tr>
+          <tr><td>Active ratio</td><td><strong>Active ratio:</strong> <strong>94.2%</strong> with <strong>?</strong> (read-only)</td></tr>
+          <tr><td>Active ratio <strong>?</strong> popover</td><td>The memory request ratio currently calculated across all VMs on this cluster. It reflects active workload and resource availability and may differ from your saved ratio.</td></tr>
           <tr><td>Saved ratio</td><td><strong>Saved ratio</strong> label with <strong>?</strong> above number input</td></tr>
           <tr><td>Saved ratio <strong>?</strong> popover</td><td>After changes are saved, they apply cluster-wide: <strong>New VMs:</strong> Use the saved ratio immediately, unless they have a specific ratio set by the VM owner. <strong>Running VMs:</strong> Retain their current ratio until they reboot or migrate.</td></tr>
           <tr><td>Badge</td><td><strong>New</strong> (accordion header only)</td></tr>
