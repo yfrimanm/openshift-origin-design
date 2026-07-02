@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory request ratio — UX documentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
+  <style>
+    body {
+      margin: 0;
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      font-family: var(--pf-t--global--font--family--body);
+      color: var(--pf-t--global--text--color--regular);
+      line-height: 1.55;
+    }
+    .doc-wrap { max-width: 720px; margin: 0 auto; padding: 32px 32px 48px; }
+    .doc-nav { margin-bottom: 24px; font-size: 14px; }
+    .doc-nav a { color: var(--pf-t--global--color--brand--default); text-decoration: none; }
+    .doc-nav a:hover { text-decoration: underline; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    h2 { font-size: 18px; margin: 28px 0 12px; }
+    h3 { font-size: 15px; margin: 20px 0 8px; }
+    p { margin: 0 0 12px; font-size: 14px; }
+    ul { margin: 0 0 12px; padding-left: 24px; font-size: 14px; }
+    li { margin-bottom: 8px; }
+    pre {
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium, 16px);
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; margin: 12px 0 0;
+    }
+    th, td {
+      border: 1px solid var(--pf-t--global--border--color--default);
+      padding: 10px 12px; text-align: left; vertical-align: top;
+    }
+    th { background: var(--pf-t--global--background--color--secondary--default); }
+    .doc-card {
+      background: #fff;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium, 16px);
+      padding: 24px;
+    }
+    .doc-note { font-size: 13px; color: var(--pf-t--global--text--color--subtle, #6a6e73); font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="doc-wrap">
+    <div class="doc-card">
+      <h1>Memory request ratio — UX documentation</h1>
+
+      <h2>Goal</h2>
+      <p>Replace <strong>Memory density</strong> with a <strong>memory request ratio</strong> control: requested memory as a percentage of <strong>configured memory</strong>, on a <strong>0–100%</strong> range.</p>
+      <ul>
+        <li>Set the cluster-wide default ratio with a PF6 number input (no slider)</li>
+        <li><strong>Save</strong> when the value changes</li>
+        <li><strong>Restore default</strong> to reset the field to <strong>97.5%</strong></li>
+        <li>Full context in the <strong>?</strong> help popover only</li>
+      </ul>
+      <p class="doc-note">Related bug: <a href="https://redhat.atlassian.net/browse/CNV-88963">CNV-88963</a>. KSM unchanged in this mockup.</p>
+
+      <h2>UX summary</h2>
+
+      <h3>Current problem (today)</h3>
+      <p>The current <strong>Memory density</strong> control uses a percentage slider that can go above 100%. It does not explain <strong>configured</strong> vs <strong>requested</strong> memory, so values like 120% are hard to interpret without backend context. Bounding the UI at <strong>0–100%</strong> ties the control to one relationship admins can reason about: <strong>requested ÷ configured</strong>.</p>
+
+      <h3>Terminology</h3>
+      <p>We are replacing the existing <strong>Memory density</strong> with <strong>Memory request ratio</strong>. The <strong>memory request ratio</strong> is the <strong>percentage of</strong> each VM's <strong>configured memory</strong> (the VM's memory size) that is <strong>requested</strong> on the cluster, on a <strong>0–100%</strong> range. This setting sets the cluster-wide default ratio for all VMs.</p>
+
+      <h3>Control</h3>
+      <p>PF6 Number input with unit for <strong>Saved ratio</strong>. Two values inside the accordion:</p>
+      <ul>
+        <li><strong>Applied ratio</strong> — read-only live cluster value (e.g. <strong>94.2%</strong>)</li>
+        <li><strong>Saved ratio</strong> — editable cluster default with <strong>Save</strong> / <strong>Restore default</strong></li>
+      </ul>
+
+      <h3>Applied ratio</h3>
+      <p><strong>Applied ratio: 94.2%</strong> with <strong>?</strong> — read-only. The actual real-time memory ratio currently calculated across all VMs on the cluster. This fluctuates based on active system load and resource availability.</p>
+
+      <h3>Saved ratio</h3>
+      <p><strong>Saved ratio</strong> label with <strong>?</strong> above the number input. The cluster-wide default the admin sets. <strong>?</strong> popover — after changes are saved, they apply cluster-wide:</p>
+      <ul>
+        <li><strong>New VMs:</strong> Use the saved ratio immediately, unless they have a specific ratio set by the VM owner.</li>
+        <li><strong>Running VMs:</strong> Retain their current ratio until they reboot or migrate.</li>
+      </ul>
+
+      <h3>Validation</h3>
+      <p>If the value is outside <strong>0–100</strong>, we show: <strong>Enter a value from 0 to 100.</strong></p>
+
+      <h3>Ratio levels (traffic light)</h3>
+      <p>A lower ratio requests less memory on the cluster and increases overcommit risk.</p>
+      <p>When the value is valid, show a colored dot and short label below the number input. This is informational only and does not block <strong>Save</strong>.</p>
+      <p>Level definitions are in the <strong>?</strong> help popover.</p>
+      <table>
+        <thead><tr><th>Level</th><th>Range</th><th>Label</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Green</strong></td><td><strong>75% – 100%</strong></td><td>Recommended</td><td>Requests most of configured memory. Default <strong>97.5%</strong> is here.</td></tr>
+          <tr><td><strong>Yellow</strong></td><td><strong>50% – 74.9%</strong></td><td>Use with caution</td><td>Moderate overcommit; monitor memory pressure.</td></tr>
+          <tr><td><strong>Red</strong></td><td><strong>Below 50%</strong></td><td>High overcommit risk</td><td>Each VM requests less than half of configured memory.</td></tr>
+        </tbody>
+      </table>
+      <p class="doc-note">Thresholds are proposed for the mockup — confirm with engineering and PM.</p>
+
+      <h3>Save</h3>
+      <p>We show <strong>Save</strong> (secondary button) only when the entered value differs from the saved cluster setting. No <strong>Cancel</strong> button.</p>
+
+      <h3>Restore default</h3>
+      <p>When the value has been edited, <strong>Restore default</strong> (link button) appears to the right of <strong>Save</strong>. It resets the field to <strong>97.5%</strong> without saving. If <strong>97.5%</strong> matches the saved setting, the action row is hidden again.</p>
+
+      <h2>Replacing the current control</h2>
+      <table>
+        <thead><tr><th>Today (Memory density)</th><th>Proposed</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Memory density</strong></td><td><strong>Memory request ratio</strong></td></tr>
+          <tr><td><strong>?</strong> mentions swap / higher density</td><td><strong>?</strong> defines request vs configured memory</td></tr>
+          <tr><td>Percentage slider (can exceed 100%)</td><td>PF6 Number input with unit, <strong>0–100%</strong> only</td></tr>
+          <tr><td>VMware-style <em>reservation</em> framing</td><td>Kubernetes-style <strong>request</strong> framing</td></tr>
+          <tr><td>Opaque density percentage</td><td><strong>Applied ratio</strong> readout + <strong>Saved ratio</strong> input; default <strong>97.5%</strong>; <strong>Restore default</strong> link</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Layout</h2>
+      <pre>Memory request ratio  [New] [?]               [accordion, expanded]
+└── Applied ratio: 94.2%  [?]                [read-only; live cluster value]
+    Saved ratio  [?]
+    [−] [ 97.5 ] [+] %                         [PF6 Number input with unit]
+    ● Recommended
+    [Save]  [Restore default]
+
+Kernel Samepage Merging (KSM)  [?]</pre>
+
+      <h2>Interaction</h2>
+      <ul>
+        <li><strong>Default</strong> — mockup loads at <strong>97.5%</strong></li>
+        <li><strong>Edit</strong> — type or use − / + (0.1% steps, 0–100)</li>
+        <li><strong>Save</strong> — when <strong>Saved ratio</strong> differs from last saved setting</li>
+        <li><strong>Rollout</strong> — running VMs apply the saved ratio after reboot or migrate</li>
+        <li><strong>Restore default</strong> — link button with Save; resets to <strong>97.5%</strong></li>
+      </ul>
+
+      <h2>Copy reference (mockup)</h2>
+      <table>
+        <thead><tr><th>Element</th><th>Copy</th></tr></thead>
+        <tbody>
+          <tr><td>Accordion</td><td><strong>Memory request ratio</strong></td></tr>
+          <tr><td>Applied ratio</td><td><strong>Applied ratio:</strong> <strong>94.2%</strong> with <strong>?</strong> (read-only)</td></tr>
+          <tr><td>Applied ratio <strong>?</strong> popover</td><td>The actual real-time memory ratio currently calculated across all VMs on the cluster. This fluctuates based on active system load and resource availability.</td></tr>
+          <tr><td>Saved ratio</td><td><strong>Saved ratio</strong> label with <strong>?</strong> above number input</td></tr>
+          <tr><td>Saved ratio <strong>?</strong> popover</td><td>After changes are saved, they apply cluster-wide: <strong>New VMs:</strong> Use the saved ratio immediately, unless they have a specific ratio set by the VM owner. <strong>Running VMs:</strong> Retain their current ratio until they reboot or migrate.</td></tr>
+          <tr><td>Badge</td><td><strong>New</strong> (accordion header only)</td></tr>
+          <tr><td><strong>?</strong> popover (accordion)</td><td><strong>Memory request ratio</strong> — The percentage of each VM's configured memory that is requested on the cluster. <strong>Formula:</strong> requested ÷ configured, on a 0–100% range. At <strong>25%</strong>, a 4 GiB VM requests 1 GiB on the cluster. At <strong>100%</strong>, it requests the full configured amount of 4 GiB. This setting is the cluster-wide default for all VMs. <strong>Ratio levels:</strong> …</td></tr>
+          <tr><td>Ratio level indicator</td><td>Colored dot + label: <strong>Recommended</strong> / <strong>Use with caution</strong> / <strong>High overcommit risk</strong></td></tr>
+          <tr><td>Save</td><td><strong>Save</strong> (secondary)</td></tr>
+          <tr><td>Restore default</td><td><strong>Restore default</strong> (link)</td></tr>
+          <tr><td>Validation error</td><td>Enter a value from 0 to 100.</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Out of scope</h2>
+      <ul>
+        <li>Rollout progress bar / per-VM applied-status dashboard</li>
+        <li>Legacy density values &gt; 100%</li>
+        <li>KSM behavior</li>
+        <li>Enable/disable toggle for the ratio (always on per PM)</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
