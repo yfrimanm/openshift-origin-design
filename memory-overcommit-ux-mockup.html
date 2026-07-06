@@ -743,7 +743,7 @@
                         <div class="pf-v6-c-input-group__item">
                           <span class="pf-v6-c-form-control" id="reservation-ratio-form-control">
                             <input class="pf-v6-c-form-control__input" type="number" id="reservation-ratio-input"
-                              value="97.5" min="0" max="100" step="0.1" aria-label="Saved ratio"
+                              value="97.5" min="25" max="100" step="0.1" aria-label="Saved ratio"
                               aria-describedby="ratio-field-error" />
                           </span>
                         </div>
@@ -758,7 +758,7 @@
                       <div class="pf-v6-c-number-input__unit">%</div>
                     </div>
                     <p class="pf-v6-c-form__helper-text ratio-error hidden" id="ratio-field-error" role="alert">
-                      Enter a value from 0 to 100.
+                      Enter a value from 25 to 100.
                     </p>
                     <p class="ratio-level-indicator ratio-level-indicator--green hidden" id="ratio-level-indicator" aria-live="polite">
                       <span class="ratio-level-indicator__dot" aria-hidden="true"></span>
@@ -854,7 +854,7 @@
     <div class="help-popover__section">
       <p class="help-popover__text" style="font-weight: 600; margin-bottom: 10px;">Memory request ratio</p>
       <p class="help-popover__text">The percentage of each VM's configured memory that is requested on the cluster.</p>
-      <p class="help-popover__text"><strong>Formula:</strong> requested ÷ configured, on a 0–100% range.</p>
+      <p class="help-popover__text"><strong>Formula:</strong> requested ÷ configured, on a 25–100% range.</p>
       <p class="help-popover__text">At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster. At <strong>100%</strong>, it requests the full configured amount of 4&nbsp;GiB.</p>
       <p class="help-popover__text">This setting is the cluster-wide default for all VMs.</p>
       <div class="help-popover__levels-block">
@@ -890,7 +890,7 @@
                   <div class="help-popover__level">
                     <span class="help-popover__level-dot help-popover__level-dot--red" aria-hidden="true"></span>
                     <div>
-                      <div class="help-popover__level-title">High overcommit risk <span class="help-popover__level-range">(below 50%)</span></div>
+                      <div class="help-popover__level-title">High overcommit risk <span class="help-popover__level-range">(25% to 49.9%)</span></div>
                       <p class="help-popover__level-desc">Each VM requests less than half of its configured memory.</p>
                     </div>
                   </div>
@@ -933,6 +933,7 @@
     const ratioLevelLabel = document.getElementById('ratio-level-label');
 
     const RATIO_STEP = 0.1;
+    const MIN_RATIO = 25;
     const DEFAULT_RATIO = 97.5;
     const ACTIVE_RATIO = 94.2;
     const RATIO_LEVELS = {
@@ -950,7 +951,7 @@
     }
 
     function isValidRatio(value) {
-      if (!Number.isFinite(value) || value < 0 || value > 100) return false;
+      if (!Number.isFinite(value) || value < MIN_RATIO || value > 100) return false;
       return Math.abs(Math.round(value * 10) / 10 - value) < 1e-9;
     }
 
@@ -978,7 +979,7 @@
       const requested = getRequestedRatio();
       const valid = isValidRatio(requested);
       const current = valid ? requested : targetRatio;
-      ratioMinusBtn.disabled = valid && current <= 0;
+      ratioMinusBtn.disabled = valid && current <= MIN_RATIO;
       ratioPlusBtn.disabled = valid && current >= 100;
     }
 
@@ -1028,8 +1029,8 @@
     });
     ratioMinusBtn.addEventListener('click', () => {
       const current = getRequestedRatio();
-      if (Number.isFinite(current) && current > 0) {
-        setRatioInputValue(Math.max(0, Math.round((current - RATIO_STEP) * 10) / 10));
+      if (Number.isFinite(current) && current > MIN_RATIO) {
+        setRatioInputValue(Math.max(MIN_RATIO, Math.round((current - RATIO_STEP) * 10) / 10));
       }
     });
     ratioPlusBtn.addEventListener('click', () => {
