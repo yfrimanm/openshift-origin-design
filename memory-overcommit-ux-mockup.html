@@ -721,9 +721,9 @@
                       </button>
                     </div>
                     <div class="ratio-readout ratio-readout--saved-header">
-                      <span class="ratio-readout__label ratio-readout__label--heading">Saved ratio</span>
+                      <span class="ratio-readout__label ratio-readout__label--heading">Request ratio</span>
                       <button type="button" class="pf-v6-c-button pf-m-plain settings-row__help-btn" id="saved-ratio-help-btn"
-                        aria-label="Saved ratio help" aria-expanded="false" aria-haspopup="dialog">
+                        aria-label="Request ratio help" aria-expanded="false" aria-haspopup="dialog">
                         <span class="rh-ui-icon-question-mark-circle" aria-hidden="true">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" focusable="false">
                             <path d="M16 1C7.729 1 1 7.729 1 16s6.729 15 15 15 15-6.729 15-15S24.271 1 16 1Zm0 28C8.832 29 3 23.168 3 16S8.832 3 16 3s13 5.832 13 13-5.832 13-13 13Zm5-17a5.008 5.008 0 0 1-4 4.899V19a1 1 0 0 1-2 0v-3a1 1 0 0 1 1-1c1.654 0 3-1.346 3-3s-1.346-3-3-3-3 1.346-3 3a1 1 0 0 1-2 0c0-2.757 2.243-5 5-5s5 2.243 5 5Zm-3.25 12a1.75 1.75 0 1 1-3.501-.001A1.75 1.75 0 0 1 17.75 24Z"/>
@@ -743,7 +743,7 @@
                         <div class="pf-v6-c-input-group__item">
                           <span class="pf-v6-c-form-control" id="reservation-ratio-form-control">
                             <input class="pf-v6-c-form-control__input" type="number" id="reservation-ratio-input"
-                              value="97.5" min="25" max="100" step="0.1" aria-label="Saved ratio"
+                              value="97.5" min="25" max="100" step="0.1" aria-label="Request ratio"
                               aria-describedby="ratio-field-error" />
                           </span>
                         </div>
@@ -854,9 +854,7 @@
     <div class="help-popover__section">
       <p class="help-popover__text" style="font-weight: 600; margin-bottom: 10px;">Memory request ratio</p>
       <p class="help-popover__text">The percentage of each VM's configured memory that is requested on the cluster.</p>
-      <p class="help-popover__text"><strong>Formula:</strong> requested ÷ configured, on a 25–100% range.</p>
-      <p class="help-popover__text">At <strong>25%</strong>, a 4&nbsp;GiB VM requests 1&nbsp;GiB on the cluster. At <strong>100%</strong>, it requests the full configured amount of 4&nbsp;GiB.</p>
-      <p class="help-popover__text">This setting is the cluster-wide default for all VMs.</p>
+      <p class="help-popover__text">For example: At <strong>25%</strong> ratio, a VM with a memory configuration of 4&nbsp;GiB will request 1&nbsp;GiB on the cluster. At <strong>100%</strong>, it requests the configured amount of 4&nbsp;GiB.</p>
       <div class="help-popover__levels-block">
         <div class="pf-v6-c-accordion pf-m-plain pf-m-toggle-start" aria-label="Ratio levels">
           <div class="pf-v6-c-accordion__item" id="ratio-levels-accordion-item">
@@ -903,13 +901,13 @@
     </div>
   </div>
   <div class="help-popover" id="active-ratio-help-popover" role="dialog" aria-label="Active ratio">
-    <p class="help-popover__body">The memory request ratio currently calculated across all VMs on this cluster. It reflects active workload and resource availability and may differ from your saved ratio.</p>
+    <p class="help-popover__body">The memory request ratio currently calculated across all VMs on this cluster. It reflects active workload and resource availability and may differ from your request ratio.</p>
   </div>
-  <div class="help-popover" id="saved-ratio-help-popover" role="dialog" aria-label="Saved ratio">
+  <div class="help-popover" id="saved-ratio-help-popover" role="dialog" aria-label="Request ratio">
     <div class="help-popover__section">
       <p class="help-popover__text">After changes are saved, they apply cluster-wide:</p>
       <ul class="help-popover__list">
-        <li><strong>New VMs:</strong> Use the saved ratio immediately, unless they have a specific ratio set by the VM owner.</li>
+        <li><strong>New VMs:</strong> Created with the set ratio, unless they have a specific ratio set by the VM owner.</li>
         <li><strong>Running VMs:</strong> Retain their current ratio until they reboot or migrate.</li>
       </ul>
     </div>
