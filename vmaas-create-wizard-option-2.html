@@ -3097,12 +3097,22 @@
       }
     }
 
-    .toast {
-      display: none; position: fixed; bottom: 24px; right: 24px; z-index: 1100;
-      min-width: 280px; max-width: 420px; padding: 14px 16px;
-      background: #1f1f1f; color: #fff; border-radius: 6px; font-size: 14px;
+    /* PF6 toast alert group (replaces solid black snackbar) */
+    #toast-group {
+      display: none;
+      position: fixed;
+      inset-block-start: var(--pf-t--global--spacer--md, 16px);
+      inset-inline-end: var(--pf-t--global--spacer--md, 16px);
+      z-index: 1100;
+      width: min(420px, calc(100vw - 32px));
+      margin: 0;
+      padding: 0;
+      list-style: none;
     }
-    .toast.pf-m-open { display: block; }
+    #toast-group.pf-m-open { display: block; }
+    #toast-group .pf-v6-c-alert {
+      box-shadow: var(--pf-t--global--box-shadow--lg, 0 8px 16px rgba(3, 3, 3, 0.16));
+    }
 
     /* Embedded in OSAC VMaaS / Ethan Kim Northstar shell (iframe).
        Hide the nested OpenShift-style console so only page content remains. */
@@ -3525,7 +3535,7 @@
     </div>
   </div>
 
-  <div class="toast" id="toast" role="status"></div>
+  <ul class="pf-v6-c-alert-group pf-m-toast" id="toast-group" aria-live="polite" aria-atomic="false"></ul>
 
   <div class="pf-v6-c-backdrop" id="cancel-overlay" aria-hidden="true">
     <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
@@ -4903,12 +4913,51 @@
       });
     }
 
-    function toast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('pf-m-open');
+    function toast(msg, variant = 'info') {
+      const group = document.getElementById('toast-group');
+      if (!group) return;
+      const allowed = ['success', 'danger', 'warning', 'info', 'custom'];
+      const kind = allowed.includes(variant) ? variant : 'info';
+      const icons = {
+        success: 'fas fa-check-circle',
+        danger: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle',
+        custom: 'fas fa-bell',
+      };
+      const labels = {
+        success: 'Success',
+        danger: 'Danger',
+        warning: 'Warning',
+        info: 'Information',
+        custom: 'Notification',
+      };
+      const safe = String(msg || '').replace(/</g, '&lt;');
+      group.innerHTML = `
+        <li class="pf-v6-c-alert-group__item">
+          <div class="pf-v6-c-alert pf-m-${kind}" aria-label="${labels[kind]} alert">
+            <div class="pf-v6-c-alert__icon">
+              <i class="${icons[kind]}" aria-hidden="true"></i>
+            </div>
+            <div class="pf-v6-c-alert__title">
+              <span class="pf-v6-screen-reader">${labels[kind]} alert:</span>
+              ${safe}
+            </div>
+            <div class="pf-v6-c-alert__action">
+              <button type="button" class="pf-v6-c-button pf-m-plain" id="toast-close" aria-label="Close">
+                <span class="pf-v6-c-button__icon">
+                  <i class="fas fa-times" aria-hidden="true"></i>
+                </span>
+              </button>
+            </div>
+          </div>
+        </li>
+      `;
+      group.classList.add('pf-m-open');
+      const close = () => group.classList.remove('pf-m-open');
+      document.getElementById('toast-close')?.addEventListener('click', close);
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove('pf-m-open'), 3000);
+      toast._t = setTimeout(close, 4000);
     }
 
     /** PF6 FormSelect caret (RhMicronsCaretDownFill equivalent) */
@@ -6033,7 +6082,7 @@
       });
       closeAddNetworkModal();
       renderWizard();
-      toast('Network added.');
+      toast('Network added.', 'success');
     }
 
     /**
@@ -6379,7 +6428,7 @@
       });
       closeAddDiskModal();
       renderWizard();
-      toast(`Disk “${name}” added.`);
+      toast(`Disk “${name}” added.`, 'success');
     }
 
     function openVmDetail(name, tab = 'overview') {
@@ -8753,7 +8802,7 @@
               const id = btn.dataset.removeDisk;
               d.extraDisks = (d.extraDisks || []).filter(disk => disk.id !== id);
               renderWizard();
-              toast('Disk removed.');
+              toast('Disk removed.', 'success');
             });
           });
         } else if (stepKey === 'config-network') {
@@ -8962,7 +9011,7 @@
               const id = btn.dataset.removeNetwork;
               d.extraNetworks = (d.extraNetworks || []).filter(net => net.id !== id);
               renderWizard();
-              toast('Network removed.');
+              toast('Network removed.', 'success');
             });
           });
         }
