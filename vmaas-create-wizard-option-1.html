@@ -7500,13 +7500,22 @@
               <textarea id="f-desc" placeholder="">${d.description}</textarea>
             </div>
             ${isCatalogFlow ? `
-            <div class="pf-v6-c-alert pf-m-info pf-m-inline project-context" role="status">
-              <div class="pf-v6-c-alert__icon">
-                <i class="fas fa-info-circle" aria-hidden="true"></i>
-              </div>
-              <div class="pf-v6-c-alert__title">
-                Your VirtualMachine will be created in project <strong>${(d.project || 'default').replace(/</g, '&lt;')}</strong>
-              </div>
+            <div class="form-field ${state.fieldErrors.project ? 'pf-m-error' : ''}" data-field="project">
+              <label for="f-project">Project</label>
+              ${(() => {
+                const currentProject = d.project || 'default';
+                const projectOpts = PROJECTS.includes(currentProject)
+                  ? PROJECTS
+                  : [currentProject, ...PROJECTS];
+                return pfSelect({
+                  id: 'f-project',
+                  ariaLabel: 'Project',
+                  optionsHtml: projectOpts.map(p =>
+                    `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
+                  ).join(''),
+                });
+              })()}
+              ${fieldErrorHtml('project')}
             </div>
             ` : ''}
           </div>
@@ -7541,9 +7550,7 @@
         `;
         const syncLocation = () => {
           const projectVal = document.getElementById('f-project')?.value?.trim() || '';
-          // Catalog flow: project is not collected on Details; keep existing/default.
-          if (!isCatalogFlow) d.project = projectVal || 'default';
-          else if (!d.project) d.project = 'default';
+          d.project = projectVal || 'default';
           d.group = document.getElementById('f-group')?.value?.trim() || '';
           if (isCatalogFlow) syncWizardNextDisabled();
         };
@@ -7564,6 +7571,12 @@
           if (isCatalogFlow) syncWizardNextDisabled();
         });
         panel.querySelector('#f-desc')?.addEventListener('input', e => { d.description = e.target.value; });
+        if (isCatalogFlow) {
+          panel.querySelector('#f-project')?.addEventListener('change', e => {
+            d.project = e.target.value || 'default';
+            clearFieldError('project');
+          });
+        }
         if (!isCatalogFlow && document.getElementById('f-project')) {
           wireCreatableSearch({
             id: 'f-project',

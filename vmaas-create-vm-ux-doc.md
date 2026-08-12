@@ -35,7 +35,7 @@ Document the **Create VirtualMachine** wizard for OSAC VMaaS so developers can i
 | **Network under Configure** | Virtual network, subnet, and security groups on Configure → Network. |
 | **Compute under Configure** | OS image always locked; compute locked or editable on Configure → Compute resource. |
 | **Locked vs Editable** | **Locked** uses a lock icon; **Editable** uses a pen icon. Drawer panels: “Locked by this template” / “Editable later”. Prefer **Locked** (not “Fixed”) in UI copy. |
-| **Project** | Context awareness on Details (info alert) — inherited from the Virtual machines list where Create was clicked. Not a disabled dropdown. |
+| **Project** | Editable Project dropdown on Details (CNV pattern). Prefills from the Virtual machines list context where Create was clicked; user can change it. |
 | **Exit confirm** | Warning modal: Exit without saving / Continue creating. |
 
 ```
@@ -79,15 +79,15 @@ Browse templates as cards (or list). Selecting a template opens a drawer with **
 - Step help: *Name your VirtualMachine and optionally set access.*  
 - **Name** (required) + generate  
 - **Description** (optional)  
-- **Project** — context awareness only (inline info alert), not a disabled dropdown. One line: *Your VirtualMachine will be created in project **&lt;name&gt;*** (project name bold). Bound from the VMs list where Create was started.
+- **Project** — editable dropdown (CNV pattern). Prefills from list/workspace context (`createContextProject()`); user can change the project.  
 - **Access** (Optional) — SSH public key (PF6 FileUpload) and cloud-init on this step (moved off Configure for details-page alignment).
 
 ![Details](videos/vmaas-create-ux-doc/04-details.png)
 
 **Dev notes**
 
-- Do not ask the user to pick a project here. Bind from list/workspace context (`createContextProject()`).
-- Use an info alert (or equivalent non-control) so Project reads as awareness, not a form field.
+- Prefill Project from list/workspace context, then allow edit via a FormSelect (not an info alert).
+- Keep Review in sync with the selected project.
 
 ---
 
@@ -157,7 +157,7 @@ Shown when Cancel / close would discard entered data.
 - [ ] Wizard nav includes **Storage** and **Network** as separate steps (Option 1) or Configure substeps (Option 2)  
 - [ ] Configure has no disks UI; Storage owns boot + additional disks  
 - [ ] Locked fields use disabled controls + lock icon; copy says **Locked** (not Fixed)  
-- [ ] Details Project is context awareness from list (not a disabled dropdown)  
+- [ ] Details Project is an editable dropdown (CNV), prefilled from list context  
 - [ ] Add disk: auto name; storage tier select with in-menu search + divider  
 - [ ] Add network: same list/modal/empty pattern as Add disk; Review shows Network N or None  
 - [ ] Exit modal matches copy and button roles above  
