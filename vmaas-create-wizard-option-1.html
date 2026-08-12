@@ -8808,6 +8808,7 @@
                 ${fieldErrorHtml('securityGroups')}
                 <p class="form-helper">Firewall rules for inbound and outbound traffic. A project default is preselected.</p>
               </div>
+              <h4 class="config-section-title">Additional networks</h4>
               ${(d.extraNetworks || []).length ? `
               <ul class="disk-list" aria-label="Additional networks">
                 ${(d.extraNetworks || []).map(net => `
