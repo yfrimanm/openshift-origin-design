@@ -105,7 +105,7 @@ Nav parent **Configure** with three substeps:
 - **Boot disk size** — editable or locked per template.  
 - Editable step help: *Set the boot disk size. Add additional disks if you need more storage.*  
 - When locked, step help: *Boot disk size is locked by the template. You can add additional disks below.*  
-- **Add disk** below boot disk; empty state *No additional disks yet.*
+- **Add disk** below boot disk under a small **Additional disks** section title; empty state *No additional disks yet.*
 
 ### Network
 - Primary attach: virtual network, subnet, security groups (required).  
