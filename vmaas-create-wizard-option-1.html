@@ -7510,11 +7510,15 @@
                 return pfSelect({
                   id: 'f-project',
                   ariaLabel: 'Project',
+                  describedBy: state.fieldErrors.project ? 'f-project-help err-project' : 'f-project-help',
                   optionsHtml: projectOpts.map(p =>
                     `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
                   ).join(''),
                 });
               })()}
+              <p class="form-helper" id="f-project-help">
+                Your VirtualMachine will be created in project <strong>${(d.project || 'default').replace(/</g, '&lt;')}</strong>
+              </p>
               ${fieldErrorHtml('project')}
             </div>
             ` : ''}
@@ -7575,6 +7579,10 @@
           panel.querySelector('#f-project')?.addEventListener('change', e => {
             d.project = e.target.value || 'default';
             clearFieldError('project');
+            const help = panel.querySelector('#f-project-help');
+            if (help) {
+              help.innerHTML = `Your VirtualMachine will be created in project <strong>${String(d.project).replace(/</g, '&lt;')}</strong>`;
+            }
           });
         }
         if (!isCatalogFlow && document.getElementById('f-project')) {

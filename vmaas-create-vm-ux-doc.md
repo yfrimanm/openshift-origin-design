@@ -79,7 +79,7 @@ Browse templates as cards (or list). Selecting a template opens a drawer with **
 - Step help: *Name your VirtualMachine and optionally set access.*  
 - **Name** (required) + generate  
 - **Description** (optional)  
-- **Project** — editable dropdown (CNV pattern). Prefills from list/workspace context (`createContextProject()`); user can change the project.  
+- **Project** — editable dropdown (CNV pattern). Prefills from list/workspace context (`createContextProject()`); user can change the project. Helper: *Your VirtualMachine will be created in project **&lt;name&gt;*** (updates when the selection changes).  
 - **Access** (Optional) — SSH public key (PF6 FileUpload) and cloud-init on this step (moved off Configure for details-page alignment).
 
 ![Details](videos/vmaas-create-ux-doc/04-details.png)
