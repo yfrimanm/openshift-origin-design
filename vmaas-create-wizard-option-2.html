@@ -272,11 +272,22 @@
     .console__nav .pf-v6-c-nav__item.pf-m-expandable {
       display: block;
     }
-    .console__content { padding: 20px 24px 28px; }
+    .console__content {
+      padding: 20px 24px 28px;
+      /* Grid default min-width:auto expands past the viewport; Create then sits off-screen. */
+      min-width: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
     .page-header {
       display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+      gap: 16px; margin-bottom: 16px; flex-wrap: nowrap;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
+    .page-header .page-title { min-width: 0; flex: 1 1 auto; }
+    .page-header > .pf-v6-c-button { flex: 0 0 auto; }
     .page-title { font-size: 28px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
     .page-title .star { color: var(--vmaas-text-subtle); font-size: 18px; border: none; background: none; cursor: pointer; padding: 0; }
     .muted { color: var(--vmaas-text-subtle); }
@@ -9791,6 +9802,9 @@
     });
     document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => {
       if (b.disabled || b.classList.contains('pf-m-disabled')) return;
+      if (document.getElementById('overlay')?.classList.contains('pf-m-open')) {
+        closeWizard();
+      }
       state.selectedVmName = null;
       setView(b.dataset.nav);
     }));
