@@ -617,12 +617,16 @@
     .project-context .pf-v6-c-alert__title strong {
       font-weight: 700;
     }
-    /* Divider between project awareness and Access on Details — match field width */
-    .section-block .project-context + .config-section-title {
-      margin-top: var(--pf-t--global--spacer--lg, 24px);
+    /* Details Access — same divider as Configure Access (Option 1) */
+    .section-block > .form-field ~ .config-section-title {
+      margin: 0 0 var(--pf-t--global--spacer--lg, 24px);
       padding-top: var(--pf-t--global--spacer--lg, 24px);
-      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border-top: 1px solid var(--vmaas-border-light);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vmaas-text);
       max-width: 560px;
+      scroll-margin-top: 12px;
     }
     .vm-config__fields > .pf-v6-c-button { margin-top: 0; }
     .vm-config__fields .form-helper {
