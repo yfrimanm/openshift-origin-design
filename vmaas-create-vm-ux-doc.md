@@ -109,8 +109,7 @@ Nav parent **Configure** with three substeps:
 
 ### Network
 - Primary attach: virtual network, subnet, security groups (required).  
-- **Add network** below (same pattern as Add disk): opens a modal for virtual network / subnet / security groups; auto name `{vm}-netN`.  
-- Empty state: *No additional networks yet.*  
+- **Add network** below under a small **Additional networks** section title (same pattern as Additional disks); empty state *No additional networks yet.*  
 - Additional networks listed with remove; Review shows *Network N* → `vnet | subnet | security groups`, or *Additional networks* → *None*.
 
 ![Configure](videos/vmaas-create-ux-doc/05-configure.png)
