@@ -38,6 +38,7 @@
     .demo-bar__label { font-size: 13px; font-weight: 600; color: var(--vmaas-text-subtle); }
 
     .console {
+      position: relative;
       background: #fff; border: 1px solid var(--vmaas-border-light);
       border-radius: 8px; overflow: hidden; min-height: 640px;
     }
@@ -180,11 +181,13 @@
     .create-search__option--create {
       color: var(--vmaas-blue);
     }
-    .console__body { display: grid; grid-template-columns: 220px 1fr; min-height: 580px; }
-    @media (max-width: 860px) {
-      .console__body { grid-template-columns: 1fr; }
-      .console__nav { display: none; }
+    .console__body {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 580px;
+      position: relative;
     }
+    /* Stakeholder mocks: keep Ethan's-style page nav visible (incl. during Create). */
     .console__nav {
       border-right: 1px solid var(--vmaas-border-light);
       background: var(--vmaas-bg-subtle);
@@ -257,9 +260,14 @@
       padding-block: var(--pf-t--global--spacer--sm, 8px);
       padding-inline-start: var(--pf-t--global--spacer--md, 16px);
     }
-    .console__nav #nav-virtualization-toggle {
+    .console__nav .pf-v6-c-nav__item.pf-m-expandable > .pf-v6-c-nav__link {
       font-weight: 600;
       color: var(--vmaas-text);
+    }
+    .console__nav .pf-v6-c-nav__link.pf-m-disabled,
+    .console__nav .pf-v6-c-nav__link:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable {
       display: block;
@@ -1638,8 +1646,11 @@
     #overlay:not(.pf-m-open) { display: none; }
     #overlay.pf-m-open {
       display: flex;
-      position: fixed;
-      inset: 0;
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      /* Leave the page sidebar visible (Ethan shell pattern). */
+      inset-inline-start: 220px;
       z-index: 400;
       background: var(--pf-t--global--background--color--primary--default, #fff);
     }
@@ -3164,6 +3175,9 @@
     html.vmaas-embed .console__content {
       padding: 0 0 32px;
     }
+    html.vmaas-embed #overlay.pf-m-open {
+      inset-inline-start: 0;
+    }
   </style>
 </head>
 <body>
@@ -3210,30 +3224,62 @@
         <span class="muted" id="role-badge">VM Author</span>
       </div>
       <div class="console__body">
-        <nav class="console__nav pf-v6-c-nav" aria-label="Virtualization">
+        <nav class="console__nav pf-v6-c-nav" aria-label="Primary">
           <ul class="pf-v6-c-nav__list">
-            <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded" id="nav-virtualization">
-              <button type="button" class="pf-v6-c-nav__link" id="nav-virtualization-toggle" aria-expanded="true" aria-controls="nav-virtualization-sub">
-                Virtualization
+            <li class="pf-v6-c-nav__item">
+              <button type="button" class="pf-v6-c-nav__link" data-nav="templates">Catalog</button>
+            </li>
+            <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded" id="nav-services">
+              <button type="button" class="pf-v6-c-nav__link" id="nav-services-toggle" aria-expanded="true" aria-controls="nav-services-sub">
+                Services
                 <span class="pf-v6-c-nav__toggle">
                   <span class="pf-v6-c-nav__toggle-icon">
                     <i class="fas fa-angle-right" aria-hidden="true"></i>
                   </span>
                 </span>
               </button>
-              <section class="pf-v6-c-nav__subnav" id="nav-virtualization-sub" aria-label="Virtualization pages">
+              <section class="pf-v6-c-nav__subnav" id="nav-services-sub" aria-label="Services">
                 <ul class="pf-v6-c-nav__list">
                   <li class="pf-v6-c-nav__item">
-                    <button type="button" class="pf-v6-c-nav__link pf-m-current" data-nav="vms">VirtualMachines</button>
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="baremetal">Bare metal</button>
                   </li>
                   <li class="pf-v6-c-nav__item">
-                    <button type="button" class="pf-v6-c-nav__link" data-nav="networks">Networks</button>
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="clusters">Clusters</button>
                   </li>
                   <li class="pf-v6-c-nav__item">
-                    <button type="button" class="pf-v6-c-nav__link" data-nav="templates">Templates</button>
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="models">Models</button>
+                  </li>
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link pf-m-current" data-nav="vms">Virtual machines</button>
                   </li>
                 </ul>
               </section>
+            </li>
+            <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded" id="nav-networking">
+              <button type="button" class="pf-v6-c-nav__link" id="nav-networking-toggle" aria-expanded="true" aria-controls="nav-networking-sub">
+                Networking
+                <span class="pf-v6-c-nav__toggle">
+                  <span class="pf-v6-c-nav__toggle-icon">
+                    <i class="fas fa-angle-right" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </button>
+              <section class="pf-v6-c-nav__subnav" id="nav-networking-sub" aria-label="Networking">
+                <ul class="pf-v6-c-nav__list">
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link" data-nav="networks">Virtual networks</button>
+                  </li>
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="subnets">Subnets</button>
+                  </li>
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="security-groups">Security groups</button>
+                  </li>
+                </ul>
+              </section>
+            </li>
+            <li class="pf-v6-c-nav__item">
+              <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="activity">Activity log</button>
             </li>
           </ul>
         </nav>
@@ -3473,11 +3519,7 @@
             </div>
           </section>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="wiz-title">
+        <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="wiz-title">
     <div class="pf-v6-c-wizard">
       <div class="pf-v6-c-wizard__header">
         <div class="pf-v6-c-wizard__close">
@@ -3548,6 +3590,9 @@
             </div>
           </div>
         </footer>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
   </div>
@@ -9682,6 +9727,7 @@
       state.data.startAfter = e.target.checked;
     });
     document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => {
+      if (b.disabled || b.classList.contains('pf-m-disabled')) return;
       state.selectedVmName = null;
       setView(b.dataset.nav);
     }));
@@ -9700,15 +9746,18 @@
         if (document.getElementById('view-vm')?.classList.contains('pf-m-active')) renderVmDetail();
       }
     });
-    document.getElementById('nav-virtualization-toggle')?.addEventListener('click', () => {
-      const item = document.getElementById('nav-virtualization');
-      const toggle = document.getElementById('nav-virtualization-toggle');
-      const sub = document.getElementById('nav-virtualization-sub');
-      const expanded = !item.classList.contains('pf-m-expanded');
-      item.classList.toggle('pf-m-expanded', expanded);
-      toggle.setAttribute('aria-expanded', String(expanded));
-      sub.hidden = !expanded;
-    });
+    function bindNavExpandable(toggleId, itemId) {
+      document.getElementById(toggleId)?.addEventListener('click', () => {
+        const item = document.getElementById(itemId);
+        const toggle = document.getElementById(toggleId);
+        if (!item || !toggle) return;
+        const expanded = !item.classList.contains('pf-m-expanded');
+        item.classList.toggle('pf-m-expanded', expanded);
+        toggle.setAttribute('aria-expanded', String(expanded));
+      });
+    }
+    bindNavExpandable('nav-services-toggle', 'nav-services');
+    bindNavExpandable('nav-networking-toggle', 'nav-networking');
 
     applyRole();
     initVmFilterDropdowns();
