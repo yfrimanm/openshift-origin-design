@@ -1262,14 +1262,14 @@
       gap: var(--pf-t--global--spacer--sm, 8px);
     }
     .disk-list-empty {
-      margin: calc(-1 * var(--pf-t--global--spacer--sm, 8px)) 0 0;
+      margin: 0;
       max-width: 560px;
       font-size: 14px;
       line-height: 1.4;
       color: var(--vmaas-text-subtle, #6a6e73);
     }
-    .add-disk-action + .disk-list-empty,
-    .add-network-action + .disk-list-empty {
+    .disk-list-empty + .add-disk-action,
+    .disk-list-empty + .add-network-action {
       margin-top: var(--pf-t--global--spacer--sm, 8px);
     }
     .disk-list__item {
@@ -8700,8 +8700,8 @@
               ${bootFieldHtml}
               <h4 class="config-section-title">Additional disks</h4>
               ${diskListHtml}
-              ${addDiskHtml}
               ${diskEmptyHtml}
+              ${addDiskHtml}
             </div>
           `;
 
@@ -8852,12 +8852,12 @@
                 `).join('')}
               </ul>
               ` : ''}
-              <div class="add-network-action">
-                <button type="button" class="pf-v6-c-button pf-m-secondary" id="f-add-network">Add network</button>
-              </div>
               ${(d.extraNetworks || []).length
                 ? ''
                 : `<p class="disk-list-empty" aria-live="polite">No additional networks yet.</p>`}
+              <div class="add-network-action">
+                <button type="button" class="pf-v6-c-button pf-m-secondary" id="f-add-network">Add network</button>
+              </div>
             </div>
           `;
           const vn = panel.querySelector('#f-virtual-network');
