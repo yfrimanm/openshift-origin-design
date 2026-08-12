@@ -1652,10 +1652,33 @@
     }
     #overlay .pf-v6-c-wizard {
       --pf-v6-c-wizard--Height: 100%;
+      --pf-v6-c-wizard__nav--Width: var(--pf-v6-c-wizard__nav--lg--Width, 15.625rem);
+      --pf-v6-c-wizard__nav--BoxShadow: none;
+      --pf-v6-c-wizard__nav--BorderBlockEndWidth: 0;
+      --pf-v6-c-wizard__outer-wrap--lg--PaddingInlineStart: var(--pf-v6-c-wizard__nav--Width);
       width: 100%;
       height: 100%;
       flex: 1 1 auto;
       min-height: 0;
+    }
+    /* Stakeholder mocks: always show desktop left step nav (PF hides it below 62rem). */
+    #overlay .pf-v6-c-wizard__toggle {
+      display: none !important;
+    }
+    #overlay .pf-v6-c-wizard__outer-wrap {
+      padding-inline-start: var(--pf-v6-c-wizard__outer-wrap--lg--PaddingInlineStart);
+    }
+    #overlay .pf-v6-c-wizard__inner-wrap {
+      position: static;
+    }
+    #overlay .pf-v6-c-wizard__nav {
+      display: block !important;
+      height: 100%;
+      width: var(--pf-v6-c-wizard__nav--Width);
+      border-inline-end: var(--pf-v6-c-wizard__nav--lg--BorderInlineEndWidth, 1px)
+        solid var(--pf-v6-c-wizard__nav--lg--BorderInlineEndColor, var(--vmaas-border-light, #d2d2d2));
+      border-block-end-width: 0;
+      box-shadow: none;
     }
     /* Template drawer: fill wizard main top→bottom */
     #overlay .pf-v6-c-wizard__main:has(.tpl-step) {
