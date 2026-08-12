@@ -1666,23 +1666,9 @@
       background: var(--pf-t--global--background--color--primary--default, #fff);
       min-height: 100%;
     }
-    /* Stakeholder full-page create: fill the viewport beside the page nav. */
-    .console:has(#overlay.pf-m-open) {
-      min-height: calc(100vh - 48px);
-    }
-    .console__body:has(#overlay.pf-m-open) {
-      min-height: calc(100vh - 96px);
-    }
-    html:not(.vmaas-embed) .mockup-shell:has(#overlay.pf-m-open) {
-      max-width: none;
-      padding-block: 12px 16px;
-    }
-    html:not(.vmaas-embed) .mockup-shell:has(#overlay.pf-m-open) .mockup-header,
-    html:not(.vmaas-embed) .mockup-shell:has(#overlay.pf-m-open) .demo-bar {
-      display: none;
-    }
-    html:not(.vmaas-embed) .mockup-shell:has(#overlay.pf-m-open) .console__masthead {
-      display: none;
+    /* Keep shell chrome stable when Create opens — avoids a ~200px layout jump. */
+    html {
+      scrollbar-gutter: stable;
     }
     #overlay .pf-v6-c-wizard {
       --pf-v6-c-wizard--Height: 100%;
