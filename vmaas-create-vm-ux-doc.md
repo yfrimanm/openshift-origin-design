@@ -76,7 +76,7 @@ Browse templates as cards (or list). Selecting a template opens a drawer with **
 
 ## Step 2 — Details (+ Access)
 
-- Step help: *Name your VirtualMachine and optionally set access.*  
+- Step help: *Name your VirtualMachine, select a project, and optionally set access.* (Option 1: *Name your VirtualMachine and select a project. Description is optional.*)  
 - **Name** (required) + generate  
 - **Description** (optional)  
 - **Project** — editable dropdown (CNV pattern). Prefills from list/workspace context (`createContextProject()`); user can change the project. Helper: *Your VirtualMachine will be created in project **&lt;name&gt;*** (updates when the selection changes).  
