@@ -662,8 +662,9 @@
     .form-field .unit-size-row .pf-v6-c-button {
       flex-shrink: 0;
     }
-    /* Keep Add disk out of the boot-disk field row so it reads as additional disks */
-    .add-disk-action {
+    /* Keep Add disk / Add network out of the primary field row */
+    .add-disk-action,
+    .add-network-action {
       margin: 0 0 var(--pf-t--global--spacer--md, 16px);
       max-width: 560px;
     }
@@ -1267,7 +1268,8 @@
       line-height: 1.4;
       color: var(--vmaas-text-subtle, #6a6e73);
     }
-    .add-disk-action + .disk-list-empty {
+    .add-disk-action + .disk-list-empty,
+    .add-network-action + .disk-list-empty {
       margin-top: var(--pf-t--global--spacer--sm, 8px);
     }
     .disk-list__item {
@@ -1794,7 +1796,7 @@
     .form-field textarea::placeholder {
       color: #8a8d90; font-style: italic; font-family: "Red Hat Text", "Helvetica Neue", Arial, sans-serif;
     }
-    /* SSH public key — PF6 simple text FileUpload (browse + always-visible textarea) */
+    /* SSH public key — PF6 FileUpload; textarea collapsed until focus/upload */
     .form-field .pf-v6-c-file-upload {
       max-width: 560px;
       display: flex;
@@ -1806,12 +1808,18 @@
       border: 1px dashed var(--pf-t--global--border--color--default, #c7c7c7);
       border-radius: var(--pf-t--global--border--radius--medium, 8px);
     }
+    .form-field .pf-v6-c-file-upload:not(.pf-m-show-details) {
+      gap: 0;
+    }
+    .form-field .pf-v6-c-file-upload:not(.pf-m-show-details) .pf-v6-c-file-upload__file-details {
+      display: none !important;
+    }
     .form-field .pf-v6-c-file-upload.pf-m-drag-hover {
       border-color: var(--vmaas-blue, #0066cc);
       background: var(--pf-t--global--background--color--primary--hover, #f0f0f0);
     }
     .form-field .pf-v6-c-file-upload .pf-v6-c-form-control { width: 100%; max-width: 100%; }
-    .form-field .pf-v6-c-file-upload__file-details {
+    .form-field .pf-v6-c-file-upload.pf-m-show-details .pf-v6-c-file-upload__file-details {
       display: flex !important;
       width: 100%;
     }
@@ -4364,9 +4372,11 @@
         ],
         disks: [],
         extraDisks: [],
+        extraNetworks: [],
         mountWindowsDrivers: false,
       },
       diskModal: null,
+      networkModal: null,
       netData: {
         type: 'isolated', // isolated | shared | provider
         name: '',
@@ -5592,6 +5602,7 @@
 
     function openAddNicModal(context = 'vm-detail') {
       const existing = existingNicsForContext(context);
+      state.networkModal = null;
       state.nicModal = {
         context,
         view: 'main',
@@ -5602,6 +5613,8 @@
         mac: '',
         linkState: 'Up',
       };
+      const title = document.getElementById('nic-modal-title');
+      if (title) title.textContent = 'Add network interface';
       renderAddNicModal();
       const overlay = document.getElementById('nic-overlay');
       overlay.classList.add('pf-m-open');
@@ -5788,6 +5801,228 @@
       closeAddNicModal();
       renderVmDetail();
       toast(`Network interface “${nic.name}” added.`);
+    }
+
+    function nextAutoNetworkName(d = state.data) {
+      const base = String(d.name || 'vm').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-') || 'vm';
+      const existing = new Set((d.extraNetworks || []).map(n => String(n.name || '').toLowerCase()));
+      let n = (d.extraNetworks || []).length + 1;
+      let candidate = `${base}-net${n}`;
+      while (existing.has(candidate.toLowerCase())) {
+        n += 1;
+        candidate = `${base}-net${n}`;
+      }
+      return candidate;
+    }
+
+    function openAddNetworkModal() {
+      if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
+      state.nicModal = null;
+      const defaultNet = CONFIG_VIRTUAL_NETWORKS[0];
+      state.networkModal = {
+        virtualNetwork: defaultNet?.id || '',
+        subnet: defaultNet?.subnets?.[0] || '',
+        securityGroups: [DEFAULT_SECURITY_GROUP],
+        sgMenuOpen: false,
+        error: '',
+      };
+      const title = document.getElementById('nic-modal-title');
+      if (title) title.textContent = 'Add network';
+      renderAddNetworkModal();
+      const overlay = document.getElementById('nic-overlay');
+      overlay?.classList.add('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('net-f-virtual-network')?.focus(), 0);
+    }
+
+    function closeAddNetworkModal() {
+      state.networkModal = null;
+      const title = document.getElementById('nic-modal-title');
+      if (title) title.textContent = 'Add network interface';
+      const overlay = document.getElementById('nic-overlay');
+      overlay?.classList.remove('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'true');
+    }
+
+    function canSaveNetworkModal(m = state.networkModal) {
+      if (!m) return false;
+      return !!(m.virtualNetwork && m.subnet && Array.isArray(m.securityGroups) && m.securityGroups.length);
+    }
+
+    function renderAddNetworkModal() {
+      const m = state.networkModal;
+      const body = document.getElementById('nic-modal-body');
+      const footer = document.getElementById('nic-modal-footer');
+      if (!m || !body || !footer) return;
+      const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+      const subnetOpts = net ? net.subnets : [];
+      if (m.virtualNetwork && (!m.subnet || !subnetOpts.includes(m.subnet))) {
+        m.subnet = subnetOpts[0] || '';
+      }
+      if (!Array.isArray(m.securityGroups)) m.securityGroups = [];
+      m.securityGroups = m.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
+      if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+      const canSave = canSaveNetworkModal(m);
+      const previewName = nextAutoNetworkName(state.data);
+      const chips = (m.securityGroups || []).map(sg => `
+        <span class="sg-select__chip">
+          ${sg}
+          <button type="button" data-net-sg-remove="${sg}" aria-label="Remove ${sg}">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </span>
+      `).join('');
+      const sgOpen = !!m.sgMenuOpen;
+      body.innerHTML = `
+        ${m.error ? `
+        <p class="nic-modal__error" role="alert" style="margin:0 0 12px;">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <span>${m.error}</span>
+        </p>
+        ` : ''}
+        <div class="form-field">
+          <label for="net-f-virtual-network">Virtual network <span class="req">*</span></label>
+          ${pfSelect({
+            id: 'net-f-virtual-network',
+            ariaLabel: 'Virtual network',
+            required: true,
+            extraClass: m.virtualNetwork ? '' : 'pf-m-placeholder',
+            optionsHtml: `
+              <option value="" ${!m.virtualNetwork ? 'selected' : ''} disabled hidden>Select a virtual network</option>
+              ${CONFIG_VIRTUAL_NETWORKS.map(n =>
+                `<option value="${n.id}" ${m.virtualNetwork === n.id ? 'selected' : ''}>${n.label}</option>`
+              ).join('')}
+            `,
+          })}
+          <p class="form-helper">Name will be <code>${previewName}</code> (from the VirtualMachine name).</p>
+        </div>
+        <div class="form-field" style="margin-top:16px;">
+          <label for="net-f-subnet">Subnet <span class="req">*</span></label>
+          ${pfSelect({
+            id: 'net-f-subnet',
+            ariaLabel: 'Subnet',
+            required: true,
+            disabled: !m.virtualNetwork,
+            extraClass: m.subnet ? '' : 'pf-m-placeholder',
+            optionsHtml: `
+              <option value="" ${!m.subnet ? 'selected' : ''} disabled hidden>Select a subnet</option>
+              ${subnetOpts.map(s =>
+                `<option value="${s}" ${m.subnet === s ? 'selected' : ''}>${s}</option>`
+              ).join('')}
+            `,
+          })}
+        </div>
+        <div class="form-field" style="margin-top:16px;">
+          <label id="net-f-sg-label">Security groups <span class="req">*</span></label>
+          <div class="sg-select ${m.virtualNetwork && m.subnet ? '' : 'pf-m-disabled'} ${sgOpen ? 'pf-m-focus' : ''}"
+            id="net-f-security-groups" role="combobox" aria-labelledby="net-f-sg-label"
+            aria-expanded="${sgOpen}" aria-disabled="${!(m.virtualNetwork && m.subnet)}">
+            ${chips || `<span class="sg-select__placeholder">Select security groups</span>`}
+            <span class="sg-select__actions">
+              ${(m.securityGroups || []).length ? `
+                <button type="button" id="net-f-sg-clear" aria-label="Clear security groups">
+                  <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+              ` : ''}
+              <button type="button" id="net-f-sg-toggle" aria-label="Toggle security groups"
+                ${m.virtualNetwork && m.subnet ? '' : 'disabled'}>
+                <i class="fas fa-caret-down" aria-hidden="true"></i>
+              </button>
+            </span>
+            ${sgOpen ? `
+              <div class="sg-select__menu" role="listbox" aria-label="Security groups">
+                ${CONFIG_SECURITY_GROUPS.map(sg => {
+                  const checked = (m.securityGroups || []).includes(sg);
+                  return `
+                    <button type="button" class="sg-select__option" role="option" data-net-sg-toggle="${sg}" aria-selected="${checked}">
+                      <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
+                      ${sg}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      footer.innerHTML = `
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="net-modal-save" ${canSave ? '' : 'disabled'}>Add</button>
+        <button type="button" class="pf-v6-c-button pf-m-link" id="net-modal-cancel">Cancel</button>
+      `;
+
+      const refresh = () => renderAddNetworkModal();
+      document.getElementById('net-f-virtual-network')?.addEventListener('change', e => {
+        m.virtualNetwork = e.target.value;
+        m.subnet = '';
+        m.securityGroups = [];
+        m.sgMenuOpen = false;
+        const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+        if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
+        if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+        refresh();
+      });
+      document.getElementById('net-f-subnet')?.addEventListener('change', e => {
+        m.subnet = e.target.value;
+        if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+        m.sgMenuOpen = false;
+        refresh();
+      });
+      const sgRoot = document.getElementById('net-f-security-groups');
+      const sgEnabled = !!(m.virtualNetwork && m.subnet);
+      if (sgRoot && sgEnabled) {
+        document.getElementById('net-f-sg-toggle')?.addEventListener('click', e => {
+          e.stopPropagation();
+          m.sgMenuOpen = !m.sgMenuOpen;
+          refresh();
+        });
+        sgRoot.addEventListener('click', e => {
+          if (e.target.closest('[data-net-sg-remove]') || e.target.closest('#net-f-sg-clear') || e.target.closest('[data-net-sg-toggle]')) return;
+          m.sgMenuOpen = !m.sgMenuOpen;
+          refresh();
+        });
+        document.getElementById('net-f-sg-clear')?.addEventListener('click', e => {
+          e.stopPropagation();
+          m.securityGroups = [];
+          refresh();
+        });
+        body.querySelectorAll('[data-net-sg-remove]').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            m.securityGroups = (m.securityGroups || []).filter(x => x !== btn.dataset.netSgRemove);
+            refresh();
+          });
+        });
+        body.querySelectorAll('[data-net-sg-toggle]').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const sg = btn.dataset.netSgToggle;
+            const set = new Set(m.securityGroups || []);
+            if (set.has(sg)) set.delete(sg); else set.add(sg);
+            m.securityGroups = [...set];
+            refresh();
+          });
+        });
+      }
+      document.getElementById('net-modal-save')?.addEventListener('click', saveAddNetworkModal);
+      document.getElementById('net-modal-cancel')?.addEventListener('click', closeAddNetworkModal);
+    }
+
+    function saveAddNetworkModal() {
+      const m = state.networkModal;
+      if (!canSaveNetworkModal(m)) return;
+      if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
+      const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+      state.data.extraNetworks.push({
+        id: `net-${Date.now()}`,
+        name: nextAutoNetworkName(state.data),
+        virtualNetwork: m.virtualNetwork,
+        virtualNetworkLabel: net?.label || m.virtualNetwork,
+        subnet: m.subnet,
+        securityGroups: [...(m.securityGroups || [])],
+      });
+      closeAddNetworkModal();
+      renderWizard();
+      toast('Network added.');
     }
 
     /**
@@ -6725,7 +6960,9 @@
       state.data.catalogPreset = null;
       state.data.disks = [];
       state.data.extraDisks = [];
+      state.data.extraNetworks = [];
       state.diskModal = null;
+      state.networkModal = null;
       state.data.osImage = 'rhel.10';
       state.data.computeResource = 'small';
       state.data.bootDiskGiB = 20;
@@ -6812,6 +7049,7 @@
         (d.securityGroups && d.securityGroups.length) ||
         (d.nics && d.nics.length > 0) ||
         (d.extraDisks && d.extraDisks.length > 0) ||
+        (d.extraNetworks && d.extraNetworks.length > 0) ||
         (d.disks && d.disks.length > 0)
       );
     }
@@ -8121,7 +8359,7 @@
           ` : `
             <div class="form-field">
               <label for="f-ssh-key">SSH public key</label>
-              <div class="pf-v6-c-file-upload" id="f-ssh-upload">
+              <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-ssh-upload">
                 <div class="pf-v6-c-file-upload__file-select">
                   <div class="pf-v6-c-input-group">
                     <div class="pf-v6-c-input-group__item pf-m-fill">
@@ -8266,6 +8504,15 @@
               keyArea.style.height = Math.min(Math.max(keyArea.scrollHeight, 96), 280) + 'px';
             };
 
+            const syncSshDetailsVisibility = (forceShow = false) => {
+              if (!uploadRoot) return;
+              const filled = !!(keyArea?.value?.trim() || d.sshPublicKey?.trim() || filenameInput?.value);
+              if (forceShow || filled) uploadRoot.classList.add('pf-m-show-details');
+              else if (!uploadRoot.contains(document.activeElement)) {
+                uploadRoot.classList.remove('pf-m-show-details');
+              }
+            };
+
             const syncClearEnabled = () => {
               const filled = !!(d.sshPublicKey?.trim() || filenameInput?.value || keyArea?.value?.trim());
               if (clearBtn) clearBtn.disabled = !filled;
@@ -8278,6 +8525,7 @@
                 keyArea.classList.toggle('pf-m-has-content', !!d.sshPublicKey);
               }
               if (filenameInput) filenameInput.value = d.sshKeyFileName;
+              syncSshDetailsVisibility(!!d.sshPublicKey || !!d.sshKeyFileName);
               syncSshHeight();
               syncClearEnabled();
             };
@@ -8295,11 +8543,18 @@
               if (!e.target.value.trim()) d.sshKeyFileName = '';
               if (filenameInput && !e.target.value.trim()) filenameInput.value = '';
               keyArea.classList.toggle('pf-m-has-content', !!e.target.value.trim());
+              syncSshDetailsVisibility(true);
               syncSshHeight();
               syncClearEnabled();
             });
-            browseBtn?.addEventListener('click', () => fileInput?.click());
-            filenameInput?.addEventListener('click', () => fileInput?.click());
+            browseBtn?.addEventListener('click', () => {
+              syncSshDetailsVisibility(true);
+              fileInput?.click();
+            });
+            filenameInput?.addEventListener('click', () => {
+              syncSshDetailsVisibility(true);
+              fileInput?.click();
+            });
             fileInput?.addEventListener('change', e => {
               const file = e.target.files && e.target.files[0];
               readFile(file);
@@ -8308,13 +8563,19 @@
             clearBtn?.addEventListener('click', () => {
               applyKeyContent('', '');
               if (fileInput) fileInput.value = '';
+              syncSshDetailsVisibility(false);
             });
             if (uploadRoot) {
+              uploadRoot.addEventListener('focusin', () => syncSshDetailsVisibility(true));
+              uploadRoot.addEventListener('focusout', () => {
+                requestAnimationFrame(() => syncSshDetailsVisibility(false));
+              });
               ['dragenter', 'dragover'].forEach(evt => {
                 uploadRoot.addEventListener(evt, e => {
                   e.preventDefault();
                   e.stopPropagation();
                   uploadRoot.classList.add('pf-m-drag-hover');
+                  syncSshDetailsVisibility(true);
                 });
               });
               ['dragleave', 'drop'].forEach(evt => {
@@ -8340,6 +8601,7 @@
                 applyKeyContent(text.trim(), '');
               });
             }
+            syncSshDetailsVisibility(!!hasKey);
             syncSshHeight();
             syncClearEnabled();
           }
@@ -8540,6 +8802,34 @@
                 ${fieldErrorHtml('securityGroups')}
                 <p class="form-helper">Firewall rules for inbound and outbound traffic. A project default is preselected.</p>
               </div>
+              ${(d.extraNetworks || []).length ? `
+              <ul class="disk-list" aria-label="Additional networks">
+                ${(d.extraNetworks || []).map(net => `
+                  <li class="disk-list__item">
+                    <div class="disk-list__meta">
+                      <span class="disk-list__name">${(net.name || '—').replace(/</g, '&lt;')}</span>
+                      <span class="disk-list__size">
+                        ${(net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;')}
+                        ${net.subnet ? ` · ${String(net.subnet).replace(/</g, '&lt;')}` : ''}
+                        ${(net.securityGroups || []).length
+                          ? ` · ${net.securityGroups.map(sg => String(sg).replace(/</g, '&lt;')).join(', ')}`
+                          : ''}
+                      </span>
+                    </div>
+                    <button type="button" class="pf-v6-c-button pf-m-plain pf-m-small" data-remove-network="${net.id}"
+                      aria-label="Remove network ${String(net.name || '').replace(/"/g, '&quot;')}">
+                      <span class="pf-v6-c-button__icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
+                    </button>
+                  </li>
+                `).join('')}
+              </ul>
+              ` : ''}
+              <div class="add-network-action">
+                <button type="button" class="pf-v6-c-button pf-m-secondary" id="f-add-network">Add network</button>
+              </div>
+              ${(d.extraNetworks || []).length
+                ? ''
+                : `<p class="disk-list-empty" aria-live="polite">No additional networks yet.</p>`}
             </div>
           `;
           const vn = panel.querySelector('#f-virtual-network');
@@ -8615,6 +8905,15 @@
               }
             }, { signal: ac.signal });
           }
+          panel.querySelector('#f-add-network')?.addEventListener('click', openAddNetworkModal);
+          panel.querySelectorAll('[data-remove-network]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const id = btn.dataset.removeNetwork;
+              d.extraNetworks = (d.extraNetworks || []).filter(net => net.id !== id);
+              renderWizard();
+              toast('Network removed.');
+            });
+          });
         }
 
       } else if (state.createType === 'clone') {
@@ -8763,6 +9062,16 @@
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
               ${reviewRow('Security groups', sgs)}
+              ${(d.extraNetworks || []).length
+                ? (d.extraNetworks || []).map((net, i) => {
+                    const label = (net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;');
+                    const sub = (net.subnet || '—').replace(/</g, '&lt;');
+                    const groups = (net.securityGroups || []).length
+                      ? net.securityGroups.map(sg => String(sg).replace(/</g, '&lt;')).join(', ')
+                      : '—';
+                    return reviewRow(`Network ${i + 1}`, `${label} | ${sub} | ${groups}`);
+                  }).join('')
+                : reviewRow('Additional networks', 'None')}
             `)}
           </div>
         `;
@@ -9012,10 +9321,14 @@
         closeCancelConfirm();
       }
     });
-    document.getElementById('nic-modal-close')?.addEventListener('click', closeAddNicModal);
+    document.getElementById('nic-modal-close')?.addEventListener('click', () => {
+      if (state.networkModal) closeAddNetworkModal();
+      else closeAddNicModal();
+    });
     document.getElementById('nic-overlay')?.addEventListener('click', e => {
       if (e.target.id === 'nic-overlay' || (e.target.classList.contains('pf-v6-l-bullseye') && e.target.closest('#nic-overlay'))) {
-        closeAddNicModal();
+        if (state.networkModal) closeAddNetworkModal();
+        else closeAddNicModal();
       }
     });
     document.getElementById('disk-modal-close')?.addEventListener('click', closeAddDiskModal);
@@ -9234,6 +9547,10 @@
         }
         if (document.getElementById('cancel-overlay')?.classList.contains('pf-m-open')) {
           closeCancelConfirm();
+          return;
+        }
+        if (state.networkModal) {
+          closeAddNetworkModal();
           return;
         }
         if (state.nicModal) {

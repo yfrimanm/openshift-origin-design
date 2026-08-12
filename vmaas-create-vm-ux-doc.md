@@ -11,12 +11,15 @@ Document the **Create VirtualMachine** wizard for OSAC VMaaS so developers can i
 | Steps | Select template → Details → Configure → Storage → Network → Review | Select template → Details (+ Access) → Configure (Compute / Storage / Network) → Review |
 | Mock | `vmaas-create-wizard-option-1.html` | `vmaas-create-wizard-option-2.html` (embedded in tenant shell) |
 
+**Preferred baseline (stakeholder feedback):** Option 1 flat flow. Option 2 remains an alternate IA reference.
+
+**Option 1 wizard steps:** Select template → Details → Configure (compute + Access) → Storage → Network → Review and create  
 **Option 2 wizard steps:** Select template → Details (Access) → Configure → Review and create
 
-*Interactive mockup (Option 2):* `vmaas-create-wizard-option-2.html` (also embedded in the tenant shell: Services → Virtual machines)  
-*Option 1 (previous flat flow):* `vmaas-create-wizard-option-1.html`  
+*Interactive mockup (Option 1):* `vmaas-create-wizard-option-1.html`  
+*Option 2 (alternate):* `vmaas-create-wizard-option-2.html` (also embedded in the tenant shell: Services → Virtual machines)  
 *Google Doc:* [Create VirtualMachine — UX documentation](https://docs.google.com/document/d/1o97lTRGKAOPdNQz_zH7KbUOxAchPnJYsjlGye9W_tNs/edit)  
-*Screenshots:* `videos/vmaas-create-ux-doc/` (Option 1 capture; regenerate for Option 2 when needed)  
+*Screenshots:* `videos/vmaas-create-ux-doc/` (Option 1 capture)  
 *Regenerate screenshots:* `node scripts/capture-vmaas-create-screenshots.mjs`
 
 ---
@@ -25,6 +28,8 @@ Document the **Create VirtualMachine** wizard for OSAC VMaaS so developers can i
 
 | Decision | Detail |
 |---|---|
+| **Wizard left nav** | Keep the PatternFly wizard step nav on the left in **both** Option 1 and Option 2. Do not replace with a nav-less / single-page form or header-only stepper for stakeholder or product mocks. |
+| **Option 1 preferred IA** | Flat steps: Select template → Details → Configure → Storage → Network → Review. Access stays on Configure. |
 | **Option 2 IA** | Details holds identity + optional Access. Configure groups Compute resource, Storage, and Network as substeps (aligns with VM details). |
 | **Storage under Configure** | Boot disk + additional disks on Configure → Storage. |
 | **Network under Configure** | Virtual network, subnet, and security groups on Configure → Network. |
@@ -103,7 +108,10 @@ Nav parent **Configure** with three substeps:
 - **Add disk** below boot disk; empty state *No additional disks yet.*
 
 ### Network
-Attach to an existing virtual network: network, subnet, security groups.
+- Primary attach: virtual network, subnet, security groups (required).  
+- **Add network** below (same pattern as Add disk): opens a modal for virtual network / subnet / security groups; auto name `{vm}-netN`.  
+- Empty state: *No additional networks yet.*  
+- Additional networks listed with remove; Review shows *Network N* → `vnet | subnet | security groups`, or *Additional networks* → *None*.
 
 ![Configure](videos/vmaas-create-ux-doc/05-configure.png)
 
@@ -115,7 +123,10 @@ Grouped review: Details / Configure / Storage / Network with edit affordances ba
 
 - **SSH public key** / **Cloud-init:** *Configured* or *Not configured* (no dash). If SSH was uploaded, *Configured (filename)*. Do not paste key or cloud-init body on Review.
 - **Additional disks:** when present, one row per disk: *Disk N* → *Size | Storage tier* (e.g. `30 GiB | Balanced`). When none: *Additional disks* → *None*.
+- **Additional networks:** when present, one row per network: *Network N* → *vnet | subnet | security groups*. When none: *Additional networks* → *None*.
 - **Empty values:** optional text (e.g. Description) uses *—*; required Network fields show values (or *—* only as a fail-safe if incomplete). Access uses *Configured* / *Not configured* only.
+
+**Option 1 Access (on Configure):** SSH FileUpload textarea stays collapsed until focus, upload, drag, or paste (same progressive disclosure as Option 2). Cloud-init stays single-line until focus/content.
 
 ![Review](videos/vmaas-create-ux-doc/10-review.png)
 
@@ -143,18 +154,22 @@ Shown when Cancel / close would discard entered data.
 
 ## Acceptance checklist (for implementation)
 
-- [ ] Wizard nav includes **Storage** and **Network** as separate steps  
+- [ ] Wizard keeps **left step nav** (PF6 wizard nav) in Option 1 and Option 2  
+- [ ] Wizard nav includes **Storage** and **Network** as separate steps (Option 1) or Configure substeps (Option 2)  
 - [ ] Configure has no disks UI; Storage owns boot + additional disks  
 - [ ] Locked fields use disabled controls + lock icon; copy says **Locked** (not Fixed)  
 - [ ] Details Project is context awareness from list (not a disabled dropdown)  
 - [ ] Add disk: auto name; storage tier select with in-menu search + divider  
+- [ ] Add network: same list/modal/empty pattern as Add disk; Review shows Network N or None  
 - [ ] Exit modal matches copy and button roles above  
 - [ ] Estimate cost updates when compute / storage changes  
+- [ ] Review: Access = Configured / Not configured; empty Description = —; no additional disks = None 
 
 ---
 
 ## Related
 
-- Mock: `osac-vmaas/public/vmaas-create-wizard-option-2.html`  
+- Preferred mock: `vmaas-create-wizard-option-1.html`  
+- Alternate IA: `vmaas-create-wizard-option-2.html` (tenant shell may still embed this)  
 - Earlier alignment notes: `vmaas-openshift-ux-doc-v3.md`  
 - Governance PRD context: OSAC-3538 / enhancement-proposals PR #195 (per-field locked/editable)
