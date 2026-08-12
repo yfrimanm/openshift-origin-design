@@ -7545,7 +7545,7 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your VirtualMachine and optionally set access.</p>
+            <p class="step-help">Name your VirtualMachine, select a project, and optionally set access.</p>
             ` : '<h3 class="section-label">General info</h3>'}
             <div class="form-field ${state.fieldErrors.name ? 'pf-m-error' : ''}" data-field="name">
               <label for="f-name">Name <span class="req">*</span></label>
@@ -7656,6 +7656,10 @@
           panel.querySelector('#f-project')?.addEventListener('change', e => {
             d.project = e.target.value || 'default';
             clearFieldError('project');
+            const help = panel.querySelector('#f-project-help');
+            if (help) {
+              help.innerHTML = `Your VirtualMachine will be created in project <strong>${String(d.project).replace(/</g, '&lt;')}</strong>`;
+            }
           });
           const cloudEl = panel.querySelector('#f-cloud-init');
           if (cloudEl) {
