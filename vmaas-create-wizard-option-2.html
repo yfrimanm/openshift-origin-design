@@ -8595,7 +8595,7 @@
             </div>
             <div class="tpl-toolbar">
               <div class="tpl-toolbar__project">
-                <label for="f-tpl-project">Project <span class="req">*</span></label>
+                <label for="f-tpl-project">Project</label>
                 ${(() => {
                   const currentProject = d.project || createContextProject() || 'default';
                   d.project = currentProject;
@@ -8605,7 +8605,6 @@
                   return pfSelect({
                     id: 'f-tpl-project',
                     ariaLabel: 'Project',
-                    required: true,
                     optionsHtml: projectOpts.map(p =>
                       `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
                     ).join(''),
