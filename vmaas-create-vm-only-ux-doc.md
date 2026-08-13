@@ -24,10 +24,10 @@ Select template → Details → Compute resource → Storage → Network → Rev
 | **Scope** | List + Create wizard only. VM names are not links; no details Overview page. |
 | **IA** | Same as Option 2: flat steps — no **Configure** parent in the wizard nav. |
 | **Wizard left nav** | PatternFly wizard step nav on the left (always visible in mock). |
-| **Role labels** | Masthead role dropdown: **VM Author**, **VM User**, Console Access Only, Organization Administrator — no vApp aliases. |
+| **Role labels** | Masthead role dropdown: **VM Admin**, **VM User**, Console Access Only, Organization Administrator — no vApp aliases. |
 | **Search** | Regular search field only (no advanced filters / sliders icon). Attribute filters (Project / Status / OS) remain below. |
 | **Row kebab = Actions** | Same items and copy: Control ▸, Open console, Delete. Helper text uses **VM** (not VirtualMachine). |
-| **OS image** | Locked field on **Details** (after Project). Not on Compute resource. |
+| **OS image** | Shown when selecting the template (and on Review). Not on Details. |
 | **Access** | Optional SSH / cloud-init on **Details**. |
 | **Locked vs Editable** | Lock / pen icons. Prefer **Locked** / **Editable** (not Flexible / Fixed). |
 | **Project** | Editable dropdown on Details; prefills from list context. |
@@ -78,11 +78,10 @@ Browse templates as cards. Selecting a template opens a drawer with **Template s
 
 ## Step 2 — Details
 
-- Step help: *Name your VirtualMachine, select a project, and optionally set access. OS image is locked by the template.*
+- Step help: *Name your VirtualMachine, select a project, and optionally set access.*
 - **Name** (required) + generate
 - **Description** (optional)
 - **Project** — This needs to be set before showing the available templates
-- **OS image** — This needs to be set before showing the available templates
 - **Access** (Optional) — SSH public key and cloud-init
 
 ![05-details](videos/vmaas-create-vm-only-ux-doc/05-details.png)
@@ -122,7 +121,7 @@ Browse templates as cards. Selecting a template opens a drawer with **Template s
 
 ## Step 6 — Review and create
 
-Grouped review: Details (includes OS image + Access) / Compute resource / Storage / Network with edit links. Cost panel on the right. Optional *Start this VirtualMachine after creation*.
+Grouped review: Details (includes Access) / Compute resource / Storage / Network with edit links. Cost panel on the right. Optional *Start this VirtualMachine after creation*.
 
 - Access: *Configured* / *Not configured* (filename when SSH uploaded)
 - Additional disks / networks: *Disk N* / *Network N* or *None*
