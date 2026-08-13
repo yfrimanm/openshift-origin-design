@@ -216,23 +216,21 @@
     .console__nav {
       border-right: 1px solid var(--vmaas-border-light);
       background: var(--vmaas-bg-subtle);
-      padding: var(--pf-t--global--spacer--md, 16px) 0;
+      padding: var(--pf-t--global--spacer--sm, 8px) 0;
     }
     .console__nav.pf-v6-c-nav,
     .console__nav .pf-v6-c-nav {
-      /* PF6 default density */
       --pf-v6-c-nav__link--FontSize: var(--pf-t--global--font--size--body--default, 14px);
-      --pf-v6-c-nav__list--RowGap: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__item--RowGap: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__subnav--RowGap: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__subnav--PaddingBlockStart: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__subnav--PaddingBlockEnd: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-nav__list--RowGap: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__item--RowGap: 0;
+      --pf-v6-c-nav__subnav--RowGap: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__subnav--PaddingBlockStart: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__subnav--PaddingBlockEnd: var(--pf-t--global--spacer--xs, 4px);
       --pf-v6-c-nav__subnav--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
-      --pf-v6-c-nav__link--PaddingBlockStart: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__link--PaddingBlockEnd: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-nav__link--PaddingBlockStart: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__link--PaddingBlockEnd: var(--pf-t--global--spacer--xs, 4px);
       --pf-v6-c-nav__link--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
       --pf-v6-c-nav__link--PaddingInlineEnd: var(--pf-t--global--spacer--md, 16px);
-      /* Keep transparent chrome (no white pills) */
       --pf-v6-c-nav__link--BackgroundColor: transparent;
       --pf-v6-c-nav__link--hover--BackgroundColor: rgba(0, 0, 0, 0.04);
       --pf-v6-c-nav__link--m-current--BackgroundColor: transparent;
@@ -245,22 +243,34 @@
       --pf-v6-c-nav__link--m-current--Color: var(--vmaas-text);
       background: transparent;
     }
-    .console__nav .pf-v6-c-nav__list,
-    .console__nav .pf-v6-c-nav__item,
-    .console__nav .pf-v6-c-nav__subnav {
-      row-gap: var(--pf-t--global--spacer--sm, 8px);
+    /* Flex avoids PF grid + whitespace text nodes creating tall phantom rows. */
+    .console__nav > .pf-v6-c-nav__list,
+    .console__nav .pf-v6-c-nav__subnav > .pf-v6-c-nav__list {
+      display: flex !important;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--xs, 4px);
+      row-gap: var(--pf-t--global--spacer--xs, 4px);
+    }
+    .console__nav .pf-v6-c-nav__item {
+      display: block !important;
+      height: auto !important;
+      min-height: 0 !important;
+      row-gap: 0;
     }
     .console__nav .pf-v6-c-nav__link {
+      display: flex;
       width: 100%;
+      height: auto !important;
+      min-height: 0 !important;
       text-align: left;
       cursor: pointer;
       border: none;
       background: transparent !important;
       box-shadow: none !important;
-      padding-block: var(--pf-t--global--spacer--sm, 8px);
+      padding-block: var(--pf-t--global--spacer--xs, 4px);
       padding-inline: var(--pf-t--global--spacer--md, 16px);
-      min-height: 0;
       align-items: center;
+      line-height: var(--pf-t--global--font--line-height--body, 1.5);
     }
     .console__nav .pf-v6-c-nav__link::before,
     .console__nav .pf-v6-c-nav__link::after {
@@ -278,11 +288,12 @@
       box-shadow: inset 3px 0 0 var(--vmaas-blue) !important;
     }
     .console__nav .pf-v6-c-nav__subnav {
-      max-height: none;
+      display: block !important;
+      max-height: none !important;
       overflow: visible;
       opacity: 1;
       translate: none;
-      padding-block: var(--pf-t--global--spacer--sm, 8px);
+      padding-block: var(--pf-t--global--spacer--xs, 4px);
       padding-inline-start: var(--pf-t--global--spacer--md, 16px);
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable > .pf-v6-c-nav__link {
@@ -295,7 +306,7 @@
       cursor: not-allowed;
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable {
-      display: block;
+      display: block !important;
     }
     .console__content {
       padding: 20px 24px 28px;
