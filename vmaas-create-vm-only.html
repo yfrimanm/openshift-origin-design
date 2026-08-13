@@ -1397,11 +1397,6 @@
     .vm-search-main input {
       flex: 1; border: none; padding: 8px 8px 8px 0; font-size: 14px; outline: none; min-width: 0;
     }
-    .vm-search-main__filter {
-      width: 40px; border: none; border-left: 1px solid var(--vmaas-border-light);
-      background: #fff; cursor: pointer; color: var(--vmaas-text-subtle);
-    }
-    .vm-search-main__filter:hover { background: var(--vmaas-bg-subtle); }
     .filter-bar {
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
       margin-bottom: 12px;
@@ -3414,7 +3409,6 @@
               <div class="vm-search-main">
                 <span class="vm-search-main__icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
                 <input type="search" id="vm-search-global" placeholder="Search virtual machines" aria-label="Search virtual machines" />
-                <button type="button" class="vm-search-main__filter" aria-label="Advanced filters"><i class="fa-solid fa-sliders"></i></button>
               </div>
               <button type="button" class="pf-v6-c-button pf-m-secondary">Save search</button>
               <button type="button" class="pf-v6-c-button pf-m-secondary">Saved searches <i class="fa-solid fa-caret-down" style="margin-left:6px;"></i></button>
@@ -3551,7 +3545,7 @@
                         <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-action-delete-item">
                           <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="delete" disabled id="vm-action-delete-btn">
                             <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
-                            <span class="pf-v6-c-menu__item-description" id="vm-action-delete-desc">The VirtualMachine is running</span>
+                            <span class="pf-v6-c-menu__item-description" id="vm-action-delete-desc">The VM is running</span>
                           </button>
                         </li>
                       </ul>
@@ -4355,7 +4349,7 @@
       const control = document.getElementById(
         field === 'name' ? 'f-name'
           : field === 'project' ? 'f-project'
-          : field === 'osImage' ? 'f-config-os'
+          : field === 'osImage' ? 'f-os-image'
           : field === 'virtualNetwork' ? 'f-virtual-network'
           : field === 'subnet' ? 'f-subnet'
           : field === 'securityGroups' ? 'f-security-groups'
@@ -4417,7 +4411,7 @@
       const id =
         field === 'name' ? 'f-name'
         : field === 'project' ? 'f-project'
-        : field === 'osImage' ? 'f-config-os'
+        : field === 'osImage' ? 'f-os-image'
         : field === 'virtualNetwork' ? 'f-virtual-network'
         : field === 'subnet' ? 'f-subnet'
         : field === 'securityGroups' ? 'f-security-groups'
@@ -5488,7 +5482,7 @@
       btn.disabled = !canUse;
       btn.title = !role.canPower
         ? 'No power operations for this role'
-        : hasSelection ? '' : 'Select one or more VirtualMachines';
+        : hasSelection ? '' : 'Select one or more VMs';
 
       if (!canUse) setVmActionsMenuOpen(false);
 
@@ -5503,7 +5497,7 @@
       setActionItemState('vm-action-console-item', 'vm-action-console-btn', 'vm-action-console-desc', {
         disabled: allStopped || !selected.length,
         description: allStopped
-          ? (single ? 'The VirtualMachine is not running' : 'VirtualMachines are not running')
+          ? (single ? 'The VM is not running' : 'VMs are not running')
           : 'Open console in new tab',
       });
 
@@ -5512,8 +5506,8 @@
       let deleteDesc = '';
       if (someRunning) {
         deleteDesc = single
-          ? 'The VirtualMachine is running'
-          : 'Some VirtualMachines are running';
+          ? 'The VM is running'
+          : 'Some VMs are running';
       }
       setActionItemState('vm-action-delete-item', 'vm-action-delete-btn', 'vm-action-delete-desc', {
         disabled: deleteBlocked,
@@ -7164,7 +7158,7 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your VirtualMachine and select a project. Description is optional.</p>
+            <p class="step-help">Name your VirtualMachine and select a project. OS image is locked by the template.</p>
             ` : '<h3 class="section-label">General info</h3>'}
             <div class="form-field ${state.fieldErrors.name ? 'pf-m-error' : ''}" data-field="name">
               <label for="f-name">Name <span class="req">*</span></label>
@@ -7207,6 +7201,15 @@
                 Your VirtualMachine will be created in project <strong>${(d.project || 'default').replace(/</g, '&lt;')}</strong>
               </p>
               ${fieldErrorHtml('project')}
+            </div>
+            <div class="form-field">
+              <label for="f-os-image" class="label-with-optional">
+                <span>OS image</span>
+                ${fieldGovLabel('locked')}
+              </label>
+              <input type="text" id="f-os-image" class="unit-size-input"
+                value="${(d.osImage || TEMPLATES.find(t => t.id === d.templateId)?.osImage || TEMPLATES.find(t => t.id === d.templateId)?.os || d.os || '—').toString().replace(/"/g, '&quot;')}"
+                disabled aria-disabled="true" aria-label="OS image" />
             </div>
             ` : ''}
           </div>
@@ -7688,7 +7691,7 @@
           const costHourLabel = sizeEditable ? `From ${selRates.hour}` : selRates.hour;
           const computeDigits = selEst.computeHourly > 0 && selEst.computeHourly < 1 ? 3 : 2;
           const fixedItems = [
-            { label: 'OS image', value: selected.osImage || selected.os || '—' },
+            { label: 'OS image', value: selected.osImage || selected.os || '—', note: 'Details step' },
           ];
           if (fieldBeh.compute === 'locked') {
             fixedItems.push({ label: 'Compute', value: `${selSpecs.cpu} · ${selSpecs.mem}`, note: '' });
@@ -8114,8 +8117,7 @@
           const fieldBeh = getTemplateFields(selectedTpl || d.catalogPreset);
           const computeEditable = fieldBeh.compute === 'editable';
           const computeLabel = computeResourceLabel(d.computeResource);
-          // OS image stays in step help + template drawer (not repeated as a Locked panel here).
-          const computeFieldHtml = computeEditable ? `
+                    const computeFieldHtml = computeEditable ? `
               <div class="form-field">
                 <label for="f-compute-resource" class="label-with-optional">
                   <span>Compute resource <span class="req">*</span></span>
@@ -8143,7 +8145,7 @@
               </div>
           `;
           const stepHelp = computeEditable
-            ? 'OS image is locked by the template. Set compute and access here.'
+            ? 'Set compute and access here.'
             : 'Review locked size and set access.';
 
           panel.innerHTML = `
@@ -8753,9 +8755,9 @@
               ${reviewRow('Name', d.name || '—')}
               ${reviewRow('Description', d.description || '—')}
               ${reviewRow('Project', d.project || '—')}
+              ${reviewRow('OS image', osImage)}
             `)}
             ${reviewSection('Configure', 'configure', `
-              ${reviewRow('OS image', osImage)}
               ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
               ${windowsAccess
                 ? reviewRow('Access method', 'Password / RDP after create')
