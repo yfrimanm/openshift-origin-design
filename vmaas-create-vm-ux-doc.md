@@ -59,18 +59,18 @@ Browse templates as cards (or list). Selecting a template opens a drawer with **
 - **Locked by this template** — OS image always; compute / boot disk when the SKU locks them  
 - **Editable later** — fields the user can change on later steps  
 
-**Flexible** templates show starting CPU / memory / storage and pen icons. Locked SKUs show lock icons.
+**Editable** templates show starting CPU / memory / storage and pen icons. Locked SKUs show lock icons.
 
 ![Select template](videos/vmaas-create-ux-doc/02-select-template.png)
 
 ![Template drawer (locked SKU)](videos/vmaas-create-ux-doc/03-template-drawer.png)
 
-![Template drawer (flexible SKU)](videos/vmaas-create-ux-doc/12-flexible-template-drawer.png)
+![Template drawer (Editable SKU)](videos/vmaas-create-ux-doc/12-editable-template-drawer.png)
 
 **Dev notes**
 
 - Template field governance is per-field: `compute` / `bootDisk` = `locked` | `editable`; image is always locked.
-- Card footer: **Estimate cost** with hourly + monthly (flexible may prefix hourly with **From**).
+- Card footer: **Estimate cost** with hourly + monthly (Editable templates may prefix hourly with **From**).
 
 ---
 

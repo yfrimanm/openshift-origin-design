@@ -4059,8 +4059,8 @@
       },
       {
         id: 'catalog-custom-1',
-        name: 'RHEL 10 Flexible',
-        slug: 'rhel10-flexible',
+        name: 'RHEL 10 Editable',
+        slug: 'rhel10-editable',
         project: 'default',
         osImage: 'rhel.10',
         os: 'Red Hat Enterprise Linux 10',
@@ -4081,8 +4081,8 @@
       },
       {
         id: 'catalog-custom-2',
-        name: 'RHEL 10 Flexible (XL)',
-        slug: 'rhel10-flexible-xl',
+        name: 'RHEL 10 Editable (XL)',
+        slug: 'rhel10-editable-xl',
         project: 'default',
         osImage: 'rhel.10',
         os: 'Red Hat Enterprise Linux 10',
@@ -4116,7 +4116,7 @@
     function isTplFieldEditable(tpl, field) {
       return getTemplateFields(tpl)[field] === 'editable';
     }
-    function isSizeFlexibleTemplate(tpl) {
+    function isSizeEditableTemplate(tpl) {
       const f = getTemplateFields(tpl);
       return f.compute === 'editable' || f.bootDisk === 'editable';
     }
@@ -7647,7 +7647,7 @@
         const cards = list.map(t => {
           const rates = cardRates(t);
           const specs = cardSpecs(t);
-          const flexible = isSizeFlexibleTemplate(t);
+          const sizeEditable = isSizeEditableTemplate(t);
           return `
           <div class="tpl-card ${t.id === d.templateId ? 'pf-m-selected' : ''}"
             data-tpl="${t.id}" role="option" aria-selected="${t.id === d.templateId}" tabindex="0">
@@ -7656,27 +7656,27 @@
             </span>
             <div class="tpl-card__title-row">
               <span class="tpl-card__title" title="${cardName(t)}">${cardName(t)}</span>
-              ${flexible ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
+              ${sizeEditable ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
             <div class="tpl-card__specs">
               <div>
-                <span class="tpl-card__spec-label">${flexible ? 'Starting CPU' : 'CPU'}</span>
+                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting CPU' : 'CPU'}</span>
                 <span class="tpl-card__spec-value">${specs.cpu}</span>
               </div>
               <div>
-                <span class="tpl-card__spec-label">${flexible ? 'Starting memory' : 'Memory'}</span>
+                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting memory' : 'Memory'}</span>
                 <span class="tpl-card__spec-value">${specs.mem}</span>
               </div>
               <div>
-                <span class="tpl-card__spec-label">${flexible ? 'Starting storage' : 'Storage'}</span>
+                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting storage' : 'Storage'}</span>
                 <span class="tpl-card__spec-value">${cardStorage(t)}</span>
               </div>
             </div>
             <div class="tpl-card__footer">
               <span class="tpl-card__cost-label">Estimate cost</span>
               <span class="tpl-card__cost-values">
-                ${flexible ? `From ${rates.hour}` : rates.hour}
+                ${sizeEditable ? `From ${rates.hour}` : rates.hour}
                 <span class="tpl-card__cost-month">${rates.month}</span>
               </span>
             </div>
@@ -7686,7 +7686,7 @@
         const listRows = list.map(t => {
           const specs = cardSpecs(t);
           const rates = cardRates(t);
-          const flexible = isSizeFlexibleTemplate(t);
+          const sizeEditable = isSizeEditableTemplate(t);
           return `
           <tr class="${t.id === d.templateId ? 'pf-m-selected' : ''}" data-tpl="${t.id}" tabindex="0">
             <td>
@@ -7695,13 +7695,13 @@
                   <i class="${cardIcon(t)}"></i>
                 </span>
                 <span class="tpl-list__name-link">${cardName(t)}</span>
-                ${flexible ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
+                ${sizeEditable ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
               </span>
             </td>
             <td>${specs.cpu}</td>
             <td>${specs.mem}</td>
             <td>${cardStorage(t)}</td>
-            <td>${flexible ? `From ${rates.hour}` : cardCost(t)}</td>
+            <td>${sizeEditable ? `From ${rates.hour}` : cardCost(t)}</td>
           </tr>
         `;
         }).join('');
@@ -7712,9 +7712,9 @@
           const selEst = estimateCatalogItemCost(selected);
           const selRates = formatEstimateRates(selEst);
           const fieldBeh = getTemplateFields(selected);
-          const flexible = isSizeFlexibleTemplate(selected);
+          const sizeEditable = isSizeEditableTemplate(selected);
           const drawerTab = state.tplDrawerTab === 'cost' ? 'cost' : 'details';
-          const costHourLabel = flexible ? `From ${selRates.hour}` : selRates.hour;
+          const costHourLabel = sizeEditable ? `From ${selRates.hour}` : selRates.hour;
           const computeDigits = selEst.computeHourly > 0 && selEst.computeHourly < 1 ? 3 : 2;
           const fixedItems = [
             { label: 'OS image', value: selected.osImage || selected.os || '—' },
@@ -7794,7 +7794,7 @@
                   <dd>${formatUsd(selEst.storageHourly, 3)}/hour</dd>
                 </dl>
                 <p class="tpl-drawer__cost-note">
-                  ${flexible
+                  ${sizeEditable
                     ? 'Starting estimate from template defaults. Cost updates on Configure if you change size. OS image stays locked.'
                     : 'Same rates as template cards. Size is locked for this template. Actual billing may vary.'}
                 </p>
@@ -7809,7 +7809,7 @@
                   </span>
                   <div class="tpl-drawer__heading">
                     <h4 class="tpl-drawer__title" id="tpl-drawer-title">${cardName(selected)}</h4>
-                    <p class="tpl-drawer__sub">${flexible ? 'Flexible size · locked image' : `${selected.os} VM`}</p>
+                    <p class="tpl-drawer__sub">${sizeEditable ? 'Editable size · locked image' : `${selected.os} VM`}</p>
                   </div>
                 </div>
                 <button type="button" class="tpl-drawer__close" id="tpl-drawer-close" aria-label="Close details">&times;</button>
