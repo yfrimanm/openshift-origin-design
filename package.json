@@ -1,0 +1,14 @@
+{
+  "name": "jira-mockup-demos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "record:search-dropdown": "node scripts/record-search-dropdown.mjs",
+    "record:search-by-autosuggest": "node scripts/record-search-by-autosuggest.mjs",
+    "capture:vmaas-create": "node scripts/capture-vmaas-create-screenshots.mjs",
+    "capture:vmaas-create-vm-only": "node scripts/capture-vmaas-create-vm-only-screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}

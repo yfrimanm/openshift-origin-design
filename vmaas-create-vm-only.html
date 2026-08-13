@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VMaaS — Create VirtualMachine only</title>
+  <title>VMaaS Create VirtualMachine only — list + create (Option 2 IA)</title>
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -326,7 +326,6 @@
     .page-header .page-title { min-width: 0; flex: 1 1 auto; }
     .page-header > .pf-v6-c-button { flex: 0 0 auto; }
     .page-title { font-size: 28px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
-    .vm-name { font-weight: 600; color: var(--vmaas-text); }
     .page-title .star { color: var(--vmaas-text-subtle); font-size: 18px; border: none; background: none; cursor: pointer; padding: 0; }
     .muted { color: var(--vmaas-text-subtle); }
     .view { display: none; }
@@ -629,6 +628,17 @@
     }
     .project-context .pf-v6-c-alert__title strong {
       font-weight: 700;
+    }
+    /* Details Access — same divider as Configure Access (Option 1) */
+    .section-block > .form-field ~ .config-section-title {
+      margin: 0 0 var(--pf-t--global--spacer--lg, 24px);
+      padding-top: var(--pf-t--global--spacer--lg, 24px);
+      border-top: 1px solid var(--vmaas-border-light);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vmaas-text);
+      max-width: 560px;
+      scroll-margin-top: 12px;
     }
     .vm-config__fields > .pf-v6-c-button { margin-top: 0; }
     .vm-config__fields .form-helper {
@@ -1556,6 +1566,7 @@
     .cell-res {
       display: inline-flex; align-items: center; gap: 8px;
     }
+    .vm-name { font-weight: 600; color: var(--vmaas-text); }
     .name-link {
       background: none; border: none; padding: 0; cursor: pointer;
       color: var(--vmaas-blue); font-weight: 400; font-size: 14px;
@@ -2493,7 +2504,6 @@
       display: flex;
       align-items: center;
       gap: var(--pf-t--global--spacer--sm, 8px);
-      /* PF: sm (8px) between heading and following content */
       margin: 0 0 var(--pf-t--global--spacer--sm, 8px);
     }
     .review-nebius__title {
@@ -3308,10 +3318,10 @@
 </script>
   <div class="mockup-shell">
     <header class="mockup-header">
-      <h1>VMaaS — Create VirtualMachine only</h1>
+      <h1>VMaaS — Create VirtualMachine (Option 2)</h1>
       <p>
-        Create VirtualMachine flow only (same steps as Option 1).
-        VirtualMachine details page removed — list is an entry point for Create.
+        Create VM only (Option 2 IA): Select template → Details (includes Access) → Compute resource
+        → Storage → Network → Review and create. No VM details page.
       </p>
     </header>
 
@@ -3575,7 +3585,12 @@
             </div>
           </section>
 
-
+          <section class="view" id="view-vm">
+            <button type="button" class="vm-detail__crumb" id="vm-back-to-list">
+              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Virtual machines
+            </button>
+            <div id="vm-detail-root"></div>
+          </section>
 
           <section class="view" id="view-networks">
             <div class="page-header">
@@ -4213,10 +4228,10 @@
       // Hide on Catalog / Details.
       return state.wizard === 'vm'
         && state.createType === 'template'
-        && (key === 'configure' || key === 'networking' || key === 'review'
-          || key === 'compute' || key === 'access' || key === 'storage'
-          || key === 'config-os' || key === 'config-compute'
-          || key === 'config-cloud-init' || key === 'config-ssh' || key === 'customize');
+        && (key === 'config-compute' || key === 'config-storage' || key === 'config-network'
+          || key === 'configure' || key === 'networking' || key === 'storage' || key === 'review'
+          || key === 'compute' || key === 'access'
+          || key === 'config-os' || key === 'config-cloud-init' || key === 'config-ssh' || key === 'customize');
     }
 
     function catalogBaselineReasons(d = state.data) {
@@ -4300,7 +4315,7 @@
       if (noteEl) noteEl.textContent = getCostEstimateNote(state.data);
       const stepKey = key || stepsForType()[state.step]?.key;
       const networkNoteEl = document.getElementById('cost-estimate-network-note');
-      if (networkNoteEl) networkNoteEl.hidden = stepKey !== 'networking';
+      if (networkNoteEl) networkNoteEl.hidden = stepKey !== 'config-network';
     }
 
     const CONFIG_VIRTUAL_NETWORKS = [
@@ -4394,9 +4409,9 @@
       const details = validateDetailsFields(d);
       if (Object.keys(details).length) return { stepKey: 'details', errors: details };
       const configure = validateConfigureFields(d);
-      if (Object.keys(configure).length) return { stepKey: 'configure', errors: configure };
+      if (Object.keys(configure).length) return { stepKey: 'config-compute', errors: configure };
       const networking = validateNetworkingFields(d);
-      if (Object.keys(networking).length) return { stepKey: 'networking', errors: networking };
+      if (Object.keys(networking).length) return { stepKey: 'config-network', errors: networking };
       return null;
     }
 
@@ -6573,11 +6588,519 @@
     }
 
     function openVmDetail(/* name, tab */) {
-      /* Create-VM-only mock: details page removed. */
+      /* Create-vm-only mock: no VirtualMachine details page */
     }
 
     function renderVmDetail() {
-      /* Create-VM-only mock: details page removed. */
+      const root = document.getElementById('vm-detail-root');
+      if (!root) return;
+      const raw = VMS.find(v => v.name === state.selectedVmName);
+      const v = enrichVm(raw);
+      if (!v) {
+        root.innerHTML = '<p class="muted">VirtualMachine not found.</p>';
+        return;
+      }
+      const tab = state.vmDetailTab || 'overview';
+      const tabs = [
+        ['overview', 'Overview'],
+        ['metrics', 'Metrics'],
+        ['yaml', 'YAML'],
+        ['configuration', 'Configuration'],
+        ['events', 'Events'],
+        ['console', 'Console'],
+        ['snapshots', 'Snapshots'],
+        ['diagnostics', 'Diagnostics'],
+      ];
+      const running = v.status === 'running';
+      const header = `
+        <div class="vm-detail__header">
+          <div class="vm-detail__title-row">
+            <h2 class="vm-detail__title">
+              <span class="res-icon res-icon--vm" aria-hidden="true">VM</span>
+              ${v.name}
+            </h2>
+            <span class="vm-detail__status">${statusCell(v.status)}</span>
+          </div>
+          <div class="vm-detail__actions" role="group" aria-label="VM actions">
+            <button type="button" class="vm-action-icon" aria-label="Stop" title="Stop" ${running ? '' : 'disabled'}>
+              <i class="fa-solid fa-stop" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="vm-action-icon" aria-label="Restart" title="Restart" ${running ? '' : 'disabled'}>
+              <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="vm-action-icon" aria-label="Pause" title="Pause" ${running ? '' : 'disabled'}>
+              <i class="fa-solid fa-pause" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="vm-action-icon" aria-label="Start" title="Start" ${running ? 'disabled' : ''}>
+              <i class="fa-solid fa-play" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="pf-v6-c-button pf-m-secondary vm-action-menu">
+              Actions <i class="fa-solid fa-caret-down" style="margin-left:6px;" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <div class="vm-detail__tabs" role="tablist" aria-label="VirtualMachine sections">
+          ${tabs.map(([id, label]) => `
+            <button type="button" class="vm-detail__tab ${tab === id ? 'pf-m-selected' : ''}" data-vm-tab="${id}" role="tab" aria-selected="${tab === id}">
+              ${label}${id === 'diagnostics' ? ' <span class="vm-detail__badge" aria-label="1 issue">1</span>' : ''}
+            </button>
+          `).join('')}
+        </div>
+      `;
+
+      let body = '';
+      if (tab === 'overview') {
+        const u = v.utilization;
+        const filesystems = v.filesystems || [
+          { name: 'vda2', type: 'vfat', mount: '/boot/efi', total: '99.76 MiB', used: '21.47 MiB' },
+          { name: 'vda3', type: 'btrfs', mount: '/', total: '29.45 GiB', used: '749.2 MiB' },
+        ];
+        const services = v.services || [
+          { name: 'headless', ns: v.ns, labels: 'No labels', selector: 'network.kubevirt.io/headlessService=headless', location: 'None' },
+        ];
+        const cpuPct = parseFloat(String(u.cpu).replace('%', '')) || 0;
+        const memPct = parseFloat(String(u.memory).replace('%', '')) || 0;
+        const storPct = parseFloat(String(u.storage).replace('%', '')) || 0;
+        body = `
+          <div class="vm-overview">
+            <div class="vm-overview__top">
+              <div>
+                <div class="vm-card">
+                  <h3 class="vm-card__title">Details</h3>
+                  <div class="vm-details-grid">
+                    <dl class="vm-dl">
+                      <dt>Name</dt>
+                      <dd>
+                        <span class="vm-dl__name">
+                          ${v.name}
+                          <span class="vm-arch-badge">${v.arch}</span>
+                        </span>
+                      </dd>
+                      <dt>Group</dt><dd>${v.group || '—'}</dd>
+                      <dt>Status</dt><dd>${statusCell(v.status)}</dd>
+                      <dt>Created</dt><dd>${v.created || '—'}</dd>
+                      <dt>Operating system</dt><dd>${v.osFull}</dd>
+                      <dt>CPU | Memory</dt><dd>${v.cpu} | ${v.mem} Memory</dd>
+                      <dt>Time zone</dt><dd>${v.timezone}</dd>
+                      <dt class="pf-m-help" title="VirtualMachine instance type">InstanceType</dt>
+                      <dd><span class="cell-res"><span class="res-icon res-icon--cr" aria-hidden="true">CR</span><button type="button" class="name-link">${v.instanceType}</button></span></dd>
+                      <dt class="pf-m-help" title="VirtualMachine preference">Preference</dt>
+                      <dd><span class="cell-res"><span class="res-icon res-icon--cr" aria-hidden="true">CR</span><button type="button" class="name-link">${v.preference}</button></span></dd>
+                      <dt>Hostname</dt><dd>${v.hostname}</dd>
+                    </dl>
+                    <div class="vm-vnc">
+                      <h4 class="vm-vnc__title">VNC console</h4>
+                      <button type="button" class="name-link vm-vnc__open">Open web console <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;" aria-hidden="true"></i></button>
+                      <button type="button" class="vm-console-preview" aria-label="Open VNC console">
+                        <i class="fa-solid fa-play vm-console-preview__play" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="vm-card">
+                  <div class="vm-card__title-row">
+                    <h3 class="vm-card__title">
+                      Utilization
+                      <button type="button" class="util-title-info" title="Resource utilization over the selected time range" aria-label="Utilization information">
+                        <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                      </button>
+                    </h3>
+                    <button type="button" class="filter-select">Last 5 minutes <i class="fa-solid fa-caret-down"></i></button>
+                  </div>
+                  <div class="util-grid">
+                    <div class="util-tile">
+                      <div class="util-tile__label">CPU</div>
+                      <div class="util-tile__abs">7.49 m</div>
+                      <div class="util-tile__abs-sub">Requested of 1</div>
+                      <div class="util-donut-wrap">
+                        <div class="util-donut" style="--pct:${Math.min(cpuPct || 0.75, 100)}" role="img" aria-label="${u.cpu || '0.75%'} CPU used">
+                          <svg viewBox="0 0 100 100" aria-hidden="true">
+                            <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                            <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                          </svg>
+                          <span class="util-donut__center">${u.cpu || '0.75%'} Used</span>
+                        </div>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
+                        <div class="util-spark__y"><span>1000.00</span><span>0.00</span></div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,35 40,34 60,35 80,34 100,35 120,34" />
+                            <line x1="0" y1="6" x2="120" y2="6" stroke="#ec7a08" stroke-width="1" stroke-dasharray="3 3" opacity="0.75" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                    <div class="util-tile">
+                      <div class="util-tile__label">Memory</div>
+                      <div class="util-tile__abs">303 MiB</div>
+                      <div class="util-tile__abs-sub">Used of 2 GiB</div>
+                      <div class="util-donut-wrap">
+                        <div class="util-donut" style="--pct:${Math.min(memPct || 14.81, 100)}" role="img" aria-label="${u.memory || '14.81%'} memory used">
+                          <svg viewBox="0 0 100 100" aria-hidden="true">
+                            <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                            <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                          </svg>
+                          <span class="util-donut__center">${u.memory || '14.81%'} Used</span>
+                        </div>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
+                        <div class="util-spark__y"><span>2.00 GiB</span><span>0.00 B</span></div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="rgba(0,102,204,0.12)" stroke="none" points="0,40 0,28 20,27 40,28 60,27 80,28 100,27 120,28 120,40" />
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,28 20,27 40,28 60,27 80,28 100,27 120,28" />
+                            <line x1="0" y1="4" x2="120" y2="4" stroke="#ec7a08" stroke-width="1" stroke-dasharray="3 3" opacity="0.75" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                    <div class="util-tile">
+                      <div class="util-tile__label">Storage</div>
+                      <div class="util-tile__abs">770.97 MiB</div>
+                      <div class="util-tile__abs-sub">Used of 29.55 GiB</div>
+                      <div class="util-donut-wrap">
+                        <div class="util-donut" style="--pct:${Math.min(storPct || 2.55, 100)}" role="img" aria-label="${u.storage || '2.55%'} storage used">
+                          <svg viewBox="0 0 100 100" aria-hidden="true">
+                            <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                            <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                          </svg>
+                          <span class="util-donut__center">${u.storage || '2.55%'} Used</span>
+                        </div>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
+                        <div class="util-spark__y"><span>1 B</span><span>0 B</span></div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,36 40,36 60,36 80,36 100,36 120,36" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                    <div class="util-tile util-tile--net">
+                      <div class="util-tile__label">Network transfer</div>
+                      <div class="util-tile__abs">0 Bps</div>
+                      <div class="util-tile__abs-sub">Total</div>
+                      <div class="util-net-body">
+                        <div class="util-net-row"><span>0 Bs</span><span>In</span></div>
+                        <div class="util-net-row"><span>0 Bs</span><span>Out</span></div>
+                        <button type="button" class="name-link util-tile__breakdown">Breakdown by network</button>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
+                        <div class="util-spark__y"><span>&nbsp;</span><span>&nbsp;</span></div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="rgba(0,102,204,0.15)" stroke="none" points="0,40 0,18 24,18 24,22 48,22 48,28 72,28 72,34 96,34 96,36 120,36 120,40" />
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,18 24,18 24,22 48,22 48,28 72,28 72,34 96,34 96,36 120,36" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <aside>
+                <div class="vm-card">
+                  <h3 class="vm-card__title">Alerts (0)</h3>
+                  <p class="muted" style="margin:0;font-size:13px;">No alerts</p>
+                </div>
+                <div class="vm-card">
+                  <h3 class="vm-card__title">General</h3>
+                  <dl class="vm-dl">
+                    <dt>Namespace</dt><dd><span class="cell-res"><span class="res-icon res-icon--ns" aria-hidden="true">NS</span><button type="button" class="name-link">${v.ns}</button></span></dd>
+                    <dt>Node</dt><dd><span class="cell-res"><span class="res-icon res-icon--node" aria-hidden="true">N</span><button type="button" class="name-link">${v.node}</button></span></dd>
+                    <dt>VirtualMachineInstance</dt><dd><span class="cell-res"><span class="res-icon res-icon--vmi" aria-hidden="true">VMI</span><button type="button" class="name-link">${v.name}</button></span></dd>
+                    <dt>Pod</dt><dd><span class="cell-res"><span class="res-icon res-icon--pod" aria-hidden="true">P</span><button type="button" class="name-link">virt-launcher-${v.name}-8wdbh</button></span></dd>
+                    <dt>Owner</dt><dd>No owner</dd>
+                  </dl>
+                </div>
+                <div class="vm-card">
+                  <div class="vm-card__title-row">
+                    <h3 class="vm-card__title">Snapshots (1)</h3>
+                    <button type="button" class="name-link">Take snapshot</button>
+                  </div>
+                  <div class="snap-row">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    <div class="snap-row__body">
+                      <strong>${v.name}-snapshot-20240720-131123</strong><br>
+                      <span class="muted">20 Jul 2026, 13:11</span>
+                    </div>
+                    <button type="button" class="kebab" aria-label="Snapshot actions"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button>
+                  </div>
+                  <button type="button" class="pf-v6-c-button pf-m-secondary" style="margin-top:4px;">View more</button>
+                </div>
+                <div class="vm-card">
+                  <h3 class="vm-card__title">Network (${v.nics.length})</h3>
+                  <table class="side-table">
+                    <thead><tr><th>Name</th><th>IP address</th></tr></thead>
+                    <tbody>
+                      ${v.nics.map(n => `
+                        <tr>
+                          <td>${n.name}</td>
+                          <td><span class="side-copy">${n.ip || v.ip || '—'} <button type="button" aria-label="Copy IP"><i class="fa-regular fa-copy" aria-hidden="true"></i></button></span></td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                  <p style="margin:10px 0 0;font-size:12px;color:var(--vmaas-text-subtle);word-break:break-all;">
+                    <strong>Internal FQDN</strong><br>
+                    <span class="side-copy">${v.fqdn} <button type="button" aria-label="Copy FQDN"><i class="fa-regular fa-copy" aria-hidden="true"></i></button></span>
+                  </p>
+                </div>
+                <div class="vm-card">
+                  <h3 class="vm-card__title">Storage (${v.disks.length})</h3>
+                  <table class="side-table">
+                    <thead><tr><th>Name</th><th>Drive</th><th>Size</th><th>Interface</th></tr></thead>
+                    <tbody>
+                      ${v.disks.map(dsk => `<tr><td>${dsk.name}</td><td>${dsk.drive}</td><td>${dsk.size}</td><td>${dsk.interface}</td></tr>`).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </aside>
+            </div>
+            <div class="vm-overview__bottom">
+              <div class="vm-card">
+                <h3 class="vm-card__title">Hardware devices (0)</h3>
+                <div class="subtabs" style="margin-bottom:12px;">
+                  <button type="button" class="subtab pf-m-selected">GPU devices (0)</button>
+                  <button type="button" class="subtab">Host devices (0)</button>
+                </div>
+                <p class="muted" style="margin:0;">No GPU devices found</p>
+              </div>
+              <div class="vm-card">
+                <h3 class="vm-card__title">
+                  File systems
+                  <button type="button" class="util-title-info" title="Guest file systems reported by the agent" aria-label="File systems information">
+                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                  </button>
+                </h3>
+                <div class="vm-overview__table-wrap">
+                  <table class="pf-v6-c-table pf-m-compact vm-table" role="grid" aria-label="File systems">
+                    <thead class="pf-v6-c-table__thead">
+                      <tr class="pf-v6-c-table__tr">
+                        <th class="pf-v6-c-table__th" scope="col">Name</th>
+                        <th class="pf-v6-c-table__th" scope="col">File system type</th>
+                        <th class="pf-v6-c-table__th" scope="col">Mount point</th>
+                        <th class="pf-v6-c-table__th" scope="col">Total bytes</th>
+                        <th class="pf-v6-c-table__th" scope="col">Used bytes</th>
+                      </tr>
+                    </thead>
+                    <tbody class="pf-v6-c-table__tbody">
+                      ${filesystems.map(fs => `
+                        <tr class="pf-v6-c-table__tr">
+                          <td class="pf-v6-c-table__td">${fs.name}</td>
+                          <td class="pf-v6-c-table__td">${fs.type}</td>
+                          <td class="pf-v6-c-table__td">${fs.mount}</td>
+                          <td class="pf-v6-c-table__td">${fs.total}</td>
+                          <td class="pf-v6-c-table__td">${fs.used}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="vm-card">
+                <h3 class="vm-card__title">Services (${services.length})</h3>
+                <div class="vm-overview__table-wrap">
+                  <table class="pf-v6-c-table pf-m-compact vm-table" role="grid" aria-label="Services">
+                    <thead class="pf-v6-c-table__thead">
+                      <tr class="pf-v6-c-table__tr">
+                        <th class="pf-v6-c-table__th" scope="col">Name</th>
+                        <th class="pf-v6-c-table__th" scope="col">Namespace</th>
+                        <th class="pf-v6-c-table__th" scope="col">Labels</th>
+                        <th class="pf-v6-c-table__th" scope="col">Pod selector</th>
+                        <th class="pf-v6-c-table__th" scope="col">Location</th>
+                        <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                      </tr>
+                    </thead>
+                    <tbody class="pf-v6-c-table__tbody">
+                      ${services.map(svc => `
+                        <tr class="pf-v6-c-table__tr">
+                          <td class="pf-v6-c-table__td">
+                            <span class="cell-res"><span class="res-icon res-icon--svc" aria-hidden="true">S</span><button type="button" class="name-link">${svc.name}</button></span>
+                          </td>
+                          <td class="pf-v6-c-table__td">
+                            <span class="cell-res"><span class="res-icon res-icon--ns" aria-hidden="true">NS</span><button type="button" class="name-link">${svc.ns}</button></span>
+                          </td>
+                          <td class="pf-v6-c-table__td">${svc.labels}</td>
+                          <td class="pf-v6-c-table__td">
+                            <button type="button" class="name-link" style="font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="margin-right:4px;" aria-hidden="true"></i>${svc.selector}</button>
+                          </td>
+                          <td class="pf-v6-c-table__td">${svc.location}</td>
+                          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${svc.name}"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="vm-card">
+                <h3 class="vm-card__title">Active users (0)</h3>
+                <p class="muted" style="margin:0;">No active users</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (tab === 'configuration') {
+        const section = state.vmConfigSection || 'details';
+        const sections = [
+          ['details', 'Details'],
+          ['storage', 'Storage'],
+          ['network', 'Network'],
+          ['scheduling', 'Scheduling'],
+          ['ssh', 'SSH'],
+          ['initial', 'Initial run'],
+          ['metadata', 'Labels and annotations'],
+        ];
+        let panel = '';
+        if (section === 'network') {
+          const nicRows = v.nics.map(n => `
+            <tr class="pf-v6-c-table__tr">
+              <td class="pf-v6-c-table__td">${n.name}</td>
+              <td class="pf-v6-c-table__td">${n.model || 'virtio'}</td>
+              <td class="pf-v6-c-table__td">${n.network}</td>
+              <td class="pf-v6-c-table__td">
+                <span class="nic-state" title="Plugged" aria-label="Plugged">
+                  <i class="fa-solid fa-plug-circle-plus" aria-hidden="true"></i>
+                </span>
+              </td>
+              <td class="pf-v6-c-table__td">${n.type || 'Masquerade'}</td>
+              <td class="pf-v6-c-table__td">${n.mac || '—'}</td>
+              <td class="pf-v6-c-table__td">
+                <div class="nic-actions-wrap">
+                  <button type="button" class="kebab" data-nic-menu="${n.name}" aria-label="Actions for ${n.name}" aria-expanded="${state.nicMenuOpen === n.name}">
+                    <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                  </button>
+                  ${state.nicMenuOpen === n.name ? `
+                    <div class="nic-menu" role="menu">
+                      <button type="button" role="menuitem">Set link down</button>
+                      <button type="button" role="menuitem">Edit</button>
+                      <button type="button" role="menuitem" data-nic-delete="${n.name}">Delete</button>
+                    </div>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `).join('');
+          panel = `
+            <div class="storage-section">
+              <h3 class="storage-section__title">Network interfaces</h3>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-add-vm-nic">Add network interface</button>
+              <div class="nic-toolbar">
+                <button type="button" class="filter-btn"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filter</button>
+                <button type="button" class="nic-attr-select">Name <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
+                <div class="filter-name-search">
+                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                  <input type="search" placeholder="Search by name..." aria-label="Search interfaces by name" />
+                </div>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="pf-v6-c-table pf-m-compact vm-table" role="grid" aria-label="Network interfaces">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr">
+                      <th class="pf-v6-c-table__th" scope="col">Name <span class="sort-hint">↕</span></th>
+                      <th class="pf-v6-c-table__th" scope="col">Model <span class="sort-hint">↕</span></th>
+                      <th class="pf-v6-c-table__th" scope="col">Network <span class="sort-hint">↕</span></th>
+                      <th class="pf-v6-c-table__th" scope="col">State <span class="sort-hint">↕</span></th>
+                      <th class="pf-v6-c-table__th" scope="col">Type <span class="sort-hint">↕</span></th>
+                      <th class="pf-v6-c-table__th" scope="col">MAC address <span class="sort-hint">↕</span></th>
+                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody">${nicRows}</tbody>
+                </table>
+              </div>
+              <p class="form-helper" style="margin-top:12px;">
+                Attach NICs to networks that already exist. Create new networks from the
+                <button type="button" class="name-link" id="vm-goto-networks">Networks</button> page.
+              </p>
+            </div>
+          `;
+        } else {
+          panel = `<p class="muted" style="margin:0;">${sections.find(s => s[0] === section)?.[1] || 'Section'} (placeholder). Use <strong>Network</strong> to attach NICs.</p>`;
+        }
+        const tabsHtml = sections.map(([id, label]) => `
+          <li class="pf-v6-c-tabs__item ${section === id ? 'pf-m-current' : ''}" role="presentation">
+            <button type="button" class="pf-v6-c-tabs__link" role="tab"
+              id="vm-config-tab-${id}"
+              data-vm-config="${id}"
+              aria-selected="${section === id}"
+              aria-controls="vm-config-panel">
+              <span class="pf-v6-c-tabs__item-text">${label}</span>
+            </button>
+          </li>
+        `).join('');
+        body = `
+          <div class="filter-name-search" style="max-width:100%;margin-bottom:12px;">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" placeholder="Find settings" aria-label="Find settings" />
+          </div>
+          <div class="vm-config">
+            <div class="pf-v6-c-tabs pf-m-vertical" aria-label="Configuration sections">
+              <ul class="pf-v6-c-tabs__list" role="tablist">
+                ${tabsHtml}
+              </ul>
+            </div>
+            <div class="vm-config__panel">
+              <section class="pf-v6-c-tab-content" role="tabpanel" id="vm-config-panel"
+                aria-labelledby="vm-config-tab-${section}" tabindex="0">
+                ${panel}
+              </section>
+            </div>
+          </div>
+        `;
+      } else {
+        body = `<div class="vm-card"><p class="muted" style="margin:0;">${tabs.find(t => t[0] === tab)?.[1] || 'Tab'} (placeholder for mockup).</p></div>`;
+      }
+
+      root.innerHTML = header + body;
+
+      root.querySelectorAll('[data-vm-tab]').forEach(b => {
+        b.onclick = () => {
+          state.vmDetailTab = b.dataset.vmTab;
+          if (b.dataset.vmTab === 'configuration') state.vmConfigSection = 'details';
+          state.nicMenuOpen = null;
+          renderVmDetail();
+        };
+      });
+      root.querySelector('[data-goto-config-net]')?.addEventListener('click', () => {
+        state.vmDetailTab = 'configuration';
+        state.vmConfigSection = 'network';
+        renderVmDetail();
+      });
+      root.querySelectorAll('[data-vm-config]').forEach(b => {
+        b.onclick = () => {
+          state.vmConfigSection = b.dataset.vmConfig;
+          state.nicMenuOpen = null;
+          renderVmDetail();
+        };
+      });
+      root.querySelectorAll('[data-nic-menu]').forEach(b => {
+        b.onclick = e => {
+          e.stopPropagation();
+          const name = b.dataset.nicMenu;
+          state.nicMenuOpen = state.nicMenuOpen === name ? null : name;
+          renderVmDetail();
+        };
+      });
+      root.querySelector('#btn-add-vm-nic')?.addEventListener('click', () => openAddNicModal('vm-detail'));
+      root.querySelector('#vm-goto-networks')?.addEventListener('click', () => setView('networks'));
+      root.querySelectorAll('[data-nic-delete]').forEach(b => {
+        b.onclick = () => {
+          const vm = VMS.find(x => x.name === state.selectedVmName);
+          if (!vm?.nics || vm.nics.length < 2) {
+            toast('At least one network interface is required.');
+            return;
+          }
+          vm.nics = vm.nics.filter(n => n.name !== b.dataset.nicDelete);
+          state.nicMenuOpen = null;
+          renderVmDetail();
+        };
+      });
     }
 
     function stepsForType() {
@@ -6590,13 +7113,13 @@
         ];
       }
       if (state.createType === 'template') {
-        /* Option 1: Select template → Details → Configure → Storage → Network → Review */
+        /* Option 2: Details (+ Access) → Compute resource → Storage → Network → Review */
         return [
           { key: 'catalog', label: 'Select template', navNum: 1 },
           { key: 'details', label: 'Details', navNum: 2 },
-          { key: 'configure', label: 'Configure', navNum: 3 },
-          { key: 'storage', label: 'Storage', navNum: 4 },
-          { key: 'networking', label: 'Network', navNum: 5 },
+          { key: 'config-compute', label: 'Compute resource', navNum: 3 },
+          { key: 'config-storage', label: 'Storage', navNum: 4 },
+          { key: 'config-network', label: 'Network', navNum: 5 },
           { key: 'review', label: 'Review and create', navNum: 6 },
         ];
       }
@@ -7136,6 +7659,68 @@
       if (key === 'details' || key === 'deploy') {
         const isClone = state.createType === 'clone';
         const isCatalogFlow = key === 'details';
+        let accessHtml = '';
+        if (isCatalogFlow) {
+          if (d.cloudInit == null) d.cloudInit = '';
+          const expanded = !!(d.cloudInit && String(d.cloudInit).trim());
+          const cloudInitField = `
+            <div class="form-field">
+              <label for="f-cloud-init">Cloud-init</label>
+              <textarea id="f-cloud-init" class="cloud-init-input ${expanded ? 'pf-m-expanded' : ''}"
+                rows="${expanded ? 8 : 1}"
+                placeholder="Add cloud-init configuration"
+                aria-label="Cloud-init">${(d.cloudInit || '').replace(/</g, '&lt;')}</textarea>
+            </div>
+          `;
+          const windowsAccess = isWindowsOs(d);
+          const hasKey = !!(d.sshPublicKey && String(d.sshPublicKey).trim());
+          const fileName = d.sshKeyFileName || '';
+          accessHtml = windowsAccess ? `
+            <p class="catalog-preset-note">
+              SSH keys are not used for Windows. Set the administrator password after creation, then connect with RDP.
+            </p>
+            ${cloudInitField}
+          ` : `
+            <div class="form-field">
+              <label for="f-ssh-key">SSH public key</label>
+              <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-ssh-upload">
+                <div class="pf-v6-c-file-upload__file-select">
+                  <div class="pf-v6-c-input-group">
+                    <div class="pf-v6-c-input-group__item pf-m-fill">
+                      <span class="pf-v6-c-form-control">
+                        <input class="pf-v6-c-form-control__input" type="text" id="f-ssh-filename" readonly
+                          value="${(fileName || '').replace(/"/g, '&quot;')}"
+                          placeholder="Drag a file here or browse to upload"
+                          aria-label="Drag a file here or browse to upload"
+                          aria-describedby="f-ssh-browse" />
+                      </span>
+                    </div>
+                    <div class="pf-v6-c-input-group__item">
+                      <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-browse">Upload</button>
+                    </div>
+                    <div class="pf-v6-c-input-group__item">
+                      <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-clear"
+                        ${hasKey || fileName ? '' : 'disabled'}>Clear</button>
+                    </div>
+                  </div>
+                  <input type="file" id="f-ssh-file" accept=".pub,text/plain,.txt" hidden
+                    aria-hidden="true" tabindex="-1" />
+                </div>
+                <div class="pf-v6-c-file-upload__file-details" id="f-ssh-details">
+                  <span class="pf-v6-c-form-control pf-m-resize-vertical">
+                    <textarea id="f-ssh-key" class="pf-m-ssh${hasKey ? ' pf-m-has-content' : ''}" rows="4"
+                      aria-label="SSH public key" aria-describedby="f-ssh-help"
+                      placeholder="">${(d.sshPublicKey || '').replace(/</g, '&lt;')}</textarea>
+                  </span>
+                </div>
+              </div>
+              <p class="form-helper" id="f-ssh-help">
+                Paste a public SSH key or upload a file. Supported types: ssh-rsa, ssh-ed25519, and ecdsa-sha2-nistp256/384/521.
+              </p>
+            </div>
+            ${cloudInitField}
+          `;
+        }
         panel.innerHTML = `
           ${isCatalogFlow ? '' : `
           <div class="section-block">
@@ -7158,7 +7743,7 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your VirtualMachine and select a project. OS image is locked by the template.</p>
+            <p class="step-help">Name your VirtualMachine, select a project, and optionally set access. OS image is locked by the template.</p>
             ` : '<h3 class="section-label">General info</h3>'}
             <div class="form-field ${state.fieldErrors.name ? 'pf-m-error' : ''}" data-field="name">
               <label for="f-name">Name <span class="req">*</span></label>
@@ -7211,6 +7796,15 @@
                 value="${(d.osImage || TEMPLATES.find(t => t.id === d.templateId)?.osImage || TEMPLATES.find(t => t.id === d.templateId)?.os || d.os || '—').toString().replace(/"/g, '&quot;')}"
                 disabled aria-disabled="true" aria-label="OS image" />
             </div>
+            <h4 class="config-section-title label-with-optional">
+              Access
+              <span class="pf-v6-c-label pf-m-outline">
+                <span class="pf-v6-c-label__content">
+                  <span class="pf-v6-c-label__text">Optional</span>
+                </span>
+              </span>
+            </h4>
+            ${accessHtml}
             ` : ''}
           </div>
           `}
@@ -7274,6 +7868,152 @@
               help.innerHTML = `Your VirtualMachine will be created in project <strong>${String(d.project).replace(/</g, '&lt;')}</strong>`;
             }
           });
+          const cloudEl = panel.querySelector('#f-cloud-init');
+          if (cloudEl) {
+            const syncCloudHeight = () => {
+              const hasContent = !!cloudEl.value.trim();
+              cloudEl.classList.toggle('pf-m-expanded', hasContent);
+              cloudEl.rows = hasContent ? 8 : 1;
+              cloudEl.style.height = 'auto';
+              if (hasContent) cloudEl.style.height = Math.min(cloudEl.scrollHeight, 280) + 'px';
+              else cloudEl.style.height = '';
+            };
+            syncCloudHeight();
+            cloudEl.addEventListener('input', () => {
+              d.cloudInit = cloudEl.value;
+              syncCloudHeight();
+            });
+            cloudEl.addEventListener('focus', () => {
+              if (!cloudEl.value.trim()) {
+                cloudEl.classList.add('pf-m-expanded');
+                cloudEl.rows = 4;
+              }
+            });
+            cloudEl.addEventListener('blur', () => {
+              if (!cloudEl.value.trim()) {
+                cloudEl.classList.remove('pf-m-expanded');
+                cloudEl.rows = 1;
+                cloudEl.style.height = '';
+              }
+            });
+          }
+          if (!isWindowsOs(d)) {
+            const uploadRoot = panel.querySelector('#f-ssh-upload');
+            const fileInput = panel.querySelector('#f-ssh-file');
+            const filenameInput = panel.querySelector('#f-ssh-filename');
+            const keyArea = panel.querySelector('#f-ssh-key');
+            const clearBtn = panel.querySelector('#f-ssh-clear');
+            const browseBtn = panel.querySelector('#f-ssh-browse');
+
+            const syncSshHeight = () => {
+              if (!keyArea) return;
+              const hasContent = !!keyArea.value.trim();
+              keyArea.classList.toggle('pf-m-has-content', hasContent);
+              keyArea.style.height = 'auto';
+              keyArea.style.height = Math.min(Math.max(keyArea.scrollHeight, 96), 280) + 'px';
+            };
+
+            const syncSshDetailsVisibility = (forceShow = false) => {
+              if (!uploadRoot) return;
+              const filled = !!(keyArea?.value?.trim() || d.sshPublicKey?.trim() || filenameInput?.value);
+              if (forceShow || filled) uploadRoot.classList.add('pf-m-show-details');
+              else if (!uploadRoot.contains(document.activeElement)) {
+                uploadRoot.classList.remove('pf-m-show-details');
+              }
+            };
+
+            const syncClearEnabled = () => {
+              const filled = !!(d.sshPublicKey?.trim() || filenameInput?.value || keyArea?.value?.trim());
+              if (clearBtn) clearBtn.disabled = !filled;
+            };
+            const applyKeyContent = (text, name = '') => {
+              d.sshPublicKey = (text || '').trim();
+              d.sshKeyFileName = name || '';
+              if (keyArea) {
+                keyArea.value = d.sshPublicKey;
+                keyArea.classList.toggle('pf-m-has-content', !!d.sshPublicKey);
+              }
+              if (filenameInput) filenameInput.value = d.sshKeyFileName;
+              syncSshDetailsVisibility(!!d.sshPublicKey || !!d.sshKeyFileName);
+              syncSshHeight();
+              syncClearEnabled();
+            };
+            const readFile = (file) => {
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                applyKeyContent(String(reader.result || '').trim(), file.name);
+              };
+              reader.onerror = () => toast('Could not read the selected file.');
+              reader.readAsText(file);
+            };
+            keyArea?.addEventListener('input', e => {
+              d.sshPublicKey = e.target.value;
+              if (!e.target.value.trim()) d.sshKeyFileName = '';
+              if (filenameInput && !e.target.value.trim()) filenameInput.value = '';
+              keyArea.classList.toggle('pf-m-has-content', !!e.target.value.trim());
+              syncSshDetailsVisibility(true);
+              syncSshHeight();
+              syncClearEnabled();
+            });
+            browseBtn?.addEventListener('click', () => {
+              syncSshDetailsVisibility(true);
+              fileInput?.click();
+            });
+            filenameInput?.addEventListener('click', () => {
+              syncSshDetailsVisibility(true);
+              fileInput?.click();
+            });
+            fileInput?.addEventListener('change', e => {
+              const file = e.target.files && e.target.files[0];
+              readFile(file);
+              e.target.value = '';
+            });
+            clearBtn?.addEventListener('click', () => {
+              applyKeyContent('', '');
+              if (fileInput) fileInput.value = '';
+              syncSshDetailsVisibility(false);
+            });
+            if (uploadRoot) {
+              uploadRoot.addEventListener('focusin', () => syncSshDetailsVisibility(true));
+              uploadRoot.addEventListener('focusout', () => {
+                requestAnimationFrame(() => syncSshDetailsVisibility(false));
+              });
+              ['dragenter', 'dragover'].forEach(evt => {
+                uploadRoot.addEventListener(evt, e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  uploadRoot.classList.add('pf-m-drag-hover');
+                  syncSshDetailsVisibility(true);
+                });
+              });
+              ['dragleave', 'drop'].forEach(evt => {
+                uploadRoot.addEventListener(evt, e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  uploadRoot.classList.remove('pf-m-drag-hover');
+                });
+              });
+              uploadRoot.addEventListener('drop', e => {
+                const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+                if (file) {
+                  readFile(file);
+                  return;
+                }
+                const text = e.dataTransfer?.getData('text/plain');
+                if (text && text.trim()) applyKeyContent(text.trim(), '');
+              });
+              uploadRoot.addEventListener('paste', e => {
+                const text = e.clipboardData?.getData('text/plain');
+                if (!text || !text.trim()) return;
+                e.preventDefault();
+                applyKeyContent(text.trim(), '');
+              });
+            }
+            syncSshDetailsVisibility(!!hasKey);
+            syncSshHeight();
+            syncClearEnabled();
+          }
         }
         if (!isCatalogFlow && document.getElementById('f-project')) {
           wireCreatableSearch({
@@ -7704,7 +8444,7 @@
             editableItems.push({
               label: 'Compute',
               value: `${selSpecs.cpu} · ${selSpecs.mem}`,
-              note: 'Starting default · Configure step',
+              note: 'Starting default · Compute resource step',
             });
           }
           if (fieldBeh.bootDisk === 'editable') {
@@ -7714,7 +8454,7 @@
               note: 'Starting default · Storage step',
             });
           }
-          editableItems.push({ label: 'Access', value: 'SSH key or cloud-init', note: 'Configure step' });
+          editableItems.push({ label: 'Access', value: 'SSH key or cloud-init', note: 'Details step' });
           editableItems.push({ label: 'Network', value: 'Virtual network, subnet, security groups', note: 'Network step' });
           const govList = (items) => `
             <ul class="tpl-drawer__gov-list">
@@ -8016,9 +8756,10 @@
         });
       } else if (
         state.createType === 'template'
-        && (key === 'configure' || key === 'networking'
-          || key === 'compute' || key === 'access' || key === 'storage'
-          || key === 'config-os' || key === 'config-compute' || key === 'config-cloud-init'
+        && (key === 'configure' || key === 'networking' || key === 'storage'
+          || key === 'config-compute' || key === 'config-storage' || key === 'config-network'
+          || key === 'compute' || key === 'access'
+          || key === 'config-os' || key === 'config-cloud-init'
           || key === 'config-ssh' || key === 'customize')
       ) {
         // Prefill from selected catalog item when empty
@@ -8045,79 +8786,23 @@
         const sgEnabled = !!d.virtualNetwork && !!d.subnet;
         const sgOpen = !!state.sgMenuOpen && sgEnabled;
 
-        // Map legacy keys → consolidated steps (Option 2: storage is first-class)
+        // Option 2: Compute / Storage / Network are first-class steps
         let stepKey = key;
-        if (key === 'customize' || key === 'config-os' || key === 'config-compute'
-            || key === 'config-ssh' || key === 'config-cloud-init'
-            || key === 'compute' || key === 'access') {
-          stepKey = 'configure';
+        if (key === 'customize' || key === 'config-os' || key === 'config-ssh' || key === 'config-cloud-init'
+            || key === 'compute' || key === 'access' || key === 'configure') {
+          stepKey = 'config-compute';
+        } else if (key === 'storage') {
+          stepKey = 'config-storage';
+        } else if (key === 'networking') {
+          stepKey = 'config-network';
         }
 
-        if (stepKey === 'configure') {
-          const expanded = !!(d.cloudInit && String(d.cloudInit).trim());
-          const cloudInitField = `
-            <div class="form-field">
-              <label for="f-cloud-init">Cloud-init</label>
-              <textarea id="f-cloud-init" class="cloud-init-input ${expanded ? 'pf-m-expanded' : ''}"
-                rows="${expanded ? 8 : 1}"
-                placeholder="Add cloud-init configuration"
-                aria-label="Cloud-init">${(d.cloudInit || '').replace(/</g, '&lt;')}</textarea>
-            </div>
-          `;
-          const windowsAccess = isWindowsOs(d);
-          const hasKey = !!(d.sshPublicKey && String(d.sshPublicKey).trim());
-          const fileName = d.sshKeyFileName || '';
-          const accessHtml = windowsAccess ? `
-            <p class="catalog-preset-note">
-              SSH keys are not used for Windows. Set the administrator password after creation, then connect with RDP.
-            </p>
-            ${cloudInitField}
-          ` : `
-            <div class="form-field">
-              <label for="f-ssh-key">SSH public key</label>
-              <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-ssh-upload">
-                <div class="pf-v6-c-file-upload__file-select">
-                  <div class="pf-v6-c-input-group">
-                    <div class="pf-v6-c-input-group__item pf-m-fill">
-                      <span class="pf-v6-c-form-control">
-                        <input class="pf-v6-c-form-control__input" type="text" id="f-ssh-filename" readonly
-                          value="${(fileName || '').replace(/"/g, '&quot;')}"
-                          placeholder="Drag a file here or browse to upload"
-                          aria-label="Drag a file here or browse to upload"
-                          aria-describedby="f-ssh-browse" />
-                      </span>
-                    </div>
-                    <div class="pf-v6-c-input-group__item">
-                      <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-browse">Upload</button>
-                    </div>
-                    <div class="pf-v6-c-input-group__item">
-                      <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-clear"
-                        ${hasKey || fileName ? '' : 'disabled'}>Clear</button>
-                    </div>
-                  </div>
-                  <input type="file" id="f-ssh-file" accept=".pub,text/plain,.txt" hidden
-                    aria-hidden="true" tabindex="-1" />
-                </div>
-                <div class="pf-v6-c-file-upload__file-details" id="f-ssh-details">
-                  <span class="pf-v6-c-form-control pf-m-resize-vertical">
-                    <textarea id="f-ssh-key" class="pf-m-ssh${hasKey ? ' pf-m-has-content' : ''}" rows="4"
-                      aria-label="SSH public key" aria-describedby="f-ssh-help"
-                      placeholder="">${(d.sshPublicKey || '').replace(/</g, '&lt;')}</textarea>
-                  </span>
-                </div>
-              </div>
-              <p class="form-helper" id="f-ssh-help">
-                Paste a public SSH key or upload a file. Supported types: ssh-rsa, ssh-ed25519, and ecdsa-sha2-nistp256/384/521.
-              </p>
-            </div>
-            ${cloudInitField}
-          `;
-
+        if (stepKey === 'config-compute') {
           const selectedTpl = TEMPLATES.find(t => t.id === d.templateId);
           const fieldBeh = getTemplateFields(selectedTpl || d.catalogPreset);
           const computeEditable = fieldBeh.compute === 'editable';
           const computeLabel = computeResourceLabel(d.computeResource);
-                    const computeFieldHtml = computeEditable ? `
+          const computeFieldHtml = computeEditable ? `
               <div class="form-field">
                 <label for="f-compute-resource" class="label-with-optional">
                   <span>Compute resource <span class="req">*</span></span>
@@ -8145,24 +8830,14 @@
               </div>
           `;
           const stepHelp = computeEditable
-            ? 'Set compute and access here.'
-            : 'Review locked size and set access.';
+            ? 'Choose a compute size.'
+            : 'Compute size is locked by the template.';
 
           panel.innerHTML = `
-            <h3>Configure</h3>
+            <h3>Compute resource</h3>
             <p class="step-help">${stepHelp}</p>
             <div class="vm-config__fields">
               ${computeFieldHtml}
-
-              <h4 class="config-section-title label-with-optional">
-                Access
-                <span class="pf-v6-c-label pf-m-outline">
-                  <span class="pf-v6-c-label__content">
-                    <span class="pf-v6-c-label__text">Optional</span>
-                  </span>
-                </span>
-              </h4>
-              ${accessHtml}
             </div>
           `;
 
@@ -8172,155 +8847,7 @@
               updateCostEstimate(key);
             });
           }
-
-          const cloudEl = panel.querySelector('#f-cloud-init');
-          if (cloudEl) {
-            const syncCloudHeight = () => {
-              const hasContent = !!cloudEl.value.trim();
-              cloudEl.classList.toggle('pf-m-expanded', hasContent);
-              cloudEl.rows = hasContent ? 8 : 1;
-              cloudEl.style.height = 'auto';
-              if (hasContent) cloudEl.style.height = Math.min(cloudEl.scrollHeight, 280) + 'px';
-              else cloudEl.style.height = '';
-            };
-            syncCloudHeight();
-            cloudEl.addEventListener('input', () => {
-              d.cloudInit = cloudEl.value;
-              syncCloudHeight();
-            });
-            cloudEl.addEventListener('focus', () => {
-              if (!cloudEl.value.trim()) {
-                cloudEl.classList.add('pf-m-expanded');
-                cloudEl.rows = 4;
-              }
-            });
-            cloudEl.addEventListener('blur', () => {
-              if (!cloudEl.value.trim()) {
-                cloudEl.classList.remove('pf-m-expanded');
-                cloudEl.rows = 1;
-                cloudEl.style.height = '';
-              }
-            });
-          }
-
-          if (!windowsAccess) {
-            const uploadRoot = panel.querySelector('#f-ssh-upload');
-            const fileInput = panel.querySelector('#f-ssh-file');
-            const filenameInput = panel.querySelector('#f-ssh-filename');
-            const keyArea = panel.querySelector('#f-ssh-key');
-            const clearBtn = panel.querySelector('#f-ssh-clear');
-            const browseBtn = panel.querySelector('#f-ssh-browse');
-
-            const syncSshHeight = () => {
-              if (!keyArea) return;
-              const hasContent = !!keyArea.value.trim();
-              keyArea.classList.toggle('pf-m-has-content', hasContent);
-              keyArea.style.height = 'auto';
-              keyArea.style.height = Math.min(Math.max(keyArea.scrollHeight, 96), 280) + 'px';
-            };
-
-            const syncSshDetailsVisibility = (forceShow = false) => {
-              if (!uploadRoot) return;
-              const filled = !!(keyArea?.value?.trim() || d.sshPublicKey?.trim() || filenameInput?.value);
-              if (forceShow || filled) uploadRoot.classList.add('pf-m-show-details');
-              else if (!uploadRoot.contains(document.activeElement)) {
-                uploadRoot.classList.remove('pf-m-show-details');
-              }
-            };
-
-            const syncClearEnabled = () => {
-              const filled = !!(d.sshPublicKey?.trim() || filenameInput?.value || keyArea?.value?.trim());
-              if (clearBtn) clearBtn.disabled = !filled;
-            };
-            const applyKeyContent = (text, name = '') => {
-              d.sshPublicKey = (text || '').trim();
-              d.sshKeyFileName = name || '';
-              if (keyArea) {
-                keyArea.value = d.sshPublicKey;
-                keyArea.classList.toggle('pf-m-has-content', !!d.sshPublicKey);
-              }
-              if (filenameInput) filenameInput.value = d.sshKeyFileName;
-              syncSshDetailsVisibility(!!d.sshPublicKey || !!d.sshKeyFileName);
-              syncSshHeight();
-              syncClearEnabled();
-            };
-            const readFile = (file) => {
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = () => {
-                applyKeyContent(String(reader.result || '').trim(), file.name);
-              };
-              reader.onerror = () => toast('Could not read the selected file.');
-              reader.readAsText(file);
-            };
-            keyArea?.addEventListener('input', e => {
-              d.sshPublicKey = e.target.value;
-              if (!e.target.value.trim()) d.sshKeyFileName = '';
-              if (filenameInput && !e.target.value.trim()) filenameInput.value = '';
-              keyArea.classList.toggle('pf-m-has-content', !!e.target.value.trim());
-              syncSshDetailsVisibility(true);
-              syncSshHeight();
-              syncClearEnabled();
-            });
-            browseBtn?.addEventListener('click', () => {
-              syncSshDetailsVisibility(true);
-              fileInput?.click();
-            });
-            filenameInput?.addEventListener('click', () => {
-              syncSshDetailsVisibility(true);
-              fileInput?.click();
-            });
-            fileInput?.addEventListener('change', e => {
-              const file = e.target.files && e.target.files[0];
-              readFile(file);
-              e.target.value = '';
-            });
-            clearBtn?.addEventListener('click', () => {
-              applyKeyContent('', '');
-              if (fileInput) fileInput.value = '';
-              syncSshDetailsVisibility(false);
-            });
-            if (uploadRoot) {
-              uploadRoot.addEventListener('focusin', () => syncSshDetailsVisibility(true));
-              uploadRoot.addEventListener('focusout', () => {
-                requestAnimationFrame(() => syncSshDetailsVisibility(false));
-              });
-              ['dragenter', 'dragover'].forEach(evt => {
-                uploadRoot.addEventListener(evt, e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  uploadRoot.classList.add('pf-m-drag-hover');
-                  syncSshDetailsVisibility(true);
-                });
-              });
-              ['dragleave', 'drop'].forEach(evt => {
-                uploadRoot.addEventListener(evt, e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  uploadRoot.classList.remove('pf-m-drag-hover');
-                });
-              });
-              uploadRoot.addEventListener('drop', e => {
-                const file = e.dataTransfer?.files && e.dataTransfer.files[0];
-                if (file) {
-                  readFile(file);
-                  return;
-                }
-                const text = e.dataTransfer?.getData('text/plain');
-                if (text && text.trim()) applyKeyContent(text.trim(), '');
-              });
-              uploadRoot.addEventListener('paste', e => {
-                const text = e.clipboardData?.getData('text/plain');
-                if (!text || !text.trim()) return;
-                e.preventDefault();
-                applyKeyContent(text.trim(), '');
-              });
-            }
-            syncSshDetailsVisibility(!!hasKey);
-            syncSshHeight();
-            syncClearEnabled();
-          }
-        } else if (stepKey === 'storage') {
+        } else if (stepKey === 'config-storage') {
           const diskMin = 1;
           const diskMax = 16384;
           const diskVal = Math.min(diskMax, Math.max(diskMin, Number(d.bootDiskGiB) || 20));
@@ -8379,7 +8906,7 @@
               </div>
           `;
           const storageStepHelp = bootEditable
-            ? 'Specify storage for this VirtualMachine — boot disk size and any additional disks.'
+            ? 'Set the boot disk size. Add additional disks if you need more storage.'
             : 'Boot disk size is locked by the template. You can add additional disks below.';
 
           panel.innerHTML = `
@@ -8422,7 +8949,7 @@
               toast('Disk removed.', 'success');
             });
           });
-        } else if (stepKey === 'networking') {
+        } else if (stepKey === 'config-network') {
           ensureNetworkingDefaults(d);
           const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork);
           const subnetOptsLive = net ? net.subnets : [];
@@ -8756,15 +9283,15 @@
               ${reviewRow('Description', d.description || '—')}
               ${reviewRow('Project', d.project || '—')}
               ${reviewRow('OS image', osImage)}
-            `)}
-            ${reviewSection('Configure', 'configure', `
-              ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
               ${windowsAccess
                 ? reviewRow('Access method', 'Password / RDP after create')
                 : reviewRow('SSH public key', sshVal)}
               ${reviewRow('Cloud-init', cloudInitVal)}
             `)}
-            ${reviewSection('Storage', 'storage', `
+            ${reviewSection('Compute resource', 'config-compute', `
+              ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
+            `)}
+            ${reviewSection('Storage', 'config-storage', `
               ${reviewRow('Boot disk', reviewValue(bootDisk, diskChanged))}
               ${(d.extraDisks || []).length
                 ? (d.extraDisks || []).map((disk, i) => {
@@ -8775,7 +9302,7 @@
                   }).join('')
                 : reviewRow('Additional disks', 'None')}
             `)}
-            ${reviewSection('Network', 'networking', `
+            ${reviewSection('Network', 'config-network', `
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
               ${reviewRow('Security groups', sgs)}
@@ -8861,16 +9388,16 @@
             applyStepValidation(errors);
             return;
           }
-        } else if (key === 'configure') {
+        } else if (key === 'config-compute' || key === 'configure') {
           const errors = validateConfigureFields(state.data);
           if (Object.keys(errors).length) {
             applyStepValidation(errors);
             return;
           }
-        } else if (key === 'storage') {
+        } else if (key === 'config-storage' || key === 'storage') {
           // Boot disk always has a value from the template; additional disks optional.
           clearFieldErrors();
-        } else if (key === 'networking') {
+        } else if (key === 'config-network' || key === 'networking') {
           const errors = validateNetworkingFields(state.data);
           if (Object.keys(errors).length) {
             applyStepValidation(errors);
@@ -8941,12 +9468,21 @@
       }
       state.step += 1;
       state.maxVisited = Math.max(state.maxVisited, state.step);
+      if (steps[state.step]?.parentKey === 'config') {
+        state.configNavExpanded = true;
+      }
       renderWizard();
     }
 
     function goBack() {
       readFields();
-      if (state.step > 0) { state.step -= 1; renderWizard(); }
+      if (state.step > 0) {
+        state.step -= 1;
+        if (stepsForType()[state.step]?.parentKey === 'config') {
+          state.configNavExpanded = true;
+        }
+        renderWizard();
+      }
     }
 
     const ROLES = {
@@ -9306,11 +9842,19 @@
       state.selectedVmName = null;
       setView(b.dataset.nav);
     }));
-    /* Create-VM-only: no VirtualMachine details navigation */
+    document.getElementById('vm-tbody')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-open-vm]');
+      if (!btn) return;
+      openVmDetail(btn.dataset.openVm, 'overview');
+    });
+    document.getElementById('vm-back-to-list')?.addEventListener('click', () => {
+      state.selectedVmName = null;
+      setView('vms');
+    });
     document.addEventListener('click', e => {
       if (state.nicMenuOpen && !e.target.closest('.nic-actions-wrap')) {
         state.nicMenuOpen = null;
-        /* details removed */
+        if (document.getElementById('view-vm')?.classList.contains('pf-m-active')) renderVmDetail();
       }
     });
     function bindNavExpandable(toggleId, itemId) {
