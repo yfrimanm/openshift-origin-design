@@ -1950,13 +1950,69 @@
     .form-helper {
       margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--vmaas-text-subtle); max-width: 560px;
     }
+    /* Validation error — danger border wins over default/focus blue (MTV Create plan pattern). */
     .form-field.pf-m-error > input,
     .form-field.pf-m-error > textarea,
     .form-field.pf-m-error > .pf-v6-c-form-control,
     .form-field.pf-m-error > .create-search .pf-v6-c-form-control,
     .form-field.pf-m-error > .sg-select,
-    .form-field.pf-m-error > .name-row > input {
-      border-color: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+    .form-field.pf-m-error > .name-row > input,
+    .form-field.pf-m-error .pf-v6-c-form-control,
+    .form-field.pf-m-error .create-search .pf-v6-c-form-control,
+    .form-field.pf-m-error .sg-select {
+      border-color: var(--pf-t--global--border--color--status--danger--default, #c9190b) !important;
+      --pf-v6-c-form-control--BorderColor: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+      --pf-v6-c-form-control--after--BorderColor: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+      --pf-v6-c-form-control--before--BorderColor: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+      outline: none;
+      box-shadow: none;
+    }
+    .form-field.pf-m-error > input:focus,
+    .form-field.pf-m-error > input:focus-visible,
+    .form-field.pf-m-error > textarea:focus,
+    .form-field.pf-m-error > textarea:focus-visible,
+    .form-field.pf-m-error > .name-row > input:focus,
+    .form-field.pf-m-error > .name-row > input:focus-visible,
+    .form-field.pf-m-error > .pf-v6-c-form-control:focus,
+    .form-field.pf-m-error > .pf-v6-c-form-control:focus-within,
+    .form-field.pf-m-error .pf-v6-c-form-control:focus,
+    .form-field.pf-m-error .pf-v6-c-form-control:focus-within,
+    .form-field.pf-m-error .create-search .pf-v6-c-form-control:focus-within,
+    .form-field.pf-m-error .sg-select:focus,
+    .form-field.pf-m-error .sg-select:focus-within,
+    .form-field.pf-m-error .cloud-init-input:focus {
+      border-color: var(--pf-t--global--border--color--status--danger--default, #c9190b) !important;
+      outline: none !important;
+      box-shadow: 0 0 0 1px var(--pf-t--global--border--color--status--danger--default, #c9190b);
+      --pf-v6-c-form-control--after--BorderColor: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+      --pf-v6-c-form-control--before--BorderColor: var(--pf-t--global--border--color--status--danger--default, #c9190b);
+    }
+    /* Inline status icon inside errored text controls (Create migration plan). */
+    .form-field.pf-m-error > .name-row,
+    .form-field.pf-m-error > .form-control-error-wrap {
+      position: relative;
+    }
+    .form-field.pf-m-error > .name-row > input,
+    .form-field.pf-m-error > .form-control-error-wrap > input,
+    .form-field.pf-m-error > .form-control-error-wrap > textarea {
+      padding-inline-end: 2rem;
+    }
+    .form-field.pf-m-error > .name-row::after,
+    .form-field.pf-m-error > .form-control-error-wrap::after {
+      content: "\f06a"; /* fa-circle-exclamation */
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: 0.75rem;
+      translate: 0 -50%;
+      color: var(--pf-t--global--icon--color--status--danger--default, #c9190b);
+      font-size: 14px;
+      pointer-events: none;
+      line-height: 1;
+    }
+    .form-field.pf-m-error > .name-row::after {
+      inset-inline-end: calc(36px + 0.75rem + 8px); /* leave room for generate button */
     }
     .field-error {
       display: flex; align-items: flex-start; gap: 8px;
