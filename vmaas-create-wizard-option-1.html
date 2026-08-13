@@ -212,23 +212,24 @@
       height: 100%;
       position: relative;
     }
-    /* Stakeholder mocks: keep Ethan's-style page nav visible (incl. during Create). */
+    /* Stakeholder mocks: keep Ethan's-style page nav visible (incl. during Create).
+       Density matches OpenShift console / PF spacer-sm (8px) — not xs. */
     .console__nav {
       border-right: 1px solid var(--vmaas-border-light);
       background: var(--vmaas-bg-subtle);
-      padding: var(--pf-t--global--spacer--sm, 8px) 0;
+      padding: var(--pf-t--global--spacer--md, 16px) 0;
     }
     .console__nav.pf-v6-c-nav,
     .console__nav .pf-v6-c-nav {
       --pf-v6-c-nav__link--FontSize: var(--pf-t--global--font--size--body--default, 14px);
-      --pf-v6-c-nav__list--RowGap: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__list--RowGap: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__item--RowGap: 0;
-      --pf-v6-c-nav__subnav--RowGap: var(--pf-t--global--spacer--xs, 4px);
-      --pf-v6-c-nav__subnav--PaddingBlockStart: var(--pf-t--global--spacer--xs, 4px);
-      --pf-v6-c-nav__subnav--PaddingBlockEnd: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__subnav--RowGap: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-nav__subnav--PaddingBlockStart: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-nav__subnav--PaddingBlockEnd: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__subnav--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
-      --pf-v6-c-nav__link--PaddingBlockStart: var(--pf-t--global--spacer--xs, 4px);
-      --pf-v6-c-nav__link--PaddingBlockEnd: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav__link--PaddingBlockStart: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-nav__link--PaddingBlockEnd: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__link--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
       --pf-v6-c-nav__link--PaddingInlineEnd: var(--pf-t--global--spacer--md, 16px);
       --pf-v6-c-nav__link--BackgroundColor: transparent;
@@ -248,8 +249,8 @@
     .console__nav .pf-v6-c-nav__subnav > .pf-v6-c-nav__list {
       display: flex !important;
       flex-direction: column;
-      gap: var(--pf-t--global--spacer--xs, 4px);
-      row-gap: var(--pf-t--global--spacer--xs, 4px);
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      row-gap: var(--pf-t--global--spacer--sm, 8px);
     }
     .console__nav .pf-v6-c-nav__item {
       display: block !important;
@@ -267,7 +268,7 @@
       border: none;
       background: transparent !important;
       box-shadow: none !important;
-      padding-block: var(--pf-t--global--spacer--xs, 4px);
+      padding-block: var(--pf-t--global--spacer--sm, 8px);
       padding-inline: var(--pf-t--global--spacer--md, 16px);
       align-items: center;
       line-height: var(--pf-t--global--font--line-height--body, 1.5);
@@ -293,7 +294,7 @@
       overflow: visible;
       opacity: 1;
       translate: none;
-      padding-block: var(--pf-t--global--spacer--xs, 4px);
+      padding-block: var(--pf-t--global--spacer--sm, 8px);
       padding-inline-start: var(--pf-t--global--spacer--md, 16px);
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable > .pf-v6-c-nav__link {
