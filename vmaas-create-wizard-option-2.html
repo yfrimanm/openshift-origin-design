@@ -3335,8 +3335,8 @@
           <span class="demo-bar__label">Role</span>
           <span class="pf-v6-c-form-control" style="width:auto;min-width:220px;">
             <select id="role-select" aria-label="Tenant role">
-              <option value="author" selected>VM Author (vApp Author)</option>
-              <option value="user">VM User (vApp User)</option>
+              <option value="author" selected>VM Author</option>
+              <option value="user">VM User</option>
               <option value="console">Console Access Only</option>
               <option value="orgadmin">Organization Administrator</option>
             </select>
@@ -9493,7 +9493,7 @@
 
     const ROLES = {
       author: {
-        label: 'VM Author (vApp Author)',
+        label: 'VM Author',
         canCreate: true,
         canPower: true,
         canCreateNetwork: true,
@@ -9501,7 +9501,7 @@
         canViewNetworks: true,
       },
       user: {
-        label: 'VM User (vApp User)',
+        label: 'VM User',
         canCreate: false,
         canPower: true,
         canCreateNetwork: false,
