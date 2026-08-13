@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VMaaS create wizard option 2 — Storage + Network first-class</title>
+  <title>VMaaS create wizard option 2 — flat Compute / Storage / Network</title>
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -3324,8 +3324,8 @@
     <header class="mockup-header">
       <h1>VMaaS — Create VirtualMachine (Option 2)</h1>
       <p>
-        Option 2: Select template → Details (includes Access) → Configure
-        (Compute, Storage, Network) → Review and create.
+        Option 2: Select template → Details (includes Access) → Compute resource
+        → Storage → Network → Review and create.
       </p>
     </header>
 
@@ -3557,15 +3557,6 @@
                             <span class="pf-v6-c-menu__item-description" id="vm-action-console-desc">Open console in new tab</span>
                           </button>
                         </li>
-                        <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-action-ssh-item">
-                          <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="copy-ssh" disabled id="vm-action-ssh-btn">
-                            <span class="pf-v6-c-menu__item-main">
-                              <span class="pf-v6-c-menu__item-icon"><i class="fas fa-copy" aria-hidden="true"></i></span>
-                              <span class="pf-v6-c-menu__item-text">Copy SSH command</span>
-                            </span>
-                            <span class="pf-v6-c-menu__item-description" id="vm-action-ssh-desc">SSH using virtctl</span>
-                          </button>
-                        </li>
                         <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-action-delete-item">
                           <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="delete" disabled id="vm-action-delete-btn">
                             <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
@@ -3781,7 +3772,7 @@
     </div>
   </div>
 
-  <div class="pf-v6-c-menu pf-m-flyout" id="vm-kebab-menu" hidden role="menu" aria-label="VirtualMachine actions">
+  <div class="pf-v6-c-menu pf-m-flyout" id="vm-kebab-menu" hidden role="menu" aria-label="VM actions">
     <div class="pf-v6-c-menu__content">
       <ul class="pf-v6-c-menu__list" role="menu">
         <li class="pf-v6-c-menu__list-item" role="none" data-flyout="control">
@@ -3803,19 +3794,10 @@
             <span class="pf-v6-c-menu__item-description" id="vm-kebab-console-desc">Open console in new tab</span>
           </button>
         </li>
-        <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-kebab-ssh-item">
-          <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="copy-ssh" disabled id="vm-kebab-ssh-btn">
-            <span class="pf-v6-c-menu__item-main">
-              <span class="pf-v6-c-menu__item-icon"><i class="fas fa-copy" aria-hidden="true"></i></span>
-              <span class="pf-v6-c-menu__item-text">Copy SSH command</span>
-            </span>
-            <span class="pf-v6-c-menu__item-description" id="vm-kebab-ssh-desc">SSH using virtctl</span>
-          </button>
-        </li>
         <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-kebab-delete-item">
           <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="delete" disabled id="vm-kebab-delete-btn">
             <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
-            <span class="pf-v6-c-menu__item-description" id="vm-kebab-delete-desc">The VirtualMachine is running</span>
+            <span class="pf-v6-c-menu__item-description" id="vm-kebab-delete-desc">The VM is running</span>
           </button>
         </li>
       </ul>
@@ -5539,12 +5521,6 @@
           : 'Open console in new tab',
       });
 
-      // Copy SSH — disabled in mockup; description is helper
-      setActionItemState('vm-action-ssh-item', 'vm-action-ssh-btn', 'vm-action-ssh-desc', {
-        disabled: true,
-        description: 'SSH using virtctl',
-      });
-
       // Delete — blocked while any selected VM is running
       const deleteBlocked = !selected.length || someRunning;
       let deleteDesc = '';
@@ -5616,17 +5592,12 @@
 
       setActionItemState('vm-kebab-console-item', 'vm-kebab-console-btn', 'vm-kebab-console-desc', {
         disabled: !running,
-        description: running ? 'Open console in new tab' : 'The VirtualMachine is not running',
-      });
-
-      setActionItemState('vm-kebab-ssh-item', 'vm-kebab-ssh-btn', 'vm-kebab-ssh-desc', {
-        disabled: true,
-        description: 'SSH using virtctl',
+        description: running ? 'Open console in new tab' : 'The VM is not running',
       });
 
       setActionItemState('vm-kebab-delete-item', 'vm-kebab-delete-btn', 'vm-kebab-delete-desc', {
         disabled: running,
-        description: running ? 'The VirtualMachine is running' : '',
+        description: running ? 'The VM is running' : '',
         hideDesc: !running,
       });
     }
@@ -6662,7 +6633,7 @@
             </h2>
             <span class="vm-detail__status">${statusCell(v.status)}</span>
           </div>
-          <div class="vm-detail__actions" role="group" aria-label="VirtualMachine actions">
+          <div class="vm-detail__actions" role="group" aria-label="VM actions">
             <button type="button" class="vm-action-icon" aria-label="Stop" title="Stop" ${running ? '' : 'disabled'}>
               <i class="fa-solid fa-stop" aria-hidden="true"></i>
             </button>
@@ -7154,14 +7125,14 @@
         ];
       }
       if (state.createType === 'template') {
-        /* Option 2: Details (+ Access) → Configure with Compute / Storage / Network substeps → Review */
+        /* Option 2: Details (+ Access) → Compute resource → Storage → Network → Review */
         return [
           { key: 'catalog', label: 'Select template', navNum: 1 },
           { key: 'details', label: 'Details', navNum: 2 },
-          { key: 'config-compute', label: 'Compute resource', parentKey: 'config', parentLabel: 'Configure', navNum: 3 },
-          { key: 'config-storage', label: 'Storage', parentKey: 'config', parentLabel: 'Configure', navNum: 3 },
-          { key: 'config-network', label: 'Network', parentKey: 'config', parentLabel: 'Configure', navNum: 3 },
-          { key: 'review', label: 'Review and create', navNum: 4 },
+          { key: 'config-compute', label: 'Compute resource', navNum: 3 },
+          { key: 'config-storage', label: 'Storage', navNum: 4 },
+          { key: 'config-network', label: 'Network', navNum: 5 },
+          { key: 'review', label: 'Review and create', navNum: 6 },
         ];
       }
       if (state.createType === 'clone') {
@@ -8818,7 +8789,7 @@
         const sgEnabled = !!d.virtualNetwork && !!d.subnet;
         const sgOpen = !!state.sgMenuOpen && sgEnabled;
 
-        // Option 2: Configure = Compute / Storage / Network substeps
+        // Option 2: Compute / Storage / Network are first-class steps
         let stepKey = key;
         if (key === 'customize' || key === 'config-os' || key === 'config-ssh' || key === 'config-cloud-init'
             || key === 'compute' || key === 'access' || key === 'configure') {
