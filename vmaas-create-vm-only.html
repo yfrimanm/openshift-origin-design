@@ -507,6 +507,34 @@
       min-width: 0;
       word-break: break-word;
     }
+
+    #disk-detail-popover {
+      position: absolute;
+      z-index: 10000;
+      display: none;
+      width: min(100vw - 24px, 18.75rem);
+    }
+    #disk-detail-popover.pf-m-open { display: block; }
+    #disk-detail-popover .disk-detail-dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 8px 20px;
+      margin: 0;
+      font-size: 14px;
+      align-items: baseline;
+    }
+    #disk-detail-popover .disk-detail-dl dt {
+      margin: 0;
+      font-weight: 600;
+      color: var(--vmaas-text);
+    }
+    #disk-detail-popover .disk-detail-dl dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text);
+      min-width: 0;
+      word-break: break-word;
+    }
     .pf-v6-c-button.pf-m-small {
       font-size: 13px; padding: 4px 12px; min-height: 28px;
     }
@@ -6183,6 +6211,7 @@
           e.stopPropagation();
           let nic = {};
           try { nic = JSON.parse(trigger.dataset.nicDetail || '{}'); } catch (_) {}
+          closeDiskDetailPopover();
           openNicDetailPopover(trigger, nic);
           return;
         }
@@ -6197,7 +6226,101 @@
       window.addEventListener('scroll', closeNicDetailPopover, true);
     }
 
-        function enrichVm(v) {
+        
+    let diskDetailPopoverTrigger = null;
+
+    function normalizeDisk(dsk) {
+      const size = dsk.size
+        ? (dsk.unit ? `${dsk.size} ${dsk.unit}` : String(dsk.size))
+        : '—';
+      return {
+        name: dsk.label || dsk.name || 'Disk',
+        size,
+        storageTier: dsk.storageTierLabel || dsk.storageTierId || dsk.storageClass || 'General Purpose SSD',
+        bootable: !!(dsk.bootable || /boot/i.test(dsk.label || dsk.name || '')),
+      };
+    }
+
+    function closeDiskDetailPopover() {
+      const pop = document.getElementById('disk-detail-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (diskDetailPopoverTrigger) {
+        diskDetailPopoverTrigger.setAttribute('aria-expanded', 'false');
+        diskDetailPopoverTrigger = null;
+      }
+    }
+
+    function openDiskDetailPopover(trigger, disk) {
+      const pop = document.getElementById('disk-detail-popover');
+      const body = document.getElementById('disk-detail-popover-body');
+      if (!pop || !body) return;
+      if (diskDetailPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeDiskDetailPopover();
+        return;
+      }
+      const d = normalizeDisk(disk || {});
+      body.innerHTML = `
+        <dl class="disk-detail-dl">
+          <dt>Name</dt><dd>${d.name}</dd>
+          <dt>Size</dt><dd>${d.size}</dd>
+          <dt>Storage tier</dt><dd>${d.storageTier}</dd>
+          <dt>Bootable</dt><dd>${d.bootable ? 'Yes' : 'No'}</dd>
+        </dl>
+      `;
+      if (diskDetailPopoverTrigger && diskDetailPopoverTrigger !== trigger) {
+        diskDetailPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      diskDetailPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      pop.hidden = false;
+      pop.classList.add('pf-m-open');
+      pop.classList.add('pf-m-left');
+      pop.classList.remove('pf-m-right');
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        let left = rect.left + window.scrollX - pr.width - gap;
+        let top = rect.top + window.scrollY + (rect.height / 2) - (pr.height / 2);
+        if (left < 8) {
+          pop.classList.remove('pf-m-left');
+          pop.classList.add('pf-m-right');
+          left = rect.right + window.scrollX + gap;
+        }
+        pop.style.left = `${Math.max(8, left)}px`;
+        pop.style.top = `${Math.max(8, top)}px`;
+      });
+      document.getElementById('disk-detail-popover-close')?.focus();
+    }
+
+    function wireDiskDetailPopover() {
+      if (document.body.dataset.diskDetailPopoverWired) return;
+      document.body.dataset.diskDetailPopoverWired = '1';
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-disk-detail]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          let disk = {};
+          try { disk = JSON.parse(trigger.dataset.diskDetail || '{}'); } catch (_) {}
+          closeNicDetailPopover();
+          openDiskDetailPopover(trigger, disk);
+          return;
+        }
+        if (e.target.closest('#disk-detail-popover')) return;
+        closeDiskDetailPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeDiskDetailPopover();
+      });
+      document.getElementById('disk-detail-popover-close')?.addEventListener('click', () => closeDiskDetailPopover());
+      window.addEventListener('resize', closeDiskDetailPopover);
+      window.addEventListener('scroll', closeDiskDetailPopover, true);
+    }
+
+    function enrichVm(v) {
       if (!v) return null;
       const osFullMap = { RHEL: 'Red Hat Enterprise Linux', Fedora: 'Fedora Linux', Windows: 'Microsoft Windows', Other: 'Other Linux', CentOS: 'CentOS Stream' };
       return {
@@ -7336,12 +7459,21 @@
                   <table class="side-table">
                     <thead><tr><th>Name</th><th>Size</th></tr></thead>
                     <tbody>
-                      ${diskRows.map(dsk => `
+                      ${diskRows.map(dsk => {
+                        const detail = normalizeDisk(dsk);
+                        const payload = JSON.stringify(detail).replace(/"/g, '&quot;');
+                        return `
                         <tr>
-                          <td><button type="button" class="name-link">${dsk.label}</button></td>
-                          <td>${dsk.size}</td>
-                        </tr>
-                      `).join('')}
+                          <td>
+                            <button type="button" class="name-link name-link--dotted"
+                              data-disk-detail="${payload}"
+                              aria-haspopup="dialog" aria-expanded="false">
+                              ${detail.name}
+                            </button>
+                          </td>
+                          <td>${detail.size}</td>
+                        </tr>`;
+                      }).join('')}
                     </tbody>
                   </table>
                 </div>
@@ -10349,6 +10481,7 @@
     wireStatusPopover();
     wireEditComputeModal();
     wireNicDetailPopover();
+    wireDiskDetailPopover();
     renderNetworks();
 
     try {
@@ -10395,6 +10528,19 @@
         </span>
       </button>
       <div class="pf-v6-c-popover__body" id="nic-detail-popover-body"></div>
+    </div>
+  </div>
+
+
+  <div class="pf-v6-c-popover pf-m-left" id="disk-detail-popover" role="dialog" aria-modal="true" aria-label="Disk details" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="disk-detail-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="disk-detail-popover-body"></div>
     </div>
   </div>
 
