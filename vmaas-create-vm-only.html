@@ -365,6 +365,17 @@
     .vm-detail__actions .vm-action-menu {
       margin-left: 4px;
     }
+    .vm-detail__actions .vm-action-menu.pf-v6-c-menu-toggle {
+      min-height: 36px;
+    }
+    #pf-tooltip {
+      position: absolute;
+      z-index: 10050;
+      display: none;
+      pointer-events: none;
+      max-width: 18.75rem;
+    }
+    #pf-tooltip.pf-m-open { display: block; }
     .vm-detail__yaml-toggle {
       display: inline-flex; align-items: center; gap: 8px; margin-right: 8px;
       font-size: 14px; color: var(--vmaas-text);
@@ -411,7 +422,11 @@
       padding: 16px 18px; margin-bottom: 16px;
     }
     .vm-card__title {
-      margin: 0 0 12px; font-size: 16px; font-weight: 600; color: var(--vmaas-blue);
+      margin: 0 0 12px; font-size: 16px; font-weight: 600; color: var(--vmaas-text);
+    }
+    .vm-card .vm-card__title,
+    .vm-card__title-row .vm-card__title {
+      color: var(--vmaas-text);
     }
 
     .vm-card__title-link {
@@ -551,6 +566,22 @@
       min-width: 0;
       word-break: break-word;
     }
+
+    #fs-help-popover {
+      position: absolute;
+      z-index: 10000;
+      display: none;
+      width: min(100vw - 24px, 22rem);
+    }
+    #fs-help-popover.pf-m-open { display: block; }
+
+    #util-help-popover {
+      position: absolute;
+      z-index: 10000;
+      display: none;
+      width: min(100vw - 24px, 20rem);
+    }
+    #util-help-popover.pf-m-open { display: block; }
     .pf-v6-c-button.pf-m-small {
       font-size: 13px; padding: 4px 12px; min-height: 28px;
     }
@@ -4168,7 +4199,7 @@
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '5 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
+        disks: [{ name: 'Boot disk', size: 5, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
         id: 'catalog-item-2',
@@ -4190,7 +4221,7 @@
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '10 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
+        disks: [{ name: 'Boot disk', size: 10, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
         id: 'catalog-item-3',
@@ -4212,7 +4243,7 @@
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '20 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
+        disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
         id: 'catalog-item-4',
@@ -4234,7 +4265,7 @@
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '20 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
+        disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
         id: 'catalog-custom-1',
@@ -4256,7 +4287,7 @@
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '20 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
+        disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
         id: 'catalog-custom-2',
@@ -4278,7 +4309,7 @@
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '40 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
+        disks: [{ name: 'Boot disk', size: 40, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
     ];
 
@@ -4365,6 +4396,163 @@
       }
       return COMPUTE_RESOURCES[2]?.id || 'small';
     }
+
+    /** Build utilization metrics from VM compute, disks, and status (mock telemetry). */
+    function parseMemToMiB(memStr) {
+      const s = String(memStr || '').trim();
+      const m = s.match(/^([\d.]+)\s*(KiB|MiB|GiB|TiB|KB|MB|GB|TB)?$/i);
+      if (!m) return 0;
+      const n = parseFloat(m[1]);
+      const u = (m[2] || 'MiB').toLowerCase();
+      if (u.startsWith('t')) return n * 1024 * 1024;
+      if (u.startsWith('g')) return n * 1024;
+      if (u.startsWith('k')) return n / 1024;
+      return n;
+    }
+
+    function formatMemAmount(mib) {
+      if (mib >= 1024) {
+        const gib = mib / 1024;
+        const rounded = gib >= 10 ? Math.round(gib) : Math.round(gib * 10) / 10;
+        return `${String(rounded).replace(/\.0$/, '')} GiB`;
+      }
+      if (mib >= 1) return `${Math.round(mib)} MiB`;
+      return `${Math.max(0, Math.round(mib * 1024))} KiB`;
+    }
+
+    function diskSizeGiB(dsk) {
+      if (!dsk) return 0;
+      if (typeof dsk.size === 'number') {
+        const u = String(dsk.unit || 'GiB').toLowerCase();
+        if (u.startsWith('m')) return dsk.size / 1024;
+        if (u.startsWith('t')) return dsk.size * 1024;
+        return dsk.size;
+      }
+      const s = String(dsk.size || '');
+      if (/dynamic/i.test(s) || s === '—' || s === '') return 0;
+      const m = s.match(/([\d.]+)\s*(TiB|GiB|MiB|TB|GB|MB)?/i);
+      if (!m) return 0;
+      const n = parseFloat(m[1]);
+      const u = (m[2] || 'GiB').toLowerCase();
+      if (u.startsWith('t')) return n * 1024;
+      if (u.startsWith('m')) return n / 1024;
+      return n;
+    }
+
+    function hashVmSeed(name) {
+      let h = 2166136261;
+      const str = String(name || '');
+      for (let i = 0; i < str.length; i += 1) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function formatStorageAmount(gib) {
+      if (gib >= 1) {
+        const rounded = gib >= 10 ? Math.round(gib) : Math.round(gib * 100) / 100;
+        return `${String(rounded).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')} GiB`;
+      }
+      return `${Math.round(gib * 1024)} MiB`;
+    }
+
+    function formatNetworkRate(bps) {
+      if (bps <= 0) return '0 Bps';
+      if (bps < 1024) return `${Math.round(bps)} Bps`;
+      if (bps < 1024 * 1024) return `${(bps / 1024).toFixed(1)} KBps`;
+      return `${(bps / (1024 * 1024)).toFixed(2)} MBps`;
+    }
+
+    function getVmUtilization(vm) {
+      if (!vm) {
+        return {
+          cpu: '0%', memory: '0%', storage: null, network: '0 Bps',
+          cpuAbs: '0 m', cpuOf: '1', memAbs: '0 MiB', memOf: '—',
+          storAbs: null, storOf: null, netIn: '0 Bs', netOut: '0 Bs',
+        };
+      }
+      const computeId = resolveVmComputeId(vm);
+      const specs = computeResourceSpecs(computeId);
+      const cpuCount = parseInt(String(specs.cpu).match(/\d+/)?.[0] || '1', 10) || 1;
+      const memOfStr = specs.mem && specs.mem !== '—' ? specs.mem : (vm.mem || '2 GiB');
+      const memOfMiB = parseMemToMiB(memOfStr) || 2048;
+      const status = vm.status || 'stopped';
+      const running = status === 'running';
+      const paused = status === 'paused';
+      const starting = status === 'starting';
+      const active = running || paused || starting;
+      const seed = hashVmSeed(vm.name);
+
+      let cpuPct;
+      let cpuAbs;
+      if (!active) {
+        cpuPct = 0;
+        cpuAbs = '0 m';
+      } else if (paused) {
+        cpuPct = Math.round((0.02 + (seed % 5) / 100) * 100) / 100;
+        cpuAbs = `${((cpuPct / 100) * cpuCount * 1000).toFixed(2)} m`;
+      } else if (starting) {
+        cpuPct = Math.round((12 + (seed % 20)) * 100) / 100;
+        cpuAbs = `${Math.round((cpuPct / 100) * cpuCount * 1000)} m`;
+      } else {
+        cpuPct = Math.round((0.4 + (seed % 90) / 10) * 100) / 100;
+        const millicores = (cpuPct / 100) * cpuCount * 1000;
+        cpuAbs = millicores < 10 ? `${millicores.toFixed(2)} m` : `${Math.round(millicores)} m`;
+      }
+
+      let memPct;
+      let memAbs;
+      if (!active) {
+        memPct = 0;
+        memAbs = '0 MiB';
+      } else if (paused) {
+        memPct = Math.round((3 + (seed % 6)) * 100) / 100;
+        memAbs = formatMemAmount((memPct / 100) * memOfMiB);
+      } else {
+        memPct = Math.round((10 + (seed % 28)) * 100) / 100;
+        memAbs = formatMemAmount((memPct / 100) * memOfMiB);
+      }
+
+      const disks = Array.isArray(vm.disks) ? vm.disks : [];
+      const storOfGiB = disks.reduce((sum, d) => sum + diskSizeGiB(d), 0);
+      let storage = null;
+      let storAbs = null;
+      let storOf = null;
+      let storPct = null;
+      if (storOfGiB > 0) {
+        storPct = active ? (6 + (seed % 22)) : (4 + (seed % 10));
+        storage = `${storPct}%`;
+        storAbs = formatStorageAmount(storOfGiB * (storPct / 100));
+        storOf = formatStorageAmount(storOfGiB);
+      }
+
+      let networkBps = 0;
+      let netInBps = 0;
+      let netOutBps = 0;
+      if (running) {
+        networkBps = 256 + (seed % 48) * 512;
+        netInBps = Math.round(networkBps * 0.55);
+        netOutBps = Math.round(networkBps * 0.45);
+      }
+
+      return {
+        cpu: `${cpuPct}%`,
+        memory: `${memPct}%`,
+        storage,
+        network: formatNetworkRate(networkBps),
+        cpuAbs,
+        cpuOf: String(cpuCount),
+        memAbs,
+        memOf: memOfStr,
+        storAbs,
+        storOf,
+        storPct,
+        netIn: formatNetworkRate(netInBps).replace(/ps$/i, 's'),
+        netOut: formatNetworkRate(netOutBps).replace(/ps$/i, 's'),
+      };
+    }
+
 
     function openEditComputeModal() {
       const vm = VMS.find(v => v.name === state.selectedVmName);
@@ -5616,6 +5804,11 @@
           </span>
         </span>`;
       }
+      if (kind === 'paused') {
+        return `<span class="pf-v6-c-icon pf-m-inline pf-m-md" aria-hidden="true">
+          <span class="pf-v6-c-icon__content pf-m-warning"><i class="fa-solid fa-pause" aria-hidden="true"></i></span>
+        </span>`;
+      }
       return `<span class="pf-v6-c-icon pf-m-inline pf-m-md" aria-hidden="true">
         <span class="pf-v6-c-icon__content"><i class="pf-v6-pficon-off"></i></span>
       </span>`;
@@ -5625,6 +5818,9 @@
       const vmAttr = vmName ? ` data-status-vm="${vmName}"` : '';
       if (s === 'running') {
         return `<button type="button" class="status-link" data-status-popover="running"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('running')}<span class="status-link__label">Running</span></button>`;
+      }
+      if (s === 'paused') {
+        return `<button type="button" class="status-link" data-status-popover="paused"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('paused')}<span class="status-link__label">Paused</span></button>`;
       }
       if (s === 'ErrorPvcNotFound') {
         return `<button type="button" class="status-link" data-status-popover="error"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('error')}<span class="status-link__label">ErrorPvcNotFound</span></button>`;
@@ -5643,6 +5839,10 @@
       stopped: {
         title: 'Stopped',
         body: 'Virtual machine is currently Stopped',
+      },
+      paused: {
+        title: 'Paused',
+        body: 'Virtual machine is currently Paused',
       },
       error: {
         title: 'ErrorPvcNotFound',
@@ -5725,18 +5925,8 @@
       });
       document.getElementById('status-popover-close')?.addEventListener('click', () => closeStatusPopover());
       document.getElementById('status-popover-diagnostic')?.addEventListener('click', () => {
-        const vmName = statusPopoverTrigger?.dataset?.statusVm || state.selectedVmName;
         closeStatusPopover();
-        if (!vmName) {
-          toast('Open a Virtual machine to view diagnostics.');
-          return;
-        }
-        if (document.getElementById('view-vm')?.classList.contains('pf-m-active') && state.selectedVmName === vmName) {
-          state.vmDetailTab = 'diagnostics';
-          renderVmDetail();
-        } else {
-          openVmDetail(vmName, 'diagnostics');
-        }
+        toast('Diagnostics coming soon.');
       });
       document.getElementById('status-popover-learn')?.addEventListener('click', () => {
         closeStatusPopover();
@@ -5920,7 +6110,7 @@
       menu.hidden = true;
       menu.classList.remove('pf-m-open');
       closeVmKebabFlyouts();
-      document.querySelectorAll('.vm-table .kebab.pf-m-expanded').forEach(b => {
+      document.querySelectorAll('.vm-table .kebab.pf-m-expanded, #vm-detail-actions-btn.pf-m-expanded').forEach(b => {
         b.classList.remove('pf-m-expanded');
         b.setAttribute('aria-expanded', 'false');
       });
@@ -5931,12 +6121,21 @@
       const list = document.getElementById('vm-kebab-control-list');
       if (!list) return;
       const running = !!vm && isVmRunning(vm);
+      const paused = !!vm && vm.status === 'paused';
       const items = running
         ? [
             { action: 'stop', label: 'Stop' },
             { action: 'pause', label: 'Pause' },
             { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM' },
             { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM' },
+          ]
+        : paused
+        ? [
+            { action: 'start', label: 'Start' },
+            { action: 'stop', label: 'Stop' },
+            { action: 'pause', label: 'Pause', disabled: true },
+            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM', disabled: true },
+            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM', disabled: true },
           ]
         : [
             { action: 'start', label: 'Start' },
@@ -6026,6 +6225,12 @@
   <div class="box">
     <h1>Console placeholder</h1>
     <p>Console for <code>${safeName}</code> would open here.</p>
+  </div>
+
+
+  <div class="pf-v6-c-tooltip pf-m-top" id="pf-tooltip" role="tooltip" hidden>
+    <div class="pf-v6-c-tooltip__arrow"></div>
+    <div class="pf-v6-c-tooltip__content" id="pf-tooltip-content"></div>
   </div>
 
 </body>
@@ -6252,7 +6457,7 @@
       return {
         name: dsk.label || dsk.name || 'Disk',
         size,
-        storageTier: dsk.storageTierLabel || dsk.storageTierId || dsk.storageClass || 'General Purpose SSD',
+        storageTier: dsk.storageTierLabel || dsk.storageTierId || dsk.storageClass || 'Balanced',
         bootable: !!(dsk.bootable || /boot/i.test(dsk.label || dsk.name || '')),
       };
     }
@@ -6336,25 +6541,159 @@
       window.addEventListener('scroll', closeDiskDetailPopover, true);
     }
 
+    let fsHelpPopoverTrigger = null;
+
+    function closeFsHelpPopover() {
+      const pop = document.getElementById('fs-help-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (fsHelpPopoverTrigger) {
+        fsHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
+        fsHelpPopoverTrigger = null;
+      }
+    }
+
+    function openFsHelpPopover(trigger) {
+      const pop = document.getElementById('fs-help-popover');
+      if (!pop || !trigger) return;
+      if (fsHelpPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeFsHelpPopover();
+        return;
+      }
+      closeNicDetailPopover();
+      closeDiskDetailPopover();
+      closeUtilHelpPopover();
+      if (fsHelpPopoverTrigger && fsHelpPopoverTrigger !== trigger) {
+        fsHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      fsHelpPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      pop.hidden = false;
+      pop.classList.add('pf-m-open');
+      pop.classList.add('pf-m-right');
+      pop.classList.remove('pf-m-left');
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        let left = rect.right + window.scrollX + gap;
+        let top = rect.top + window.scrollY + (rect.height / 2) - (pr.height / 2);
+        if (left + pr.width > window.scrollX + window.innerWidth - 8) {
+          pop.classList.remove('pf-m-right');
+          pop.classList.add('pf-m-left');
+          left = rect.left + window.scrollX - pr.width - gap;
+        }
+        pop.style.left = `${Math.max(8, left)}px`;
+        pop.style.top = `${Math.max(8, top)}px`;
+      });
+      document.getElementById('fs-help-popover-close')?.focus();
+    }
+
+    function wireFsHelpPopover() {
+      if (document.body.dataset.fsHelpPopoverWired) return;
+      document.body.dataset.fsHelpPopoverWired = '1';
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-fs-help]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openFsHelpPopover(trigger);
+          return;
+        }
+        if (e.target.closest('#fs-help-popover')) return;
+        closeFsHelpPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeFsHelpPopover();
+      });
+      document.getElementById('fs-help-popover-close')?.addEventListener('click', () => closeFsHelpPopover());
+      window.addEventListener('resize', closeFsHelpPopover);
+      window.addEventListener('scroll', closeFsHelpPopover, true);
+    }
+
+    let utilHelpPopoverTrigger = null;
+
+    function closeUtilHelpPopover() {
+      const pop = document.getElementById('util-help-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (utilHelpPopoverTrigger) {
+        utilHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
+        utilHelpPopoverTrigger = null;
+      }
+    }
+
+    function openUtilHelpPopover(trigger) {
+      const pop = document.getElementById('util-help-popover');
+      if (!pop || !trigger) return;
+      if (utilHelpPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeUtilHelpPopover();
+        return;
+      }
+      closeNicDetailPopover();
+      closeDiskDetailPopover();
+      closeFsHelpPopover();
+      if (utilHelpPopoverTrigger && utilHelpPopoverTrigger !== trigger) {
+        utilHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      utilHelpPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      pop.hidden = false;
+      pop.classList.add('pf-m-open');
+      pop.classList.add('pf-m-right');
+      pop.classList.remove('pf-m-left');
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        let left = rect.right + window.scrollX + gap;
+        let top = rect.top + window.scrollY + (rect.height / 2) - (pr.height / 2);
+        if (left + pr.width > window.scrollX + window.innerWidth - 8) {
+          pop.classList.remove('pf-m-right');
+          pop.classList.add('pf-m-left');
+          left = rect.left + window.scrollX - pr.width - gap;
+        }
+        pop.style.left = `${Math.max(8, left)}px`;
+        pop.style.top = `${Math.max(8, top)}px`;
+      });
+      document.getElementById('util-help-popover-close')?.focus();
+    }
+
+    function wireUtilHelpPopover() {
+      if (document.body.dataset.utilHelpPopoverWired) return;
+      document.body.dataset.utilHelpPopoverWired = '1';
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-util-help]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openUtilHelpPopover(trigger);
+          return;
+        }
+        if (e.target.closest('#util-help-popover')) return;
+        closeUtilHelpPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeUtilHelpPopover();
+      });
+      document.getElementById('util-help-popover-close')?.addEventListener('click', () => closeUtilHelpPopover());
+      window.addEventListener('resize', closeUtilHelpPopover);
+      window.addEventListener('scroll', closeUtilHelpPopover, true);
+    }
+
     function enrichVm(v) {
       if (!v) return null;
       const osFullMap = { RHEL: 'Red Hat Enterprise Linux', Fedora: 'Fedora Linux', Windows: 'Microsoft Windows', Other: 'Other Linux', CentOS: 'CentOS Stream' };
-      return {
+      const enriched = {
         arch: 'amd64',
-        cpu: '1 CPU',
-        mem: '2 GiB',
         instanceType: 'u1.small',
         preference: (v.os || 'fedora').toLowerCase(),
         hostname: v.name,
         group: '—',
         timezone: 'UTC',
         fqdn: `${v.name}.headless.${v.ns || 'default'}.svc.cluster.local`,
-        utilization: {
-          cpu: '0.14%', memory: '16.55%', storage: null, network: '0 Bps',
-          cpuAbs: '1.39 m', cpuOf: '1', memAbs: '21 MiB', memOf: '128 MiB',
-        },
-        cpu: '1 CPU',
-        mem: '128 MiB',
         guestAgent: false,
         computeResource: 'small',
         alerts: [],
@@ -6370,11 +6709,18 @@
           ip: '—',
         }],
         disks: v.disks || [
-          { name: 'Boot disk', size: '5 GiB', bootable: true },
-          { name: 'Disk 1', size: '5 GiB' },
-          { name: 'Disk 2', size: '5 GiB' },
+          { name: 'Boot disk', size: 5, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
+          { name: 'Disk 1', size: 5, unit: 'GiB', storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
+          { name: 'Disk 2', size: 5, unit: 'GiB', storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
         ],
       };
+      const computeId = resolveVmComputeId(enriched);
+      const specs = computeResourceSpecs(computeId);
+      enriched.computeResource = computeId;
+      if (specs.cpu !== '—') enriched.cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      if (specs.mem !== '—') enriched.mem = specs.mem;
+      enriched.utilization = getVmUtilization(enriched);
+      return enriched;
     }
 
     function nextNicName(existing = []) {
@@ -6399,24 +6745,8 @@
     }
 
     function openAddNicModal(context = 'vm-detail') {
-      const existing = existingNicsForContext(context);
-      state.networkModal = null;
-      state.nicModal = {
-        context,
-        view: 'main',
-        name: nextNicName(existing),
-        model: 'virtio',
-        network: '',
-        bootSource: false,
-        mac: '',
-        linkState: 'Up',
-      };
-      const title = document.getElementById('nic-modal-title');
-      if (title) title.textContent = 'Add network interface';
-      renderAddNicModal();
-      const overlay = document.getElementById('nic-overlay');
-      overlay.classList.add('pf-m-open');
-      overlay.setAttribute('aria-hidden', 'false');
+      // VMaaS: use Virtual network / Subnet / Security groups (not CNV NAD attach)
+      openAddNetworkModal(context === 'wizard' ? 'wizard' : 'vm-detail');
     }
 
     function closeAddNicModal() {
@@ -6613,11 +6943,12 @@
       return candidate;
     }
 
-    function openAddNetworkModal() {
-      if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
+    function openAddNetworkModal(context = 'wizard') {
+      if (context === 'wizard' && !Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
       state.nicModal = null;
       const defaultNet = CONFIG_VIRTUAL_NETWORKS[0];
       state.networkModal = {
+        context,
         virtualNetwork: defaultNet?.id || '',
         subnet: defaultNet?.subnets?.[0] || '',
         securityGroups: [DEFAULT_SECURITY_GROUP],
@@ -6661,7 +6992,9 @@
       m.securityGroups = m.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
       if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
       const canSave = canSaveNetworkModal(m);
-      const previewName = nextAutoNetworkName(state.data);
+      const previewName = m.context === 'vm-detail'
+        ? nextNicName(existingNicsForContext('vm-detail'))
+        : nextAutoNetworkName(state.data);
       const chips = (m.securityGroups || []).map(sg => `
         <span class="sg-select__chip">
           ${sg}
@@ -6692,7 +7025,13 @@
               ).join('')}
             `,
           })}
-          <p class="form-helper">Name will be <code>${previewName}</code> (from the Virtual machine name).</p>
+          <p class="form-helper">Interface name will be <code>${previewName}</code>.</p>
+          ${CONFIG_VIRTUAL_NETWORKS.length ? '' : `
+            <p class="nic-modal__error" role="alert" style="margin-top:12px;">
+              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+              <span><strong>No virtual networks available.</strong> Create a virtual network first, or contact your administrator.</span>
+            </p>
+          `}
         </div>
         <div class="form-field" style="margin-top:16px;">
           <label for="net-f-subnet">Subnet <span class="req">*</span></label>
@@ -6808,8 +7147,25 @@
     function saveAddNetworkModal() {
       const m = state.networkModal;
       if (!canSaveNetworkModal(m)) return;
-      if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
       const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+      if (m.context === 'vm-detail') {
+        const vm = VMS.find(v => v.name === state.selectedVmName);
+        if (!vm) return;
+        if (!vm.nics) vm.nics = enrichVm(vm).nics.slice();
+        const nic = {
+          name: nextNicName(vm.nics),
+          virtualNetwork: m.virtualNetwork,
+          subnet: m.subnet,
+          securityGroups: [...(m.securityGroups || [])],
+          ip: '—',
+        };
+        vm.nics.push(nic);
+        closeAddNetworkModal();
+        renderVmDetail();
+        toast(`Network “${nic.name}” added.`, 'success');
+        return;
+      }
+      if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
       state.data.extraNetworks.push({
         id: `net-${Date.now()}`,
         name: nextAutoNetworkName(state.data),
@@ -6925,11 +7281,12 @@
       return candidate;
     }
 
-    function openAddDiskModal() {
-      if (!Array.isArray(state.data.extraDisks)) state.data.extraDisks = [];
+    function openAddDiskModal(context = 'wizard') {
+      if (context === 'wizard' && !Array.isArray(state.data.extraDisks)) state.data.extraDisks = [];
       const tiers = getStorageTiers();
       const defaultTier = tiers[0];
       state.diskModal = {
+        context,
         size: 30,
         unit: 'GiB',
         storageTierId: defaultTier?.id || '',
@@ -7027,7 +7384,14 @@
         </div>
       ` : '';
 
-      const previewName = nextAutoDiskName(state.data);
+      const previewSource = m.context === 'vm-detail'
+        ? (() => {
+            const vm = VMS.find(v => v.name === state.selectedVmName);
+            const disks = (vm?.disks || []).filter(d => !(d.bootable || /boot/i.test(d.name || d.label || '')));
+            return { name: state.selectedVmName || 'vm', extraDisks: disks };
+          })()
+        : state.data;
+      const previewName = nextAutoDiskName(previewSource);
       body.innerHTML = `
         ${m.error ? `
         <p class="nic-modal__error" role="alert" style="margin:0 0 12px;">
@@ -7040,7 +7404,7 @@
           <input type="number" id="disk-f-size" class="unit-size-input" value="${diskVal}"
             min="${diskMin}" max="${diskMax}" step="1" required
             aria-label="Disk size in GiB" />
-          <p class="form-helper">Name will be <code>${previewName}</code> (from the Virtual machine name).</p>
+          <p class="form-helper">Disk name will be <code>${previewName}</code>.</p>
         </div>
         <div class="form-field">
           <label for="disk-tier-toggle" id="disk-tier-label">Storage tier <span class="req">*</span></label>
@@ -7060,7 +7424,13 @@
             </button>
             ${tierMenu}
           </div>
-          <p class="form-helper">Fetched from Storage tiers (GET /api/private/v1/storage_tiers). Defined by your cloud provider administrator.</p>
+          <p class="form-helper">Storage tiers are defined by your cloud provider administrator.</p>
+          ${tiers.length ? '' : `
+            <p class="nic-modal__error" role="alert" style="margin-top:12px;">
+              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+              <span><strong>No storage tiers available.</strong> Contact your administrator.</span>
+            </p>
+          `}
         </div>
       `;
       footer.innerHTML = `
@@ -7153,20 +7523,175 @@
       syncDiskModalDraftFromDom();
       const m = state.diskModal;
       if (!canSaveDiskModal(m)) return;
+      const tier = getStorageTiers().find(t => t.id === m.storageTierId);
+      const tierLabel = tier?.name || m.storageTierId;
+      if (m.context === 'vm-detail') {
+        const vm = VMS.find(v => v.name === state.selectedVmName);
+        if (!vm) return;
+        if (!vm.disks) vm.disks = enrichVm(vm).disks.slice();
+        const extra = vm.disks.filter(d => !(d.bootable || /boot/i.test(d.name || d.label || '')));
+        const name = nextAutoDiskName({ name: vm.name, extraDisks: extra });
+        vm.disks.push({
+          name,
+          size: Number(m.size),
+          unit: m.unit || 'GiB',
+          storageTierId: m.storageTierId,
+          storageTierLabel: tierLabel,
+          bootable: false,
+        });
+        closeAddDiskModal();
+        renderVmDetail();
+        toast(`Disk “${name}” added.`, 'success');
+        return;
+      }
       if (!Array.isArray(state.data.extraDisks)) state.data.extraDisks = [];
       const name = nextAutoDiskName(state.data);
-      const tier = getStorageTiers().find(t => t.id === m.storageTierId);
       state.data.extraDisks.push({
         id: `disk-${Date.now()}`,
         name,
         size: Number(m.size),
         unit: m.unit || 'GiB',
         storageTierId: m.storageTierId,
-        storageTierLabel: tier?.name || m.storageTierId,
+        storageTierLabel: tierLabel,
       });
       closeAddDiskModal();
       renderWizard();
       toast(`Disk “${name}” added.`, 'success');
+    }
+
+    let vmPowerActionTimer = null;
+
+    function refreshVmStatusViews() {
+      if (document.getElementById('view-vm')?.classList.contains('pf-m-active')) {
+        renderVmDetail();
+      }
+      renderVms(state.vmFilter);
+    }
+
+    function setVmStatus(name, status) {
+      const vm = VMS.find(v => v.name === name);
+      if (!vm) return null;
+      vm.status = status;
+      return vm;
+    }
+
+    function applyVmPowerAction(action, name = state.selectedVmName) {
+      const vm = VMS.find(v => v.name === name);
+      if (!vm) return;
+      if (vmPowerActionTimer) {
+        clearTimeout(vmPowerActionTimer);
+        vmPowerActionTimer = null;
+      }
+      const label = vm.name;
+      if (action === 'stop') {
+        if (vm.status !== 'running' && vm.status !== 'paused') return;
+        setVmStatus(name, 'stopped');
+        refreshVmStatusViews();
+        toast(`Stopped “${label}”.`, 'success');
+        return;
+      }
+      if (action === 'pause') {
+        if (vm.status !== 'running') return;
+        setVmStatus(name, 'paused');
+        refreshVmStatusViews();
+        toast(`Paused “${label}”.`, 'success');
+        return;
+      }
+      if (action === 'start') {
+        if (vm.status === 'running' || vm.status === 'starting') return;
+        setVmStatus(name, 'starting');
+        refreshVmStatusViews();
+        toast(`Starting “${label}”…`);
+        vmPowerActionTimer = setTimeout(() => {
+          setVmStatus(name, 'running');
+          refreshVmStatusViews();
+          toast(`“${label}” is Running.`, 'success');
+          vmPowerActionTimer = null;
+        }, 900);
+        return;
+      }
+      if (action === 'restart') {
+        if (vm.status !== 'running') return;
+        setVmStatus(name, 'starting');
+        refreshVmStatusViews();
+        toast(`Restarting “${label}”…`);
+        vmPowerActionTimer = setTimeout(() => {
+          setVmStatus(name, 'running');
+          refreshVmStatusViews();
+          toast(`“${label}” restarted.`, 'success');
+          vmPowerActionTimer = null;
+        }, 900);
+      }
+    }
+
+    let pfTooltipTrigger = null;
+
+    function hidePfTooltip() {
+      const tip = document.getElementById('pf-tooltip');
+      if (!tip) return;
+      tip.classList.remove('pf-m-open');
+      tip.hidden = true;
+      if (pfTooltipTrigger) {
+        pfTooltipTrigger.removeAttribute('aria-describedby');
+        pfTooltipTrigger = null;
+      }
+    }
+
+    function showPfTooltip(trigger) {
+      const tip = document.getElementById('pf-tooltip');
+      const content = document.getElementById('pf-tooltip-content');
+      if (!tip || !content || !trigger) return;
+      const text = trigger.getAttribute('data-pf-tooltip');
+      if (!text || trigger.disabled) {
+        hidePfTooltip();
+        return;
+      }
+      content.textContent = text;
+      pfTooltipTrigger = trigger;
+      trigger.setAttribute('aria-describedby', 'pf-tooltip');
+      tip.hidden = false;
+      tip.classList.add('pf-m-open');
+      tip.classList.add('pf-m-top');
+      tip.classList.remove('pf-m-bottom');
+      const rect = trigger.getBoundingClientRect();
+      requestAnimationFrame(() => {
+        const tr = tip.getBoundingClientRect();
+        let left = rect.left + window.scrollX + (rect.width / 2) - (tr.width / 2);
+        let top = rect.top + window.scrollY - tr.height - 8;
+        if (top < window.scrollY + 4) {
+          tip.classList.remove('pf-m-top');
+          tip.classList.add('pf-m-bottom');
+          top = rect.bottom + window.scrollY + 8;
+        }
+        tip.style.left = `${Math.max(8, left)}px`;
+        tip.style.top = `${Math.max(4, top)}px`;
+      });
+    }
+
+    function wirePfTooltips() {
+      if (document.body.dataset.pfTooltipWired) return;
+      document.body.dataset.pfTooltipWired = '1';
+      document.addEventListener('mouseover', e => {
+        const trigger = e.target.closest('[data-pf-tooltip]');
+        if (!trigger || trigger.disabled) return;
+        showPfTooltip(trigger);
+      });
+      document.addEventListener('mouseout', e => {
+        const trigger = e.target.closest('[data-pf-tooltip]');
+        if (!trigger) return;
+        const related = e.relatedTarget;
+        if (related && trigger.contains(related)) return;
+        hidePfTooltip();
+      });
+      document.addEventListener('focusin', e => {
+        const trigger = e.target.closest('[data-pf-tooltip]');
+        if (trigger && !trigger.disabled) showPfTooltip(trigger);
+      });
+      document.addEventListener('focusout', e => {
+        if (e.target.closest('[data-pf-tooltip]')) hidePfTooltip();
+      });
+      window.addEventListener('scroll', hidePfTooltip, true);
+      window.addEventListener('resize', hidePfTooltip);
     }
 
     function openVmDetail(name, tab = 'overview') {
@@ -7189,7 +7714,9 @@
         root.innerHTML = '<p class="muted">Virtual machine not found.</p>';
         return;
       }
-      const tab = state.vmDetailTab || 'overview';
+      // Detail section tabs hidden for now — Overview only
+      state.vmDetailTab = 'overview';
+      const tab = 'overview';
       const tabs = [
         ['overview', 'Overview'],
         ['metrics', 'Metrics'],
@@ -7201,6 +7728,12 @@
         ['diagnostics', 'Diagnostics'],
       ];
       const running = v.status === 'running';
+      const paused = v.status === 'paused';
+      const starting = v.status === 'starting';
+      const canStop = (running || paused) && !starting;
+      const canRestart = running && !starting;
+      const canPause = running && !starting;
+      const canStart = !running && !starting;
       const header = `
         <div class="vm-detail__header">
           <div class="vm-detail__title-row">
@@ -7212,59 +7745,60 @@
             <span class="vm-detail__status">${statusCell(v.status, v.name)}</span>
           </div>
           <div class="vm-detail__actions" role="group" aria-label="VM actions">
-            <button type="button" class="vm-action-icon" aria-label="Stop" title="Stop" ${running ? '' : 'disabled'}>
+            <button type="button" class="vm-action-icon" data-vm-action="stop" data-pf-tooltip="Stop" aria-label="Stop" ${canStop ? '' : 'disabled'}>
               <i class="fa-solid fa-stop" aria-hidden="true"></i>
             </button>
-            <button type="button" class="vm-action-icon" aria-label="Restart" title="Restart" ${running ? '' : 'disabled'}>
+            <button type="button" class="vm-action-icon" data-vm-action="restart" data-pf-tooltip="Restart" aria-label="Restart" ${canRestart ? '' : 'disabled'}>
               <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
             </button>
-            <button type="button" class="vm-action-icon" aria-label="Pause" title="Pause" ${running ? '' : 'disabled'}>
+            <button type="button" class="vm-action-icon" data-vm-action="pause" data-pf-tooltip="Pause" aria-label="Pause" ${canPause ? '' : 'disabled'}>
               <i class="fa-solid fa-pause" aria-hidden="true"></i>
             </button>
-            <button type="button" class="vm-action-icon" aria-label="Start" title="Start" ${running ? 'disabled' : ''}>
+            <button type="button" class="vm-action-icon" data-vm-action="start" data-pf-tooltip="Start" aria-label="Start" ${canStart ? '' : 'disabled'}>
               <i class="fa-solid fa-play" aria-hidden="true"></i>
             </button>
-            <button type="button" class="pf-v6-c-button pf-m-secondary vm-action-menu">
-              Actions <i class="fa-solid fa-caret-down" style="margin-left:6px;" aria-hidden="true"></i>
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary vm-action-menu" id="vm-detail-actions-btn"
+              data-vm-kebab="${v.name}" aria-expanded="false" aria-haspopup="menu" aria-controls="vm-kebab-menu">
+              <span class="pf-v6-c-menu-toggle__text">Actions</span>
+              <span class="pf-v6-c-menu-toggle__controls">
+                <span class="pf-v6-c-menu-toggle__toggle-icon">
+                  <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                </span>
+              </span>
             </button>
           </div>
-        </div>
-        <div class="vm-detail__tabs" role="tablist" aria-label="Virtual machine sections">
-          ${tabs.map(([id, label]) => `
-            <button type="button" class="vm-detail__tab ${tab === id ? 'pf-m-selected' : ''}" data-vm-tab="${id}" role="tab" aria-selected="${tab === id}">
-              ${label}${id === 'diagnostics' ? ' <span class="vm-detail__badge" aria-label="1 issue">1</span>' : ''}
-            </button>
-          `).join('')}
         </div>
       `;
 
       let body = '';
       
       if (tab === 'overview') {
-        const u = v.utilization || {};
+        const u = getVmUtilization(v);
+        const bootGiB = diskSizeGiB((v.disks || []).find(d => d.bootable) || (v.disks || [])[0]) || 30;
+        const rootUsed = u.storPct != null ? (bootGiB * (u.storPct / 100)) : bootGiB * 0.08;
         const filesystems = v.filesystems || [
           { name: 'vda2', type: 'vfat', mount: '/boot/efi', total: '199.8 MiB', used: '8.95 MiB' },
-          { name: 'vda3', type: 'xfs', mount: '/', total: '29.74 GiB', used: '2.35 GiB' },
+          { name: 'vda3', type: 'xfs', mount: '/', total: formatStorageAmount(bootGiB), used: formatStorageAmount(rootUsed) },
         ];
         const projectRaw = v.project || v.ns || 'default';
         const projectDisplay = projectRaw === 'default' ? 'Default' : projectRaw;
         const osDisplay = v.guestAgent === true
           ? (v.osFull || v.os || '—')
           : 'Guest agent is required.';
-        const cpuAbs = u.cpuAbs || '1.39 m';
-        const cpuOf = u.cpuOf || '1';
-        const cpuPct = parseFloat(String(u.cpu || '0.14').replace('%', '')) || 0.14;
-        const memAbs = u.memAbs || '21 MiB';
-        const memOf = u.memOf || v.mem || '128 MiB';
-        const memPct = parseFloat(String(u.memory || '16.55').replace('%', '')) || 16.55;
+        const cpuAbs = u.cpuAbs;
+        const cpuOf = u.cpuOf;
+        const cpuPct = parseFloat(String(u.cpu || '0').replace('%', '')) || 0;
+        const memAbs = u.memAbs;
+        const memOf = u.memOf;
+        const memPct = parseFloat(String(u.memory || '0').replace('%', '')) || 0;
         const storHasData = u.storage != null && u.storage !== '' && u.storage !== '—';
-        const storPct = storHasData ? (parseFloat(String(u.storage).replace('%', '')) || 0) : 0;
+        const storPct = storHasData ? (u.storPct != null ? u.storPct : (parseFloat(String(u.storage).replace('%', '')) || 0)) : 0;
         const disks = (v.disks && v.disks.length)
           ? v.disks
           : [
-              { name: 'Boot disk', size: '5 GiB', bootable: true },
-              { name: 'Disk 1', size: '5 GiB' },
-              { name: 'Disk 2', size: '5 GiB' },
+              { name: 'Boot disk', size: 5, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
+              { name: 'Disk 1', size: 5, unit: 'GiB', storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
+              { name: 'Disk 2', size: 5, unit: 'GiB', storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
             ];
         const diskRows = disks.map((dsk, i) => {
           const label = dsk.label
@@ -7316,8 +7850,8 @@
                 <div class="vm-card">
                   <div class="vm-card__title-row">
                     <h3 class="vm-card__title">
-                      Utilization
-                      <button type="button" class="util-title-info" title="Resource utilization over the selected time range" aria-label="Utilization information">
+                      <span class="vm-card__title-static">Utilization</span>
+                      <button type="button" class="util-title-info" id="btn-util-help" data-util-help aria-label="Utilization information" aria-haspopup="dialog" aria-expanded="false">
                         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                       </button>
                     </h3>
@@ -7338,7 +7872,7 @@
                         </div>
                       </div>
                       <div class="util-spark" aria-hidden="true">
-                        <div class="util-spark__y"><span>1000.00</span><span>0.00</span></div>
+                        <div class="util-spark__y"><span>${Number(cpuOf) * 1000}.00</span><span>0.00</span></div>
                         <div class="util-spark__plot">
                           <svg viewBox="0 0 120 40" preserveAspectRatio="none">
                             <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,35 40,34 60,35 80,34 100,35 120,34" />
@@ -7391,7 +7925,7 @@
                         <div class="util-tile__nodata">No data available</div>
                       `}
                       <div class="util-spark" aria-hidden="true">
-                        <div class="util-spark__y"><span>1 B</span><span>0 B</span></div>
+                        <div class="util-spark__y"><span>${storHasData ? (u.storOf || '—') : '—'}</span><span>0 B</span></div>
                         <div class="util-spark__plot">
                           <svg viewBox="0 0 120 40" preserveAspectRatio="none">
                             <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,36 40,36 60,36 80,36 100,36 120,36" />
@@ -7405,8 +7939,8 @@
                       <div class="util-tile__abs">${u.network || '0 Bps'}</div>
                       <div class="util-tile__abs-sub">Total</div>
                       <div class="util-net-body">
-                        <div class="util-net-row"><span>0 Bs</span><span>In</span></div>
-                        <div class="util-net-row"><span>0 Bs</span><span>Out</span></div>
+                        <div class="util-net-row"><span>${u.netIn || '0 Bs'}</span><span>In</span></div>
+                        <div class="util-net-row"><span>${u.netOut || '0 Bs'}</span><span>Out</span></div>
                         <button type="button" class="name-link util-tile__breakdown">Breakdown by network</button>
                       </div>
                       <div class="util-spark" aria-hidden="true">
@@ -7532,7 +8066,7 @@
               <div class="vm-card">
                 <h3 class="vm-card__title">
                   File systems
-                  <button type="button" class="util-title-info" title="Guest file systems reported by the agent" aria-label="File systems information">
+                  <button type="button" class="util-title-info" id="btn-fs-help" data-fs-help aria-label="File systems information" aria-haspopup="dialog" aria-expanded="false">
                     <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                   </button>
                 </h3>
@@ -7635,8 +8169,8 @@
                 </table>
               </div>
               <p class="form-helper" style="margin-top:12px;">
-                Attach NICs to networks that already exist. Create new networks from the
-                <button type="button" class="name-link" id="vm-goto-networks">Networks</button> page.
+                Attach interfaces to an existing virtual network, subnet, and security groups. Manage virtual networks from the
+                <button type="button" class="name-link" id="vm-goto-networks">Virtual networks</button> page.
               </p>
             </div>
           `;
@@ -7679,18 +8213,21 @@
 
       root.innerHTML = header + body;
 
-      root.querySelectorAll('[data-vm-tab]').forEach(b => {
-        b.onclick = () => {
-          state.vmDetailTab = b.dataset.vmTab;
-          if (b.dataset.vmTab === 'configuration') state.vmConfigSection = 'details';
-          state.nicMenuOpen = null;
-          renderVmDetail();
-        };
+      root.querySelectorAll('[data-vm-action]').forEach(b => {
+        b.addEventListener('click', () => {
+          hidePfTooltip();
+          applyVmPowerAction(b.dataset.vmAction, v.name);
+        });
       });
+
+      root.querySelector('#vm-detail-actions-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        hidePfTooltip();
+        openVmKebabMenu(v.name, e.currentTarget);
+      });
+
       root.querySelector('[data-goto-config-net]')?.addEventListener('click', () => {
-        state.vmDetailTab = 'configuration';
-        state.vmConfigSection = 'network';
-        renderVmDetail();
+        toast('Network configuration coming soon.');
       });
       root.querySelectorAll('[data-vm-config]').forEach(b => {
         b.onclick = () => {
@@ -7707,11 +8244,10 @@
           renderVmDetail();
         };
       });
-      root.querySelector('#btn-add-vm-nic')?.addEventListener('click', () => openAddNicModal('vm-detail'));
-      root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNicModal('vm-detail'));
+      root.querySelector('#btn-add-vm-nic')?.addEventListener('click', () => openAddNetworkModal('vm-detail'));
+      root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNetworkModal('vm-detail'));
       root.querySelector('#btn-overview-alerts')?.addEventListener('click', () => {
-        state.vmDetailTab = 'diagnostics';
-        renderVmDetail();
+        toast('Diagnostics coming soon.');
       });
       root.querySelectorAll('[data-hw-tab]').forEach(b => {
         b.addEventListener('click', () => {
@@ -7720,15 +8256,11 @@
         });
       });
       root.querySelector('#btn-overview-hardware')?.addEventListener('click', () => {
-        state.vmDetailTab = 'configuration';
-        state.vmConfigSection = 'details';
-        renderVmDetail();
+        toast('Hardware configuration coming soon.');
       });
 
       root.querySelector('#btn-overview-add-disk')?.addEventListener('click', () => {
-        state.vmDetailTab = 'configuration';
-        state.vmConfigSection = 'storage';
-        renderVmDetail();
+        openAddDiskModal('vm-detail');
       });
       root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
         openEditComputeModal();
@@ -10399,6 +10931,10 @@
           openVmConsolePlaceholder(name);
           return;
         }
+        if (['stop', 'start', 'pause', 'restart', 'reset'].includes(action)) {
+          applyVmPowerAction(action === 'reset' ? 'restart' : action, name);
+          return;
+        }
         const label = actionBtn.querySelector('.pf-v6-c-menu__item-text')?.textContent?.trim() || action;
         toast(`${label}: ${name}`);
         return;
@@ -10540,6 +11076,9 @@
     wireEditComputeModal();
     wireNicDetailPopover();
     wireDiskDetailPopover();
+    wireFsHelpPopover();
+    wireUtilHelpPopover();
+    wirePfTooltips();
     renderNetworks();
 
     try {
@@ -10599,6 +11138,30 @@
         </span>
       </button>
       <div class="pf-v6-c-popover__body" id="disk-detail-popover-body"></div>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-popover pf-m-right" id="fs-help-popover" role="dialog" aria-modal="true" aria-label="File systems information" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="fs-help-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="fs-help-popover-body">The following information regarding how the disks are partitioned is provided by the guest agent.</div>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-popover pf-m-right" id="util-help-popover" role="dialog" aria-modal="true" aria-label="Utilization information" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="util-help-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="util-help-popover-body">Donut charts represent current values.<br>Sparkline charts represent data over time.</div>
     </div>
   </div>
 
