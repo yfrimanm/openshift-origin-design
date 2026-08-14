@@ -1084,7 +1084,36 @@
       justify-content: flex-start;
     }
 
-    /* —— Add network interface / Add disk modals —— */
+    /* —— Add network interface / Add disk / Edit compute modals —— */
+
+    #compute-overlay:not(.pf-m-open) { display: none; }
+    #compute-overlay.pf-m-open {
+      display: flex; position: fixed; inset: 0; z-index: 600;
+      align-items: center; justify-content: center;
+      background: rgba(3, 3, 3, 0.5);
+    }
+    #compute-overlay .pf-v6-c-modal-box {
+      --pf-v6-c-modal-box--Width: min(32rem, calc(100vw - 2rem)) !important;
+      width: min(32rem, calc(100vw - 2rem)) !important;
+      max-width: min(32rem, calc(100vw - 2rem)) !important;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      padding: 0;
+    }
+    #compute-overlay .pf-v6-c-modal-box__body {
+      padding: 0 24px 8px;
+    }
+    #compute-overlay .pf-v6-c-modal-box__header {
+      padding: 24px 24px 16px;
+    }
+    #compute-overlay .pf-v6-c-modal-box__footer {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 24px 24px;
+      justify-content: flex-start;
+    }
+    #compute-overlay .form-field { max-width: none; margin-bottom: 0; }
+
     #nic-overlay:not(.pf-m-open),
     #disk-overlay:not(.pf-m-open) { display: none; }
     #nic-overlay.pf-m-open,
@@ -3864,7 +3893,35 @@
     </div>
   </div>
 
-  <div class="pf-v6-c-backdrop" id="nic-overlay" aria-hidden="true">
+  
+  <div class="pf-v6-c-backdrop" id="compute-overlay" aria-hidden="true">
+    <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
+      <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="compute-modal-title" id="compute-modal">
+        <div class="pf-v6-c-modal-box__header">
+          <div class="pf-v6-c-modal-box__close">
+            <button type="button" class="pf-v6-c-button pf-m-plain" id="compute-modal-close" aria-label="Close">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+          <h1 class="pf-v6-c-modal-box__title" id="compute-modal-title">
+            <span class="pf-v6-c-modal-box__title-text">Edit Compute resources size</span>
+          </h1>
+        </div>
+        <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
+          <div class="form-field">
+            <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
+            <span class="pf-v6-c-form-control" id="compute-modal-select-wrap"></span>
+          </div>
+        </div>
+        <div class="pf-v6-c-modal-box__footer">
+          <button type="button" class="pf-v6-c-button pf-m-primary" id="compute-modal-save">Save</button>
+          <button type="button" class="pf-v6-c-button pf-m-link" id="compute-modal-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="pf-v6-c-backdrop" id="nic-overlay" aria-hidden="true">
     <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
       <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="nic-modal-title" id="nic-modal">
         <div class="nic-modal__header">
@@ -4194,6 +4251,83 @@
         mem: m[2].trim(),
       };
     }
+
+
+    function formatComputeDisplay(id) {
+      const specs = computeResourceSpecs(id);
+      if (!specs || specs.cpu === '—') return '—';
+      const cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      return `${cpu} | ${specs.mem} Memory`;
+    }
+
+    function resolveVmComputeId(vm) {
+      if (!vm) return COMPUTE_RESOURCES[2]?.id || 'small';
+      if (vm.computeResource && COMPUTE_RESOURCES.some(c => c.id === vm.computeResource)) {
+        return vm.computeResource;
+      }
+      return COMPUTE_RESOURCES[2]?.id || 'small';
+    }
+
+    function openEditComputeModal() {
+      const vm = VMS.find(v => v.name === state.selectedVmName);
+      if (!vm) return;
+      const current = resolveVmComputeId(vm);
+      const field = document.querySelector('#compute-modal-body .form-field');
+      if (field) {
+        const label = field.querySelector('label');
+        const labelHtml = label ? label.outerHTML : '<label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>';
+        field.innerHTML = labelHtml + pfSelect({
+          id: 'f-edit-compute-resource',
+          ariaLabel: 'Compute resource',
+          required: true,
+          optionsHtml: COMPUTE_RESOURCES.map(c =>
+            `<option value="${c.id}" ${current === c.id ? 'selected' : ''}>${c.label}</option>`
+          ).join(''),
+        });
+      }
+      const overlay = document.getElementById('compute-overlay');
+      overlay?.classList.add('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('f-edit-compute-resource')?.focus(), 0);
+    }
+
+    function closeEditComputeModal() {
+      const overlay = document.getElementById('compute-overlay');
+      overlay?.classList.remove('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'true');
+    }
+
+    function saveEditComputeModal() {
+      const vm = VMS.find(v => v.name === state.selectedVmName);
+      const id = document.getElementById('f-edit-compute-resource')?.value;
+      if (!vm || !id) return;
+      const specs = computeResourceSpecs(id);
+      vm.computeResource = id;
+      vm.cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      vm.mem = specs.mem;
+      closeEditComputeModal();
+      renderVmDetail();
+      toast(`Compute resources updated to ${computeResourceLabel(id)}.`, 'success');
+    }
+
+    function wireEditComputeModal() {
+      if (document.body.dataset.computeModalWired) return;
+      document.body.dataset.computeModalWired = '1';
+      document.getElementById('compute-modal-close')?.addEventListener('click', closeEditComputeModal);
+      document.getElementById('compute-modal-cancel')?.addEventListener('click', closeEditComputeModal);
+      document.getElementById('compute-modal-save')?.addEventListener('click', saveEditComputeModal);
+      document.getElementById('compute-overlay')?.addEventListener('click', e => {
+        if (e.target.id === 'compute-overlay' || e.target.classList.contains('pf-v6-l-bullseye')) {
+          closeEditComputeModal();
+        }
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.getElementById('compute-overlay')?.classList.contains('pf-m-open')) {
+          closeEditComputeModal();
+        }
+      });
+    }
+
 
     function formatUsd(amount, digits = 2) {
       if (amount == null || Number.isNaN(amount)) return '—';
@@ -5931,6 +6065,7 @@
         cpu: '1 CPU',
         mem: '128 MiB',
         guestAgent: false,
+        computeResource: 'small',
         ...v,
         osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
         nics: v.nics || [{
@@ -6864,7 +6999,7 @@
                       <dt>Compute resources</dt>
                       <dd>
                         <span class="vm-compute-row">
-                          ${v.cpu || '1 CPU'} | ${v.mem || '128 MiB'} Memory
+                          ${v.computeResource ? formatComputeDisplay(v.computeResource) : `${v.cpu || '1 CPU'} | ${v.mem || '128 MiB'} Memory`}
                           <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources" title="Edit">
                             <i class="fa-solid fa-pen" aria-hidden="true"></i>
                           </button>
@@ -7226,9 +7361,7 @@
         renderVmDetail();
       });
       root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
-        state.vmDetailTab = 'configuration';
-        state.vmConfigSection = 'details';
-        renderVmDetail();
+        openEditComputeModal();
       });
       root.querySelector('#vm-goto-networks')?.addEventListener('click', () => setView('networks'));
       root.querySelectorAll('[data-nic-delete]').forEach(b => {
@@ -10015,6 +10148,7 @@
     initVmFilterDropdowns();
     renderVms();
     wireStatusPopover();
+    wireEditComputeModal();
     renderNetworks();
 
     try {
