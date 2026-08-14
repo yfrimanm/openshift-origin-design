@@ -479,6 +479,34 @@
       text-decoration: underline dotted;
       text-underline-offset: 3px;
     }
+
+    #nic-detail-popover {
+      position: absolute;
+      z-index: 10000;
+      display: none;
+      width: min(100vw - 24px, 18.75rem);
+    }
+    #nic-detail-popover.pf-m-open { display: block; }
+    #nic-detail-popover .nic-detail-dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 8px 20px;
+      margin: 0;
+      font-size: 14px;
+      align-items: baseline;
+    }
+    #nic-detail-popover .nic-detail-dl dt {
+      margin: 0;
+      font-weight: 600;
+      color: var(--vmaas-text);
+    }
+    #nic-detail-popover .nic-detail-dl dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text);
+      min-width: 0;
+      word-break: break-word;
+    }
     .pf-v6-c-button.pf-m-small {
       font-size: 13px; padding: 4px 12px; min-height: 28px;
     }
@@ -3988,7 +4016,7 @@
         group: '—',
         timezone: 'UTC',
         fqdn: 'indigo-quokka-89.headless.default.svc.cluster.local',
-        nics: [{ name: 'default', model: 'virtio', network: 'Pod networking', state: 'plugged', type: 'Masquerade', mac: '02:dd:c7:71:fd:3b', ip: '10.130.1.191' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'], ip: '10.130.1.191' }],
         disks: [
           { name: 'rootdisk', drive: 'Disk', size: '30 GiB', interface: 'virtio' },
           { name: 'cloudinitdisk', drive: 'Disk', size: 'Dynamic', interface: 'virtio' },
@@ -4085,7 +4113,7 @@
         description: 'RHEL 10 with a 5 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', network: 'Pod networking', type: 'Masquerade' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '5 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
       },
       {
@@ -4107,7 +4135,7 @@
         description: 'RHEL 9 with a 10 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', network: 'Pod networking', type: 'Masquerade' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '10 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
       },
       {
@@ -4129,7 +4157,7 @@
         description: 'Windows Server 2025 with a 20 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', network: 'Pod networking', type: 'Masquerade' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '20 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
       },
       {
@@ -4151,7 +4179,7 @@
         description: 'Fedora with a 20 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', network: 'Pod networking', type: 'Masquerade' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '20 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
       },
       {
@@ -4173,7 +4201,7 @@
         description: 'RHEL 10 with editable compute and disk. Image is locked by the template.',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
-        nics: [{ name: 'default', network: 'Pod networking', type: 'Masquerade' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '20 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
       },
       {
@@ -4195,7 +4223,7 @@
         description: 'RHEL 10 XL defaults with editable compute and disk. Image is locked by the template.',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
-        nics: [{ name: 'default', network: 'Pod networking', type: 'Masquerade' }],
+        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'rootdisk', source: 'DV', sourceName: '', size: '40 GiB', drive: 'Disk', interface: 'virtio', storageClass: '—', bootable: true }],
       },
     ];
@@ -6061,7 +6089,105 @@
       });
     }
 
-    function enrichVm(v) {
+
+    let nicDetailPopoverTrigger = null;
+
+    function normalizeNic(n) {
+      const sgs = Array.isArray(n.securityGroups)
+        ? n.securityGroups
+        : (n.securityGroup ? [n.securityGroup] : [DEFAULT_SECURITY_GROUP]);
+      return {
+        name: n.name || 'default',
+        virtualNetwork: n.virtualNetwork || n.network || CONFIG_VIRTUAL_NETWORKS[0]?.label || 'tenant-workload',
+        subnet: n.subnet || CONFIG_VIRTUAL_NETWORKS[0]?.subnets?.[0] || 'bm-compute-a',
+        securityGroups: sgs,
+        ip: n.ip || '—',
+      };
+    }
+
+    function closeNicDetailPopover() {
+      const pop = document.getElementById('nic-detail-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (nicDetailPopoverTrigger) {
+        nicDetailPopoverTrigger.setAttribute('aria-expanded', 'false');
+        nicDetailPopoverTrigger = null;
+      }
+    }
+
+    function openNicDetailPopover(trigger, nic) {
+      const pop = document.getElementById('nic-detail-popover');
+      const body = document.getElementById('nic-detail-popover-body');
+      if (!pop || !body) return;
+      if (nicDetailPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeNicDetailPopover();
+        return;
+      }
+      const n = normalizeNic(nic || {});
+      const sgText = (n.securityGroups || []).join(', ') || '—';
+      // Map network id to label when needed
+      const netLabel = CONFIG_VIRTUAL_NETWORKS.find(x => x.id === n.virtualNetwork)?.label || n.virtualNetwork;
+      body.innerHTML = `
+        <dl class="nic-detail-dl">
+          <dt>Name</dt><dd>${n.name}</dd>
+          <dt>Virtual network</dt><dd>${netLabel}</dd>
+          <dt>Subnet</dt><dd>${n.subnet}</dd>
+          <dt>Security groups</dt><dd>${sgText}</dd>
+        </dl>
+      `;
+      if (nicDetailPopoverTrigger && nicDetailPopoverTrigger !== trigger) {
+        nicDetailPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      nicDetailPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      pop.hidden = false;
+      pop.classList.add('pf-m-open');
+      pop.classList.add('pf-m-left');
+      pop.classList.remove('pf-m-right');
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        let left = rect.left + window.scrollX - pr.width - gap;
+        let top = rect.top + window.scrollY + (rect.height / 2) - (pr.height / 2);
+        if (left < 8) {
+          // flip to right of trigger
+          pop.classList.remove('pf-m-left');
+          pop.classList.add('pf-m-right');
+          left = rect.right + window.scrollX + gap;
+        }
+        pop.style.left = `${Math.max(8, left)}px`;
+        pop.style.top = `${Math.max(8, top)}px`;
+      });
+      document.getElementById('nic-detail-popover-close')?.focus();
+    }
+
+    function wireNicDetailPopover() {
+      if (document.body.dataset.nicDetailPopoverWired) return;
+      document.body.dataset.nicDetailPopoverWired = '1';
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-nic-detail]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          let nic = {};
+          try { nic = JSON.parse(trigger.dataset.nicDetail || '{}'); } catch (_) {}
+          openNicDetailPopover(trigger, nic);
+          return;
+        }
+        if (e.target.closest('#nic-detail-popover')) return;
+        closeNicDetailPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeNicDetailPopover();
+      });
+      document.getElementById('nic-detail-popover-close')?.addEventListener('click', () => closeNicDetailPopover());
+      window.addEventListener('resize', closeNicDetailPopover);
+      window.addEventListener('scroll', closeNicDetailPopover, true);
+    }
+
+        function enrichVm(v) {
       if (!v) return null;
       const osFullMap = { RHEL: 'Red Hat Enterprise Linux', Fedora: 'Fedora Linux', Windows: 'Microsoft Windows', Other: 'Other Linux', CentOS: 'CentOS Stream' };
       return {
@@ -6086,8 +6212,11 @@
         ...v,
         osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
         nics: v.nics || [{
-          name: 'default', model: 'virtio', network: 'Pod networking',
-          state: 'plugged', type: 'Masquerade', mac: '—', ip: '—',
+          name: 'default',
+          virtualNetwork: 'tenant-workload',
+          subnet: 'bm-compute-a',
+          securityGroups: [DEFAULT_SECURITY_GROUP],
+          ip: '—',
         }],
         disks: v.disks || [
           { name: 'Boot disk', size: '5 GiB', bootable: true },
@@ -7171,12 +7300,21 @@
                   <table class="side-table">
                     <thead><tr><th>Name</th><th>IP address</th></tr></thead>
                     <tbody>
-                      ${nics.map(n => `
+                      ${nics.map(n => {
+                        const detail = normalizeNic(n);
+                        const payload = JSON.stringify(detail).replace(/"/g, '&quot;');
+                        return `
                         <tr>
-                          <td><button type="button" class="name-link name-link--dotted">${n.name}</button></td>
-                          <td>${n.ip || '—'}</td>
-                        </tr>
-                      `).join('')}
+                          <td>
+                            <button type="button" class="name-link name-link--dotted"
+                              data-nic-detail="${payload}"
+                              aria-haspopup="dialog" aria-expanded="false">
+                              ${detail.name}
+                            </button>
+                          </td>
+                          <td>${detail.ip || '—'}</td>
+                        </tr>`;
+                      }).join('')}
                     </tbody>
                   </table>
                 </div>
@@ -10187,6 +10325,7 @@
     renderVms();
     wireStatusPopover();
     wireEditComputeModal();
+    wireNicDetailPopover();
     renderNetworks();
 
     try {
@@ -10220,6 +10359,19 @@
           Learn more
         </button>
       </footer>
+    </div>
+  </div>
+
+
+  <div class="pf-v6-c-popover pf-m-left" id="nic-detail-popover" role="dialog" aria-modal="true" aria-label="Network details" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="nic-detail-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="nic-detail-popover-body"></div>
     </div>
   </div>
 
