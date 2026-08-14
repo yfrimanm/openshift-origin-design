@@ -1320,11 +1320,6 @@
     }
     .filter-dd-menu.pf-m-open { display: block; }
     .filter-dd-badge { margin: 0 4px; }
-    .filter-more-link {
-      background: none; border: none; padding: 0; margin-left: 4px;
-      color: var(--vmaas-blue); font-size: 14px; cursor: pointer;
-    }
-    .filter-more-link:hover { text-decoration: underline; }
     .filter-chips {
       display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start;
       margin: -4px 0 12px;
@@ -3163,7 +3158,6 @@
                 <div class="pf-v6-c-menu filter-dd-menu" id="osFilterMenu" role="listbox" aria-label="OS filter" style="min-width:200px;"></div>
               </div>
 
-              <button type="button" class="filter-more-link" id="vm-show-more-filters">Show more filters</button>
             </div>
 
             <div class="filter-chips" id="vm-filter-chips" hidden aria-label="Active filters"></div>
@@ -4752,9 +4746,6 @@
         });
       }
 
-      document.getElementById('vm-show-more-filters')?.addEventListener('click', () => {
-        toast('Additional filters coming soon.');
-      });
     }
 
     function toast(msg) {
