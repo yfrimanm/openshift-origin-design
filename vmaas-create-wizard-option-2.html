@@ -6404,7 +6404,6 @@
       const netLabel = CONFIG_VIRTUAL_NETWORKS.find(x => x.id === n.virtualNetwork)?.label || n.virtualNetwork;
       body.innerHTML = `
         <dl class="nic-detail-dl">
-          <dt>Name</dt><dd>${n.name}</dd>
           <dt>Virtual network</dt><dd>${netLabel}</dd>
           <dt>Subnet</dt><dd>${n.subnet}</dd>
           <dt>Security groups</dt><dd>${sgText}</dd>
