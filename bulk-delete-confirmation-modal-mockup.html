@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CNV-82030 – Bulk VM Delete Confirmation (PatternFly 6 mockup)</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--pf-t--global--background--color--secondary--default);
+      font-family: var(--pf-t--global--font--family--body);
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .page { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+    .state-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--pf-t--global--text--color--subtle);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .state-heading::after { content:''; flex:1; height:1px; background: var(--pf-t--global--border--color--default); }
+    .pf-v6-c-card { margin-bottom: 20px; }
+    .annotation {
+      font-size: 12px;
+      background: #fffbe6;
+      border: 1px solid #f0ab00;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-top: 10px;
+      color: #444;
+      line-height: 1.5;
+    }
+    .annotation--danger { background: #ffeae9; border-color: #c9190b; }
+    .annotation--success { background: #e9f4e9; border-color: #3e8635; }
+    .annotation strong { color: #795600; }
+    .annotation--danger strong { color: #a30000; }
+    .annotation--success strong { color: #1e4f18; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+    .modal-stage {
+      background: rgba(21, 21, 21, .45);
+      border-radius: 6px;
+      padding: 32px 16px;
+      display: flex;
+      justify-content: center;
+    }
+    .pf-v6-c-modal-box { max-width: 520px; width: 100%; }
+    .pf-v6-c-modal-box.pf-m-sm { max-width: 440px; }
+    .pf-v6-c-modal-box.pf-m-danger-header .pf-v6-c-modal-box__header {
+      border-top: 4px solid #c9190b;
+    }
+    .vm-summary-list {
+      max-height: 120px;
+      overflow-y: auto;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: var(--pf-t--global--background--color--primary--default);
+      margin: 0;
+      list-style: none;
+    }
+    .vm-summary-list--expanded { max-height: 220px; }
+    .vm-summary-list li { padding: 2px 0; }
+    .vm-summary-list .vm-list-toggle-row { padding-top: 4px; list-style: none; }
+    .vm-summary-list .vm-list-toggle {
+      padding: 0;
+      font-size: 13px;
+      font-weight: 400;
+    }
+    .type-confirm-input {
+      width: 100%;
+      max-width: 160px;
+      padding: 8px 10px;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: 4px;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+    .type-confirm-input:focus {
+      outline: 2px solid #0066cc;
+      outline-offset: 1px;
+      border-color: #0066cc;
+    }
+    .type-confirm-input.is-match {
+      border-color: #3e8635;
+      background: #f3faf2;
+    }
+    .type-confirm-input.is-mismatch:not(:placeholder-shown) {
+      border-color: #c9190b;
+    }
+    .type-confirm-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 16px 0 6px;
+    }
+    .type-confirm-hint {
+      font-size: 12px;
+      color: var(--pf-t--global--text--color--subtle);
+      margin: 6px 0 0;
+    }
+    .type-confirm-hint.is-success { color: #3e8635; }
+    .count-emphasis {
+      font-size: 18px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #a30000;
+    }
+    .req-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .req-table th, .req-table td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--pf-t--global--border--color--default);
+      vertical-align: top;
+      line-height: 1.45;
+    }
+    .req-table th { background: var(--pf-t--global--background--color--secondary--default); font-size: 12px; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 3px; }
+    .tag--current { background: #f0f0f0; color: #555; }
+    .tag--proposed { background: #e7f1fa; color: #0066cc; }
+    .tag--gap { background: #ffeae9; color: #a30000; }
+    code { font-size: 12px; background: #f0f3f7; border: 1px solid #d2d2d2; border-radius: 3px; padding: 1px 5px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1 style="font-size:24px;font-weight:700;margin:0 0 4px;">CNV-82030 — Bulk VM delete confirmation</h1>
+  <p style="font-size:14px;color:var(--pf-t--global--text--color--subtle);margin:0 0 20px;">
+    PatternFly 6 mockup · Type VM count to confirm · Expandable affected-VM list · CNV-82030
+  </p>
+
+  <!-- Context -->
+  <div class="pf-v6-c-card">
+    <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">Problem summary</h2></div>
+    <div class="pf-v6-c-card__body" style="font-size:14px;line-height:1.55;">
+      Customer on <strong>OCP 4.19</strong> right-clicked a <strong>project</strong> in the VM tree and chose Delete, believing they were deleting one VM. ~100 VMs were removed. The bulk confirmation dialog title/body is too similar to single-VM delete.
+      <div class="annotation annotation--danger" style="margin-top:12px;">
+        <strong>Root UX failure:</strong> Scope is ambiguous. Title <code>Delete 3 Virtual machines?</code> reads like a count of selected rows, not “every VM in this project.”
+      </div>
+    </div>
+  </div>
+
+  <!-- Side by side modals -->
+  <div class="two-col">
+
+    <!-- CURRENT -->
+    <div class="pf-v6-c-card">
+      <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">Current — bulk delete <span class="tag tag--current">today</span></h2></div>
+      <div class="pf-v6-c-card__body">
+        <p class="state-heading">ConfirmMultipleVMActionsModal</p>
+        <div class="modal-stage">
+          <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true">
+            <div class="pf-v6-c-modal-box__header">
+              <h1 class="pf-v6-c-modal-box__title">
+                <span class="pf-v6-c-modal-box__title-icon"><i class="fa-solid fa-triangle-exclamation" style="color:#f0ab00;"></i></span>
+                Delete 100 Virtual machines?
+              </h1>
+            </div>
+            <div class="pf-v6-c-modal-box__body" style="font-size:14px;">
+              Are you sure you want to delete
+              <button class="pf-v6-c-button pf-m-link" type="button" style="padding:0;font-size:14px;">100 Virtual machines in 1 namespace</button>?
+            </div>
+            <div class="pf-v6-c-modal-box__footer">
+              <button class="pf-v6-c-button pf-m-danger" type="button">Delete</button>
+              <button class="pf-v6-c-button pf-m-link" type="button">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="annotation">
+          <strong>Issues:</strong> Same modal component as multi-select delete. No project context. No type-to-confirm. Popover link is easy to miss. Title differs from single VM by count only.
+        </div>
+      </div>
+    </div>
+
+    <!-- SINGLE VM for comparison -->
+    <div class="pf-v6-c-card">
+      <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">Reference — single VM delete</h2></div>
+      <div class="pf-v6-c-card__body">
+        <p class="state-heading">DeleteVMModal</p>
+        <div class="modal-stage">
+          <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true">
+            <div class="pf-v6-c-modal-box__header">
+              <h1 class="pf-v6-c-modal-box__title">
+                <span class="pf-v6-c-modal-box__title-icon"><i class="fa-solid fa-triangle-exclamation" style="color:#f0ab00;"></i></span>
+                Delete Virtual machine?
+              </h1>
+            </div>
+            <div class="pf-v6-c-modal-box__body" style="font-size:14px;">
+              Are you sure you want to delete <strong>web-server-01</strong> in namespace <strong>production-vms</strong>?
+              <p style="margin:12px 0 0;font-size:13px;color:var(--pf-t--global--text--color--subtle);">Associated disks, snapshots, and secrets may also be removed.</p>
+            </div>
+            <div class="pf-v6-c-modal-box__footer">
+              <button class="pf-v6-c-button pf-m-danger" type="button">Delete</button>
+              <button class="pf-v6-c-button pf-m-link" type="button">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="annotation">
+          Customer confusion: bulk title <code>Delete N Virtual machines?</code> feels like a variant of this dialog, not a destructive project-wide action.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSED v2 -->
+  <div class="pf-v6-c-card">
+    <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">Proposed — project / tree-view bulk delete <span class="tag tag--proposed">CNV-82030 v2</span></h2></div>
+    <div class="pf-v6-c-card__body">
+      <p class="state-heading">Type VM count to confirm · when <code>isTreeViewAction === true</code></p>
+      <div class="modal-stage">
+        <div class="pf-v6-c-modal-box pf-m-danger-header" role="dialog" aria-modal="true" id="proposedModal">
+          <div class="pf-v6-c-modal-box__header">
+            <h1 class="pf-v6-c-modal-box__title">
+              <span class="pf-v6-c-modal-box__title-icon"><i class="fa-solid fa-triangle-exclamation" style="color:#c9190b;"></i></span>
+              Delete all Virtual machines in project?
+            </h1>
+          </div>
+          <div class="pf-v6-c-modal-box__body" style="font-size:14px;line-height:1.55;">
+            <p style="margin:0 0 12px;">
+              You are about to permanently delete <strong>all <span class="count-emphasis">100</span> Virtual machines</strong> in project
+              <strong>production-vms</strong>. This action cannot be undone.
+            </p>
+
+            <div class="pf-v6-c-alert pf-m-danger pf-m-inline" style="margin-bottom:12px;">
+              <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+              <div class="pf-v6-c-alert__title">Bulk deletion</div>
+              <div class="pf-v6-c-alert__description" style="font-size:13px;">
+                This deletes every VM in the project, not just the VM you clicked. Running VMs must be stopped first.
+              </div>
+            </div>
+
+            <p style="font-size:13px;font-weight:600;margin:0 0 6px;">Affected Virtual machines (100)</p>
+            <ul class="vm-summary-list" id="vmSummaryList" aria-live="polite"></ul>
+
+            <label class="type-confirm-label" for="typeConfirmCount">
+              Type <strong>100</strong> to confirm
+            </label>
+            <input
+              class="type-confirm-input"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              id="typeConfirmCount"
+              placeholder="100"
+              aria-describedby="typeConfirmHint"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <p class="type-confirm-hint" id="typeConfirmHint">
+              Enter the number of Virtual machines shown above to confirm deletion.
+            </p>
+          </div>
+          <div class="pf-v6-c-modal-box__footer">
+            <button class="pf-v6-c-button pf-m-danger" type="button" id="btnDeleteAll" disabled>Delete all 100 Virtual machines</button>
+            <button class="pf-v6-c-button pf-m-link" type="button">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="annotation annotation--success">
+        <strong>Delete button enabled</strong> only when the typed value exactly matches the VM count (digits only, e.g. <code>100</code>). Click <strong>Show all 100 Virtual machines</strong> in the list to expand the full scrollable preview inline.
+      </div>
+      <div class="annotation" style="margin-top:8px;">
+        <strong>Rejected v1:</strong> Checkbox ack was considered too easy to click without reading. Table multi-select (small N) may still use lighter confirmation; tree/project bulk delete always uses type-to-confirm.
+      </div>
+    </div>
+  </div>
+
+  <!-- Requirements table -->
+  <div class="pf-v6-c-card">
+    <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">UX requirements</h2></div>
+    <div class="pf-v6-c-card__body" style="padding-top:0;">
+      <table class="req-table">
+        <thead>
+          <tr><th>Requirement</th><th>Current</th><th>Proposed</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Block delete when any VM is running</td>
+            <td><span class="tag tag--gap">4.19 gap</span> Customer reports not greyed out</td>
+            <td><span class="tag tag--proposed">4.20+</span> Menu disabled via <code>isBulkDeleteActionDisabled</code>; backport to 4.19?</td>
+          </tr>
+          <tr>
+            <td>Distinct modal for project/tree bulk delete</td>
+            <td>Same <code>ConfirmMultipleVMActionsModal</code> as row multi-select</td>
+            <td>Dedicated copy/layout when <code>isTreeViewAction</code></td>
+          </tr>
+          <tr>
+            <td>Explicit scope in title</td>
+            <td><code>Delete {{n}} Virtual machines?</code></td>
+            <td><code>Delete all Virtual machines in project?</code></td>
+          </tr>
+          <tr>
+            <td>Explicit scope in body</td>
+            <td>“Are you sure you want to delete …”</td>
+            <td>“You are about to delete <strong>all {{n}}</strong> in project <strong>{{name}}</strong>”</td>
+          </tr>
+          <tr>
+            <td>Confirmation gate</td>
+            <td>None (Delete enabled immediately)</td>
+            <td>Type-to-confirm: user must enter exact VM <strong>count</strong> (digits only)</td>
+          </tr>
+          <tr>
+            <td>Confirmation copy</td>
+            <td>—</td>
+            <td><code>Type {{count}} to confirm</code></td>
+          </tr>
+          <tr>
+            <td>Helper text</td>
+            <td>—</td>
+            <td><code>Enter the number of Virtual machines shown above to confirm deletion.</code></td>
+          </tr>
+          <tr>
+            <td>VM list preview</td>
+            <td>Hidden behind popover link</td>
+            <td>Inline scrollable list; first 3 shown, <code>Show all {{count}} Virtual machines</code> expands in place</td>
+          </tr>
+          <tr>
+            <td>Deletion protection</td>
+            <td>Disables bulk delete if any VM protected (4.20+)</td>
+            <td>Keep; show which VMs are protected in error state</td>
+          </tr>
+          <tr>
+            <td>Context menu label</td>
+            <td><code>Delete all VMs</code> (tree view)</td>
+            <td>Keep; consider adding project name: <code>Delete all VMs in production-vms</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Copy strings -->
+  <div class="pf-v6-c-card">
+    <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">Recommended copy (i18n keys)</h2></div>
+    <div class="pf-v6-c-card__body" style="font-size:13px;font-family:'Red Hat Mono',monospace;line-height:1.7;">
+      <p style="font-family:inherit;font-weight:700;margin:0 0 8px;">Tree-view bulk delete modal</p>
+      <pre style="margin:0;background:#f0f3f7;padding:12px;border-radius:4px;overflow-x:auto;font-size:12px;">title: "Delete all Virtual machines in project?"
+body: "You are about to permanently delete all {{count}} Virtual machines in project {{projectName}}. This action cannot be undone."
+alertTitle: "Bulk deletion"
+alertDescription: "This deletes every Virtual machine in the project, not just one VM. All Virtual machines must be stopped before deletion."
+typeConfirmLabel: "Type {{count}} to confirm"
+typeConfirmHint: "Enter the number of Virtual machines shown above to confirm deletion."
+typeConfirmMismatch: "The number you entered does not match."
+typeConfirmMatch: "Number confirmed."
+showAllVms: "Show all {{count}} Virtual machines"
+showFewerVms: "Show fewer"
+submitButton: "Delete all {{count}} Virtual machines"
+disabledRunningTooltip: "Stop all Virtual machines in this project before deleting."
+disabledProtectedTooltip: "One or more Virtual machines have deletion protection enabled."
+
+// Validation: trim input, match String(count) exactly (digits only, no "100 VMs")</pre>
+    </div>
+  </div>
+
+  <!-- Code pointers -->
+  <div class="pf-v6-c-card">
+    <div class="pf-v6-c-card__header"><h2 class="pf-v6-c-card__title">Implementation map (kubevirt-plugin)</h2></div>
+    <div class="pf-v6-c-card__body" style="font-size:13px;line-height:1.6;">
+      <ul style="margin:0;padding-left:20px;">
+        <li><code>BulkVirtual machineActionFactory.tsx</code> — delete action; passes <code>isTreeViewAction</code> for menu label</li>
+        <li><code>ConfirmMultipleVMActionsModal.tsx</code> — bulk confirmation UI (title/body today)</li>
+        <li><code>AckConfirmationModal.tsx</code> — extend with type-to-confirm variant (count match) for tree bulk delete</li>
+        <li><code>actions/utils.ts</code> — <code>isBulkDeleteActionDisabled</code>, <code>getBulkDeleteActionDescription</code></li>
+        <li><code>DeleteVMModal.tsx</code> — single-VM delete (keep visually distinct from bulk)</li>
+        <li><code>GroupedRightClickActionMenu.tsx</code> — tree right-click entry point</li>
+      </ul>
+      <p style="margin:12px 0 0;"><a href="https://github.com/kubevirt-ui/kubevirt-plugin">kubevirt-ui/kubevirt-plugin</a></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const REQUIRED_COUNT = 100;
+  const COLLAPSED_VISIBLE = 3;
+  const VM_NAMES = [
+    'web-server-01', 'web-server-02', 'db-primary',
+    ...Array.from({ length: 97 }, (_, i) => `app-vm-${String(i + 4).padStart(3, '0')}`),
+  ];
+
+  const input = document.getElementById('typeConfirmCount');
+  const btn = document.getElementById('btnDeleteAll');
+  const hint = document.getElementById('typeConfirmHint');
+  const list = document.getElementById('vmSummaryList');
+  let listExpanded = false;
+
+  function renderVmList() {
+    if (!list) return;
+    list.classList.toggle('vm-summary-list--expanded', listExpanded);
+    list.innerHTML = '';
+
+    const visible = listExpanded ? VM_NAMES : VM_NAMES.slice(0, COLLAPSED_VISIBLE);
+    visible.forEach((name) => {
+      const li = document.createElement('li');
+      li.textContent = name;
+      list.appendChild(li);
+    });
+
+    if (!listExpanded) {
+      const toggleRow = document.createElement('li');
+      toggleRow.className = 'vm-list-toggle-row';
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'pf-v6-c-button pf-m-link vm-list-toggle';
+      toggle.textContent = `Show all ${REQUIRED_COUNT} Virtual machines`;
+      toggle.addEventListener('click', () => {
+        listExpanded = true;
+        renderVmList();
+      });
+      toggleRow.appendChild(toggle);
+      list.appendChild(toggleRow);
+    } else {
+      const toggleRow = document.createElement('li');
+      toggleRow.className = 'vm-list-toggle-row';
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'pf-v6-c-button pf-m-link vm-list-toggle';
+      toggle.textContent = 'Show fewer';
+      toggle.addEventListener('click', () => {
+        listExpanded = false;
+        renderVmList();
+      });
+      toggleRow.appendChild(toggle);
+      list.appendChild(toggleRow);
+    }
+  }
+
+  function syncConfirm() {
+    if (!input || !btn || !hint) return;
+    const value = input.value.trim();
+    const match = value === String(REQUIRED_COUNT);
+    btn.disabled = !match;
+    input.classList.toggle('is-match', match);
+    input.classList.toggle('is-mismatch', value.length > 0 && !match);
+    if (match) {
+      hint.textContent = 'Number confirmed.';
+      hint.classList.add('is-success');
+    } else if (value.length > 0) {
+      hint.textContent = 'The number you entered does not match.';
+      hint.classList.remove('is-success');
+    } else {
+      hint.textContent = 'Enter the number of Virtual machines shown above to confirm deletion.';
+      hint.classList.remove('is-success');
+    }
+  }
+
+  renderVmList();
+  if (input) {
+    input.addEventListener('input', syncConfirm);
+    syncConfirm();
+  }
+})();
+</script>
+</body>
+</html>

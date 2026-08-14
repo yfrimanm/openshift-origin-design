@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Templates — OpenShift + VM templates (PatternFly 6 mockup)</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      font-family: var(--pf-t--global--font--family--body);
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .mockup-shell { max-width: 1320px; margin: 0 auto; padding: 24px 16px 48px; }
+    .mockup-header { margin-bottom: 20px; }
+    .mockup-header h1 { font-size: 24px; font-weight: 700; margin: 0 0 6px; }
+    .mockup-header p { margin: 0; font-size: 14px; color: var(--pf-t--global--text--color--subtle); max-width: 960px; line-height: 1.5; }
+
+    .demo-bar {
+      display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 20px;
+      margin-bottom: 16px; padding: 12px 16px; background: #fff;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+    }
+    .demo-bar__label { font-size: 13px; font-weight: 600; color: var(--pf-t--global--text--color--subtle); white-space: nowrap; padding-top: 6px; }
+    .demo-bar__notes { flex: 1; min-width: 280px; font-size: 13px; color: var(--pf-t--global--text--color--subtle); line-height: 1.5; }
+    .demo-bar__notes ul { margin: 6px 0 0; padding-left: 18px; }
+    .demo-bar__notes li { margin-bottom: 4px; }
+
+    .console-pane {
+      background: #fff;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      overflow: visible;
+    }
+    .console-pane__inner { padding: 20px 24px 28px; }
+
+    .project-bar {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px; font-size: 14px;
+    }
+    .project-bar__label { color: var(--pf-t--global--text--color--subtle); }
+    .project-select {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      background: #fff; font-size: 14px; cursor: pointer;
+    }
+    .project-select i { font-size: 12px; color: var(--pf-t--global--text--color--subtle); }
+
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .page-header__left { display: flex; align-items: center; gap: 10px; }
+    .page-title { font-size: 28px; font-weight: 700; margin: 0; }
+    .page-title__star {
+      color: var(--pf-t--global--text--color--subtle); background: none; border: none;
+      cursor: pointer; padding: 4px; font-size: 18px;
+    }
+    .page-title__star:hover { color: #f0ab00; }
+
+    /* Toolbar */
+    .templates-toolbar {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+      margin-bottom: 0; padding-bottom: 16px;
+      border-bottom: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .type-scope {
+      display: inline-flex; border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium); overflow: hidden;
+    }
+    .type-scope__btn {
+      padding: 6px 14px; font-size: 14px; border: none; background: #fff;
+      cursor: pointer; color: var(--pf-t--global--text--color--regular);
+      border-right: 1px solid var(--pf-t--global--border--color--default);
+      white-space: nowrap;
+    }
+    .type-scope__btn:last-child { border-right: none; }
+    .type-scope__btn:hover { background: var(--pf-t--global--background--color--secondary--default); }
+    .type-scope__btn.pf-m-selected {
+      background: var(--pf-t--global--background--color--secondary--default);
+      font-weight: 600; box-shadow: inset 0 -2px 0 var(--pf-t--global--color--brand--default);
+    }
+
+    .filter-wrap { position: relative; }
+    .filter-btn.pf-m-expanded { border-color: var(--pf-t--global--color--brand--default); }
+
+    .filter-menu {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
+      width: 300px; max-height: 480px; overflow-y: auto;
+      background: #fff; border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    }
+    .filter-menu.pf-m-open { display: block; }
+    .filter-menu__section { padding: 12px 16px; border-bottom: 1px solid var(--pf-t--global--border--color--default); }
+    .filter-menu__section:last-child { border-bottom: none; }
+    .filter-menu__section.pf-m-hidden { display: none; }
+    .filter-menu__heading {
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em;
+      color: var(--pf-t--global--text--color--subtle); margin: 0 0 8px;
+    }
+    .filter-menu__subheading {
+      font-size: 14px; font-weight: 700; margin: 0 0 8px; color: var(--pf-t--global--text--color--regular);
+    }
+    .filter-menu__item {
+      display: flex; align-items: center; gap: 10px; padding: 6px 0;
+      font-size: 14px; cursor: pointer;
+    }
+    .filter-menu__item input { margin: 0; flex-shrink: 0; cursor: pointer; }
+    .filter-menu__item label { cursor: pointer; flex: 1; display: flex; align-items: center; gap: 8px; }
+    .filter-menu__item:hover { background: var(--pf-t--global--background--color--secondary--default); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 4px; }
+
+    .type-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      font-size: 11px; font-weight: 700; color: #fff;
+    }
+    .type-icon--os { background: #0066cc; }
+    .type-icon--vm { background: #0066cc; border-radius: 4px; font-size: 8px; letter-spacing: -.02em; }
+
+    .search-group {
+      display: flex; align-items: stretch; flex: 1; min-width: 240px; max-width: 420px;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium); overflow: hidden;
+    }
+    .search-group__attr {
+      padding: 6px 10px; font-size: 14px; border: none; border-right: 1px solid var(--pf-t--global--border--color--default);
+      background: var(--pf-t--global--background--color--secondary--default); cursor: default;
+    }
+    .search-group__input {
+      flex: 1; border: none; padding: 6px 12px; font-size: 14px; outline: none; min-width: 0;
+    }
+    .toolbar-icons { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+    .toolbar-icon-btn {
+      width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid transparent; background: transparent; border-radius: 4px;
+      color: var(--pf-t--global--text--color--subtle); cursor: pointer;
+    }
+    .toolbar-icon-btn:hover { background: var(--pf-t--global--background--color--secondary--default); color: var(--pf-t--global--text--color--regular); }
+    .toolbar-icon-btn.pf-m-active { border-color: var(--pf-t--global--color--brand--default); color: var(--pf-t--global--color--brand--default); }
+
+    /* Filter chips row */
+    .filter-chips-row {
+      display: none; align-items: center; flex-wrap: wrap; gap: 8px 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .filter-chips-row.pf-m-active { display: flex; }
+    .filter-chips-row__chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 2px 8px 2px 10px; font-size: 13px;
+      background: var(--pf-t--global--background--color--secondary--default);
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: 16px;
+    }
+    .filter-chip__remove {
+      background: none; border: none; padding: 2px; cursor: pointer;
+      color: var(--pf-t--global--text--color--subtle); line-height: 1;
+    }
+    .filter-chip__remove:hover { color: var(--pf-t--global--text--color--regular); }
+
+    .result-count { margin: 12px 0; font-size: 14px; color: var(--pf-t--global--text--color--subtle); }
+
+    /* Table */
+    .pf-v6-c-table { border-block-end: none !important; }
+    .pf-v6-c-table tbody tr.pf-m-hidden { display: none; }
+    .pf-v6-c-table .col-hidden { display: none; }
+    .pf-v6-c-table th.col-hidden, .pf-v6-c-table td.col-hidden { display: none; }
+
+    .tpl-name { color: var(--pf-t--global--color--brand--default); text-decoration: none; font-weight: 500; }
+    .tpl-name:hover { text-decoration: underline; }
+    .ns-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 14px;
+    }
+    .ns-badge__icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%; background: #3e8635; color: #fff;
+      font-size: 9px; font-weight: 700;
+    }
+    .ns-badge a { color: var(--pf-t--global--color--brand--default); text-decoration: none; }
+    .arch-label {
+      display: inline-block; padding: 2px 10px; font-size: 13px; font-weight: 600;
+      background: #e7f1fa; color: #0066cc; border-radius: 12px;
+    }
+    .cell-na {
+      color: var(--pf-t--global--text--color--disabled, #a3a3a3);
+      font-size: 14px;
+    }
+    .type-cell { display: flex; align-items: center; gap: 8px; font-size: 14px; white-space: nowrap; }
+    .category-hint {
+      display: inline-flex; align-items: center; margin-left: 4px;
+      color: var(--pf-t--global--text--color--subtle); cursor: help;
+    }
+    .actions-btn {
+      background: none; border: none; padding: 4px 8px; cursor: pointer;
+      color: var(--pf-t--global--text--color--subtle);
+    }
+    .actions-btn:hover { color: var(--pf-t--global--text--color--regular); }
+
+    /* Manage columns panel */
+    .columns-panel {
+      display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 200;
+      width: 260px; background: #fff;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      box-shadow: 0 4px 16px rgba(0,0,0,.15); padding: 12px 16px;
+    }
+    .columns-panel.pf-m-open { display: block; }
+    .columns-panel__title { font-size: 14px; font-weight: 600; margin: 0 0 10px; }
+    .columns-panel__item {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px;
+    }
+    .columns-panel__item input { margin: 0; }
+    .columns-panel__item.pf-m-disabled { opacity: .5; pointer-events: none; }
+    .columns-wrap { position: relative; }
+
+    /* Empty state */
+    .empty-state {
+      display: none; flex-direction: column; align-items: center;
+      padding: 48px 24px; text-align: center;
+    }
+    .empty-state.pf-m-active { display: flex; }
+    .empty-state__icon { font-size: 36px; color: var(--pf-t--global--text--color--subtle); opacity: .6; margin-bottom: 12px; }
+    .empty-state__title { font-size: 18px; margin: 0 0 8px; font-weight: 400; }
+    .empty-state__body { font-size: 14px; color: var(--pf-t--global--text--color--subtle); margin: 0 0 16px; }
+    .table-wrap.pf-m-empty .pf-v6-c-table { display: none; }
+
+    .ux-callout {
+      margin-top: 20px; padding: 14px 16px; font-size: 13px; line-height: 1.55;
+      background: #f0f8ff; border: 1px solid #b8daff; border-radius: var(--pf-t--global--border--radius--medium);
+      color: var(--pf-t--global--text--color--regular);
+    }
+    .ux-callout strong { font-weight: 600; }
+
+    /* View switcher */
+    .view-panel { display: none; }
+    .view-panel.pf-m-active { display: block; }
+    .demo-bar .pf-v6-c-tabs { flex: 1; min-width: 280px; }
+    .pf-v6-c-tabs__link { font-size: 13px; }
+
+    /* Create VM wizard */
+    .wizard-page-title {
+      font-size: 18px; font-weight: 600; margin: 0 0 16px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .wizard-layout {
+      display: grid; grid-template-columns: 200px 1fr; min-height: 560px;
+    }
+    .wizard-nav {
+      padding: 20px 16px 20px 0;
+      border-right: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .wizard-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; font-size: 14px; color: var(--pf-t--global--text--color--subtle);
+    }
+    .wizard-step.pf-m-current { color: var(--pf-t--global--text--color--regular); font-weight: 600; }
+    .wizard-step__num {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+      border: 2px solid var(--pf-t--global--border--color--default);
+      background: #fff; color: var(--pf-t--global--text--color--subtle);
+    }
+    .wizard-step.pf-m-current .wizard-step__num {
+      border-color: var(--pf-t--global--color--brand--default);
+      background: var(--pf-t--global--color--brand--default); color: #fff;
+    }
+    .wizard-step.pf-m-complete .wizard-step__num {
+      border-color: var(--pf-t--global--color--brand--default);
+      color: var(--pf-t--global--color--brand--default);
+    }
+    .wizard-main { padding: 0 0 0 24px; display: flex; flex-direction: column; min-height: 560px; }
+    .wizard-main__head { margin-bottom: 16px; }
+    .wizard-main__head h2 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .wizard-main__head p { margin: 0; font-size: 14px; color: var(--pf-t--global--text--color--subtle); }
+
+    .wizard-toolbar {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+      margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .wizard-toolbar .search-group { max-width: none; flex: 1; min-width: 200px; }
+
+    .wizard-body {
+      display: grid; grid-template-columns: 240px 1fr; gap: 20px; flex: 1; align-items: start;
+    }
+    .wizard-sidebar {
+      font-size: 14px;
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      padding: 12px 14px;
+    }
+    .wizard-sidebar__block { margin-bottom: 16px; }
+    .wizard-sidebar__block:last-child { margin-bottom: 0; }
+    .wizard-sidebar__title {
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em;
+      color: var(--pf-t--global--text--color--subtle); margin: 0 0 10px;
+    }
+    .wizard-sidebar__title.pf-m-highlight {
+      color: var(--pf-t--global--color--brand--default);
+    }
+    .wizard-sidebar__item {
+      display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer;
+    }
+    .wizard-sidebar__item input { margin: 0; cursor: pointer; }
+    .wizard-sidebar__item label { cursor: pointer; flex: 1; display: flex; align-items: center; gap: 8px; }
+    .wizard-sidebar__divider {
+      height: 1px; background: var(--pf-t--global--border--color--default);
+      margin: 14px 0;
+    }
+    .wizard-sidebar__section { }
+    .wizard-sidebar__section.pf-m-hidden { display: none; }
+    .wizard-sidebar__subheading {
+      font-size: 13px; font-weight: 700; margin: 0 0 8px;
+    }
+    .wizard-sidebar__hint {
+      font-size: 13px; line-height: 1.45; color: var(--pf-t--global--text--color--subtle);
+      margin: 4px 0 0; padding-top: 4px;
+    }
+    .wizard-sidebar__hint.pf-m-hidden { display: none; }
+
+    .tpl-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;
+    }
+    .tpl-grid.pf-m-hidden { display: none; }
+    .tpl-card {
+      border: 1px solid var(--pf-t--global--border--color--default);
+      border-radius: var(--pf-t--global--border--radius--medium);
+      padding: 14px; background: #fff; cursor: pointer; transition: border-color .15s, box-shadow .15s;
+      position: relative;
+    }
+    .tpl-card:hover { border-color: var(--pf-t--global--color--brand--default); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .tpl-card.pf-m-selected {
+      border-color: var(--pf-t--global--color--brand--default);
+      box-shadow: 0 0 0 1px var(--pf-t--global--color--brand--default);
+    }
+    .tpl-card.pf-m-hidden { display: none; }
+    .tpl-card__top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+    .tpl-card__icon {
+      width: 40px; height: 40px; object-fit: contain;
+    }
+    .tpl-card__icon-fallback {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #fff;
+    }
+    .tpl-card__icon-fallback--rhel { background: #ee0000; }
+    .tpl-card__icon-fallback--fedora { background: #294172; }
+    .tpl-card__icon-fallback--centos { background: #932279; }
+    .tpl-card__icon-fallback--windows { background: #0078d4; }
+    .tpl-card__icon-fallback--db { background: #0066cc; font-size: 14px; }
+    .tpl-card__star {
+      background: none; border: none; padding: 2px; cursor: pointer;
+      color: var(--pf-t--global--text--color--subtle); font-size: 14px;
+    }
+    .tpl-card__star:hover { color: #f0ab00; }
+    .tpl-card__name {
+      font-size: 14px; font-weight: 600; margin: 0 0 8px; line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .tpl-card__meta { font-size: 12px; line-height: 1.5; color: var(--pf-t--global--text--color--subtle); margin: 0; }
+    .tpl-card__meta dt { display: inline; font-weight: 600; color: var(--pf-t--global--text--color--regular); }
+    .tpl-card__meta dd { display: inline; margin: 0 0 4px; }
+    .tpl-card__meta dd::after { content: ''; display: block; margin-bottom: 2px; }
+
+    .wizard-empty {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      padding: 48px 24px; text-align: center; grid-column: 1 / -1;
+    }
+    .wizard-empty.pf-m-active { display: flex; }
+    .wizard-empty__title { font-size: 16px; margin: 0 0 6px; font-weight: 600; }
+    .wizard-empty__body { font-size: 14px; color: var(--pf-t--global--text--color--subtle); margin: 0; }
+
+    .wizard-footer {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: auto; padding-top: 20px;
+      border-top: 1px solid var(--pf-t--global--border--color--default);
+    }
+    .wizard-footer__spacer { flex: 1; }
+
+    .wizard-callout {
+      margin-top: 16px; padding: 12px 14px; font-size: 13px; line-height: 1.5;
+      background: #f0f8ff; border: 1px solid #b8daff; border-radius: var(--pf-t--global--border--radius--medium);
+    }
+  </style>
+</head>
+<body>
+<div class="mockup-shell">
+  <header class="mockup-header">
+    <h1>Templates — unified OpenShift + VM templates</h1>
+    <p>
+      PatternFly 6 mockup · Templates list + Create VM wizard (Template step) · Progressive type disclosure.
+      Open locally: <code>open templates-unified-ux-mockup.html</code>
+    </p>
+  </header>
+
+  <div class="demo-bar">
+    <span class="demo-bar__label">Show view</span>
+    <div class="pf-v6-c-tabs pf-m-box" role="tablist" aria-label="Mockup views">
+      <ul class="pf-v6-c-tabs__list" role="list">
+        <li class="pf-v6-c-tabs__item pf-m-current" role="presentation">
+          <button type="button" class="pf-v6-c-tabs__link" role="tab" aria-selected="true" data-view="list">Templates list</button>
+        </li>
+        <li class="pf-v6-c-tabs__item" role="presentation">
+          <button type="button" class="pf-v6-c-tabs__link" role="tab" aria-selected="false" data-view="create-vm">Create VM → Template</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="demo-bar" id="demo-notes-list">
+    <span class="demo-bar__label">UX decisions</span>
+    <div class="demo-bar__notes">
+      <ul>
+        <li><strong>Type scope</strong> (All / OpenShift / VM) lives in the toolbar — not inside Filter.</li>
+        <li><strong>Category</strong> merges Workload profile + Application category so rows stay populated.</li>
+        <li><strong>Filter</strong> uses facet labels (Provider, OS) with no “Shared” wrapper; type sections disclose by scope.</li>
+        <li><strong>Manage columns</strong> optionally shows separate Workload profile / Application category with em dash (—) for N/A cells.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="demo-bar pf-m-hidden" id="demo-notes-wizard" style="display:none;">
+    <span class="demo-bar__label">Create VM → Template</span>
+    <div class="demo-bar__notes">
+      <ul>
+        <li><strong>Default (both types checked):</strong> mixed card grid; sidebar shows Type + Architecture only — type-specific filters hidden.</li>
+        <li><strong>OpenShift only:</strong> reveals <em>OpenShift templates only</em> (Selection mode, Provider, OS).</li>
+        <li><strong>VM templates only:</strong> reveals <em>VM templates only</em> (category radios).</li>
+        <li>Toggle the Type checkboxes in the sidebar to compare all three states.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="view-panel pf-m-active" id="view-list">
+  <div class="console-pane">
+    <div class="console-pane__inner">
+      <div class="project-bar">
+        <span class="project-bar__label">Project:</span>
+        <button type="button" class="project-select" aria-haspopup="listbox">
+          All Projects <i class="fas fa-caret-down" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="page-header">
+        <div class="page-header__left">
+          <h1 class="page-title">Templates</h1>
+          <button type="button" class="page-title__star" aria-label="Favorite Templates"><i class="far fa-star"></i></button>
+        </div>
+        <button type="button" class="pf-v6-c-button pf-m-primary">
+          <span class="pf-v6-c-button__text">Create template</span>
+          <span class="pf-v6-c-button__icon pf-m-end"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+        </button>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="templates-toolbar" role="toolbar" aria-label="Templates toolbar">
+        <div class="type-scope" role="group" aria-label="Template type scope">
+          <button type="button" class="type-scope__btn pf-m-selected" data-scope="all">All templates</button>
+          <button type="button" class="type-scope__btn" data-scope="openshift">OpenShift templates</button>
+          <button type="button" class="type-scope__btn" data-scope="vm">VM templates</button>
+        </div>
+
+        <div class="filter-wrap">
+          <button type="button" class="pf-v6-c-button pf-m-secondary filter-btn" id="filter-toggle" aria-expanded="false" aria-haspopup="true">
+            <span class="pf-v6-c-button__icon pf-m-start"><i class="fas fa-filter" aria-hidden="true"></i></span>
+            <span class="pf-v6-c-button__text">Filter</span>
+          </button>
+          <div class="filter-menu" id="filter-menu" role="dialog" aria-label="Filter templates">
+            <div class="filter-menu__section">
+              <p class="filter-menu__heading">Provider</p>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="provider" value="redhat" /> Red Hat</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="provider" value="other" /> Other</label>
+              </div>
+            </div>
+
+            <div class="filter-menu__section">
+              <p class="filter-menu__heading">Operating system</p>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="os" value="rhel" /> RHEL</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="os" value="fedora" /> Fedora</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="os" value="centos" /> CentOS</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="os" value="windows" /> Windows</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="checkbox" data-filter="os" value="other" /> Other</label>
+              </div>
+            </div>
+
+            <div class="filter-menu__section" id="filter-section-os">
+              <p class="filter-menu__subheading">OpenShift templates</p>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="os-category" data-filter="os-category" value="all" checked /> All templates</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="os-category" data-filter="os-category" value="default" /> Default templates</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="os-category" data-filter="os-category" value="user" /> User templates</label>
+              </div>
+            </div>
+
+            <div class="filter-menu__section" id="filter-section-vm">
+              <p class="filter-menu__subheading">VM templates</p>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="all" checked /> All templates</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="databases" /> Databases</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="operating-systems" /> Operating systems</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="monitoring" /> Monitoring</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="networking" /> Networking</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="observability" /> Observability</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="security" /> Security</label>
+              </div>
+              <div class="filter-menu__item">
+                <label><input type="radio" name="vm-category" data-filter="vm-category" value="storage" /> Storage</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="search-group">
+          <span class="search-group__attr">Name</span>
+          <input class="search-group__input" type="search" id="search-input" placeholder="Search by name…" aria-label="Search templates by name" />
+        </div>
+
+        <div class="toolbar-icons">
+          <button type="button" class="toolbar-icon-btn" aria-label="Expand" title="Expand"><i class="fas fa-expand" aria-hidden="true"></i></button>
+          <div class="columns-wrap">
+            <button type="button" class="toolbar-icon-btn" id="columns-toggle" aria-expanded="false" aria-label="Manage columns" title="Manage columns">
+              <i class="fas fa-columns" aria-hidden="true"></i>
+            </button>
+            <div class="columns-panel" id="columns-panel">
+              <p class="columns-panel__title">Manage columns</p>
+              <div class="columns-panel__item pf-m-disabled"><input type="checkbox" checked disabled /> Type</div>
+              <div class="columns-panel__item pf-m-disabled"><input type="checkbox" checked disabled /> Name</div>
+              <div class="columns-panel__item pf-m-disabled"><input type="checkbox" checked disabled /> Namespace</div>
+              <div class="columns-panel__item pf-m-disabled"><input type="checkbox" checked disabled id="col-category-check" /> <span id="col-category-label">Category</span></div>
+              <div class="columns-panel__item"><input type="checkbox" id="col-workload" data-col="workload" /> Workload profile</div>
+              <div class="columns-panel__item"><input type="checkbox" id="col-appcat" data-col="appcat" /> Application category</div>
+              <div class="columns-panel__item"><input type="checkbox" checked id="col-arch" data-col="arch" /> Architecture</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="filter-chips-row" id="filter-chips-row">
+        <div class="filter-chips-row__chips" id="filter-chips"></div>
+        <button type="button" class="pf-v6-c-button pf-m-link pf-m-sm" id="clear-filters">Clear all filters</button>
+      </div>
+
+      <p class="result-count" id="result-count">8 templates</p>
+
+      <div class="table-wrap" id="table-wrap">
+        <table class="pf-v6-c-table pf-m-compact pf-m-grid-md" aria-label="Templates" id="templates-table">
+          <thead class="pf-v6-c-table__thead">
+            <tr class="pf-v6-c-table__tr">
+              <th class="pf-v6-c-table__th" scope="col">Type</th>
+              <th class="pf-v6-c-table__th" scope="col">Name</th>
+              <th class="pf-v6-c-table__th" scope="col">Namespace</th>
+              <th class="pf-v6-c-table__th" scope="col" id="th-category">
+                Category
+                <span class="category-hint" title="Workload profile for OpenShift templates; application category for VM templates" aria-label="Category column help">
+                  <i class="fas fa-question-circle" aria-hidden="true"></i>
+                </span>
+              </th>
+              <th class="pf-v6-c-table__th col-hidden" scope="col" data-col="workload">Workload profile</th>
+              <th class="pf-v6-c-table__th col-hidden" scope="col" data-col="appcat">Application category</th>
+              <th class="pf-v6-c-table__th" scope="col" data-col="arch">Architecture</th>
+              <th class="pf-v6-c-table__th" scope="col" style="width:48px;"></th>
+            </tr>
+          </thead>
+          <tbody class="pf-v6-c-table__tbody" id="templates-body"></tbody>
+        </table>
+
+        <div class="empty-state" id="empty-state">
+          <i class="fas fa-search empty-state__icon" aria-hidden="true"></i>
+          <h2 class="empty-state__title">No templates match your filters</h2>
+          <p class="empty-state__body">Try changing the type scope, clearing filters, or editing your search.</p>
+          <button type="button" class="pf-v6-c-button pf-m-link" id="empty-clear">Clear all filters</button>
+        </div>
+      </div>
+
+      <div class="ux-callout" id="ux-callout">
+        <strong>Try it:</strong> Provider and Operating system sit at the top with facet labels only (no “Shared” group). Switch type scope to see OpenShift / VM sections show/hide below the dividers.
+        Enable <em>Workload profile</em> and <em>Application category</em> in Manage columns to compare unified vs. separate columns (— = not applicable).
+        Category column header renames when a single type is selected.
+      </div>
+    </div>
+  </div>
+  </div><!-- /view-list -->
+
+  <div class="view-panel" id="view-create-vm">
+    <div class="console-pane">
+      <div class="console-pane__inner">
+        <h1 class="wizard-page-title">Create Virtual machine</h1>
+
+        <div class="wizard-layout">
+          <nav class="wizard-nav" aria-label="Create VM steps">
+            <div class="wizard-step pf-m-complete">
+              <span class="wizard-step__num">1</span>
+              <span>Deployment details</span>
+            </div>
+            <div class="wizard-step pf-m-current">
+              <span class="wizard-step__num">2</span>
+              <span>Template</span>
+            </div>
+            <div class="wizard-step">
+              <span class="wizard-step__num">3</span>
+              <span>Customization</span>
+            </div>
+            <div class="wizard-step">
+              <span class="wizard-step__num">4</span>
+              <span>Review and create</span>
+            </div>
+          </nav>
+
+          <div class="wizard-main">
+            <div class="wizard-main__head">
+              <h2>Templates</h2>
+              <p>Select a Template to create your Virtual machine from.</p>
+            </div>
+
+            <div class="wizard-toolbar">
+              <button type="button" class="project-select" aria-haspopup="listbox">
+                All projects <i class="fas fa-caret-down" aria-hidden="true"></i>
+              </button>
+              <div class="search-group">
+                <input class="search-group__input" type="search" id="wizard-search" placeholder="Filter by keyword…" aria-label="Filter templates by keyword" style="border:none;" />
+              </div>
+              <div class="toolbar-icons" style="margin-left:0;">
+                <button type="button" class="toolbar-icon-btn" aria-label="List view"><i class="fas fa-list" aria-hidden="true"></i></button>
+                <button type="button" class="toolbar-icon-btn pf-m-active" aria-label="Grid view"><i class="fas fa-th" aria-hidden="true"></i></button>
+              </div>
+            </div>
+
+            <div class="wizard-body">
+              <aside class="wizard-sidebar" aria-label="Template filters">
+                <div class="wizard-sidebar__block">
+                  <p class="wizard-sidebar__title pf-m-highlight">Type</p>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="checkbox" id="wizard-type-os" checked data-wizard-type="openshift" /> <span class="type-icon type-icon--os" aria-hidden="true">T</span> OpenShift templates</label>
+                  </div>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="checkbox" id="wizard-type-vm" checked data-wizard-type="vm" /> <span class="type-icon type-icon--vm" aria-hidden="true">VMT</span> VM templates</label>
+                  </div>
+                  <p class="wizard-sidebar__hint" id="wizard-type-hint">Select one template type to filter by provider, operating system, or application category.</p>
+                </div>
+
+                <div class="wizard-sidebar__block">
+                  <p class="wizard-sidebar__title">Architecture</p>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="checkbox" data-wizard-arch="amd64" /> amd64</label>
+                  </div>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="checkbox" data-wizard-arch="arm64" /> arm64</label>
+                  </div>
+                </div>
+
+                <div class="wizard-sidebar__divider pf-m-hidden" id="wizard-section-os-div"></div>
+                <div class="wizard-sidebar__section pf-m-hidden" id="wizard-section-os-inner">
+                  <p class="wizard-sidebar__subheading">OpenShift templates only</p>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="radio" name="wizard-os-cat" value="all" checked data-wizard-filter="os-category" /> All templates</label>
+                  </div>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="radio" name="wizard-os-cat" value="default" data-wizard-filter="os-category" /> Default templates</label>
+                  </div>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="radio" name="wizard-os-cat" value="user" data-wizard-filter="os-category" /> User templates</label>
+                  </div>
+                  <p class="wizard-sidebar__title" style="margin-top:12px;">Provider</p>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="checkbox" data-wizard-filter="provider" value="redhat" /> Red Hat</label>
+                  </div>
+                  <div class="wizard-sidebar__item">
+                    <label><input type="checkbox" data-wizard-filter="provider" value="other" /> Other</label>
+                  </div>
+                  <p class="wizard-sidebar__title" style="margin-top:12px;">Operating system</p>
+                  <div class="wizard-sidebar__item"><label><input type="checkbox" data-wizard-filter="os" value="rhel" /> RHEL</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="checkbox" data-wizard-filter="os" value="fedora" /> Fedora</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="checkbox" data-wizard-filter="os" value="centos" /> CentOS</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="checkbox" data-wizard-filter="os" value="windows" /> Windows</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="checkbox" data-wizard-filter="os" value="other" /> Other</label></div>
+                </div>
+
+                <div class="wizard-sidebar__divider wizard-sidebar__section pf-m-hidden" id="wizard-section-vm-div"></div>
+                <div class="wizard-sidebar__section pf-m-hidden" id="wizard-section-vm-inner">
+                  <p class="wizard-sidebar__subheading">VM templates only</p>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="all" checked data-wizard-filter="vm-category" /> All templates</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="databases" data-wizard-filter="vm-category" /> Databases</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="operating-systems" data-wizard-filter="vm-category" /> Operating systems</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="monitoring" data-wizard-filter="vm-category" /> Monitoring</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="networking" data-wizard-filter="vm-category" /> Networking</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="observability" data-wizard-filter="vm-category" /> Observability</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="security" data-wizard-filter="vm-category" /> Security</label></div>
+                  <div class="wizard-sidebar__item"><label><input type="radio" name="wizard-vm-cat" value="storage" data-wizard-filter="vm-category" /> Storage</label></div>
+                </div>
+              </aside>
+
+              <div>
+                <p class="result-count" id="wizard-result-count">12 templates</p>
+                <div class="tpl-grid" id="wizard-grid"></div>
+                <div class="wizard-empty" id="wizard-empty">
+                  <p class="wizard-empty__title">No templates to show</p>
+                  <p class="wizard-empty__body" id="wizard-empty-msg">Select at least one template type.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard-callout" id="wizard-callout">
+              <strong>State:</strong> <span id="wizard-state-label">Both types (default)</span> — type-specific filter sections are hidden until you uncheck one type.
+            </div>
+
+            <footer class="wizard-footer">
+              <button type="button" class="pf-v6-c-button pf-m-secondary">Back</button>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="wizard-next" disabled>Next</button>
+              <span class="wizard-footer__spacer"></span>
+              <button type="button" class="pf-v6-c-button pf-m-link">Cancel</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const TEMPLATES = [
+    { id: 1, type: 'openshift', name: 'rhel7-highperformance-small', namespace: 'openshift', workload: 'High performance', appCategory: null, arch: 'amd64', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 2, type: 'openshift', name: 'rhel7-server-tiny', namespace: 'openshift', workload: 'Server', appCategory: null, arch: 'amd64', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 3, type: 'openshift', name: 'rhel7-desktop-medium', namespace: 'openshift', workload: 'Desktop', appCategory: null, arch: 'amd64', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 4, type: 'openshift', name: 'fedora-server-small', namespace: 'openshift', workload: 'Server', appCategory: null, arch: 'amd64', provider: 'redhat', os: 'fedora', osCategory: 'default' },
+    { id: 5, type: 'openshift', name: 'custom-app-template', namespace: 'my-project', workload: 'Server', appCategory: null, arch: 'amd64', provider: 'other', os: 'rhel', osCategory: 'user' },
+    { id: 6, type: 'vm', name: 'postgresql-persistent', namespace: 'openshift', workload: null, appCategory: 'Databases', arch: 'amd64', provider: 'redhat', os: 'rhel', vmCategory: 'databases' },
+    { id: 7, type: 'vm', name: 'rhel9-server-small', namespace: 'openshift', workload: null, appCategory: 'Operating systems', arch: 'amd64', provider: 'redhat', os: 'rhel', vmCategory: 'operating-systems' },
+    { id: 8, type: 'vm', name: 'windows-11-desktop', namespace: 'openshift', workload: null, appCategory: 'Operating systems', arch: 'amd64', provider: 'redhat', os: 'windows', vmCategory: 'operating-systems' },
+    { id: 9, type: 'vm', name: 'prometheus-vm', namespace: 'openshift', workload: null, appCategory: 'Monitoring', arch: 'amd64', provider: 'other', os: 'rhel', vmCategory: 'monitoring' },
+    { id: 10, type: 'vm', name: 'ocs-storage-appliance', namespace: 'openshift', workload: null, appCategory: 'Storage', arch: 'amd64', provider: 'redhat', os: 'rhel', vmCategory: 'storage' },
+  ];
+
+  const state = {
+    scope: 'all',
+    search: '',
+    provider: [],
+    os: [],
+    osCategory: 'all',
+    vmCategory: 'all',
+    showWorkload: false,
+    showAppCat: false,
+    showArch: true,
+  };
+
+  const els = {
+    scopeBtns: document.querySelectorAll('.type-scope__btn'),
+    filterToggle: document.getElementById('filter-toggle'),
+    filterMenu: document.getElementById('filter-menu'),
+    filterSectionOs: document.getElementById('filter-section-os'),
+    filterSectionVm: document.getElementById('filter-section-vm'),
+    searchInput: document.getElementById('search-input'),
+    columnsToggle: document.getElementById('columns-toggle'),
+    columnsPanel: document.getElementById('columns-panel'),
+    colWorkload: document.getElementById('col-workload'),
+    colAppCat: document.getElementById('col-appcat'),
+    colArch: document.getElementById('col-arch'),
+    thCategory: document.getElementById('th-category'),
+    colCategoryLabel: document.getElementById('col-category-label'),
+    filterChipsRow: document.getElementById('filter-chips-row'),
+    filterChips: document.getElementById('filter-chips'),
+    clearFilters: document.getElementById('clear-filters'),
+    emptyClear: document.getElementById('empty-clear'),
+    resultCount: document.getElementById('result-count'),
+    tableWrap: document.getElementById('table-wrap'),
+    tbody: document.getElementById('templates-body'),
+    emptyState: document.getElementById('empty-state'),
+    table: document.getElementById('templates-table'),
+  };
+
+  function categoryFor(tpl) {
+    return tpl.type === 'openshift' ? tpl.workload : tpl.appCategory;
+  }
+
+  function typeLabel(type) {
+    return type === 'openshift' ? 'OpenShift template' : 'VM template';
+  }
+
+  function typeIcon(type) {
+    if (type === 'openshift') {
+      return '<span class="type-icon type-icon--os" aria-hidden="true">T</span>';
+    }
+    return '<span class="type-icon type-icon--vm" aria-hidden="true">VMT</span>';
+  }
+
+  function emDash() {
+    return '<span class="cell-na" aria-label="Not applicable">—</span>';
+  }
+
+  function renderRow(tpl) {
+    const cat = categoryFor(tpl);
+    const workloadCell = tpl.workload || emDash();
+    const appCatCell = tpl.appCategory || emDash();
+    const archCell = tpl.arch ? `<span class="arch-label">${tpl.arch}</span>` : emDash();
+
+    const workloadHidden = state.showWorkload ? '' : 'col-hidden';
+    const appCatHidden = state.showAppCat ? '' : 'col-hidden';
+    const archHidden = state.showArch ? '' : 'col-hidden';
+    const categoryHidden = (state.showWorkload && state.showAppCat) ? 'col-hidden' : '';
+
+    return `<tr class="pf-v6-c-table__tr" data-id="${tpl.id}">
+      <td class="pf-v6-c-table__td">
+        <div class="type-cell">${typeIcon(tpl.type)}<span>${typeLabel(tpl.type)}</span></div>
+      </td>
+      <td class="pf-v6-c-table__td"><a href="#" class="tpl-name" onclick="return false;">${tpl.name}</a></td>
+      <td class="pf-v6-c-table__td">
+        <span class="ns-badge"><span class="ns-badge__icon" aria-hidden="true">NS</span><a href="#" onclick="return false;">${tpl.namespace}</a></span>
+      </td>
+      <td class="pf-v6-c-table__td ${categoryHidden}" data-col="category">${cat}</td>
+      <td class="pf-v6-c-table__td ${workloadHidden}" data-col="workload">${workloadCell}</td>
+      <td class="pf-v6-c-table__td ${appCatHidden}" data-col="appcat">${appCatCell}</td>
+      <td class="pf-v6-c-table__td ${archHidden}" data-col="arch">${archCell}</td>
+      <td class="pf-v6-c-table__td"><button type="button" class="actions-btn" aria-label="Actions for ${tpl.name}"><i class="fas fa-ellipsis-v"></i></button></td>
+    </tr>`;
+  }
+
+  function matchesFilters(tpl) {
+    if (state.scope !== 'all' && tpl.type !== state.scope) return false;
+    if (state.search && !tpl.name.toLowerCase().includes(state.search.toLowerCase())) return false;
+    if (state.provider.length && !state.provider.includes(tpl.provider)) return false;
+    if (state.os.length && !state.os.includes(tpl.os)) return false;
+    if (tpl.type === 'openshift' && state.osCategory !== 'all' && tpl.osCategory !== state.osCategory) return false;
+    if (tpl.type === 'vm' && state.vmCategory !== 'all' && tpl.vmCategory !== state.vmCategory) return false;
+    return true;
+  }
+
+  function updateFilterSections() {
+    const showOs = state.scope === 'all' || state.scope === 'openshift';
+    const showVm = state.scope === 'all' || state.scope === 'vm';
+    els.filterSectionOs.classList.toggle('pf-m-hidden', !showOs);
+    els.filterSectionVm.classList.toggle('pf-m-hidden', !showVm);
+  }
+
+  function updateCategoryHeader() {
+    let label = 'Category';
+    let hint = 'Workload profile for OpenShift templates; application category for VM templates';
+    if (state.scope === 'openshift') {
+      label = 'Workload profile';
+      hint = 'Workload profile for OpenShift templates';
+    } else if (state.scope === 'vm') {
+      label = 'Application category';
+      hint = 'Application category for VM templates';
+    }
+    els.thCategory.childNodes[0].textContent = label + ' ';
+    els.thCategory.querySelector('.category-hint').title = hint;
+    els.colCategoryLabel.textContent = label;
+  }
+
+  function updateColumnVisibility() {
+    document.querySelectorAll('[data-col="workload"]').forEach(el => {
+      el.classList.toggle('col-hidden', !state.showWorkload);
+    });
+    document.querySelectorAll('[data-col="appcat"]').forEach(el => {
+      el.classList.toggle('col-hidden', !state.showAppCat);
+    });
+    document.querySelectorAll('[data-col="arch"]').forEach(el => {
+      el.classList.toggle('col-hidden', !state.showArch);
+    });
+    const hideUnified = state.showWorkload && state.showAppCat;
+    document.querySelectorAll('[data-col="category"]').forEach(el => {
+      el.classList.toggle('col-hidden', hideUnified);
+    });
+    els.thCategory.classList.toggle('col-hidden', hideUnified);
+  }
+
+  function buildChips() {
+    const chips = [];
+    if (state.provider.length) {
+      state.provider.forEach(v => {
+        const label = v === 'redhat' ? 'Red Hat' : 'Other';
+        chips.push({ key: 'provider', value: v, label: `Provider: ${label}` });
+      });
+    }
+    if (state.os.length) {
+      state.os.forEach(v => {
+        const label = v.charAt(0).toUpperCase() + v.slice(1);
+        chips.push({ key: 'os', value: v, label: `OS: ${label}` });
+      });
+    }
+    if (state.osCategory !== 'all' && (state.scope === 'all' || state.scope === 'openshift')) {
+      const labels = { default: 'Default templates', user: 'User templates' };
+      chips.push({ key: 'os-category', value: state.osCategory, label: `OpenShift: ${labels[state.osCategory]}` });
+    }
+    if (state.vmCategory !== 'all' && (state.scope === 'all' || state.scope === 'vm')) {
+      const labels = {
+        databases: 'Databases', 'operating-systems': 'Operating systems', monitoring: 'Monitoring',
+        networking: 'Networking', observability: 'Observability', security: 'Security', storage: 'Storage',
+      };
+      chips.push({ key: 'vm-category', value: state.vmCategory, label: `VM: ${labels[state.vmCategory]}` });
+    }
+    return chips;
+  }
+
+  function renderChips() {
+    const chips = buildChips();
+    els.filterChipsRow.classList.toggle('pf-m-active', chips.length > 0);
+    els.filterChips.innerHTML = chips.map(c =>
+      `<span class="filter-chip">${c.label}<button type="button" class="filter-chip__remove" data-chip-key="${c.key}" data-chip-value="${c.value}" aria-label="Remove ${c.label}"><i class="fas fa-times"></i></button></span>`
+    ).join('');
+    els.filterChips.querySelectorAll('.filter-chip__remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.chipKey;
+        const value = btn.dataset.chipValue;
+        if (key === 'provider') state.provider = state.provider.filter(v => v !== value);
+        if (key === 'os') state.os = state.os.filter(v => v !== value);
+        if (key === 'os-category') { state.osCategory = 'all'; document.querySelector('input[name="os-category"][value="all"]').checked = true; }
+        if (key === 'vm-category') { state.vmCategory = 'all'; document.querySelector('input[name="vm-category"][value="all"]').checked = true; }
+        syncFilterInputs();
+        render();
+      });
+    });
+  }
+
+  function syncFilterInputs() {
+    document.querySelectorAll('input[data-filter="provider"]').forEach(inp => {
+      inp.checked = state.provider.includes(inp.value);
+    });
+    document.querySelectorAll('input[data-filter="os"]').forEach(inp => {
+      inp.checked = state.os.includes(inp.value);
+    });
+  }
+
+  function render() {
+    updateFilterSections();
+    updateCategoryHeader();
+    updateColumnVisibility();
+
+    const visible = TEMPLATES.filter(matchesFilters);
+    els.tbody.innerHTML = visible.map(renderRow).join('');
+
+    const scopeLabel = { all: 'templates', openshift: 'OpenShift templates', vm: 'VM templates' }[state.scope];
+    els.resultCount.textContent = visible.length === 1
+      ? `1 ${state.scope === 'all' ? 'template' : scopeLabel.replace(/s$/, '')}`
+      : `${visible.length} ${scopeLabel}`;
+
+    const isEmpty = visible.length === 0;
+    els.tableWrap.classList.toggle('pf-m-empty', isEmpty);
+    els.emptyState.classList.toggle('pf-m-active', isEmpty);
+
+    renderChips();
+  }
+
+  function clearAllFilters() {
+    state.provider = [];
+    state.os = [];
+    state.osCategory = 'all';
+    state.vmCategory = 'all';
+    state.search = '';
+    els.searchInput.value = '';
+    document.querySelector('input[name="os-category"][value="all"]').checked = true;
+    document.querySelector('input[name="vm-category"][value="all"]').checked = true;
+    syncFilterInputs();
+    render();
+  }
+
+  function closeMenus() {
+    els.filterMenu.classList.remove('pf-m-open');
+    els.filterToggle.classList.remove('pf-m-expanded');
+    els.filterToggle.setAttribute('aria-expanded', 'false');
+    els.columnsPanel.classList.remove('pf-m-open');
+    els.columnsToggle.classList.remove('pf-m-active');
+    els.columnsToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  els.scopeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      els.scopeBtns.forEach(b => b.classList.remove('pf-m-selected'));
+      btn.classList.add('pf-m-selected');
+      state.scope = btn.dataset.scope;
+      render();
+    });
+  });
+
+  els.filterToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = els.filterMenu.classList.toggle('pf-m-open');
+    els.filterToggle.classList.toggle('pf-m-expanded', open);
+    els.filterToggle.setAttribute('aria-expanded', String(open));
+    if (open) els.columnsPanel.classList.remove('pf-m-open');
+  });
+
+  els.columnsToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = els.columnsPanel.classList.toggle('pf-m-open');
+    els.columnsToggle.classList.toggle('pf-m-active', open);
+    els.columnsToggle.setAttribute('aria-expanded', String(open));
+    if (open) els.filterMenu.classList.remove('pf-m-open');
+  });
+
+  document.querySelectorAll('#filter-menu input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      if (inp.dataset.filter === 'provider') {
+        if (inp.checked) state.provider.push(inp.value);
+        else state.provider = state.provider.filter(v => v !== inp.value);
+      }
+      if (inp.dataset.filter === 'os') {
+        if (inp.checked) state.os.push(inp.value);
+        else state.os = state.os.filter(v => v !== inp.value);
+      }
+      if (inp.dataset.filter === 'os-category') state.osCategory = inp.value;
+      if (inp.dataset.filter === 'vm-category') state.vmCategory = inp.value;
+      render();
+    });
+  });
+
+  els.searchInput.addEventListener('input', () => {
+    state.search = els.searchInput.value.trim();
+    render();
+  });
+
+  els.colWorkload.addEventListener('change', () => {
+    state.showWorkload = els.colWorkload.checked;
+    render();
+  });
+  els.colAppCat.addEventListener('change', () => {
+    state.showAppCat = els.colAppCat.checked;
+    render();
+  });
+  els.colArch.addEventListener('change', () => {
+    state.showArch = els.colArch.checked;
+    render();
+  });
+
+  els.clearFilters.addEventListener('click', clearAllFilters);
+  els.emptyClear.addEventListener('click', clearAllFilters);
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.filter-wrap') && !e.target.closest('.columns-wrap')) closeMenus();
+  });
+
+  render();
+})();
+
+(function () {
+  /* View switcher */
+  const viewTabs = document.querySelectorAll('[data-view]');
+  const viewPanels = document.querySelectorAll('.view-panel');
+  const demoNotesList = document.getElementById('demo-notes-list');
+  const demoNotesWizard = document.getElementById('demo-notes-wizard');
+
+  viewTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const view = tab.dataset.view;
+      viewTabs.forEach(t => {
+        const on = t === tab;
+        t.closest('.pf-v6-c-tabs__item').classList.toggle('pf-m-current', on);
+        t.setAttribute('aria-selected', String(on));
+      });
+      viewPanels.forEach(p => p.classList.toggle('pf-m-active', p.id === `view-${view}`));
+      if (demoNotesList) demoNotesList.style.display = view === 'list' ? '' : 'none';
+      if (demoNotesWizard) demoNotesWizard.style.display = view === 'create-vm' ? '' : 'none';
+    });
+  });
+
+  /* Create VM → Template step */
+  const WIZARD_CARDS = [
+    { id: 'w1', type: 'openshift', name: 'CentOS Stream 9 for OpenShift', project: 'openshift', category: 'CentOS Stream 9', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'centos', provider: 'redhat', os: 'centos', osCategory: 'default' },
+    { id: 'w2', type: 'openshift', name: 'Fedora VM', project: 'openshift', category: 'Fedora 39', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'fedora', provider: 'redhat', os: 'fedora', osCategory: 'default' },
+    { id: 'w3', type: 'openshift', name: 'Red Hat Enterprise Linux 8 VM', project: 'openshift', category: 'RHEL 8.10', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 'w4', type: 'openshift', name: 'Red Hat Enterprise Linux 9 VM', project: 'openshift', category: 'RHEL 9.4', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 'w5', type: 'openshift', name: 'Red Hat Enterprise Linux 9 VM (ARM64)', project: 'openshift', category: 'RHEL 9.4', size: '1 CPU | 1 GiB Memory', arch: 'arm64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 'w6', type: 'openshift', name: 'Windows 11 VM', project: 'openshift', category: 'Windows 11', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'windows', provider: 'other', os: 'windows', osCategory: 'default' },
+    { id: 'w7', type: 'openshift', name: 'custom-app-template', project: 'my-project', category: 'RHEL 9', size: '2 CPU | 4 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'other', os: 'rhel', osCategory: 'user' },
+    { id: 'w8', type: 'vm', name: 'Approved-Win-Server-2026', project: 'openshift', category: 'Operating system', size: '8 CPU | 16 GiB Memory', arch: 'amd64', icon: 'windows', vmCategory: 'operating-systems' },
+    { id: 'w9', type: 'vm', name: 'CentOS-Base', project: 'openshift', category: 'Operating system', size: '2 CPU | 4 GiB Memory', arch: 'amd64', icon: 'centos', vmCategory: 'operating-systems' },
+    { id: 'w10', type: 'vm', name: 'Redis-Cache-Prod', project: 'openshift', category: 'Database', size: '4 CPU | 8 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'databases' },
+    { id: 'w11', type: 'vm', name: 'MySQL-Primary', project: 'openshift', category: 'Database', size: '4 CPU | 16 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'databases' },
+    { id: 'w12', type: 'vm', name: 'Prometheus-Monitor', project: 'openshift', category: 'Monitoring', size: '2 CPU | 8 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'monitoring' },
+  ];
+
+  const wState = {
+    typeOs: true,
+    typeVm: true,
+    search: '',
+    arch: [],
+    provider: [],
+    os: [],
+    osCategory: 'all',
+    vmCategory: 'all',
+    selectedId: null,
+  };
+
+  const wEls = {
+    typeOs: document.getElementById('wizard-type-os'),
+    typeVm: document.getElementById('wizard-type-vm'),
+    hint: document.getElementById('wizard-type-hint'),
+    sectionOs: document.getElementById('wizard-section-os-inner'),
+    sectionOsDiv: document.getElementById('wizard-section-os-div'),
+    sectionVm: document.getElementById('wizard-section-vm-inner'),
+    sectionVmDiv: document.getElementById('wizard-section-vm-div'),
+    grid: document.getElementById('wizard-grid'),
+    empty: document.getElementById('wizard-empty'),
+    emptyMsg: document.getElementById('wizard-empty-msg'),
+    resultCount: document.getElementById('wizard-result-count'),
+    search: document.getElementById('wizard-search'),
+    stateLabel: document.getElementById('wizard-state-label'),
+    next: document.getElementById('wizard-next'),
+  };
+
+  if (!wEls.grid) return;
+
+  function iconHtml(icon) {
+    const labels = { rhel: 'R', fedora: 'F', centos: 'C', windows: 'W', db: 'DB' };
+    const cls = { rhel: 'rhel', fedora: 'fedora', centos: 'centos', windows: 'windows', db: 'db' };
+    return `<span class="tpl-card__icon-fallback tpl-card__icon-fallback--${cls[icon] || 'rhel'}" aria-hidden="true">${labels[icon] || '?'}</span>`;
+  }
+
+  function updateWizardSections() {
+    const both = wState.typeOs && wState.typeVm;
+    const osOnly = wState.typeOs && !wState.typeVm;
+    const vmOnly = wState.typeVm && !wState.typeOs;
+    const none = !wState.typeOs && !wState.typeVm;
+
+    wEls.hint.classList.toggle('pf-m-hidden', !both);
+    wEls.sectionOs.classList.toggle('pf-m-hidden', !osOnly);
+    wEls.sectionOsDiv.classList.toggle('pf-m-hidden', !osOnly);
+    wEls.sectionVm.classList.toggle('pf-m-hidden', !vmOnly);
+    wEls.sectionVmDiv.classList.toggle('pf-m-hidden', !vmOnly);
+
+    if (both) wEls.stateLabel.textContent = 'Both types (default)';
+    else if (osOnly) wEls.stateLabel.textContent = 'OpenShift templates only';
+    else if (vmOnly) wEls.stateLabel.textContent = 'VM templates only';
+    else wEls.stateLabel.textContent = 'No type selected';
+
+    if (none) {
+      wEls.emptyMsg.textContent = 'Select at least one template type.';
+    } else {
+      wEls.emptyMsg.textContent = 'No templates match your filters. Try clearing filters or changing your search.';
+    }
+  }
+
+  function matchesWizardCard(card) {
+    if (!wState.typeOs && card.type === 'openshift') return false;
+    if (!wState.typeVm && card.type === 'vm') return false;
+    if (wState.search && !card.name.toLowerCase().includes(wState.search.toLowerCase())) return false;
+    if (wState.arch.length && !wState.arch.includes(card.arch)) return false;
+    if (card.type === 'openshift') {
+      if (wState.provider.length && !wState.provider.includes(card.provider)) return false;
+      if (wState.os.length && !wState.os.includes(card.os)) return false;
+      if (wState.typeOs && !wState.typeVm && wState.osCategory !== 'all' && card.osCategory !== wState.osCategory) return false;
+    }
+    if (card.type === 'vm') {
+      if (wState.typeVm && !wState.typeOs && wState.vmCategory !== 'all' && card.vmCategory !== wState.vmCategory) return false;
+    }
+    return true;
+  }
+
+  function renderWizardCard(card) {
+    const selected = wState.selectedId === card.id ? ' pf-m-selected' : '';
+    return `<article class="tpl-card${selected}" data-id="${card.id}" tabindex="0" role="button" aria-pressed="${wState.selectedId === card.id}">
+      <div class="tpl-card__top">
+        ${iconHtml(card.icon)}
+        <button type="button" class="tpl-card__star" aria-label="Favorite ${card.name}" onclick="event.stopPropagation()"><i class="far fa-star"></i></button>
+      </div>
+      <h3 class="tpl-card__name">${card.name}</h3>
+      <span class="arch-label">${card.arch}</span>
+      <dl class="tpl-card__meta">
+        <dt>Project</dt><dd>${card.project}</dd>
+        <dt>Category</dt><dd>${card.category}</dd>
+        <dt>Size</dt><dd>${card.size}</dd>
+      </dl>
+    </article>`;
+  }
+
+  function renderWizard() {
+    updateWizardSections();
+    const none = !wState.typeOs && !wState.typeVm;
+    const visible = none ? [] : WIZARD_CARDS.filter(matchesWizardCard);
+
+    wEls.grid.innerHTML = visible.map(renderWizardCard).join('');
+    wEls.grid.classList.toggle('pf-m-hidden', none || visible.length === 0);
+    wEls.empty.classList.toggle('pf-m-active', none || visible.length === 0);
+    wEls.resultCount.textContent = visible.length === 1 ? '1 template' : `${visible.length} templates`;
+
+    wEls.grid.querySelectorAll('.tpl-card').forEach(card => {
+      card.addEventListener('click', () => {
+        wState.selectedId = card.dataset.id;
+        wEls.next.disabled = false;
+        renderWizard();
+      });
+    });
+  }
+
+  wEls.typeOs.addEventListener('change', () => {
+    wState.typeOs = wEls.typeOs.checked;
+    renderWizard();
+  });
+  wEls.typeVm.addEventListener('change', () => {
+    wState.typeVm = wEls.typeVm.checked;
+    renderWizard();
+  });
+
+  wEls.search.addEventListener('input', () => {
+    wState.search = wEls.search.value.trim();
+    renderWizard();
+  });
+
+  document.querySelectorAll('[data-wizard-arch]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      if (inp.checked) wState.arch.push(inp.dataset.wizardArch);
+      else wState.arch = wState.arch.filter(v => v !== inp.dataset.wizardArch);
+      renderWizard();
+    });
+  });
+
+  document.querySelectorAll('[data-wizard-filter]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const f = inp.dataset.wizardFilter;
+      if (f === 'provider') {
+        if (inp.checked) wState.provider.push(inp.value);
+        else wState.provider = wState.provider.filter(v => v !== inp.value);
+      }
+      if (f === 'os') {
+        if (inp.checked) wState.os.push(inp.value);
+        else wState.os = wState.os.filter(v => v !== inp.value);
+      }
+      if (f === 'os-category') wState.osCategory = inp.value;
+      if (f === 'vm-category') wState.vmCategory = inp.value;
+      renderWizard();
+    });
+  });
+
+  renderWizard();
+})();
+</script>
+</body>
+</html>
