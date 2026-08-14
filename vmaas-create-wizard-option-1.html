@@ -512,7 +512,7 @@
     }
 
     #nic-detail-popover {
-      position: absolute;
+      position: fixed;
       z-index: 10000;
       display: none;
       width: min(100vw - 24px, 18.75rem);
@@ -540,7 +540,7 @@
     }
 
     #disk-detail-popover {
-      position: absolute;
+      position: fixed;
       z-index: 10000;
       display: none;
       width: min(100vw - 24px, 18.75rem);
@@ -6394,34 +6394,46 @@
       pop.classList.add('pf-m-open');
       pop.classList.add('pf-m-left');
       pop.classList.remove('pf-m-right');
+      state._nicPopoverIgnoreScrollUntil = Date.now() + 200;
       const rect = trigger.getBoundingClientRect();
       const gap = 12;
       requestAnimationFrame(() => {
         const pr = pop.getBoundingClientRect();
-        let left = rect.left + window.scrollX - pr.width - gap;
-        let top = rect.top + window.scrollY + (rect.height / 2) - (pr.height / 2);
+        let left = rect.left - pr.width - gap;
+        let top = rect.top + (rect.height / 2) - (pr.height / 2);
         if (left < 8) {
-          // flip to right of trigger
           pop.classList.remove('pf-m-left');
           pop.classList.add('pf-m-right');
-          left = rect.right + window.scrollX + gap;
+          left = rect.right + gap;
         }
+        top = Math.max(8, Math.min(top, window.innerHeight - pr.height - 8));
         pop.style.left = `${Math.max(8, left)}px`;
-        pop.style.top = `${Math.max(8, top)}px`;
+        pop.style.top = `${top}px`;
+        document.getElementById('nic-detail-popover-close')?.focus({ preventScroll: true });
       });
-      document.getElementById('nic-detail-popover-close')?.focus();
     }
 
     function wireNicDetailPopover() {
       if (document.body.dataset.nicDetailPopoverWired) return;
       document.body.dataset.nicDetailPopoverWired = '1';
       document.addEventListener('click', e => {
+        if (e.target.closest('#nic-detail-popover-close')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeNicDetailPopover();
+          return;
+        }
         const trigger = e.target.closest('[data-nic-detail]');
         if (trigger) {
           e.preventDefault();
           e.stopPropagation();
           let nic = {};
-          try { nic = JSON.parse(trigger.dataset.nicDetail || '{}'); } catch (_) {}
+          try {
+            const raw = trigger.getAttribute('data-nic-detail') || '';
+            nic = JSON.parse(decodeURIComponent(raw));
+          } catch (_) {
+            try { nic = JSON.parse(trigger.dataset.nicDetail || '{}'); } catch (__) {}
+          }
           closeDiskDetailPopover();
           openNicDetailPopover(trigger, nic);
           return;
@@ -6432,9 +6444,11 @@
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') closeNicDetailPopover();
       });
-      document.getElementById('nic-detail-popover-close')?.addEventListener('click', () => closeNicDetailPopover());
       window.addEventListener('resize', closeNicDetailPopover);
-      window.addEventListener('scroll', closeNicDetailPopover, true);
+      window.addEventListener('scroll', () => {
+        if (Date.now() < (state._nicPopoverIgnoreScrollUntil || 0)) return;
+        closeNicDetailPopover();
+      }, true);
     }
 
         
@@ -6489,33 +6503,46 @@
       pop.classList.add('pf-m-open');
       pop.classList.add('pf-m-left');
       pop.classList.remove('pf-m-right');
+      state._diskPopoverIgnoreScrollUntil = Date.now() + 200;
       const rect = trigger.getBoundingClientRect();
       const gap = 12;
       requestAnimationFrame(() => {
         const pr = pop.getBoundingClientRect();
-        let left = rect.left + window.scrollX - pr.width - gap;
-        let top = rect.top + window.scrollY + (rect.height / 2) - (pr.height / 2);
+        let left = rect.left - pr.width - gap;
+        let top = rect.top + (rect.height / 2) - (pr.height / 2);
         if (left < 8) {
           pop.classList.remove('pf-m-left');
           pop.classList.add('pf-m-right');
-          left = rect.right + window.scrollX + gap;
+          left = rect.right + gap;
         }
+        top = Math.max(8, Math.min(top, window.innerHeight - pr.height - 8));
         pop.style.left = `${Math.max(8, left)}px`;
-        pop.style.top = `${Math.max(8, top)}px`;
+        pop.style.top = `${top}px`;
+        document.getElementById('disk-detail-popover-close')?.focus({ preventScroll: true });
       });
-      document.getElementById('disk-detail-popover-close')?.focus();
     }
 
     function wireDiskDetailPopover() {
       if (document.body.dataset.diskDetailPopoverWired) return;
       document.body.dataset.diskDetailPopoverWired = '1';
       document.addEventListener('click', e => {
+        if (e.target.closest('#disk-detail-popover-close')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeDiskDetailPopover();
+          return;
+        }
         const trigger = e.target.closest('[data-disk-detail]');
         if (trigger) {
           e.preventDefault();
           e.stopPropagation();
           let disk = {};
-          try { disk = JSON.parse(trigger.dataset.diskDetail || '{}'); } catch (_) {}
+          try {
+            const raw = trigger.getAttribute('data-disk-detail') || '';
+            disk = JSON.parse(decodeURIComponent(raw));
+          } catch (_) {
+            try { disk = JSON.parse(trigger.dataset.diskDetail || '{}'); } catch (__) {}
+          }
           closeNicDetailPopover();
           openDiskDetailPopover(trigger, disk);
           return;
@@ -6526,9 +6553,11 @@
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') closeDiskDetailPopover();
       });
-      document.getElementById('disk-detail-popover-close')?.addEventListener('click', () => closeDiskDetailPopover());
       window.addEventListener('resize', closeDiskDetailPopover);
-      window.addEventListener('scroll', closeDiskDetailPopover, true);
+      window.addEventListener('scroll', () => {
+        if (Date.now() < (state._diskPopoverIgnoreScrollUntil || 0)) return;
+        closeDiskDetailPopover();
+      }, true);
     }
 
     let fsHelpPopoverTrigger = null;
@@ -7977,7 +8006,7 @@
                     <tbody>
                       ${nics.map(n => {
                         const detail = normalizeNic(n);
-                        const payload = JSON.stringify(detail).replace(/"/g, '&quot;');
+                        const payload = encodeURIComponent(JSON.stringify(detail));
                         return `
                         <tr>
                           <td>
@@ -8003,7 +8032,7 @@
                     <tbody>
                       ${diskRows.map(dsk => {
                         const detail = normalizeDisk(dsk);
-                        const payload = JSON.stringify(detail).replace(/"/g, '&quot;');
+                        const payload = encodeURIComponent(JSON.stringify(detail));
                         return `
                         <tr>
                           <td>
