@@ -539,33 +539,6 @@
       word-break: break-word;
     }
 
-    #disk-detail-popover {
-      position: fixed;
-      z-index: 10000;
-      display: none;
-      width: min(100vw - 24px, 18.75rem);
-    }
-    #disk-detail-popover.pf-m-open { display: block; }
-    #disk-detail-popover .disk-detail-dl {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 8px 20px;
-      margin: 0;
-      font-size: 14px;
-      align-items: baseline;
-    }
-    #disk-detail-popover .disk-detail-dl dt {
-      margin: 0;
-      font-weight: 600;
-      color: var(--vmaas-text);
-    }
-    #disk-detail-popover .disk-detail-dl dd {
-      margin: 0;
-      font-weight: 400;
-      color: var(--vmaas-text);
-      min-width: 0;
-      word-break: break-word;
-    }
 
     #fs-help-popover {
       position: absolute;
@@ -2588,8 +2561,12 @@
     .storage-toolbar .filter-name-search { flex: 1; min-width: 180px; max-width: 280px; height: 36px; }
     .storage-toolbar .form-check { margin: 0 0 0 4px; }
     .bootable-badge {
-      display: inline-block; margin-top: 4px; padding: 0 8px; border-radius: 10px;
+      display: inline-block; margin-top: 0; padding: 0 8px; border-radius: 10px;
       background: #e7f1fa; color: #0066cc; font-size: 12px; font-weight: 600; line-height: 20px;
+      flex-shrink: 0;
+    }
+    .side-table__name-cell {
+      display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
     }
     .dv-source {
       display: inline-flex; align-items: center; gap: 6px; color: var(--vmaas-blue); font-weight: 500;
@@ -6472,7 +6449,6 @@
           } catch (_) {
             try { nic = JSON.parse(trigger.dataset.nicDetail || '{}'); } catch (__) {}
           }
-          closeDiskDetailPopover();
           openNicDetailPopover(trigger, nic);
           return;
         }
@@ -6490,7 +6466,6 @@
     }
 
         
-    let diskDetailPopoverTrigger = null;
 
     function normalizeDisk(dsk) {
       const size = dsk.size
@@ -6504,99 +6479,6 @@
       };
     }
 
-    function closeDiskDetailPopover() {
-      const pop = document.getElementById('disk-detail-popover');
-      if (!pop) return;
-      pop.classList.remove('pf-m-open');
-      pop.hidden = true;
-      if (diskDetailPopoverTrigger) {
-        diskDetailPopoverTrigger.setAttribute('aria-expanded', 'false');
-        diskDetailPopoverTrigger = null;
-      }
-    }
-
-    function openDiskDetailPopover(trigger, disk) {
-      const pop = document.getElementById('disk-detail-popover');
-      const body = document.getElementById('disk-detail-popover-body');
-      if (!pop || !body) return;
-      if (diskDetailPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
-        closeDiskDetailPopover();
-        return;
-      }
-      const d = normalizeDisk(disk || {});
-      body.innerHTML = `
-        <dl class="disk-detail-dl">
-          <dt>Name</dt><dd>${d.name}</dd>
-          <dt>Size</dt><dd>${d.size}</dd>
-          <dt>Storage tier</dt><dd>${d.storageTier}</dd>
-          <dt>Bootable</dt><dd>${d.bootable ? 'Yes' : 'No'}</dd>
-        </dl>
-      `;
-      if (diskDetailPopoverTrigger && diskDetailPopoverTrigger !== trigger) {
-        diskDetailPopoverTrigger.setAttribute('aria-expanded', 'false');
-      }
-      diskDetailPopoverTrigger = trigger;
-      trigger.setAttribute('aria-expanded', 'true');
-      pop.hidden = false;
-      pop.classList.add('pf-m-open');
-      pop.classList.add('pf-m-left');
-      pop.classList.remove('pf-m-right');
-      state._diskPopoverIgnoreScrollUntil = Date.now() + 200;
-      const rect = trigger.getBoundingClientRect();
-      const gap = 12;
-      requestAnimationFrame(() => {
-        const pr = pop.getBoundingClientRect();
-        let left = rect.left - pr.width - gap;
-        let top = rect.top + (rect.height / 2) - (pr.height / 2);
-        if (left < 8) {
-          pop.classList.remove('pf-m-left');
-          pop.classList.add('pf-m-right');
-          left = rect.right + gap;
-        }
-        top = Math.max(8, Math.min(top, window.innerHeight - pr.height - 8));
-        pop.style.left = `${Math.max(8, left)}px`;
-        pop.style.top = `${top}px`;
-        document.getElementById('disk-detail-popover-close')?.focus({ preventScroll: true });
-      });
-    }
-
-    function wireDiskDetailPopover() {
-      if (document.body.dataset.diskDetailPopoverWired) return;
-      document.body.dataset.diskDetailPopoverWired = '1';
-      document.addEventListener('click', e => {
-        if (e.target.closest('#disk-detail-popover-close')) {
-          e.preventDefault();
-          e.stopPropagation();
-          closeDiskDetailPopover();
-          return;
-        }
-        const trigger = e.target.closest('[data-disk-detail]');
-        if (trigger) {
-          e.preventDefault();
-          e.stopPropagation();
-          let disk = {};
-          try {
-            const raw = trigger.getAttribute('data-disk-detail') || '';
-            disk = JSON.parse(decodeURIComponent(raw));
-          } catch (_) {
-            try { disk = JSON.parse(trigger.dataset.diskDetail || '{}'); } catch (__) {}
-          }
-          closeNicDetailPopover();
-          openDiskDetailPopover(trigger, disk);
-          return;
-        }
-        if (e.target.closest('#disk-detail-popover')) return;
-        closeDiskDetailPopover();
-      });
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeDiskDetailPopover();
-      });
-      window.addEventListener('resize', closeDiskDetailPopover);
-      window.addEventListener('scroll', () => {
-        if (Date.now() < (state._diskPopoverIgnoreScrollUntil || 0)) return;
-        closeDiskDetailPopover();
-      }, true);
-    }
 
     let fsHelpPopoverTrigger = null;
 
@@ -6619,7 +6501,6 @@
         return;
       }
       closeNicDetailPopover();
-      closeDiskDetailPopover();
       closeUtilHelpPopover();
       if (fsHelpPopoverTrigger && fsHelpPopoverTrigger !== trigger) {
         fsHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
@@ -6690,7 +6571,6 @@
         return;
       }
       closeNicDetailPopover();
-      closeDiskDetailPopover();
       closeFsHelpPopover();
       if (utilHelpPopoverTrigger && utilHelpPopoverTrigger !== trigger) {
         utilHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
@@ -8066,21 +7946,20 @@
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk">Add disk</button>
                   </div>
                   <table class="side-table">
-                    <thead><tr><th>Name</th><th>Size</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Size</th><th>Storage tier</th></tr></thead>
                     <tbody>
                       ${diskRows.map(dsk => {
                         const detail = normalizeDisk(dsk);
-                        const payload = encodeURIComponent(JSON.stringify(detail));
                         return `
                         <tr>
                           <td>
-                            <button type="button" class="name-link name-link--dotted"
-                              data-disk-detail="${payload}"
-                              aria-haspopup="dialog" aria-expanded="false">
+                            <span class="side-table__name-cell">
                               ${detail.name}
-                            </button>
+                              ${detail.bootable ? '<span class="bootable-badge">Bootable</span>' : ''}
+                            </span>
                           </td>
                           <td>${detail.size}</td>
+                          <td>${detail.storageTier}</td>
                         </tr>`;
                       }).join('')}
                     </tbody>
@@ -11115,7 +10994,6 @@
     wireStatusPopover();
     wireEditComputeModal();
     wireNicDetailPopover();
-    wireDiskDetailPopover();
     wireFsHelpPopover();
     wireUtilHelpPopover();
     wirePfTooltips();
@@ -11168,18 +11046,6 @@
     </div>
   </div>
 
-
-  <div class="pf-v6-c-popover pf-m-left" id="disk-detail-popover" role="dialog" aria-modal="true" aria-label="Disk details" hidden>
-    <div class="pf-v6-c-popover__arrow"></div>
-    <div class="pf-v6-c-popover__content">
-      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="disk-detail-popover-close" aria-label="Close">
-        <span class="pf-v6-c-button__icon">
-          <i class="fas fa-times" aria-hidden="true"></i>
-        </span>
-      </button>
-      <div class="pf-v6-c-popover__body" id="disk-detail-popover-body"></div>
-    </div>
-  </div>
 
   <div class="pf-v6-c-popover pf-m-right" id="fs-help-popover" role="dialog" aria-modal="true" aria-label="File systems information" hidden>
     <div class="pf-v6-c-popover__arrow"></div>
