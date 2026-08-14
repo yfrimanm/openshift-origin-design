@@ -433,12 +433,15 @@
       padding: 16px 18px; margin-bottom: 16px;
     }
     .vm-card__title {
-      margin: 0 0 20px; color: var(--vmaas-text);
+      margin: 0; color: var(--vmaas-text);
+      display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0;
       font-family: var(--pf-t--global--font--family--heading, inherit);
       font-size: var(--pf-t--global--font--size--heading--h4, 1rem); /* 16px — PF6 H4 / card title */
       font-weight: var(--pf-t--global--font--weight--heading--bold, 700);
       line-height: var(--pf-t--global--font--line-height--heading, 1.3);
     }
+    /* Prefer .vm-card__title-row for title spacing (12px) across all overview cards */
+    .vm-card > .vm-card__title { margin: 0 0 12px; }
     .vm-card .vm-card__title,
     .vm-card__title-row .vm-card__title {
       color: var(--vmaas-text);
@@ -472,12 +475,15 @@
     }
     .vm-alerts-list {
       list-style: none; margin: 0; padding: 0;
-      display: flex; flex-direction: column; gap: 8px;
+      display: flex; flex-direction: column; gap: 0;
     }
     .vm-alerts-list__item {
       display: flex; align-items: flex-start; gap: 8px;
-      font-size: 13px; color: var(--vmaas-text); line-height: 1.35;
+      font-size: 14px; color: var(--vmaas-text); line-height: 1.35;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--pf-t--color--gray--20, #f0f0f0);
     }
+    .vm-alerts-list__item:last-child { border-bottom: none; }
     .vm-alerts-list__item i { color: #f0ab00; margin-top: 2px; flex-shrink: 0; }
     .vm-card__title-row {
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;
@@ -7793,7 +7799,9 @@
             <div class="vm-overview__top">
               <div>
                 <div class="vm-card">
-                  <h3 class="vm-card__title">Details</h3>
+                  <div class="vm-card__title-row">
+                    <h3 class="vm-card__title">Details</h3>
+                  </div>
                   <div class="vm-details-grid">
                     <dl class="vm-dl">
                       <dt>Name</dt>
@@ -7829,7 +7837,7 @@
                 <div class="vm-card">
                   <div class="vm-card__title-row">
                     <h3 class="vm-card__title">
-                      <span class="vm-card__title-static">Utilization</span>
+                      Utilization
                       <button type="button" class="util-title-info" id="btn-util-help" data-util-help aria-label="Utilization information" aria-haspopup="dialog" aria-expanded="false">
                         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                       </button>
@@ -7938,13 +7946,15 @@
               </div>
               <aside>
                 <div class="vm-card${alerts.length ? ' vm-card--alerts-active' : ''}">
-                  <h3 class="vm-card__title">
-                    ${alerts.length ? `
-                      <button type="button" class="vm-card__title-link" id="btn-overview-alerts" aria-label="View ${alerts.length} alert${alerts.length === 1 ? '' : 's'}">
-                        Alerts (${alerts.length})
-                      </button>
-                    ` : `Alerts (0)`}
-                  </h3>
+                  <div class="vm-card__title-row">
+                    <h3 class="vm-card__title">
+                      ${alerts.length ? `
+                        <button type="button" class="vm-card__title-link" id="btn-overview-alerts" aria-label="View ${alerts.length} alert${alerts.length === 1 ? '' : 's'}">
+                          Alerts (${alerts.length})
+                        </button>
+                      ` : `Alerts (0)`}
+                    </h3>
+                  </div>
                   ${alerts.length ? `
                     <ul class="vm-alerts-list" aria-label="Alerts">
                       ${alerts.slice(0, 3).map(a => `
@@ -8028,12 +8038,17 @@
                     ? `<button type="button" class="subtab ${hwTab === 'host' ? 'pf-m-selected' : ''}" data-hw-tab="host">Host devices (${hostDevices.length})</button>`
                     : `<span class="subtab subtab--static ${hwTab === 'host' ? 'pf-m-selected' : ''}" aria-disabled="true">Host devices (0)</span>`;
                   const listHtml = activeList.length
-                    ? `<ul class="vm-alerts-list" aria-label="Hardware devices">${activeList.map(d =>
-                        `<li class="vm-alerts-list__item"><span>${d.name || d}</span></li>`
-                      ).join('')}</ul>`
+                    ? `<table class="side-table" aria-label="Hardware devices">
+                        <thead><tr><th scope="col">Name</th></tr></thead>
+                        <tbody>
+                          ${activeList.map(d => `<tr><td>${d.name || d}</td></tr>`).join('')}
+                        </tbody>
+                      </table>`
                     : `<p class="muted" style="margin:0;">${emptyLabel}</p>`;
                   return `
-                <h3 class="vm-card__title">${titleHtml}</h3>
+                <div class="vm-card__title-row">
+                  <h3 class="vm-card__title">${titleHtml}</h3>
+                </div>
                 <div class="subtabs" style="margin-bottom:12px;" role="tablist" aria-label="Hardware device types">
                   ${gpuTab}
                   ${hostTab}
@@ -8044,7 +8059,7 @@
               <div class="vm-card">
                 <div class="vm-card__title-row">
                   <h3 class="vm-card__title">
-                    <span class="vm-card__title-static">File systems</span>
+                    File systems
                     <button type="button" class="util-title-info" id="btn-fs-help" data-fs-help aria-label="File systems information" aria-haspopup="dialog" aria-expanded="false">
                       <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                     </button>
