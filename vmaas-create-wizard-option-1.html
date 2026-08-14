@@ -332,12 +332,6 @@
     .view.pf-m-active { display: block; }
 
     /* —— VM details (Overview + Configuration → Network) —— */
-    .vm-detail__crumb {
-      display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px;
-      border: none; background: none; padding: 0; font: inherit; color: var(--vmaas-blue);
-      cursor: pointer; font-size: 14px; font-weight: 500;
-    }
-    .vm-detail__crumb:hover { text-decoration: underline; }
     .vm-detail__header {
       display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
       gap: 12px; margin-bottom: 8px;
@@ -3775,9 +3769,6 @@
               <h2 class="page-title">Virtual machines <button type="button" class="star" aria-label="Favorite">☆</button></h2>
               <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-from-detail">Create</button>
             </div>
-            <button type="button" class="vm-detail__crumb" id="vm-back-to-list">
-              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to list
-            </button>
             <div id="vm-detail-root"></div>
           </section>
 
@@ -11059,10 +11050,6 @@
       const btn = e.target.closest('[data-open-vm]');
       if (!btn) return;
       openVmDetail(btn.dataset.openVm, 'overview');
-    });
-    document.getElementById('vm-back-to-list')?.addEventListener('click', () => {
-      state.selectedVmName = null;
-      setView('vms');
     });
     document.addEventListener('click', e => {
       if (state.nicMenuOpen && !e.target.closest('.nic-actions-wrap')) {
