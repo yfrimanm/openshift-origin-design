@@ -90,7 +90,7 @@ Nav → **Virtual machines** (default landing).
 | Page title | Virtual machines + favorite | **Virtual machines** |
 | Primary action | **Create** | Visible for **Org Admin / VM Author** only |
 | Toolbar | Search, filters, pagination | Same |
-| Table | Name, Namespace, Status, Conditions, Node, IP, … | Same pattern as mockup; Node visibility TBD |
+| Table | Name, Namespace, Status, Conditions, Node, IP, … | Same pattern as mockup; **Name** is a link (blue, underlined) to VM details Overview; Node visibility TBD |
 | Status column | PF6 `Icon` + status color: **Running** = `pf-v6-pficon-running` + `success`; **Stopped** = `pf-v6-pficon-off`; transitional = spinner / in-progress | Same; status label is a link (blue, underlined) |
 | Row actions | Kebab | Filtered by role (see matrix above) |
 | Project tree (left) | Local cluster → projects | **Omit** for tenant shell |

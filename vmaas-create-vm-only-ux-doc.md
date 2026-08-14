@@ -38,6 +38,7 @@ Select template → Details → Compute resource → Storage → Network → Rev
 ## Entry — Virtual machines list
 
 - Primary **Create** opens the wizard.
+- **Name** column: VM names are clickable links (blue, underlined) and open the VM details Overview.
 - Regular search + Save search / Saved searches.
 - Attribute filters: Project, Status, Operating system.
 - Toolbar **Actions** disabled until selection; matches row kebab when enabled.
