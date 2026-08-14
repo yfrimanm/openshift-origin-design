@@ -1203,7 +1203,7 @@
       justify-content: flex-start;
     }
 
-    /* —— Add network interface / Add disk / Edit compute modals —— */
+    /* —— Add network / Add disk / Edit compute modals —— */
 
     #compute-overlay:not(.pf-m-open) { display: none; }
     #compute-overlay.pf-m-open {
@@ -4044,7 +4044,7 @@
     <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
       <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="nic-modal-title" id="nic-modal">
         <div class="nic-modal__header">
-          <h2 class="nic-modal__title" id="nic-modal-title">Add network interface</h2>
+          <h2 class="nic-modal__title" id="nic-modal-title">Add network</h2>
           <button type="button" class="pf-v6-c-button pf-m-plain" id="nic-modal-close" aria-label="Close">
             <span class="pf-v6-c-button__icon"><i class="fas fa-times" aria-hidden="true"></i></span>
           </button>
@@ -6957,7 +6957,7 @@
     function closeAddNetworkModal() {
       state.networkModal = null;
       const title = document.getElementById('nic-modal-title');
-      if (title) title.textContent = 'Add network interface';
+      if (title) title.textContent = 'Add network';
       const overlay = document.getElementById('nic-overlay');
       overlay?.classList.remove('pf-m-open');
       overlay?.setAttribute('aria-hidden', 'true');
@@ -8133,7 +8133,7 @@
           panel = `
             <div class="storage-section">
               <h3 class="storage-section__title">Network interfaces</h3>
-              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-add-vm-nic">Add network interface</button>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-add-vm-nic">Add network</button>
               <div class="nic-toolbar">
                 <button type="button" class="filter-btn"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filter</button>
                 <button type="button" class="nic-attr-select">Name <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
