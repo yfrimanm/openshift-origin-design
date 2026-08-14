@@ -426,33 +426,7 @@
     @media (max-width: 1100px) { .vm-overview__top { grid-template-columns: 1fr; } }
     .vm-overview__bottom { margin-top: 0; }
     .vm-overview__table-wrap { overflow-x: auto; }
-    /* File systems: keep header labels fully visible (no … truncation) */
-    .vm-overview__table-wrap .vm-table.pf-v6-c-table {
-      --pf-v6-c-table--cell--PaddingInlineStart: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-table--cell--PaddingInlineEnd: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-table--cell--first-last-child--PaddingInline: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-table--cell--Overflow: visible;
-      --pf-v6-c-table--cell--TextOverflow: clip;
-      --pf-v6-c-table--cell--MaxWidth: none;
-      width: 100%;
-    }
-    .vm-overview__table-wrap .vm-table th,
-    .vm-overview__table-wrap .vm-table td,
-    .vm-overview__table-wrap .vm-table .pf-v6-c-table__th,
-    .vm-overview__table-wrap .vm-table .pf-v6-c-table__td {
-      padding-inline: var(--pf-t--global--spacer--sm, 8px);
-      overflow: visible;
-      text-overflow: clip;
-      max-width: none;
-    }
-    .vm-overview__table-wrap .vm-table th:first-child,
-    .vm-overview__table-wrap .vm-table td:first-child {
-      padding-inline-start: 0;
-    }
-    .vm-overview__table-wrap .vm-table th:last-child,
-    .vm-overview__table-wrap .vm-table td:last-child {
-      padding-inline-end: 0;
-    }
+    /* File systems uses the same .side-table row look as Network / Storage */
     .res-icon--svc { background: #0066cc; }
     .vm-card {
       background: #fff; border: 1px solid var(--vmaas-border-light); border-radius: 8px;
@@ -8058,31 +8032,33 @@
                 })()}
               </div>
               <div class="vm-card">
-                <h3 class="vm-card__title">
-                  File systems
-                  <button type="button" class="util-title-info" id="btn-fs-help" data-fs-help aria-label="File systems information" aria-haspopup="dialog" aria-expanded="false">
-                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-                  </button>
-                </h3>
+                <div class="vm-card__title-row">
+                  <h3 class="vm-card__title">
+                    <span class="vm-card__title-static">File systems</span>
+                    <button type="button" class="util-title-info" id="btn-fs-help" data-fs-help aria-label="File systems information" aria-haspopup="dialog" aria-expanded="false">
+                      <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                    </button>
+                  </h3>
+                </div>
                 <div class="vm-overview__table-wrap">
-                  <table class="pf-v6-c-table pf-m-compact vm-table" role="grid" aria-label="File systems">
-                    <thead class="pf-v6-c-table__thead">
-                      <tr class="pf-v6-c-table__tr">
-                        <th class="pf-v6-c-table__th" scope="col">Name</th>
-                        <th class="pf-v6-c-table__th" scope="col">File system type</th>
-                        <th class="pf-v6-c-table__th" scope="col">Mount point</th>
-                        <th class="pf-v6-c-table__th" scope="col">Total bytes</th>
-                        <th class="pf-v6-c-table__th" scope="col">Used bytes</th>
+                  <table class="side-table" aria-label="File systems">
+                    <thead>
+                      <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">File system type</th>
+                        <th scope="col">Mount point</th>
+                        <th scope="col">Total bytes</th>
+                        <th scope="col">Used bytes</th>
                       </tr>
                     </thead>
-                    <tbody class="pf-v6-c-table__tbody">
+                    <tbody>
                       ${filesystems.map(fs => `
-                        <tr class="pf-v6-c-table__tr">
-                          <td class="pf-v6-c-table__td">${fs.name}</td>
-                          <td class="pf-v6-c-table__td">${fs.type}</td>
-                          <td class="pf-v6-c-table__td">${fs.mount}</td>
-                          <td class="pf-v6-c-table__td">${fs.total}</td>
-                          <td class="pf-v6-c-table__td">${fs.used}</td>
+                        <tr>
+                          <td>${fs.name}</td>
+                          <td>${fs.type}</td>
+                          <td>${fs.mount}</td>
+                          <td>${fs.total}</td>
+                          <td>${fs.used}</td>
                         </tr>
                       `).join('')}
                     </tbody>
