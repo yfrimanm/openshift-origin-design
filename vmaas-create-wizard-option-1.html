@@ -7671,6 +7671,12 @@
       root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
         openEditComputeModal();
       });
+      root.querySelector('.vm-vnc__open')?.addEventListener('click', () => {
+        openVmConsolePlaceholder(state.selectedVmName || v.name);
+      });
+      root.querySelector('.vm-console-preview')?.addEventListener('click', () => {
+        openVmConsolePlaceholder(state.selectedVmName || v.name);
+      });
       root.querySelector('#vm-goto-networks')?.addEventListener('click', () => setView('networks'));
       root.querySelectorAll('[data-nic-delete]').forEach(b => {
         b.onclick = () => {
