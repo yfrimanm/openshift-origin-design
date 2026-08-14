@@ -5399,17 +5399,129 @@
       </span>`;
     }
 
-    function statusCell(s) {
+    function statusCell(s, vmName = '') {
+      const vmAttr = vmName ? ` data-status-vm="${vmName}"` : '';
       if (s === 'running') {
-        return `<button type="button" class="status-link">${statusIcon('running')}<span class="status-link__label">Running</span></button>`;
+        return `<button type="button" class="status-link" data-status-popover="running"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('running')}<span class="status-link__label">Running</span></button>`;
       }
       if (s === 'ErrorPvcNotFound') {
-        return `<button type="button" class="status-link">${statusIcon('error')}<span class="status-link__label">ErrorPvcNotFound</span></button>`;
+        return `<button type="button" class="status-link" data-status-popover="error"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('error')}<span class="status-link__label">ErrorPvcNotFound</span></button>`;
       }
       if (s === 'starting') {
         return `<span class="status-static">${statusIcon('starting')} Starting</span>`;
       }
-      return `<button type="button" class="status-link">${statusIcon('stopped')}<span class="status-link__label">Stopped</span></button>`;
+      return `<button type="button" class="status-link" data-status-popover="stopped"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('stopped')}<span class="status-link__label">Stopped</span></button>`;
+    }
+
+    const STATUS_POPOVER_COPY = {
+      running: {
+        title: 'Running',
+        body: 'Virtual machine is currently Running',
+      },
+      stopped: {
+        title: 'Stopped',
+        body: 'Virtual machine is currently Stopped',
+      },
+      error: {
+        title: 'ErrorPvcNotFound',
+        body: 'Virtual machine has an error: PVC not found',
+      },
+    };
+
+    let statusPopoverTrigger = null;
+
+    function closeStatusPopover() {
+      const pop = document.getElementById('status-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (statusPopoverTrigger) {
+        statusPopoverTrigger.setAttribute('aria-expanded', 'false');
+        statusPopoverTrigger = null;
+      }
+    }
+
+    function openStatusPopover(trigger) {
+      const key = trigger.dataset.statusPopover || 'running';
+      const copy = STATUS_POPOVER_COPY[key] || STATUS_POPOVER_COPY.running;
+      const pop = document.getElementById('status-popover');
+      if (!pop) return;
+      if (statusPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeStatusPopover();
+        return;
+      }
+      document.getElementById('status-popover-title-text').textContent = copy.title;
+      document.getElementById('status-popover-body').textContent = copy.body;
+      const prev = statusPopoverTrigger;
+      if (prev && prev !== trigger) prev.setAttribute('aria-expanded', 'false');
+      statusPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      pop.hidden = false;
+      pop.classList.add('pf-m-open');
+      // Position to the right of the trigger (arrow on left of popover)
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      let top = rect.top + window.scrollY + (rect.height / 2) - 40;
+      let left = rect.right + window.scrollX + gap;
+      pop.style.top = `${Math.max(8, top)}px`;
+      pop.style.left = `${left}px`;
+      // Keep on screen
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        if (pr.right > window.innerWidth - 8) {
+          // flip to left of trigger
+          pop.classList.remove('pf-m-right');
+          pop.classList.add('pf-m-left');
+          pop.style.left = `${Math.max(8, rect.left + window.scrollX - pr.width - gap)}px`;
+        } else {
+          pop.classList.add('pf-m-right');
+          pop.classList.remove('pf-m-left');
+        }
+        if (pr.bottom > window.innerHeight - 8) {
+          pop.style.top = `${Math.max(8, window.scrollY + window.innerHeight - pr.height - 8)}px`;
+        }
+      });
+      document.getElementById('status-popover-close')?.focus();
+    }
+
+    function wireStatusPopover() {
+      if (document.body.dataset.statusPopoverWired) return;
+      document.body.dataset.statusPopoverWired = '1';
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-status-popover]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openStatusPopover(trigger);
+          return;
+        }
+        if (e.target.closest('#status-popover')) return;
+        closeStatusPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeStatusPopover();
+      });
+      document.getElementById('status-popover-close')?.addEventListener('click', () => closeStatusPopover());
+      document.getElementById('status-popover-diagnostic')?.addEventListener('click', () => {
+        const vmName = statusPopoverTrigger?.dataset?.statusVm || state.selectedVmName;
+        closeStatusPopover();
+        if (!vmName) {
+          toast('Open a Virtual machine to view diagnostics.');
+          return;
+        }
+        if (document.getElementById('view-vm')?.classList.contains('pf-m-active') && state.selectedVmName === vmName) {
+          state.vmDetailTab = 'diagnostics';
+          renderVmDetail();
+        } else {
+          openVmDetail(vmName, 'diagnostics');
+        }
+      });
+      document.getElementById('status-popover-learn')?.addEventListener('click', () => {
+        closeStatusPopover();
+        toast('Learn more about Virtual machine status.');
+      });
+      window.addEventListener('resize', closeStatusPopover);
+      window.addEventListener('scroll', closeStatusPopover, true);
     }
 
     function truncateNode(n) {
@@ -5693,6 +5805,33 @@
     <h1>Console placeholder</h1>
     <p>Console for <code>${safeName}</code> would open here.</p>
   </div>
+
+  <div class="pf-v6-c-popover pf-m-right" id="status-popover" role="dialog" aria-modal="true" aria-labelledby="status-popover-title" aria-describedby="status-popover-body" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="status-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <header class="pf-v6-c-popover__header">
+        <div class="pf-v6-c-popover__title" id="status-popover-title">
+          <h1 class="pf-v6-c-title pf-m-md">
+            <span class="pf-v6-c-popover__title-text" id="status-popover-title-text">Running</span>
+          </h1>
+        </div>
+      </header>
+      <div class="pf-v6-c-popover__body" id="status-popover-body">Virtual machine is currently Running</div>
+      <footer class="pf-v6-c-popover__footer">
+        <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="status-popover-diagnostic">View diagnostic</button>
+        <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline status-popover__learn" id="status-popover-learn">
+          <i class="fa-solid fa-sparkles" aria-hidden="true"></i>
+          Learn more
+        </button>
+      </footer>
+    </div>
+  </div>
+
 </body>
 </html>`;
       const blob = new Blob([html], { type: 'text/html' });
@@ -6674,7 +6813,7 @@
               ${v.name}
               <span class="vm-arch-badge">${v.arch || 'amd64'}</span>
             </h2>
-            <span class="vm-detail__status">${statusCell(v.status)}</span>
+            <span class="vm-detail__status">${statusCell(v.status, v.name)}</span>
           </div>
           <div class="vm-detail__actions" role="group" aria-label="VM actions">
             <button type="button" class="vm-action-icon" aria-label="Stop" title="Stop" ${running ? '' : 'disabled'}>
@@ -6755,7 +6894,7 @@
                         </span>
                       </dd>
                       <dt>Project</dt><dd>${projectDisplay}</dd>
-                      <dt>Status</dt><dd>${statusCell(v.status)}</dd>
+                      <dt>Status</dt><dd>${statusCell(v.status, v.name)}</dd>
                       <dt>Created</dt><dd>${v.created || '—'}</dd>
                       <dt>Operating system</dt><dd>${osDisplay}</dd>
                       <dt>Compute resources</dt>
@@ -8740,7 +8879,7 @@
               <td class="pf-v6-c-table__td">
                 <span class="clone-vm-name"><span class="clone-vm-badge">VM</span>${v.name}</span>
               </td>
-              <td class="pf-v6-c-table__td">${statusCell(v.status)}</td>
+              <td class="pf-v6-c-table__td">${statusCell(v.status, v.name)}</td>
               <td class="pf-v6-c-table__td">
                 <span class="clone-created"><i class="fa-solid fa-globe" aria-hidden="true"></i>${v.created || '—'}</span>
               </td>
@@ -9924,6 +10063,7 @@
     applyRole();
     initVmFilterDropdowns();
     renderVms();
+    wireStatusPopover();
     renderNetworks();
 
     try {

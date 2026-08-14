@@ -27,6 +27,7 @@ Select template → Details → Compute resource → Storage → Network → Rev
 | **Role labels** | Masthead role dropdown: **VM Admin**, **VM User**, Console Access Only, Organization Administrator — no vApp aliases. |
 | **Search** | Regular search field only (no advanced filters / sliders icon). Attribute filters (Project / Status / OS) remain below. |
 | **Row kebab = Actions** | Same items and copy: Control ▸, Open console, Delete. Helper text uses **VM** (not Virtual machine). |
+| **Status popover** | Clicking **Running** (and other status links) opens a PF6 popover: title, body, **View diagnostic**, **Learn more**. |
 | **OS image** | Shown when selecting the template (and on Review). Not on Details. |
 | **Access** | Optional SSH / cloud-init on **Details**. |
 | **Locked vs Editable** | Lock / pen icons. Prefer **Locked** / **Editable** (not Flexible / Fixed). |
