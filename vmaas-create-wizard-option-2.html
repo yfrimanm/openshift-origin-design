@@ -332,6 +332,12 @@
     .view.pf-m-active { display: block; }
 
     /* —— VM details (Overview + Configuration → Network) —— */
+    .vm-detail__breadcrumb {
+      margin: 0 0 12px;
+    }
+    .vm-detail__breadcrumb .pf-v6-c-breadcrumb__link:not(.pf-m-current) {
+      text-decoration: underline;
+    }
     .vm-detail__header {
       display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
       gap: 12px; margin-bottom: 8px;
@@ -3785,10 +3791,6 @@
           </section>
 
           <section class="view" id="view-vm">
-            <div class="page-header">
-              <h2 class="page-title">Virtual machines <button type="button" class="star" aria-label="Favorite">☆</button></h2>
-              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-from-detail">Create</button>
-            </div>
             <div id="vm-detail-root"></div>
           </section>
 
@@ -7681,6 +7683,19 @@
       const canPause = running && !starting;
       const canStart = !running && !starting;
       const header = `
+        <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol class="pf-v6-c-breadcrumb__list">
+            <li class="pf-v6-c-breadcrumb__item">
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-vms>Virtual machines</a>
+            </li>
+            <li class="pf-v6-c-breadcrumb__item">
+              <span class="pf-v6-c-breadcrumb__item-divider">
+                <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Virtual machine details</span>
+            </li>
+          </ol>
+        </nav>
         <div class="vm-detail__header">
           <div class="vm-detail__title-row">
             <h2 class="vm-detail__title">
@@ -8157,6 +8172,12 @@
       }
 
       root.innerHTML = header + body;
+
+      root.querySelector('[data-breadcrumb-vms]')?.addEventListener('click', e => {
+        e.preventDefault();
+        state.selectedVmName = null;
+        setView('vms');
+      });
 
       root.querySelectorAll('[data-vm-action]').forEach(b => {
         b.addEventListener('click', () => {
@@ -10679,7 +10700,6 @@
     }
 
     document.getElementById('btn-create').addEventListener('click', () => openWizard('template'));
-    document.getElementById('btn-create-from-detail')?.addEventListener('click', () => openWizard('template'));
     document.getElementById('btn-create-tpl')?.addEventListener('click', () => openWizard('template'));
     document.getElementById('btn-create-network')?.addEventListener('click', () => openNetworkWizard());
     document.getElementById('wiz-close').addEventListener('click', requestCloseWizard);
