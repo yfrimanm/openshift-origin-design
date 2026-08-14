@@ -505,10 +505,9 @@
     .vm-dl .res-icon {
       width: 18px; height: 18px; font-size: 8px;
     }
-    .vm-arch-badge {
-      display: inline-flex; align-items: center; height: 20px; padding: 0 8px;
-      border-radius: 12px; font-size: 12px; font-weight: 500;
-      color: #002952; background: #bee1f4;
+    .vm-arch-badge.pf-v6-c-badge {
+      flex-shrink: 0;
+      vertical-align: middle;
     }
 
     .vm-compute-row {
@@ -2467,9 +2466,8 @@
     .boot-table .toolbar .pf-v6-c-button { margin-inline-start: auto; }
     .boot-table table { width: 100%; }
     .boot-table th, .boot-table td { font-size: 13px; padding: 8px 10px; }
-    .arch-badge {
-      display: inline-block; padding: 0 6px; border-radius: 10px; font-size: 11px;
-      background: var(--vmaas-bg-subtle); border: 1px solid var(--vmaas-border-light);
+    .arch-badge.pf-v6-c-badge {
+      flex-shrink: 0;
     }
 
     /* Compute series */
@@ -2589,9 +2587,7 @@
     }
     .storage-toolbar .filter-name-search { flex: 1; min-width: 180px; max-width: 280px; height: 36px; }
     .storage-toolbar .form-check { margin: 0 0 0 4px; }
-    .bootable-badge {
-      display: inline-block; margin-top: 0; padding: 0 8px; border-radius: 10px;
-      background: #e7f1fa; color: #0066cc; font-size: 12px; font-weight: 600; line-height: 20px;
+    .bootable-badge.pf-v6-c-badge {
       flex-shrink: 0;
     }
     .side-table__name-cell {
@@ -7713,7 +7709,7 @@
             <h2 class="vm-detail__title pf-v6-c-title pf-m-2xl pf-m-page-title">
               <span class="res-icon res-icon--vm" aria-hidden="true">VM</span>
               ${v.name}
-              <span class="vm-arch-badge">${v.arch || 'amd64'}</span>
+              <span class="pf-v6-c-badge pf-m-read vm-arch-badge">${v.arch || 'amd64'}</span>
             </h2>
             <span class="vm-detail__status">${statusCell(v.status, v.name)}</span>
           </div>
@@ -7794,7 +7790,7 @@
                       <dd>
                         <span class="vm-dl__name">
                           ${v.name}
-                          <span class="vm-arch-badge">${v.arch || 'amd64'}</span>
+                          <span class="pf-v6-c-badge pf-m-read vm-arch-badge">${v.arch || 'amd64'}</span>
                         </span>
                       </dd>
                       <dt>Project</dt><dd>${projectDisplay}</dd>
@@ -7991,7 +7987,7 @@
                           <td>
                             <span class="side-table__name-cell">
                               ${detail.name}
-                              ${detail.bootable ? '<span class="bootable-badge">Bootable</span>' : ''}
+                              ${detail.bootable ? '<span class="pf-v6-c-badge pf-m-read bootable-badge">Bootable</span>' : ''}
                             </span>
                           </td>
                           <td>${detail.size}</td>
@@ -9359,7 +9355,7 @@
                             <i class="fa-brands fa-redhat" style="color:#ee0000;"></i> ${v.name}
                           </label>
                         </td>
-                        <td><span class="arch-badge">${v.arch}</span></td>
+                        <td><span class="pf-v6-c-badge pf-m-read arch-badge">${v.arch}</span></td>
                         <td>${v.project}</td>
                         <td>${v.size}</td>
                       </tr>
