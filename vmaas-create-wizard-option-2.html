@@ -3336,7 +3336,7 @@
 </script>
   <div class="mockup-shell">
     <header class="mockup-header">
-      <h1>VMaaS — Create VirtualMachine (Option 2)</h1>
+      <h1>VMaaS — Create Virtual machine (Option 2)</h1>
       <p>
         Option 2: Select template → Details (includes Access) → Compute resource
         → Storage → Network → Review and create.
@@ -3617,7 +3617,7 @@
             </div>
             <p class="muted" style="margin:-8px 0 16px;font-size:13px;max-width:720px;line-height:1.45;">
               Create and manage tenant networks here. Attach a network in
-              <strong>Create VirtualMachine → Network</strong>.
+              <strong>Create Virtual machine → Network</strong>.
             </p>
             <div class="filter-bar">
               <button type="button" class="filter-select">Type: <strong>All</strong> <i class="fa-solid fa-caret-down"></i></button>
@@ -3703,7 +3703,7 @@
           <div class="wiz-footer__start" id="wiz-start-bar" hidden>
             <label class="form-check">
               <input type="checkbox" id="f-start" />
-              Start this VirtualMachine after creation
+              Start this Virtual machine after creation
             </label>
           </div>
           <div class="pf-v6-c-action-list">
@@ -3744,7 +3744,7 @@
             <span class="pf-v6-c-modal-box__title-icon" aria-hidden="true">
               <i class="fas fa-exclamation-triangle"></i>
             </span>
-            <span class="pf-v6-c-modal-box__title-text" id="cancel-modal-title-text">Exit VirtualMachine creation?</span>
+            <span class="pf-v6-c-modal-box__title-text" id="cancel-modal-title-text">Exit Virtual machine creation?</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="cancel-modal-desc">
             If you leave now, any information you’ve entered won’t be saved.
@@ -3771,10 +3771,10 @@
             <span class="pf-v6-c-modal-box__title-icon" aria-hidden="true">
               <i class="fas fa-exclamation-triangle"></i>
             </span>
-            <span class="pf-v6-c-modal-box__title-text">Delete VirtualMachine?</span>
+            <span class="pf-v6-c-modal-box__title-text">Delete Virtual machine?</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="delete-vm-desc">
-            Are you sure you want to delete <span id="delete-vm-name">this VirtualMachine</span>? This action cannot be undone.
+            Are you sure you want to delete <span id="delete-vm-name">this Virtual machine</span>? This action cannot be undone.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__footer">
@@ -5650,7 +5650,7 @@
     }
 
     function openVmConsolePlaceholder(vmName) {
-      const safeName = String(vmName || 'VirtualMachine').replace(/[<>&"]/g, '');
+      const safeName = String(vmName || 'Virtual machine').replace(/[<>&"]/g, '');
       const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -5685,7 +5685,7 @@
       const nameEl = document.getElementById('delete-vm-name');
       if (!overlay) return;
       state.deleteVmName = vmName;
-      if (nameEl) nameEl.textContent = vmName || 'this VirtualMachine';
+      if (nameEl) nameEl.textContent = vmName || 'this Virtual machine';
       overlay.classList.add('pf-m-open');
       overlay.setAttribute('aria-hidden', 'false');
       document.getElementById('delete-vm-confirm')?.focus();
@@ -6128,7 +6128,7 @@
               ).join('')}
             `,
           })}
-          <p class="form-helper">Name will be <code>${previewName}</code> (from the VirtualMachine name).</p>
+          <p class="form-helper">Name will be <code>${previewName}</code> (from the Virtual machine name).</p>
         </div>
         <div class="form-field" style="margin-top:16px;">
           <label for="net-f-subnet">Subnet <span class="req">*</span></label>
@@ -6272,10 +6272,10 @@
         metadata: {
           name: 'balanced',
           display_name: 'Balanced',
-          description: 'General-purpose SSD for most VirtualMachines',
+          description: 'General-purpose SSD for most Virtual machines',
         },
         spec: {
-          description: 'General-purpose SSD for most VirtualMachines',
+          description: 'General-purpose SSD for most Virtual machines',
           backends: [{ backend_id: 'be-ocs-rbd', protocol: 2, quota_gib: 10240 }],
         },
         status: { state: STORAGE_TIER_STATE_ACTIVE },
@@ -6476,7 +6476,7 @@
           <input type="number" id="disk-f-size" class="unit-size-input" value="${diskVal}"
             min="${diskMin}" max="${diskMax}" step="1" required
             aria-label="Disk size in GiB" />
-          <p class="form-helper">Name will be <code>${previewName}</code> (from the VirtualMachine name).</p>
+          <p class="form-helper">Name will be <code>${previewName}</code> (from the Virtual machine name).</p>
         </div>
         <div class="form-field">
           <label for="disk-tier-toggle" id="disk-tier-label">Storage tier <span class="req">*</span></label>
@@ -6622,7 +6622,7 @@
       const raw = VMS.find(v => v.name === state.selectedVmName);
       const v = enrichVm(raw);
       if (!v) {
-        root.innerHTML = '<p class="muted">VirtualMachine not found.</p>';
+        root.innerHTML = '<p class="muted">Virtual machine not found.</p>';
         return;
       }
       const tab = state.vmDetailTab || 'overview';
@@ -6664,7 +6664,7 @@
             </button>
           </div>
         </div>
-        <div class="vm-detail__tabs" role="tablist" aria-label="VirtualMachine sections">
+        <div class="vm-detail__tabs" role="tablist" aria-label="Virtual machine sections">
           ${tabs.map(([id, label]) => `
             <button type="button" class="vm-detail__tab ${tab === id ? 'pf-m-selected' : ''}" data-vm-tab="${id}" role="tab" aria-selected="${tab === id}">
               ${label}${id === 'diagnostics' ? ' <span class="vm-detail__badge" aria-label="1 issue">1</span>' : ''}
@@ -6707,9 +6707,9 @@
                       <dt>Operating system</dt><dd>${v.osFull}</dd>
                       <dt>CPU | Memory</dt><dd>${v.cpu} | ${v.mem} Memory</dd>
                       <dt>Time zone</dt><dd>${v.timezone}</dd>
-                      <dt class="pf-m-help" title="VirtualMachine instance type">InstanceType</dt>
+                      <dt class="pf-m-help" title="Virtual machine instance type">InstanceType</dt>
                       <dd><span class="cell-res"><span class="res-icon res-icon--cr" aria-hidden="true">CR</span><button type="button" class="name-link">${v.instanceType}</button></span></dd>
-                      <dt class="pf-m-help" title="VirtualMachine preference">Preference</dt>
+                      <dt class="pf-m-help" title="Virtual machine preference">Preference</dt>
                       <dd><span class="cell-res"><span class="res-icon res-icon--cr" aria-hidden="true">CR</span><button type="button" class="name-link">${v.preference}</button></span></dd>
                       <dt>Hostname</dt><dd>${v.hostname}</dd>
                     </dl>
@@ -7296,7 +7296,7 @@
         title.textContent = 'Exit network creation?';
         desc.textContent = "If you leave now, any information you’ve entered won’t be saved.";
       } else {
-        title.textContent = 'Exit VirtualMachine creation?';
+        title.textContent = 'Exit Virtual machine creation?';
         desc.textContent = "If you leave now, any information you’ve entered won’t be saved.";
       }
       overlay.classList.add('pf-m-open');
@@ -7666,7 +7666,7 @@
         next.textContent = key === 'net-review' ? 'Create network' : 'Next';
         next.disabled = false;
       } else {
-        next.textContent = key === 'review' ? 'Create VirtualMachine' : 'Next';
+        next.textContent = key === 'review' ? 'Create Virtual machine' : 'Next';
         // Selection steps stay disabled until chosen; field steps stay enabled for inline validation
         next.disabled =
           ((key === 'catalog' || key === 'template') && !state.data.templateId) ||
@@ -7757,8 +7757,8 @@
               ${methodCard('template', 'Create from template',
                 'Create a pre-configured VM from a template with standardized images and defaults.',
                 'rh-ui:applications', state.createType === 'template')}
-              ${methodCard('clone', 'Clone existing VirtualMachine',
-                'Create a copy of an existing VirtualMachine.',
+              ${methodCard('clone', 'Clone existing Virtual machine',
+                'Create a copy of an existing Virtual machine.',
                 'rh-ui:duplicate', isClone)}
             </div>
           </div>
@@ -7768,7 +7768,7 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your VirtualMachine, select a project, and optionally set access.</p>
+            <p class="step-help">Name your Virtual machine, select a project, and optionally set access.</p>
             ` : '<h3 class="section-label">General info</h3>'}
             <div class="form-field ${state.fieldErrors.name ? 'pf-m-error' : ''}" data-field="name">
               <label for="f-name">Name <span class="req">*</span></label>
@@ -7808,7 +7808,7 @@
                 });
               })()}
               <p class="form-helper" id="f-project-help">
-                Your VirtualMachine will be created in project <strong>${(d.project || 'default').replace(/</g, '&lt;')}</strong>
+                Your Virtual machine will be created in project <strong>${(d.project || 'default').replace(/</g, '&lt;')}</strong>
               </p>
               ${fieldErrorHtml('project')}
             </div>
@@ -7827,7 +7827,7 @@
           ${isCatalogFlow ? '' : `
           <div class="section-block">
             <h3 class="section-label">Location</h3>
-            <p class="location-help">Select the location for your VirtualMachine to be created at</p>
+            <p class="location-help">Select the location for your Virtual machine to be created at</p>
             <div class="location-fields" id="location-fields">
               <div class="form-field">
                 <label for="f-project">Project <span class="req">*</span></label>
@@ -7881,7 +7881,7 @@
             clearFieldError('project');
             const help = panel.querySelector('#f-project-help');
             if (help) {
-              help.innerHTML = `Your VirtualMachine will be created in project <strong>${String(d.project).replace(/</g, '&lt;')}</strong>`;
+              help.innerHTML = `Your Virtual machine will be created in project <strong>${String(d.project).replace(/</g, '&lt;')}</strong>`;
             }
           });
           const cloudEl = panel.querySelector('#f-cloud-init');
@@ -8119,7 +8119,7 @@
 
         panel.innerHTML = `
           <h3>Guest operating system</h3>
-          <p class="step-help">Choose your OS to ensure the best compatibility and system stability for your VirtualMachine.</p>
+          <p class="step-help">Choose your OS to ensure the best compatibility and system stability for your Virtual machine.</p>
           <div class="os-grid">
             ${families.map(f => `
               <button type="button" class="os-card ${d.osFamily === f.id ? 'pf-m-selected' : ''}" data-os="${f.id}">
@@ -8852,7 +8852,7 @@
                     `<option value="${c.id}" ${d.computeResource === c.id ? 'selected' : ''}>${c.label}</option>`
                   ).join(''),
                 })}
-                <p class="form-helper">Starting default from the template. Change if this VirtualMachine needs a different size.</p>
+                <p class="form-helper">Starting default from the template. Change if this Virtual machine needs a different size.</p>
               </div>
           ` : `
               <div class="form-field">
@@ -9008,7 +9008,7 @@
           `).join('');
           panel.innerHTML = `
             <h3>Network</h3>
-            <p class="step-help">Defaults are preselected. Change them if this VirtualMachine needs different network settings.</p>
+            <p class="step-help">Defaults are preselected. Change them if this Virtual machine needs different network settings.</p>
             <div class="vm-config__fields">
               <div class="form-field ${state.fieldErrors.virtualNetwork ? 'pf-m-error' : ''}" data-field="virtualNetwork">
                 <label for="f-virtual-network">Virtual network <span class="req">*</span></label>
@@ -9200,7 +9200,7 @@
         const source = VMS.find(v => v.name === d.cloneSourceName);
         panel.innerHTML = `
           <h3>Review and create</h3>
-          <p class="step-help">Before you clone your VirtualMachine, review its configuration. You can create your own unique VM name, or we can generate a name for you.</p>
+          <p class="step-help">Before you clone your Virtual machine, review its configuration. You can create your own unique VM name, or we can generate a name for you.</p>
           <div class="review-block">
             <details class="review-section" open>
               <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Details</summary>
@@ -9226,11 +9226,11 @@
             </details>
             <details class="review-section">
               <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Storage</summary>
-              <p class="muted" style="margin:8px 0 0;font-size:13px;">Disks are cloned from the source VirtualMachine (Clone PVC).</p>
+              <p class="muted" style="margin:8px 0 0;font-size:13px;">Disks are cloned from the source Virtual machine (Clone PVC).</p>
             </details>
             <details class="review-section">
               <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Network</summary>
-              <p class="muted" style="margin:8px 0 0;font-size:13px;">Network interfaces are copied from the source VirtualMachine.</p>
+              <p class="muted" style="margin:8px 0 0;font-size:13px;">Network interfaces are copied from the source Virtual machine.</p>
             </details>
             <details class="review-section">
               <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Hardware devices</summary>
@@ -9311,7 +9311,7 @@
 
         panel.innerHTML = `
           <h3>Review and create</h3>
-          <p class="step-help">Confirm your settings before creating the VirtualMachine.</p>
+          <p class="step-help">Confirm your settings before creating the Virtual machine.</p>
           <div class="review-nebius">
             ${reviewSection('Details', 'details', `
               ${reviewRow('Template', catalogName)}
@@ -9466,7 +9466,7 @@
           return;
         }
         if (key === 'clone-source' && !state.data.cloneSourceName) {
-          toast('Select a VirtualMachine to clone.');
+          toast('Select a Virtual machine to clone.');
           return;
         }
         if (key === 'networking' && !isNetworkingComplete(state.data)) {
@@ -9497,8 +9497,8 @@
         }
         toast(
           state.createType === 'clone'
-            ? `VirtualMachine “${state.data.name}” is being cloned.`
-            : `VirtualMachine “${state.data.name}” is being created.`
+            ? `Virtual machine “${state.data.name}” is being cloned.`
+            : `Virtual machine “${state.data.name}” is being created.`
         );
         return;
       }
@@ -9697,7 +9697,7 @@
         if (actionBtn.dataset.action === 'delete') {
           setVmActionsMenuOpen(false);
           if (names.length === 1) openDeleteVmModal(names[0]);
-          else toast(`Delete: ${names.length} VirtualMachines`);
+          else toast(`Delete: ${names.length} Virtual machines`);
           return;
         }
         if (actionBtn.dataset.action === 'console') {
@@ -9707,7 +9707,7 @@
           return;
         }
         const label = actionBtn.querySelector('.pf-v6-c-menu__item-text')?.textContent?.trim() || actionBtn.dataset.action;
-        toast(`${label}: ${names.length} VirtualMachine${names.length === 1 ? '' : 's'}`);
+        toast(`${label}: ${names.length} Virtual machine${names.length === 1 ? '' : 's'}`);
         setVmActionsMenuOpen(false);
         return;
       }
