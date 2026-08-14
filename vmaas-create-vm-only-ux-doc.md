@@ -4,7 +4,7 @@
 
 ## Goal
 
-Document the Create Virtual machine flow. Virtual machines list + create wizard (no VM details drill-in).
+Document the Create Virtual machine flow. Virtual machines list + create wizard.
 
 **Mock:** `vmaas-create-vm-only.html` (Option 2 IA — no **Configure** nav item)  
 **Create VM only:** [https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — Virtual machines list first. Click Create to open the wizard.  
