@@ -30,7 +30,7 @@ Select template → Details → Compute resource → Storage → Network → Rev
 | **OS image** | Shown when selecting the template (and on Review). Not on Details. |
 | **Access** | Optional SSH / cloud-init on **Details**. |
 | **Locked vs Editable** | Lock / pen icons. Prefer **Locked** / **Editable** (not Flexible / Fixed). |
-| **Project** | Editable dropdown on Details; prefills from list context. |
+| **Project** | **Project** dropdown on **Select template** (left of Search); prefills from the list/workspace context; user can still change it. Also shown on Details. |
 | **Exit confirm** | Warning modal: Exit without saving / Continue creating. |
 
 ---
@@ -55,6 +55,8 @@ Select template → Details → Compute resource → Storage → Network → Rev
 ---
 
 ## Step 1 — Select template
+
+Toolbar: **Project** dropdown (preselected from the previous page / list filter context; editable) · **Search** · list/card view toggles.
 
 Browse templates as cards. Selecting a template opens a drawer with **Template settings**:
 
@@ -81,7 +83,7 @@ Browse templates as cards. Selecting a template opens a drawer with **Template s
 - Step help: *Name your Virtual machine, select a project, and optionally set access.*
 - **Name** (required) + generate
 - **Description** (optional)
-- **Project** — This needs to be set before showing the available templates
+- **Project** — Same value as Select template; editable here as well
 - **Access** (Optional) — SSH public key and cloud-init
 
 ![05-details](videos/vmaas-create-vm-only-ux-doc/05-details.png)
