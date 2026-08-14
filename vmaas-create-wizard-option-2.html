@@ -1224,27 +1224,23 @@
       align-items: center; justify-content: center;
       background: rgba(3, 3, 3, 0.5);
     }
+    /* Compact single-field modal — sized for longest compute label */
     #compute-overlay .pf-v6-c-modal-box {
-      --pf-v6-c-modal-box--Width: min(32rem, calc(100vw - 2rem)) !important;
-      width: min(32rem, calc(100vw - 2rem)) !important;
-      max-width: min(32rem, calc(100vw - 2rem)) !important;
+      --pf-v6-c-modal-box--Width: min(28rem, calc(100vw - 2rem)) !important;
+      --pf-v6-c-modal-box--MaxWidth: 28rem !important;
+      width: min(28rem, calc(100vw - 2rem)) !important;
+      max-width: min(28rem, calc(100vw - 2rem)) !important;
+      min-width: 0;
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
       padding: 0;
     }
-    #compute-overlay .pf-v6-c-modal-box__body {
-      padding: 0 24px 8px;
+    #compute-overlay .form-field { max-width: none; width: 100%; margin-bottom: 0; }
+    #compute-overlay .pf-v6-c-form-control,
+    #compute-overlay .pf-v6-c-form-control select {
+      width: 100%;
     }
-    #compute-overlay .pf-v6-c-modal-box__header {
-      padding: 24px 24px 16px;
-    }
-    #compute-overlay .pf-v6-c-modal-box__footer {
-      display: flex; align-items: center; gap: 16px;
-      padding: 16px 24px 24px;
-      justify-content: flex-start;
-    }
-    #compute-overlay .form-field { max-width: none; margin-bottom: 0; }
 
     #nic-overlay:not(.pf-m-open),
     #disk-overlay:not(.pf-m-open) { display: none; }
@@ -4024,24 +4020,21 @@
   
   <div class="pf-v6-c-backdrop" id="compute-overlay" aria-hidden="true">
     <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
-      <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="compute-modal-title" id="compute-modal">
-        <div class="pf-v6-c-modal-box__header">
-          <div class="pf-v6-c-modal-box__close">
-            <button type="button" class="pf-v6-c-button pf-m-plain" id="compute-modal-close" aria-label="Close">
-              <i class="fas fa-times" aria-hidden="true"></i>
-            </button>
-          </div>
-          <h1 class="pf-v6-c-modal-box__title" id="compute-modal-title">
-            <span class="pf-v6-c-modal-box__title-text">Edit Compute resources size</span>
-          </h1>
+      <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="compute-modal-title" aria-describedby="compute-modal-desc" id="compute-modal">
+        <div class="nic-modal__header">
+          <h2 class="nic-modal__title" id="compute-modal-title">Edit compute resources</h2>
+          <button type="button" class="pf-v6-c-button pf-m-plain" id="compute-modal-close" aria-label="Close">
+            <span class="pf-v6-c-button__icon"><i class="fas fa-times" aria-hidden="true"></i></span>
+          </button>
         </div>
-        <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
+        <div class="nic-modal__body" id="compute-modal-body">
+          <p class="form-helper" id="compute-modal-desc" style="margin:0 0 16px;">Choose a compute size for this Virtual machine.</p>
           <div class="form-field">
             <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
             <span class="pf-v6-c-form-control" id="compute-modal-select-wrap"></span>
           </div>
         </div>
-        <div class="pf-v6-c-modal-box__footer">
+        <div class="nic-modal__footer">
           <button type="button" class="pf-v6-c-button pf-m-primary" id="compute-modal-save">Save</button>
           <button type="button" class="pf-v6-c-button pf-m-link" id="compute-modal-cancel">Cancel</button>
         </div>
@@ -4557,18 +4550,22 @@
       const vm = VMS.find(v => v.name === state.selectedVmName);
       if (!vm) return;
       const current = resolveVmComputeId(vm);
-      const field = document.querySelector('#compute-modal-body .form-field');
-      if (field) {
-        const label = field.querySelector('label');
-        const labelHtml = label ? label.outerHTML : '<label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>';
-        field.innerHTML = labelHtml + pfSelect({
-          id: 'f-edit-compute-resource',
-          ariaLabel: 'Compute resource',
-          required: true,
-          optionsHtml: COMPUTE_RESOURCES.map(c =>
-            `<option value="${c.id}" ${current === c.id ? 'selected' : ''}>${c.label}</option>`
-          ).join(''),
-        });
+      const body = document.getElementById('compute-modal-body');
+      if (body) {
+        body.innerHTML = `
+          <p class="form-helper" id="compute-modal-desc" style="margin:0 0 16px;">Choose a compute size for this Virtual machine.</p>
+          <div class="form-field">
+            <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
+            ${pfSelect({
+              id: 'f-edit-compute-resource',
+              ariaLabel: 'Compute resource',
+              required: true,
+              optionsHtml: COMPUTE_RESOURCES.map(c =>
+                `<option value="${c.id}" ${current === c.id ? 'selected' : ''}>${c.label}</option>`
+              ).join(''),
+            })}
+          </div>
+        `;
       }
       const overlay = document.getElementById('compute-overlay');
       overlay?.classList.add('pf-m-open');
