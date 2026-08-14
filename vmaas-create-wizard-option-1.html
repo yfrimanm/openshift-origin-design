@@ -678,9 +678,18 @@
       cursor: help; font-size: 14px; vertical-align: middle;
     }
     .side-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .side-table th, .side-table td { text-align: left; padding: 8px 8px 8px 0; border-bottom: 1px solid var(--vmaas-border-light); vertical-align: top; }
+    .side-table th, .side-table td {
+      text-align: left; padding: 8px 8px 8px 0; vertical-align: top;
+      border-bottom: 1px solid var(--pf-t--color--gray--20, #f0f0f0);
+    }
+    .side-table tr:last-child > * { border-bottom: none; }
     .side-table th { color: var(--vmaas-text); font-weight: 600; }
     .side-table td { font-weight: 400; color: var(--vmaas-text); }
+    /* Softer row rules for tables nested in overview cards */
+    .vm-card .pf-v6-c-table {
+      --pf-v6-c-table--BorderColor: var(--pf-t--color--gray--20, #f0f0f0);
+      --pf-v6-c-table--responsive--BorderColor: var(--pf-t--color--gray--20, #f0f0f0);
+    }
     .vm-card > .muted { font-size: 14px; }
     .vm-card .snap-row { font-size: 14px; }
     .vm-card .snap-row strong { font-weight: 600; }
