@@ -1,15 +1,15 @@
-# Create VirtualMachine only — UX documentation
+# Create Virtual machine only — UX documentation
 
 ### Contact: Yifat Friman Menchik, UXD
 
 ## Goal
 
-Document the Create VirtualMachine flow. Virtual machines list + create wizard (no VM details drill-in).
+Document the Create Virtual machine flow. Virtual machines list + create wizard (no VM details drill-in).
 
 **Mock:** `vmaas-create-vm-only.html` (Option 2 IA — no **Configure** nav item)  
 **Create VM only:** [https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — Virtual machines list first. Click Create to open the wizard.  
 **Same IA reference:** [https://yfrimanm.github.io/openshift-origin-design/vmaas-create-wizard-option-2.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-wizard-option-2.html)  
-**Google Doc:** [Create VirtualMachine only — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit)  
+**Google Doc:** [Create Virtual machine only — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit)  
 **Screenshots:** `videos/vmaas-create-vm-only-ux-doc/`  
 **Regenerate screenshots:** `node scripts/capture-vmaas-create-vm-only-screenshots.mjs`
 
@@ -26,7 +26,7 @@ Select template → Details → Compute resource → Storage → Network → Rev
 | **Wizard left nav** | PatternFly wizard step nav on the left (always visible in mock). |
 | **Role labels** | Masthead role dropdown: **VM Admin**, **VM User**, Console Access Only, Organization Administrator — no vApp aliases. |
 | **Search** | Regular search field only (no advanced filters / sliders icon). Attribute filters (Project / Status / OS) remain below. |
-| **Row kebab = Actions** | Same items and copy: Control ▸, Open console, Delete. Helper text uses **VM** (not VirtualMachine). |
+| **Row kebab = Actions** | Same items and copy: Control ▸, Open console, Delete. Helper text uses **VM** (not Virtual machine). |
 | **OS image** | Shown when selecting the template (and on Review). Not on Details. |
 | **Access** | Optional SSH / cloud-init on **Details**. |
 | **Locked vs Editable** | Lock / pen icons. Prefer **Locked** / **Editable** (not Flexible / Fixed). |
@@ -78,7 +78,7 @@ Browse templates as cards. Selecting a template opens a drawer with **Template s
 
 ## Step 2 — Details
 
-- Step help: *Name your VirtualMachine, select a project, and optionally set access.*
+- Step help: *Name your Virtual machine, select a project, and optionally set access.*
 - **Name** (required) + generate
 - **Description** (optional)
 - **Project** — This needs to be set before showing the available templates
@@ -121,7 +121,7 @@ Browse templates as cards. Selecting a template opens a drawer with **Template s
 
 ## Step 6 — Review and create
 
-Grouped review: Details (includes Access) / Compute resource / Storage / Network with edit links. Cost panel on the right. Optional *Start this VirtualMachine after creation*.
+Grouped review: Details (includes Access) / Compute resource / Storage / Network with edit links. Cost panel on the right. Optional *Start this Virtual machine after creation*.
 
 - Access: *Configured* / *Not configured* (filename when SSH uploaded)
 - Additional disks / networks: *Disk N* / *Network N* or *None*
@@ -134,7 +134,7 @@ Grouped review: Details (includes Access) / Compute resource / Storage / Network
 
 | Element | Copy |
 |---|---|
-| Title | Exit VirtualMachine creation? |
+| Title | Exit Virtual machine creation? |
 | Body | If you leave now, any information you’ve entered won’t be saved. |
 | Primary | Exit without saving |
 | Secondary | Continue creating |

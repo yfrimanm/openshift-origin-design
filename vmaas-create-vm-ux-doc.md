@@ -1,8 +1,8 @@
-# Create VirtualMachine — UX documentation
+# Create Virtual machine — UX documentation
 
 ## Goal
 
-Document the **Create VirtualMachine** wizard for OSAC VMaaS so developers can implement the flow with clear step boundaries, locked vs editable template fields, and PatternFly patterns.
+Document the **Create Virtual machine** wizard for OSAC VMaaS so developers can implement the flow with clear step boundaries, locked vs editable template fields, and PatternFly patterns.
 
 ### Option comparison
 
@@ -18,7 +18,7 @@ Document the **Create VirtualMachine** wizard for OSAC VMaaS so developers can i
 
 *Interactive mockup (Option 1):* `vmaas-create-wizard-option-1.html`  
 *Option 2 (alternate):* `vmaas-create-wizard-option-2.html` (also embedded in the tenant shell: Services → Virtual machines)  
-*Google Doc:* [Create VirtualMachine — UX documentation](https://docs.google.com/document/d/1o97lTRGKAOPdNQz_zH7KbUOxAchPnJYsjlGye9W_tNs/edit)  
+*Google Doc:* [Create Virtual machine — UX documentation](https://docs.google.com/document/d/1o97lTRGKAOPdNQz_zH7KbUOxAchPnJYsjlGye9W_tNs/edit)  
 *Screenshots:* `videos/vmaas-create-ux-doc/` (Option 1 capture)  
 *Regenerate screenshots:* `node scripts/capture-vmaas-create-screenshots.mjs`
 
@@ -76,10 +76,10 @@ Browse templates as cards (or list). Selecting a template opens a drawer with **
 
 ## Step 2 — Details (+ Access)
 
-- Step help: *Name your VirtualMachine, select a project, and optionally set access.* (Option 1: *Name your VirtualMachine and select a project. Description is optional.*)  
+- Step help: *Name your Virtual machine, select a project, and optionally set access.* (Option 1: *Name your Virtual machine and select a project. Description is optional.*)  
 - **Name** (required) + generate  
 - **Description** (optional)  
-- **Project** — editable dropdown (CNV pattern). Prefills from list/workspace context (`createContextProject()`); user can change the project. Helper: *Your VirtualMachine will be created in project **&lt;name&gt;*** (updates when the selection changes).  
+- **Project** — editable dropdown (CNV pattern). Prefills from list/workspace context (`createContextProject()`); user can change the project. Helper: *Your Virtual machine will be created in project **&lt;name&gt;*** (updates when the selection changes).  
 - **Access** (Optional) — SSH public key (PF6 FileUpload) and cloud-init on this step (moved off Configure for details-page alignment).
 
 ![Details](videos/vmaas-create-ux-doc/04-details.png)
@@ -118,7 +118,7 @@ Nav parent **Configure** with three substeps:
 
 ## Step 4 — Review and create
 
-Grouped review: Details / Configure / Storage / Network with edit affordances back to the step. Cost panel on the right. Optional *Start this VirtualMachine after creation*.
+Grouped review: Details / Configure / Storage / Network with edit affordances back to the step. Cost panel on the right. Optional *Start this Virtual machine after creation*.
 
 - **SSH public key** / **Cloud-init:** *Configured* or *Not configured* (no dash). If SSH was uploaded, *Configured (filename)*. Do not paste key or cloud-init body on Review.
 - **Additional disks:** when present, one row per disk: *Disk N* → *Size | Storage tier* (e.g. `30 GiB | Balanced`). When none: *Additional disks* → *None*.
@@ -142,7 +142,7 @@ Shown when Cancel / close would discard entered data.
 
 | Element | Copy |
 |---|---|
-| Title | Exit VirtualMachine creation? |
+| Title | Exit Virtual machine creation? |
 | Body | If you leave now, any information you’ve entered won’t be saved. |
 | Primary | Exit without saving |
 | Secondary | Continue creating |
