@@ -420,6 +420,22 @@
       color: var(--vmaas-blue); cursor: pointer; text-align: left;
     }
     .vm-card__title-link:hover { text-decoration: underline; }
+
+    .vm-card__title-static {
+      color: var(--vmaas-text);
+      font-weight: 600;
+      cursor: default;
+    }
+    .subtab.subtab--static {
+      cursor: default;
+      pointer-events: none;
+      color: var(--vmaas-text-subtle);
+    }
+    .subtab.subtab--static.pf-m-selected {
+      color: var(--vmaas-text-subtle);
+      border-bottom-color: var(--vmaas-border-light);
+      font-weight: 600;
+    }
     .vm-alerts-list {
       list-style: none; margin: 0; padding: 0;
       display: flex; flex-direction: column; gap: 8px;
@@ -6342,6 +6358,8 @@
         guestAgent: false,
         computeResource: 'small',
         alerts: [],
+        gpuDevices: [],
+        hostDevices: [],
         ...v,
         osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
         nics: v.nics || [{
@@ -7481,12 +7499,35 @@
             </div>
             <div class="vm-overview__bottom">
               <div class="vm-card">
-                <h3 class="vm-card__title">Hardware devices (0)</h3>
-                <div class="subtabs" style="margin-bottom:12px;">
-                  <button type="button" class="subtab pf-m-selected">GPU devices (0)</button>
-                  <button type="button" class="subtab">Host devices (0)</button>
+                ${(() => {
+                  const gpuDevices = Array.isArray(v.gpuDevices) ? v.gpuDevices : [];
+                  const hostDevices = Array.isArray(v.hostDevices) ? v.hostDevices : [];
+                  const hwTotal = gpuDevices.length + hostDevices.length;
+                  const hwTab = state.hwDeviceTab || 'gpu';
+                  const activeList = hwTab === 'host' ? hostDevices : gpuDevices;
+                  const emptyLabel = hwTab === 'host' ? 'No host devices found' : 'No GPU devices found';
+                  const titleHtml = hwTotal
+                    ? `<button type="button" class="vm-card__title-link" id="btn-overview-hardware" aria-label="View ${hwTotal} hardware device${hwTotal === 1 ? '' : 's'}">Hardware devices (${hwTotal})</button>`
+                    : `<span class="vm-card__title-static">Hardware devices (0)</span>`;
+                  const gpuTab = gpuDevices.length
+                    ? `<button type="button" class="subtab ${hwTab === 'gpu' ? 'pf-m-selected' : ''}" data-hw-tab="gpu">GPU devices (${gpuDevices.length})</button>`
+                    : `<span class="subtab subtab--static ${hwTab === 'gpu' ? 'pf-m-selected' : ''}" aria-disabled="true">GPU devices (0)</span>`;
+                  const hostTab = hostDevices.length
+                    ? `<button type="button" class="subtab ${hwTab === 'host' ? 'pf-m-selected' : ''}" data-hw-tab="host">Host devices (${hostDevices.length})</button>`
+                    : `<span class="subtab subtab--static ${hwTab === 'host' ? 'pf-m-selected' : ''}" aria-disabled="true">Host devices (0)</span>`;
+                  const listHtml = activeList.length
+                    ? `<ul class="vm-alerts-list" aria-label="Hardware devices">${activeList.map(d =>
+                        `<li class="vm-alerts-list__item"><span>${d.name || d}</span></li>`
+                      ).join('')}</ul>`
+                    : `<p class="muted" style="margin:0;">${emptyLabel}</p>`;
+                  return `
+                <h3 class="vm-card__title">${titleHtml}</h3>
+                <div class="subtabs" style="margin-bottom:12px;" role="tablist" aria-label="Hardware device types">
+                  ${gpuTab}
+                  ${hostTab}
                 </div>
-                <p class="muted" style="margin:0;">No GPU devices found</p>
+                ${listHtml}`;
+                })()}
               </div>
               <div class="vm-card">
                 <h3 class="vm-card__title">
@@ -7670,6 +7711,17 @@
       root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNicModal('vm-detail'));
       root.querySelector('#btn-overview-alerts')?.addEventListener('click', () => {
         state.vmDetailTab = 'diagnostics';
+        renderVmDetail();
+      });
+      root.querySelectorAll('[data-hw-tab]').forEach(b => {
+        b.addEventListener('click', () => {
+          state.hwDeviceTab = b.dataset.hwTab;
+          renderVmDetail();
+        });
+      });
+      root.querySelector('#btn-overview-hardware')?.addEventListener('click', () => {
+        state.vmDetailTab = 'configuration';
+        state.vmConfigSection = 'details';
         renderVmDetail();
       });
 
