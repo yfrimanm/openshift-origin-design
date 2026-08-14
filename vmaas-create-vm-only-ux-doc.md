@@ -21,7 +21,7 @@ Select template → Details → Compute resource → Storage → Network → Rev
 
 | Decision | Detail |
 |---|---|
-| **Scope** | List + Create wizard. VM names are links to the VM details Overview. |
+| **Scope** | List + Create wizard. VM names are links to the VM details Overview (CNV-aligned cards). |
 | **IA** | Same as Option 2: flat steps — no **Configure** parent in the wizard nav. |
 | **Wizard left nav** | PatternFly wizard step nav on the left (always visible in mock). |
 | **Role labels** | Masthead role dropdown: **VM Admin**, **VM User**, Console Access Only, Organization Administrator — no vApp aliases. |

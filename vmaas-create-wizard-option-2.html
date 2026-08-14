@@ -445,6 +445,28 @@
       border-radius: 12px; font-size: 12px; font-weight: 500;
       color: #002952; background: #bee1f4;
     }
+
+    .vm-compute-row {
+      display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .vm-edit-inline {
+      background: none; border: none; padding: 2px; cursor: pointer;
+      color: var(--vmaas-blue); line-height: 1;
+    }
+    .vm-edit-inline:hover { color: #004080; }
+    .util-tile__nodata {
+      min-height: 88px; display: flex; align-items: center; justify-content: center;
+      color: var(--vmaas-text-subtle); font-size: 13px; text-align: center;
+      margin: 8px 0;
+    }
+    .name-link--dotted {
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+    .pf-v6-c-button.pf-m-small {
+      font-size: 13px; padding: 4px 12px; min-height: 28px;
+    }
+    .vm-detail__title .vm-arch-badge { margin-left: 4px; vertical-align: middle; }
     .vm-vnc {
       display: flex; flex-direction: column; align-items: stretch; text-align: left; min-width: 0;
     }
@@ -3603,8 +3625,12 @@
           </section>
 
           <section class="view" id="view-vm">
+            <div class="page-header">
+              <h2 class="page-title">Virtual machines <button type="button" class="star" aria-label="Favorite">☆</button></h2>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-from-detail">Create</button>
+            </div>
             <button type="button" class="vm-detail__crumb" id="vm-back-to-list">
-              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Virtual machines
+              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to list
             </button>
             <div id="vm-detail-root"></div>
           </section>
@@ -5795,16 +5821,23 @@
         group: '—',
         timezone: 'UTC',
         fqdn: `${v.name}.headless.${v.ns || 'default'}.svc.cluster.local`,
-        utilization: { cpu: '—', memory: '—', storage: '—', network: '—' },
+        utilization: {
+          cpu: '0.14%', memory: '16.55%', storage: null, network: '0 Bps',
+          cpuAbs: '1.39 m', cpuOf: '1', memAbs: '21 MiB', memOf: '128 MiB',
+        },
+        cpu: '1 CPU',
+        mem: '128 MiB',
+        guestAgent: false,
         ...v,
         osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
         nics: v.nics || [{
           name: 'default', model: 'virtio', network: 'Pod networking',
-          state: 'plugged', type: 'Masquerade', mac: '—', ip: v.ip || '—',
+          state: 'plugged', type: 'Masquerade', mac: '—', ip: '—',
         }],
         disks: v.disks || [
-          { name: 'rootdisk', drive: 'Disk', size: '30 GiB', interface: 'virtio' },
-          { name: 'cloudinitdisk', drive: 'Disk', size: 'Dynamic', interface: 'virtio' },
+          { name: 'Boot disk', size: '5 GiB', bootable: true },
+          { name: 'Disk 1', size: '5 GiB' },
+          { name: 'Disk 2', size: '5 GiB' },
         ],
       };
     }
@@ -6639,6 +6672,7 @@
             <h2 class="vm-detail__title">
               <span class="res-icon res-icon--vm" aria-hidden="true">VM</span>
               ${v.name}
+              <span class="vm-arch-badge">${v.arch || 'amd64'}</span>
             </h2>
             <span class="vm-detail__status">${statusCell(v.status)}</span>
           </div>
@@ -6670,18 +6704,41 @@
       `;
 
       let body = '';
+      
       if (tab === 'overview') {
-        const u = v.utilization;
+        const u = v.utilization || {};
         const filesystems = v.filesystems || [
-          { name: 'vda2', type: 'vfat', mount: '/boot/efi', total: '99.76 MiB', used: '21.47 MiB' },
-          { name: 'vda3', type: 'btrfs', mount: '/', total: '29.45 GiB', used: '749.2 MiB' },
+          { name: 'vda2', type: 'vfat', mount: '/boot/efi', total: '199.8 MiB', used: '8.95 MiB' },
+          { name: 'vda3', type: 'xfs', mount: '/', total: '29.74 GiB', used: '2.35 GiB' },
         ];
-        const services = v.services || [
-          { name: 'headless', ns: v.ns, labels: 'No labels', selector: 'network.kubevirt.io/headlessService=headless', location: 'None' },
-        ];
-        const cpuPct = parseFloat(String(u.cpu).replace('%', '')) || 0;
-        const memPct = parseFloat(String(u.memory).replace('%', '')) || 0;
-        const storPct = parseFloat(String(u.storage).replace('%', '')) || 0;
+        const projectRaw = v.project || v.ns || 'default';
+        const projectDisplay = projectRaw === 'default' ? 'Default' : projectRaw;
+        const osDisplay = v.guestAgent === true
+          ? (v.osFull || v.os || '—')
+          : 'Guest agent is required.';
+        const cpuAbs = u.cpuAbs || '1.39 m';
+        const cpuOf = u.cpuOf || '1';
+        const cpuPct = parseFloat(String(u.cpu || '0.14').replace('%', '')) || 0.14;
+        const memAbs = u.memAbs || '21 MiB';
+        const memOf = u.memOf || v.mem || '128 MiB';
+        const memPct = parseFloat(String(u.memory || '16.55').replace('%', '')) || 16.55;
+        const storHasData = u.storage != null && u.storage !== '' && u.storage !== '—';
+        const storPct = storHasData ? (parseFloat(String(u.storage).replace('%', '')) || 0) : 0;
+        const disks = (v.disks && v.disks.length)
+          ? v.disks
+          : [
+              { name: 'Boot disk', size: '5 GiB', bootable: true },
+              { name: 'Disk 1', size: '5 GiB' },
+              { name: 'Disk 2', size: '5 GiB' },
+            ];
+        const diskRows = disks.map((dsk, i) => {
+          const label = dsk.label
+            || (dsk.bootable || dsk.name === 'rootdisk' || (i === 0 && /boot|root/i.test(dsk.name || ''))
+              ? 'Boot disk'
+              : (dsk.name && !/^rootdisk$/i.test(dsk.name) ? dsk.name : `Disk ${i}`));
+          return { ...dsk, label };
+        });
+        const nics = (v.nics && v.nics.length) ? v.nics : [{ name: 'default', ip: '—' }];
         body = `
           <div class="vm-overview">
             <div class="vm-overview__top">
@@ -6694,20 +6751,22 @@
                       <dd>
                         <span class="vm-dl__name">
                           ${v.name}
-                          <span class="vm-arch-badge">${v.arch}</span>
+                          <span class="vm-arch-badge">${v.arch || 'amd64'}</span>
                         </span>
                       </dd>
-                      <dt>Group</dt><dd>${v.group || '—'}</dd>
+                      <dt>Project</dt><dd>${projectDisplay}</dd>
                       <dt>Status</dt><dd>${statusCell(v.status)}</dd>
                       <dt>Created</dt><dd>${v.created || '—'}</dd>
-                      <dt>Operating system</dt><dd>${v.osFull}</dd>
-                      <dt>CPU | Memory</dt><dd>${v.cpu} | ${v.mem} Memory</dd>
-                      <dt>Time zone</dt><dd>${v.timezone}</dd>
-                      <dt class="pf-m-help" title="Virtual machine instance type">InstanceType</dt>
-                      <dd><span class="cell-res"><span class="res-icon res-icon--cr" aria-hidden="true">CR</span><button type="button" class="name-link">${v.instanceType}</button></span></dd>
-                      <dt class="pf-m-help" title="Virtual machine preference">Preference</dt>
-                      <dd><span class="cell-res"><span class="res-icon res-icon--cr" aria-hidden="true">CR</span><button type="button" class="name-link">${v.preference}</button></span></dd>
-                      <dt>Hostname</dt><dd>${v.hostname}</dd>
+                      <dt>Operating system</dt><dd>${osDisplay}</dd>
+                      <dt>Compute resources</dt>
+                      <dd>
+                        <span class="vm-compute-row">
+                          ${v.cpu || '1 CPU'} | ${v.mem || '128 MiB'} Memory
+                          <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources" title="Edit">
+                            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                      </dd>
                     </dl>
                     <div class="vm-vnc">
                       <h4 class="vm-vnc__title">VNC console</h4>
@@ -6731,15 +6790,15 @@
                   <div class="util-grid">
                     <div class="util-tile">
                       <div class="util-tile__label">CPU</div>
-                      <div class="util-tile__abs">7.49 m</div>
-                      <div class="util-tile__abs-sub">Requested of 1</div>
+                      <div class="util-tile__abs">${cpuAbs}</div>
+                      <div class="util-tile__abs-sub">Requested of ${cpuOf}</div>
                       <div class="util-donut-wrap">
-                        <div class="util-donut" style="--pct:${Math.min(cpuPct || 0.75, 100)}" role="img" aria-label="${u.cpu || '0.75%'} CPU used">
+                        <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% CPU used">
                           <svg viewBox="0 0 100 100" aria-hidden="true">
                             <circle class="util-donut__track" cx="50" cy="50" r="40" />
                             <circle class="util-donut__arc" cx="50" cy="50" r="40" />
                           </svg>
-                          <span class="util-donut__center">${u.cpu || '0.75%'} Used</span>
+                          <span class="util-donut__center">${cpuPct}% Used</span>
                         </div>
                       </div>
                       <div class="util-spark" aria-hidden="true">
@@ -6755,19 +6814,19 @@
                     </div>
                     <div class="util-tile">
                       <div class="util-tile__label">Memory</div>
-                      <div class="util-tile__abs">303 MiB</div>
-                      <div class="util-tile__abs-sub">Used of 2 GiB</div>
+                      <div class="util-tile__abs">${memAbs}</div>
+                      <div class="util-tile__abs-sub">Used of ${memOf}</div>
                       <div class="util-donut-wrap">
-                        <div class="util-donut" style="--pct:${Math.min(memPct || 14.81, 100)}" role="img" aria-label="${u.memory || '14.81%'} memory used">
+                        <div class="util-donut" style="--pct:${Math.min(memPct, 100)}" role="img" aria-label="${memPct}% memory used">
                           <svg viewBox="0 0 100 100" aria-hidden="true">
                             <circle class="util-donut__track" cx="50" cy="50" r="40" />
                             <circle class="util-donut__arc" cx="50" cy="50" r="40" />
                           </svg>
-                          <span class="util-donut__center">${u.memory || '14.81%'} Used</span>
+                          <span class="util-donut__center">${memPct}% Used</span>
                         </div>
                       </div>
                       <div class="util-spark" aria-hidden="true">
-                        <div class="util-spark__y"><span>2.00 GiB</span><span>0.00 B</span></div>
+                        <div class="util-spark__y"><span>${memOf}</span><span>0.00 B</span></div>
                         <div class="util-spark__plot">
                           <svg viewBox="0 0 120 40" preserveAspectRatio="none">
                             <polyline fill="rgba(0,102,204,0.12)" stroke="none" points="0,40 0,28 20,27 40,28 60,27 80,28 100,27 120,28 120,40" />
@@ -6780,17 +6839,21 @@
                     </div>
                     <div class="util-tile">
                       <div class="util-tile__label">Storage</div>
-                      <div class="util-tile__abs">770.97 MiB</div>
-                      <div class="util-tile__abs-sub">Used of 29.55 GiB</div>
-                      <div class="util-donut-wrap">
-                        <div class="util-donut" style="--pct:${Math.min(storPct || 2.55, 100)}" role="img" aria-label="${u.storage || '2.55%'} storage used">
-                          <svg viewBox="0 0 100 100" aria-hidden="true">
-                            <circle class="util-donut__track" cx="50" cy="50" r="40" />
-                            <circle class="util-donut__arc" cx="50" cy="50" r="40" />
-                          </svg>
-                          <span class="util-donut__center">${u.storage || '2.55%'} Used</span>
+                      ${storHasData ? `
+                        <div class="util-tile__abs">${u.storAbs || '—'}</div>
+                        <div class="util-tile__abs-sub">Used of ${u.storOf || '—'}</div>
+                        <div class="util-donut-wrap">
+                          <div class="util-donut" style="--pct:${Math.min(storPct, 100)}" role="img" aria-label="${storPct}% storage used">
+                            <svg viewBox="0 0 100 100" aria-hidden="true">
+                              <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                              <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                            </svg>
+                            <span class="util-donut__center">${storPct}% Used</span>
+                          </div>
                         </div>
-                      </div>
+                      ` : `
+                        <div class="util-tile__nodata">No data available</div>
+                      `}
                       <div class="util-spark" aria-hidden="true">
                         <div class="util-spark__y"><span>1 B</span><span>0 B</span></div>
                         <div class="util-spark__plot">
@@ -6803,7 +6866,7 @@
                     </div>
                     <div class="util-tile util-tile--net">
                       <div class="util-tile__label">Network transfer</div>
-                      <div class="util-tile__abs">0 Bps</div>
+                      <div class="util-tile__abs">${u.network || '0 Bps'}</div>
                       <div class="util-tile__abs-sub">Total</div>
                       <div class="util-net-body">
                         <div class="util-net-row"><span>0 Bs</span><span>In</span></div>
@@ -6827,57 +6890,39 @@
               <aside>
                 <div class="vm-card">
                   <h3 class="vm-card__title">Alerts (0)</h3>
-                  <p class="muted" style="margin:0;font-size:13px;">No alerts</p>
-                </div>
-                <div class="vm-card">
-                  <h3 class="vm-card__title">General</h3>
-                  <dl class="vm-dl">
-                    <dt>Namespace</dt><dd><span class="cell-res"><span class="res-icon res-icon--ns" aria-hidden="true">NS</span><button type="button" class="name-link">${v.ns}</button></span></dd>
-                    <dt>Node</dt><dd><span class="cell-res"><span class="res-icon res-icon--node" aria-hidden="true">N</span><button type="button" class="name-link">${v.node}</button></span></dd>
-                    <dt>VirtualMachineInstance</dt><dd><span class="cell-res"><span class="res-icon res-icon--vmi" aria-hidden="true">VMI</span><button type="button" class="name-link">${v.name}</button></span></dd>
-                    <dt>Pod</dt><dd><span class="cell-res"><span class="res-icon res-icon--pod" aria-hidden="true">P</span><button type="button" class="name-link">virt-launcher-${v.name}-8wdbh</button></span></dd>
-                    <dt>Owner</dt><dd>No owner</dd>
-                  </dl>
+                  <p class="muted" style="margin:0;font-size:13px;">&nbsp;</p>
                 </div>
                 <div class="vm-card">
                   <div class="vm-card__title-row">
-                    <h3 class="vm-card__title">Snapshots (1)</h3>
-                    <button type="button" class="name-link">Take snapshot</button>
+                    <h3 class="vm-card__title">Network (${nics.length})</h3>
+                    <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net">Add network</button>
                   </div>
-                  <div class="snap-row">
-                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                    <div class="snap-row__body">
-                      <strong>${v.name}-snapshot-20240720-131123</strong><br>
-                      <span class="muted">20 Jul 2026, 13:11</span>
-                    </div>
-                    <button type="button" class="kebab" aria-label="Snapshot actions"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button>
-                  </div>
-                  <button type="button" class="pf-v6-c-button pf-m-secondary" style="margin-top:4px;">View more</button>
-                </div>
-                <div class="vm-card">
-                  <h3 class="vm-card__title">Network (${v.nics.length})</h3>
                   <table class="side-table">
                     <thead><tr><th>Name</th><th>IP address</th></tr></thead>
                     <tbody>
-                      ${v.nics.map(n => `
+                      ${nics.map(n => `
                         <tr>
-                          <td>${n.name}</td>
-                          <td><span class="side-copy">${n.ip || v.ip || '—'} <button type="button" aria-label="Copy IP"><i class="fa-regular fa-copy" aria-hidden="true"></i></button></span></td>
+                          <td><button type="button" class="name-link name-link--dotted">${n.name}</button></td>
+                          <td>${n.ip || '—'}</td>
                         </tr>
                       `).join('')}
                     </tbody>
                   </table>
-                  <p style="margin:10px 0 0;font-size:12px;color:var(--vmaas-text-subtle);word-break:break-all;">
-                    <strong>Internal FQDN</strong><br>
-                    <span class="side-copy">${v.fqdn} <button type="button" aria-label="Copy FQDN"><i class="fa-regular fa-copy" aria-hidden="true"></i></button></span>
-                  </p>
                 </div>
                 <div class="vm-card">
-                  <h3 class="vm-card__title">Storage (${v.disks.length})</h3>
+                  <div class="vm-card__title-row">
+                    <h3 class="vm-card__title">Storage (${diskRows.length})</h3>
+                    <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk">Add disk</button>
+                  </div>
                   <table class="side-table">
-                    <thead><tr><th>Name</th><th>Drive</th><th>Size</th><th>Interface</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Size</th></tr></thead>
                     <tbody>
-                      ${v.disks.map(dsk => `<tr><td>${dsk.name}</td><td>${dsk.drive}</td><td>${dsk.size}</td><td>${dsk.interface}</td></tr>`).join('')}
+                      ${diskRows.map(dsk => `
+                        <tr>
+                          <td><button type="button" class="name-link">${dsk.label}</button></td>
+                          <td>${dsk.size}</td>
+                        </tr>
+                      `).join('')}
                     </tbody>
                   </table>
                 </div>
@@ -6913,7 +6958,7 @@
                     <tbody class="pf-v6-c-table__tbody">
                       ${filesystems.map(fs => `
                         <tr class="pf-v6-c-table__tr">
-                          <td class="pf-v6-c-table__td">${fs.name}</td>
+                          <td class="pf-v6-c-table__td"><button type="button" class="name-link">${fs.name}</button></td>
                           <td class="pf-v6-c-table__td">${fs.type}</td>
                           <td class="pf-v6-c-table__td">${fs.mount}</td>
                           <td class="pf-v6-c-table__td">${fs.total}</td>
@@ -6924,48 +6969,10 @@
                   </table>
                 </div>
               </div>
-              <div class="vm-card">
-                <h3 class="vm-card__title">Services (${services.length})</h3>
-                <div class="vm-overview__table-wrap">
-                  <table class="pf-v6-c-table pf-m-compact vm-table" role="grid" aria-label="Services">
-                    <thead class="pf-v6-c-table__thead">
-                      <tr class="pf-v6-c-table__tr">
-                        <th class="pf-v6-c-table__th" scope="col">Name</th>
-                        <th class="pf-v6-c-table__th" scope="col">Namespace</th>
-                        <th class="pf-v6-c-table__th" scope="col">Labels</th>
-                        <th class="pf-v6-c-table__th" scope="col">Pod selector</th>
-                        <th class="pf-v6-c-table__th" scope="col">Location</th>
-                        <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                      </tr>
-                    </thead>
-                    <tbody class="pf-v6-c-table__tbody">
-                      ${services.map(svc => `
-                        <tr class="pf-v6-c-table__tr">
-                          <td class="pf-v6-c-table__td">
-                            <span class="cell-res"><span class="res-icon res-icon--svc" aria-hidden="true">S</span><button type="button" class="name-link">${svc.name}</button></span>
-                          </td>
-                          <td class="pf-v6-c-table__td">
-                            <span class="cell-res"><span class="res-icon res-icon--ns" aria-hidden="true">NS</span><button type="button" class="name-link">${svc.ns}</button></span>
-                          </td>
-                          <td class="pf-v6-c-table__td">${svc.labels}</td>
-                          <td class="pf-v6-c-table__td">
-                            <button type="button" class="name-link" style="font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="margin-right:4px;" aria-hidden="true"></i>${svc.selector}</button>
-                          </td>
-                          <td class="pf-v6-c-table__td">${svc.location}</td>
-                          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${svc.name}"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
-                        </tr>
-                      `).join('')}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div class="vm-card">
-                <h3 class="vm-card__title">Active users (0)</h3>
-                <p class="muted" style="margin:0;">No active users</p>
-              </div>
             </div>
           </div>
         `;
+
       } else if (tab === 'configuration') {
         const section = state.vmConfigSection || 'details';
         const sections = [
@@ -7109,6 +7116,17 @@
         };
       });
       root.querySelector('#btn-add-vm-nic')?.addEventListener('click', () => openAddNicModal('vm-detail'));
+      root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNicModal('vm-detail'));
+      root.querySelector('#btn-overview-add-disk')?.addEventListener('click', () => {
+        state.vmDetailTab = 'configuration';
+        state.vmConfigSection = 'storage';
+        renderVmDetail();
+      });
+      root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
+        state.vmDetailTab = 'configuration';
+        state.vmConfigSection = 'details';
+        renderVmDetail();
+      });
       root.querySelector('#vm-goto-networks')?.addEventListener('click', () => setView('networks'));
       root.querySelectorAll('[data-nic-delete]').forEach(b => {
         b.onclick = () => {
@@ -9572,6 +9590,7 @@
     }
 
     document.getElementById('btn-create').addEventListener('click', () => openWizard('template'));
+    document.getElementById('btn-create-from-detail')?.addEventListener('click', () => openWizard('template'));
     document.getElementById('btn-create-tpl')?.addEventListener('click', () => openWizard('template'));
     document.getElementById('btn-create-network')?.addEventListener('click', () => openNetworkWizard());
     document.getElementById('wiz-close').addEventListener('click', requestCloseWizard);

@@ -22,55 +22,38 @@ VM Overview is split into smaller cards that each own a specific domain:
 
 | Card | Role |
 |---|---|
-| **Details** | Identity and compute summary for the VM |
-| **Network** | NIC summary + Internal FQDN |
-| **Storage** | Disk summary |
+| **Details** | Identity + compute summary, with **VNC console** preview in the same card |
 | **Utilization** | Live resource usage for this VM |
-| **Console** | Guest console preview + power state (no kebab actions) |
+| **Alerts** | Alert count / empty state |
+| **Network** | NIC summary + **Add network** |
+| **Storage** | Disk summary + **Add disk** |
+| **Hardware devices** | GPU / Host devices tabs |
+| **File systems** | Guest file system table |
 
-### Layout (CNV-aligned)
+### Layout (CNV-aligned — current mock)
 
 | Column | Cards (top → bottom) |
 |---|---|
-| **Main (left)** | Details · Utilization |
-| **Side (right)** | Console · Network · Storage |
+| **Main (left)** | Details (incl. VNC) · Utilization |
+| **Side (right)** | Alerts · Network · Storage |
+| **Full width (bottom)** | Hardware devices · File systems |
 
-Card chrome matches the **Details** style: bordered surface, title in the header (Network / Storage titles as blue links), divider under the header, compact body content.
+### Details
 
-### Changes
+- Fields: **Name** (+ amd64 badge) · **Project** · **Status** · **Created** · **Operating system** (or *Guest agent is required.*) · **Compute resources** (with edit pencil).
+- **VNC console** lives in the Details card (Open web console + preview), not a separate side card.
 
-**Details**
+### Network (n) / Storage (n)
 
-- Network and Storage rows removed from the Details description list (those domains live in their own cards).
-- Titled **Details** card with the remaining fields (e.g. Name, Description, Operating system, CPU, Memory, Hub).
+- **Add network** / **Add disk** in the card header.
+- Network table: **Name** | **IP address** only.
+- Storage table: **Name** | **Size** only (Boot disk / Disk 1 / … as links).
 
-**Network (2)**
+### Utilization
 
-- Dedicated card outside Details.
-- Title count reflects NIC count: **Network (2)**.
-- Table: **Name** | **IP address** — one row per network (two demo NICs).
-- **Internal FQDN** below the table (separated by a divider), value in a secondary surface with copy-to-clipboard.
-
-**Storage (2)**
-
-- Dedicated card outside Details.
-- Title count reflects disk count: **Storage (2)**.
-- Table: **Name** | **Size** only (no Drive / Interface columns on Overview).
-- Demo disks: `rootdisk` (VM storage size) · `cloudinitdisk` (`Dynamic`).
-
-**Utilization**
-
-- Dedicated card for this VM (not fleet dashboard charts).
-- Header: **Utilization** + help affordance · time range **Last 5 minutes**.
+- Header: **Utilization** + help · time range **Last 5 minutes**.
 - Four columns: **CPU** · **Memory** · **Storage** · **Network transfer**.
-- CPU / Memory / Storage: absolute value + “of” capacity · thin donut (% Used) · sparkline.
-- Network transfer: **no pie** — Total / In / Out · **Breakdown by network** link · sparkline.
-- Demo values are stable per VM name so different VMs show different utilization.
-
-**Console**
-
-- Side card: preview + power label / pending only.
-- Kebab / VM actions are **not** on the Console card (moved to the page header).
+- Storage may show **No data available** when metrics are missing.
 
 ### VM detail header actions (CNV)
 
@@ -84,26 +67,25 @@ On the sticky detail heading, to the **right of the VM name** (same row as the t
 | **Start** | Icon + tooltip — enabled when Stopped; disabled (muted) when Running |
 | **Actions** | Secondary toggle — flyout menu (see below) |
 
-Power state badge (or pending spinner + label) sits next to the VM name on the left of that row.
+Power state badge sits next to the VM name on the left of that row. Arch badge (amd64) sits next to the name.
 
 **Actions menu (CNV-aligned):**
 
 | Item | Notes |
 |---|---|
-| **Control** ▸ | Flyout: Stop · Pause · Restart (“Shut down and reboot the VM”) · Reset (“Hard power cycle on the VM”) |
-| **Open Console** | Description: “Open console in new tab” — disabled unless Running |
+| **Control** ▸ | Flyout: Stop · Pause · Restart · Reset |
+| **Open Console** | Disabled unless Running |
 | **Clone** | Opens clone flow |
 | **Take snapshot** | Demo |
 | **Migration** ▸ | Flyout: Migrate · Cancel migration |
 | **Move to group** | Demo |
 | **Edit labels** | Demo |
-| **Delete** | Disabled while Running — description “The Virtual machine is running” |
+| **Delete** | Disabled while Running |
 
-### Out of scope for this Overview pass
+### Out of Overview (not shown in this mock)
 
-- Full NIC attach / edit remains under **Configuration → Network** (Overview Network is summary only).
-- Full disk management remains under Configuration / Storage flows (Overview Storage is summary only).
-- Alerts / General / Snapshots / Hardware devices / File systems / Services / Active users side or bottom cards are not part of this v3 pass unless added later.
+- Separate Console side card, General, Snapshots, Services, Active users.
+- Full NIC / disk management remains under **Configuration**.
 
 ---
 
@@ -115,7 +97,7 @@ Power state badge (or pending spinner + label) sits next to the VM name on the l
 | 2026-07-27 | Move VM actions off Console kebab to detail header: Stop / Restart / Pause / Start icons + Actions dropdown (right of VM name) |
 | 2026-07-27 | Header icons: PF6 brand blue + tooltips; Restart = RedoAlt; Actions adds Control / Migration flyouts and CNV menu items |
 | 2026-08-04 | Fork osac-bmaas → `osac-vmaas`; embed VMaaS HTML mockup under Services → Virtual machines + `/vmaas` standalone |
-| 2026-08-04 | Create VM wizard simplified: **1. Catalog** (select a catalog item) → Details → Customization → Review |
+| 2026-08-14 | Overview aligned to CNV details mock: Details+VNC, Utilization; side Alerts/Network(+Add)/Storage(+Add); bottom Hardware + File systems; drop General/Snapshots/Services/Active users |
 
 ---
 
