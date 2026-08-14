@@ -4127,7 +4127,7 @@
         group: '—',
         timezone: 'UTC',
         fqdn: 'indigo-quokka-89.headless.default.svc.cluster.local',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'], ip: '10.130.1.191' }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'], ip: '10.130.1.191' }],
         disks: [
           { name: 'rootdisk', drive: 'Disk', size: '30 GiB', interface: 'virtio' },
           { name: 'cloudinitdisk', drive: 'Disk', size: 'Dynamic', interface: 'virtio' },
@@ -4224,7 +4224,7 @@
         description: 'RHEL 10 with a 5 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'Boot disk', size: 5, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
@@ -4246,7 +4246,7 @@
         description: 'RHEL 9 with a 10 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'Boot disk', size: 10, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
@@ -4268,7 +4268,7 @@
         description: 'Windows Server 2025 with a 20 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
@@ -4290,7 +4290,7 @@
         description: 'Fedora with a 20 GiB boot disk.',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
@@ -4312,7 +4312,7 @@
         description: 'RHEL 10 with editable compute and disk. Image is locked by the template.',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
@@ -4334,7 +4334,7 @@
         description: 'RHEL 10 XL defaults with editable compute and disk. Image is locked by the template.',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
-        nics: [{ name: 'default', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
         disks: [{ name: 'Boot disk', size: 40, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
     ];
@@ -5035,7 +5035,7 @@
         sshKeyFileName: '',
         nics: [
           {
-            name: 'default', model: 'virtio', network: 'Pod networking',
+            name: 'tenant-workload', model: 'virtio', network: 'Pod networking',
             state: 'plugged', type: 'Masquerade', mac: '—',
             binding: 'Masquerade', ipMode: 'DHCP', primary: true,
           },
@@ -6662,7 +6662,7 @@
         ...v,
         osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
         nics: v.nics || [{
-          name: 'default',
+          name: 'tenant-workload',
           virtualNetwork: 'tenant-workload',
           subnet: 'bm-compute-a',
           securityGroups: [DEFAULT_SECURITY_GROUP],
@@ -6683,19 +6683,27 @@
       return enriched;
     }
 
-    function nextNicName(existing = []) {
-      const colors = ['red', 'blue', 'amber', 'green', 'coral', 'jade'];
-      const animals = ['guan', 'fox', 'hare', 'kite', 'lynx', 'orca'];
-      const used = new Set(existing.map(n => (n.name || n).toLowerCase()));
-      for (let i = 0; i < 40; i += 1) {
-        const name = `nic-${colors[i % colors.length]}-${animals[i % animals.length]}-${20 + (i * 7) % 80}`;
-        if (!used.has(name.toLowerCase())) return name;
-      }
-      return `nic-${Date.now().toString(36).slice(-6)}`;
+    /** Attachment name follows the selected virtual network (unique per VM / wizard list). */
+    function networkAttachmentName(virtualNetworkId, existing = []) {
+      const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === virtualNetworkId);
+      const base = String(net?.label || virtualNetworkId || 'network')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'network';
+      const used = new Set(existing.map(n => String(n.name || n).toLowerCase()));
+      if (!used.has(base)) return base;
+      let i = 2;
+      while (used.has(`${base}-${i}`)) i += 1;
+      return `${base}-${i}`;
+    }
+
+    function nextNicName(existing = [], virtualNetworkId) {
+      return networkAttachmentName(virtualNetworkId, existing);
     }
 
     function existingNicsForContext(context) {
-      if (context === 'wizard') return state.data.nics || [];
+      if (context === 'wizard') return state.data.extraNetworks || state.data.nics || [];
       const vm = VMS.find(v => v.name === state.selectedVmName);
       return vm?.nics || enrichVm(vm)?.nics || [];
     }
@@ -6891,16 +6899,8 @@
       toast(`Network interface “${nic.name}” added.`);
     }
 
-    function nextAutoNetworkName(d = state.data) {
-      const base = String(d.name || 'vm').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-') || 'vm';
-      const existing = new Set((d.extraNetworks || []).map(n => String(n.name || '').toLowerCase()));
-      let n = (d.extraNetworks || []).length + 1;
-      let candidate = `${base}-net${n}`;
-      while (existing.has(candidate.toLowerCase())) {
-        n += 1;
-        candidate = `${base}-net${n}`;
-      }
-      return candidate;
+    function nextAutoNetworkName(d = state.data, virtualNetworkId = d.virtualNetwork) {
+      return networkAttachmentName(virtualNetworkId, d.extraNetworks || []);
     }
 
     function openAddNetworkModal(context = 'wizard') {
@@ -6953,8 +6953,8 @@
       if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
       const canSave = canSaveNetworkModal(m);
       const previewName = m.context === 'vm-detail'
-        ? nextNicName(existingNicsForContext('vm-detail'))
-        : nextAutoNetworkName(state.data);
+        ? networkAttachmentName(m.virtualNetwork, existingNicsForContext('vm-detail'))
+        : networkAttachmentName(m.virtualNetwork, state.data.extraNetworks || []);
       const chips = (m.securityGroups || []).map(sg => `
         <span class="sg-select__chip">
           ${sg}
@@ -7113,7 +7113,7 @@
         if (!vm) return;
         if (!vm.nics) vm.nics = enrichVm(vm).nics.slice();
         const nic = {
-          name: nextNicName(vm.nics),
+          name: networkAttachmentName(m.virtualNetwork, vm.nics),
           virtualNetwork: m.virtualNetwork,
           subnet: m.subnet,
           securityGroups: [...(m.securityGroups || [])],
@@ -7128,7 +7128,7 @@
       if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
       state.data.extraNetworks.push({
         id: `net-${Date.now()}`,
-        name: nextAutoNetworkName(state.data),
+        name: networkAttachmentName(m.virtualNetwork, state.data.extraNetworks || []),
         virtualNetwork: m.virtualNetwork,
         virtualNetworkLabel: net?.label || m.virtualNetwork,
         subnet: m.subnet,
@@ -7781,7 +7781,7 @@
           return { ...dsk, label };
         });
         const alerts = Array.isArray(v.alerts) ? v.alerts : [];
-        const nics = (v.nics && v.nics.length) ? v.nics : [{ name: 'default', ip: '—' }];
+        const nics = (v.nics && v.nics.length) ? v.nics : [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', ip: '—' }];
         body = `
           <div class="vm-overview">
             <div class="vm-overview__top">
@@ -10619,15 +10619,56 @@
           const source = state.createType === 'clone'
             ? VMS.find(v => v.name === state.data.cloneSourceName)
             : null;
+          const d = state.data;
+          const primaryNet = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork);
+          const createdNics = [];
+          if (d.virtualNetwork) {
+            createdNics.push({
+              name: networkAttachmentName(d.virtualNetwork, createdNics),
+              virtualNetwork: d.virtualNetwork,
+              subnet: d.subnet || primaryNet?.subnets?.[0] || '',
+              securityGroups: [...(d.securityGroups || [])],
+              ip: '—',
+            });
+          }
+          for (const extra of (d.extraNetworks || [])) {
+            createdNics.push({
+              name: extra.name || networkAttachmentName(extra.virtualNetwork, createdNics),
+              virtualNetwork: extra.virtualNetwork,
+              subnet: extra.subnet || '',
+              securityGroups: [...(extra.securityGroups || [])],
+              ip: '—',
+            });
+          }
+          const createdDisks = [
+            {
+              name: 'Boot disk',
+              size: d.bootDiskGiB || 30,
+              unit: d.bootDiskUnit || 'GiB',
+              bootable: true,
+              storageTierId: d.bootStorageTierId || 'st-balanced-01',
+              storageTierLabel: d.bootStorageTierLabel || 'Balanced',
+            },
+            ...(d.extraDisks || []).map((disk, i) => ({
+              name: disk.name || `Disk ${i + 1}`,
+              size: disk.size,
+              unit: disk.unit || 'GiB',
+              storageTierId: disk.storageTierId,
+              storageTierLabel: disk.storageTierLabel,
+            })),
+          ];
           VMS.unshift({
-            name: state.data.name,
-            ns: state.data.project || 'default',
-            status: state.data.startAfter ? 'starting' : 'stopped',
-            os: source?.os || osMap[state.data.osFamily] || 'Other',
+            name: d.name,
+            ns: d.project || 'default',
+            status: d.startAfter ? 'starting' : 'stopped',
+            os: source?.os || osMap[d.osFamily] || 'Other',
             conditions: ['Provisioning=True'],
             node: source?.node || 'cnvge-079.lab.eng.thv2.redhat.com',
             ip: '—',
             created: new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+            computeResource: d.computeResource,
+            nics: createdNics.length ? createdNics : undefined,
+            disks: createdDisks,
           });
           renderVms(stripFilterAttributes(document.getElementById('vm-search-global')?.value || ''));
         }
