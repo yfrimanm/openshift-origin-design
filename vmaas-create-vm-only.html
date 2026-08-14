@@ -426,6 +426,33 @@
     @media (max-width: 1100px) { .vm-overview__top { grid-template-columns: 1fr; } }
     .vm-overview__bottom { margin-top: 0; }
     .vm-overview__table-wrap { overflow-x: auto; }
+    /* File systems: keep header labels fully visible (no … truncation) */
+    .vm-overview__table-wrap .vm-table.pf-v6-c-table {
+      --pf-v6-c-table--cell--PaddingInlineStart: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-table--cell--PaddingInlineEnd: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-table--cell--first-last-child--PaddingInline: var(--pf-t--global--spacer--sm, 8px);
+      --pf-v6-c-table--cell--Overflow: visible;
+      --pf-v6-c-table--cell--TextOverflow: clip;
+      --pf-v6-c-table--cell--MaxWidth: none;
+      width: 100%;
+    }
+    .vm-overview__table-wrap .vm-table th,
+    .vm-overview__table-wrap .vm-table td,
+    .vm-overview__table-wrap .vm-table .pf-v6-c-table__th,
+    .vm-overview__table-wrap .vm-table .pf-v6-c-table__td {
+      padding-inline: var(--pf-t--global--spacer--sm, 8px);
+      overflow: visible;
+      text-overflow: clip;
+      max-width: none;
+    }
+    .vm-overview__table-wrap .vm-table th:first-child,
+    .vm-overview__table-wrap .vm-table td:first-child {
+      padding-inline-start: 0;
+    }
+    .vm-overview__table-wrap .vm-table th:last-child,
+    .vm-overview__table-wrap .vm-table td:last-child {
+      padding-inline-end: 0;
+    }
     .res-icon--svc { background: #0066cc; }
     .vm-card {
       background: #fff; border: 1px solid var(--vmaas-border-light); border-radius: 8px;
