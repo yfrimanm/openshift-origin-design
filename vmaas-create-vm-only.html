@@ -1574,6 +1574,10 @@
     .name-link:hover { text-decoration: underline; }
     .vm-table .name-link,
     .vm-table .status-link { font-weight: 400; }
+    .vm-table td .cell-res > .name-link {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
     .status-link {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 14px; font-weight: 400;
@@ -4672,7 +4676,7 @@
         case 'name':
           return `<span class="cell-res">
               <span class="res-icon res-icon--vm" aria-hidden="true">VM</span>
-              <span class="vm-name">${v.name}</span>
+              <button type="button" class="name-link" data-open-vm="${v.name}">${v.name}</button>
             </span>`;
         case 'project':
           return `<span class="cell-res">
@@ -6606,8 +6610,15 @@
       toast(`Disk “${name}” added.`, 'success');
     }
 
-    function openVmDetail(/* name, tab */) {
-      /* Create-vm-only mock: no Virtual machine details page */
+    function openVmDetail(name, tab = 'overview') {
+      const vm = VMS.find(v => v.name === name);
+      if (!vm) return;
+      state.selectedVmName = name;
+      state.vmDetailTab = tab;
+      state.vmConfigSection = 'details';
+      state.nicMenuOpen = null;
+      setView('vm');
+      renderVmDetail();
     }
 
     function renderVmDetail() {
