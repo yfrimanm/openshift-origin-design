@@ -413,6 +413,22 @@
     .vm-card__title {
       margin: 0 0 12px; font-size: 16px; font-weight: 600; color: var(--vmaas-blue);
     }
+
+    .vm-card__title-link {
+      background: none; border: none; padding: 0; margin: 0;
+      font: inherit; font-size: 16px; font-weight: 600;
+      color: var(--vmaas-blue); cursor: pointer; text-align: left;
+    }
+    .vm-card__title-link:hover { text-decoration: underline; }
+    .vm-alerts-list {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .vm-alerts-list__item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 13px; color: var(--vmaas-text); line-height: 1.35;
+    }
+    .vm-alerts-list__item i { color: #f0ab00; margin-top: 2px; flex-shrink: 0; }
     .vm-card__title-row {
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;
     }
@@ -3993,7 +4009,7 @@
       { name: 'rhel9-black-gunnysack-58', ns: 'default', status: 'running', os: 'RHEL', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29' },
       { name: 'windows-golden-eider-58', ns: 'default', status: 'stopped', os: 'Windows', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
       { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49' },
-      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42' },
+      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'PVC not found for boot disk' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
     const FILTER_CATALOG = {
@@ -6076,6 +6092,7 @@
         mem: '128 MiB',
         guestAgent: false,
         computeResource: 'small',
+        alerts: [],
         ...v,
         osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
         nics: v.nics || [{
@@ -6986,6 +7003,7 @@
               : (dsk.name && !/^rootdisk$/i.test(dsk.name) ? dsk.name : `Disk ${i}`));
           return { ...dsk, label };
         });
+        const alerts = Array.isArray(v.alerts) ? v.alerts : [];
         const nics = (v.nics && v.nics.length) ? v.nics : [{ name: 'default', ip: '—' }];
         body = `
           <div class="vm-overview">
@@ -7136,9 +7154,24 @@
                 </div>
               </div>
               <aside>
-                <div class="vm-card">
-                  <h3 class="vm-card__title">Alerts (0)</h3>
-                  <p class="muted" style="margin:0;font-size:13px;">&nbsp;</p>
+                <div class="vm-card${alerts.length ? ' vm-card--alerts-active' : ''}">
+                  <h3 class="vm-card__title">
+                    ${alerts.length ? `
+                      <button type="button" class="vm-card__title-link" id="btn-overview-alerts" aria-label="View ${alerts.length} alert${alerts.length === 1 ? '' : 's'}">
+                        Alerts (${alerts.length})
+                      </button>
+                    ` : `Alerts (0)`}
+                  </h3>
+                  ${alerts.length ? `
+                    <ul class="vm-alerts-list" aria-label="Alerts">
+                      ${alerts.slice(0, 3).map(a => `
+                        <li class="vm-alerts-list__item">
+                          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                          <span>${a.message || a}</span>
+                        </li>
+                      `).join('')}
+                    </ul>
+                  ` : `<p class="muted" style="margin:0;font-size:13px;">&nbsp;</p>`}
                 </div>
                 <div class="vm-card">
                   <div class="vm-card__title-row">
@@ -7365,6 +7398,11 @@
       });
       root.querySelector('#btn-add-vm-nic')?.addEventListener('click', () => openAddNicModal('vm-detail'));
       root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNicModal('vm-detail'));
+      root.querySelector('#btn-overview-alerts')?.addEventListener('click', () => {
+        state.vmDetailTab = 'diagnostics';
+        renderVmDetail();
+      });
+
       root.querySelector('#btn-overview-add-disk')?.addEventListener('click', () => {
         state.vmDetailTab = 'configuration';
         state.vmConfigSection = 'storage';
