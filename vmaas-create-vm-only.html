@@ -1285,6 +1285,62 @@
       width: 100%;
     }
 
+    /* Edit SSH public key — same chrome as compute; wider for key paste/upload */
+    #ssh-overlay:not(.pf-m-open) { display: none; }
+    #ssh-overlay.pf-m-open {
+      display: flex; position: fixed; inset: 0; z-index: 600;
+      align-items: center; justify-content: center;
+      background: rgba(3, 3, 3, 0.5);
+    }
+    #ssh-overlay .pf-v6-c-modal-box {
+      --pf-v6-c-modal-box--Width: min(40rem, calc(100vw - 2rem)) !important;
+      --pf-v6-c-modal-box--MaxWidth: 40rem !important;
+      width: min(40rem, calc(100vw - 2rem)) !important;
+      max-width: min(40rem, calc(100vw - 2rem)) !important;
+      min-width: 0;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      padding: 0;
+    }
+    #ssh-overlay .pf-v6-c-modal-box__header {
+      padding: 24px 24px 0;
+      position: relative;
+    }
+    #ssh-overlay .pf-v6-c-modal-box__close {
+      position: absolute;
+      inset-block-start: 16px;
+      inset-inline-end: 16px;
+    }
+    #ssh-overlay .pf-v6-c-modal-box__title {
+      margin: 0;
+      padding-inline-end: 40px;
+    }
+    #ssh-overlay .pf-v6-c-modal-box__title-text {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    #ssh-overlay .pf-v6-c-modal-box__description {
+      margin-block-start: 8px;
+      margin-block-end: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--vmaas-text, #151515);
+    }
+    #ssh-overlay .pf-v6-c-modal-box__body {
+      padding: 16px 24px 8px;
+    }
+    #ssh-overlay .pf-v6-c-modal-box__footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 24px 24px;
+      justify-content: flex-start;
+    }
+    #ssh-overlay .form-field { max-width: none; width: 100%; margin-bottom: 0; }
+
     #nic-overlay:not(.pf-m-open),
     #disk-overlay:not(.pf-m-open) { display: none; }
     #nic-overlay.pf-m-open,
@@ -4088,6 +4144,31 @@
     </div>
   </div>
 
+  <div class="pf-v6-c-backdrop" id="ssh-overlay" aria-hidden="true">
+    <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
+      <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="ssh-modal-title" aria-describedby="ssh-modal-desc" id="ssh-modal">
+        <div class="pf-v6-c-modal-box__header">
+          <div class="pf-v6-c-modal-box__close">
+            <button type="button" class="pf-v6-c-button pf-m-plain" id="ssh-modal-close" aria-label="Close">
+              <span class="pf-v6-c-button__icon"><i class="fas fa-times" aria-hidden="true"></i></span>
+            </button>
+          </div>
+          <h1 class="pf-v6-c-modal-box__title" id="ssh-modal-title">
+            <span class="pf-v6-c-modal-box__title-text">Edit SSH public key</span>
+          </h1>
+          <div class="pf-v6-c-modal-box__description" id="ssh-modal-desc">
+            Paste a public SSH key or upload a file for this Virtual machine.
+          </div>
+        </div>
+        <div class="pf-v6-c-modal-box__body" id="ssh-modal-body"></div>
+        <div class="pf-v6-c-modal-box__footer">
+          <button type="button" class="pf-v6-c-button pf-m-primary" id="ssh-modal-save">Save</button>
+          <button type="button" class="pf-v6-c-button pf-m-link" id="ssh-modal-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div class="pf-v6-c-backdrop" id="nic-overlay" aria-hidden="true">
     <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
       <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="nic-modal-title" id="nic-modal">
@@ -4139,6 +4220,8 @@
         group: '—',
         timezone: 'UTC',
         fqdn: 'indigo-quokka-89.headless.default.svc.cluster.local',
+        sshPublicKey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMockKeyForDemoOnly user@example.com',
+        sshKeyFileName: 'id_ed25519.pub',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'], ip: '10.130.1.191' }],
         disks: [
           { name: 'rootdisk', drive: 'Disk', size: '30 GiB', interface: 'virtio' },
@@ -4651,6 +4734,144 @@
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && document.getElementById('compute-overlay')?.classList.contains('pf-m-open')) {
           closeEditComputeModal();
+        }
+      });
+    }
+
+    function openEditSshModal() {
+      const vm = VMS.find(v => v.name === state.selectedVmName);
+      if (!vm) return;
+      if (/win/i.test(String(vm.os || vm.osFull || ''))) {
+        toast('SSH keys are not used for Windows Virtual machines.');
+        return;
+      }
+      const key = String(vm.sshPublicKey || '').trim();
+      const fileName = vm.sshKeyFileName || '';
+      const hasKey = !!key;
+      state.sshModalDraft = { key, fileName };
+      const body = document.getElementById('ssh-modal-body');
+      if (body) {
+        body.innerHTML = `
+          <div class="form-field">
+            <label for="f-edit-ssh-key">SSH public key</label>
+            <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-edit-ssh-upload">
+              <div class="pf-v6-c-file-upload__file-select">
+                <div class="pf-v6-c-input-group">
+                  <div class="pf-v6-c-input-group__item pf-m-fill">
+                    <span class="pf-v6-c-form-control">
+                      <input class="pf-v6-c-form-control__input" type="text" id="f-edit-ssh-filename" readonly
+                        value="${(fileName || '').replace(/"/g, '&quot;')}"
+                        placeholder="Drag a file here or browse to upload"
+                        aria-label="Drag a file here or browse to upload" />
+                    </span>
+                  </div>
+                  <div class="pf-v6-c-input-group__item">
+                    <button type="button" class="pf-v6-c-button pf-m-control" id="f-edit-ssh-browse">Upload</button>
+                  </div>
+                  <div class="pf-v6-c-input-group__item">
+                    <button type="button" class="pf-v6-c-button pf-m-control" id="f-edit-ssh-clear"
+                      ${hasKey || fileName ? '' : 'disabled'}>Clear</button>
+                  </div>
+                </div>
+                <input type="file" id="f-edit-ssh-file" accept=".pub,text/plain,.txt" hidden
+                  aria-hidden="true" tabindex="-1" />
+              </div>
+              <div class="pf-v6-c-file-upload__file-details" id="f-edit-ssh-details">
+                <span class="pf-v6-c-form-control pf-m-resize-vertical">
+                  <textarea id="f-edit-ssh-key" class="pf-m-ssh${hasKey ? ' pf-m-has-content' : ''}" rows="4"
+                    aria-label="SSH public key" aria-describedby="f-edit-ssh-help"
+                    placeholder="">${key.replace(/</g, '&lt;')}</textarea>
+                </span>
+              </div>
+            </div>
+            <p class="form-helper" id="f-edit-ssh-help">
+              Supported types: ssh-rsa, ssh-ed25519, and ecdsa-sha2-nistp256/384/521.
+            </p>
+          </div>
+        `;
+        const upload = document.getElementById('f-edit-ssh-upload');
+        const details = document.getElementById('f-edit-ssh-details');
+        const keyArea = document.getElementById('f-edit-ssh-key');
+        const filenameInput = document.getElementById('f-edit-ssh-filename');
+        const clearBtn = document.getElementById('f-edit-ssh-clear');
+        const sync = () => {
+          const filled = !!(keyArea?.value?.trim() || filenameInput?.value);
+          upload?.classList.toggle('pf-m-show-details', filled);
+          keyArea?.classList.toggle('pf-m-has-content', !!keyArea?.value?.trim());
+          if (clearBtn) clearBtn.disabled = !filled;
+        };
+        document.getElementById('f-edit-ssh-browse')?.addEventListener('click', () => {
+          document.getElementById('f-edit-ssh-file')?.click();
+        });
+        document.getElementById('f-edit-ssh-file')?.addEventListener('change', e => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const text = String(reader.result || '').trim();
+            if (keyArea) keyArea.value = text;
+            if (filenameInput) filenameInput.value = file.name;
+            state.sshModalDraft = { key: text, fileName: file.name };
+            sync();
+          };
+          reader.readAsText(file);
+        });
+        clearBtn?.addEventListener('click', () => {
+          if (keyArea) keyArea.value = '';
+          if (filenameInput) filenameInput.value = '';
+          const fileInput = document.getElementById('f-edit-ssh-file');
+          if (fileInput) fileInput.value = '';
+          state.sshModalDraft = { key: '', fileName: '' };
+          sync();
+        });
+        keyArea?.addEventListener('input', e => {
+          state.sshModalDraft = {
+            key: e.target.value,
+            fileName: filenameInput?.value || state.sshModalDraft?.fileName || '',
+          };
+          sync();
+        });
+        sync();
+      }
+      const overlay = document.getElementById('ssh-overlay');
+      overlay?.classList.add('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('f-edit-ssh-key')?.focus(), 0);
+    }
+
+    function closeEditSshModal() {
+      state.sshModalDraft = null;
+      const overlay = document.getElementById('ssh-overlay');
+      overlay?.classList.remove('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'true');
+    }
+
+    function saveEditSshModal() {
+      const vm = VMS.find(v => v.name === state.selectedVmName);
+      if (!vm) return;
+      const key = (document.getElementById('f-edit-ssh-key')?.value || '').trim();
+      const fileName = (document.getElementById('f-edit-ssh-filename')?.value || '').trim();
+      vm.sshPublicKey = key;
+      vm.sshKeyFileName = key ? fileName : '';
+      closeEditSshModal();
+      renderVmDetail();
+      toast(key ? 'SSH public key updated.' : 'SSH public key cleared.', 'success');
+    }
+
+    function wireEditSshModal() {
+      if (document.body.dataset.sshModalWired) return;
+      document.body.dataset.sshModalWired = '1';
+      document.getElementById('ssh-modal-close')?.addEventListener('click', closeEditSshModal);
+      document.getElementById('ssh-modal-cancel')?.addEventListener('click', closeEditSshModal);
+      document.getElementById('ssh-modal-save')?.addEventListener('click', saveEditSshModal);
+      document.getElementById('ssh-overlay')?.addEventListener('click', e => {
+        if (e.target.id === 'ssh-overlay' || e.target.classList.contains('pf-v6-l-bullseye')) {
+          closeEditSshModal();
+        }
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.getElementById('ssh-overlay')?.classList.contains('pf-m-open')) {
+          closeEditSshModal();
         }
       });
     }
@@ -7824,6 +8045,17 @@
                           </button>
                         </span>
                       </dd>
+                      <dt>SSH public key</dt>
+                      <dd>
+                        ${/win/i.test(String(v.os || v.osFull || ''))
+                          ? 'Not applicable'
+                          : `<span class="vm-compute-row">
+                              ${v.sshPublicKey && String(v.sshPublicKey).trim() ? 'Configured' : 'Not configured'}
+                              <button type="button" class="vm-edit-inline" data-edit-ssh aria-label="Edit SSH public key" title="Edit">
+                                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                              </button>
+                            </span>`}
+                      </dd>
                     </dl>
                     <div class="vm-vnc">
                       <h4 class="vm-vnc__title">VNC console</h4>
@@ -8265,6 +8497,9 @@
       });
       root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
         openEditComputeModal();
+      });
+      root.querySelector('[data-edit-ssh]')?.addEventListener('click', () => {
+        openEditSshModal();
       });
       root.querySelector('.vm-vnc__open')?.addEventListener('click', () => {
         openVmConsolePlaceholder(state.selectedVmName || v.name);
@@ -10690,6 +10925,8 @@
             ip: '—',
             created: new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
             computeResource: d.computeResource,
+            sshPublicKey: (d.sshPublicKey || '').trim(),
+            sshKeyFileName: (d.sshPublicKey || '').trim() ? (d.sshKeyFileName || '') : '',
             nics: createdNics.length ? createdNics : undefined,
             disks: createdDisks,
           });
@@ -11111,6 +11348,7 @@
     renderVms();
     wireStatusPopover();
     wireEditComputeModal();
+    wireEditSshModal();
     wireNicDetailPopover();
     wireFsHelpPopover();
     wireUtilHelpPopover();
