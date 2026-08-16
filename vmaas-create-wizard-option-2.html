@@ -6188,7 +6188,7 @@
       document.getElementById('status-popover-close')?.addEventListener('click', () => closeStatusPopover());
       document.getElementById('status-popover-diagnostic')?.addEventListener('click', () => {
         closeStatusPopover();
-        toast('Diagnostics coming soon.');
+        toast('AI assistant for Virtual machine status coming soon.');
       });
       document.getElementById('status-popover-learn')?.addEventListener('click', () => {
         closeStatusPopover();
@@ -10249,7 +10249,9 @@
                 </label>
                 <input type="text" id="f-compute-resource" class="unit-size-input"
                   value="${(computeLabel || '—').replace(/"/g, '&quot;')}"
-                  disabled aria-disabled="true" aria-label="Compute resource" />
+                  disabled aria-disabled="true" aria-label="Compute resource"
+                  aria-describedby="f-compute-locked-help" />
+                <p class="form-helper" id="f-compute-locked-help">This size is set by the template and can’t be changed during create. You can edit compute resources after the Virtual machine is created.</p>
               </div>
           `;
           const stepHelp = computeEditable
@@ -10320,7 +10322,9 @@
                   ${fieldGovLabel('locked')}
                 </label>
                 <input type="number" id="f-boot-disk" class="unit-size-input" value="${diskVal}"
-                  disabled aria-disabled="true" aria-label="Boot disk size in GiB" />
+                  disabled aria-disabled="true" aria-label="Boot disk size in GiB"
+                  aria-describedby="f-boot-locked-help" />
+                <p class="form-helper" id="f-boot-locked-help">Boot disk size is set by the template and can’t be changed during create. Add additional disks below if you need more storage.</p>
               </div>
           `;
           const addDiskHtml = `
@@ -10638,12 +10642,7 @@
         const tpl = TEMPLATES.find(t => t.id === d.templateId);
         const catalogName = tpl?.name || '—';
         const sshConfigured = !!(d.sshPublicKey && d.sshPublicKey.trim());
-        const sshFileLabel = (d.sshKeyFileName && String(d.sshKeyFileName).trim())
-          ? String(d.sshKeyFileName).trim().replace(/</g, '&lt;')
-          : '';
-        const sshVal = sshConfigured
-          ? (sshFileLabel ? `Configured (${sshFileLabel})` : 'Configured')
-          : 'Not configured';
+        const sshVal = sshConfigured ? 'Configured' : 'Not configured';
         const osImage = d.osImage || tpl?.osImage || d.osType || '—';
         const compute = computeResourceLabel(d.computeResource || tpl?.computeResource);
         const bootDiskNum = d.bootDiskGiB != null
@@ -10864,7 +10863,6 @@
 
       if (state.step === steps.length - 1) {
         closeWizard();
-        setView('vms');
         if (!VMS.find(v => v.name === state.data.name)) {
           const osMap = { rhel: 'RHEL', windows: 'Windows', fedora: 'Fedora', centos: 'CentOS', other: 'Other' };
           const source = state.createType === 'clone'
@@ -10923,13 +10921,19 @@
             nics: createdNics.length ? createdNics : undefined,
             disks: createdDisks,
           });
-          renderVms(stripFilterAttributes(document.getElementById('vm-search-global')?.value || ''));
         }
-        toast(
-          state.createType === 'clone'
-            ? `Virtual machine “${state.data.name}” is being cloned.`
-            : `Virtual machine “${state.data.name}” is being created.`
-        );
+        const createdName = state.data.name;
+        const createdMsg = state.createType === 'clone'
+          ? `Virtual machine “${createdName}” is being cloned.`
+          : `Virtual machine “${createdName}” is being created.`;
+        if (VMS.find(v => v.name === createdName)) {
+          openVmDetail(createdName, 'overview');
+          toast(createdMsg, 'success');
+        } else {
+          setView('vms');
+          renderVms(stripFilterAttributes(document.getElementById('vm-search-global')?.value || ''));
+          toast(createdMsg);
+        }
         return;
       }
       state.step += 1;
@@ -11373,7 +11377,7 @@
       </header>
       <div class="pf-v6-c-popover__body" id="status-popover-body">Virtual machine is currently Running</div>
       <footer class="pf-v6-c-popover__footer">
-        <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="status-popover-diagnostic">View diagnostic</button>
+        <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="status-popover-diagnostic">Ask AI about this status</button>
         <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline status-popover__learn" id="status-popover-learn">
           <i class="fa-solid fa-sparkles" aria-hidden="true"></i>
           Learn more
