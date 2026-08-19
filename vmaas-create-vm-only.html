@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="pf-v6-theme-felt pf-v6-theme-glass">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VMaaS Create Virtual machine only — list + create (Option 2 IA)</title>
-  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly-addons.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -17,6 +17,11 @@
       --vmaas-bg-subtle: #f5f5f5;
       --vmaas-text: #151515;
       --vmaas-text-subtle: #6a6e73;
+      /* Project Felt + Glass (PF 6.6) — same assets as Andrew’s theme pass */
+      --pf-t--global--background--image--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Light.svg");
+      --pf-t--global--background--image--glass--dark: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Dark.svg");
+      --pf-t--global--background--image--felt--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Light.svg");
+      --pf-t--global--background--image--felt--glass--dark: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Dark.svg");
     }
     html, body {
       height: 100%;
@@ -26,7 +31,7 @@
     }
     body {
       margin: 0;
-      background: #fff;
+      background: transparent;
       font-family: "Red Hat Text", "Helvetica Neue", Arial, sans-serif;
       color: var(--vmaas-text);
     }
@@ -48,7 +53,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      background: #fff;
+      background: transparent;
       border: none;
       border-radius: 0;
       overflow: hidden;
@@ -58,8 +63,11 @@
     .console__masthead {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       flex: 0 0 auto;
-      padding: 8px 20px; border-bottom: 1px solid var(--vmaas-border-light); font-size: 13px;
-      background: #fff;
+      /* Ethan / PF glass: no hard chrome divider — soft page backdrop shows through */
+      padding: 8px var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      border-bottom: none;
+      font-size: 13px;
+      background: transparent;
     }
     .console__masthead-role {
       display: inline-flex;
@@ -206,21 +214,39 @@
     }
     .console__body {
       display: grid;
-      grid-template-columns: 220px 1fr;
+      /* Ethan / PF glass page: ~18.125rem sidebar + chrome gutters (not a hard 220px split) */
+      grid-template-columns: minmax(15rem, 18.125rem) minmax(0, 1fr);
+      column-gap: var(--pf-t--global--spacer--md, 16px);
+      padding-inline: var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      padding-block-end: var(--pf-t--global--spacer--inset--page-chrome, 24px);
       flex: 1 1 auto;
       min-height: 0;
       height: 100%;
       position: relative;
     }
-    /* Stakeholder mocks: keep Ethan's-style page nav visible (incl. during Create).
-       Density matches OpenShift console / PF spacer-sm (8px) — not xs. */
+    /* Ethan / PF glass sidebar-main: soft floating panel (no hard divider). */
     .console__nav {
-      border-right: 1px solid var(--vmaas-border-light);
-      background: var(--vmaas-bg-subtle);
-      padding: var(--pf-t--global--spacer--md, 16px) 0;
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      background: var(
+        --pf-t--global--background--color--floating--secondary--default,
+        rgba(255, 255, 255, 0.5)
+      );
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding-block: var(--pf-t--global--spacer--md, 16px);
+      padding-inline: var(--pf-t--global--spacer--xs, 4px);
+      overflow: auto;
+      min-height: 0;
+      align-self: stretch;
     }
+    /* Match Ethan osac-app-shell-nav padding; leave Felt hover/current tokens alone. */
     .console__nav.pf-v6-c-nav,
     .console__nav .pf-v6-c-nav {
+      --pf-v6-c-nav--PaddingInlineStart: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav--PaddingInlineEnd: var(--pf-t--global--spacer--xs, 4px);
       --pf-v6-c-nav__link--FontSize: var(--pf-t--global--font--size--body--default, 14px);
       --pf-v6-c-nav__list--RowGap: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__item--RowGap: 0;
@@ -230,18 +256,12 @@
       --pf-v6-c-nav__subnav--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
       --pf-v6-c-nav__link--PaddingBlockStart: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__link--PaddingBlockEnd: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__link--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
-      --pf-v6-c-nav__link--PaddingInlineEnd: var(--pf-t--global--spacer--md, 16px);
-      --pf-v6-c-nav__link--BackgroundColor: transparent;
-      --pf-v6-c-nav__link--hover--BackgroundColor: rgba(0, 0, 0, 0.04);
-      --pf-v6-c-nav__link--m-current--BackgroundColor: transparent;
-      --pf-v6-c-nav__link--BorderRadius: 0;
-      --pf-v6-c-nav__link--BorderWidth: 0;
-      --pf-v6-c-nav__link--hover--BorderWidth: 0;
-      --pf-v6-c-nav__link--m-current--BorderWidth: 0;
-      --pf-v6-c-nav__link--Color: var(--vmaas-text);
-      --pf-v6-c-nav__link--hover--Color: var(--vmaas-text);
-      --pf-v6-c-nav__link--m-current--Color: var(--vmaas-text);
+      --pf-v6-c-nav__link--PaddingInlineStart: calc(
+        var(--pf-t--global--spacer--md, 16px) + var(--pf-t--global--spacer--xs, 4px)
+      );
+      --pf-v6-c-nav__link--PaddingInlineEnd: calc(
+        var(--pf-t--global--spacer--md, 16px) + var(--pf-t--global--spacer--xs, 4px)
+      );
       background: transparent;
     }
     /* Flex avoids PF grid + whitespace text nodes creating tall phantom rows. */
@@ -265,28 +285,17 @@
       min-height: 0 !important;
       text-align: left;
       cursor: pointer;
-      border: none;
-      background: transparent !important;
-      box-shadow: none !important;
-      padding-block: var(--pf-t--global--spacer--sm, 8px);
-      padding-inline: var(--pf-t--global--spacer--md, 16px);
       align-items: center;
       line-height: var(--pf-t--global--font--line-height--body, 1.5);
     }
-    .console__nav .pf-v6-c-nav__link::before,
-    .console__nav .pf-v6-c-nav__link::after {
+    .console__nav .pf-v6-c-nav__link:not(.pf-m-current)::before,
+    .console__nav .pf-v6-c-nav__link:not(.pf-m-current)::after {
       display: none !important;
       border: none !important;
       box-shadow: none !important;
     }
-    .console__nav .pf-v6-c-nav__link:hover,
-    .console__nav .pf-v6-c-nav__link:focus {
-      background: rgba(0, 0, 0, 0.04) !important;
-    }
     .console__nav .pf-v6-c-nav__link.pf-m-current {
-      background: transparent !important;
       font-weight: 600;
-      box-shadow: inset 3px 0 0 var(--vmaas-blue) !important;
     }
     .console__nav .pf-v6-c-nav__subnav {
       display: block !important;
@@ -299,7 +308,6 @@
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable > .pf-v6-c-nav__link {
       font-weight: 600;
-      color: var(--vmaas-text);
     }
     .console__nav .pf-v6-c-nav__link.pf-m-disabled,
     .console__nav .pf-v6-c-nav__link:disabled {
@@ -309,12 +317,23 @@
     .console__nav .pf-v6-c-nav__item.pf-m-expandable {
       display: block !important;
     }
+    /* Ethan / PF glass main container: soft panel, less contrasty than flat white. */
     .console__content {
       padding: 20px 24px 28px;
-      /* Grid default min-width:auto expands past the viewport; Create then sits off-screen. */
       min-width: 0;
       max-width: 100%;
       overflow-x: hidden;
+      overflow-y: auto;
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      background: var(
+        --pf-t--global--background--color--floating--default,
+        rgba(255, 255, 255, 0.72)
+      );
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .page-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -334,7 +353,7 @@
     .view { display: none; }
     .view.pf-m-active { display: block; }
 
-    /* —— VM details (Overview + Configuration → Network) —— */
+    /* —— VM details (Overview) —— */
     .vm-detail__breadcrumb {
       margin: 0 0 12px;
     }
@@ -356,7 +375,15 @@
       display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600;
     }
     .vm-detail__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
-    .vm-detail__actions .vm-action-icon {
+        .vm-action-icon-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .vm-action-icon-wrap .vm-action-icon:disabled {
+      pointer-events: none;
+    }
+.vm-detail__actions .vm-action-icon {
       width: 36px; height: 36px; padding: 0;
       display: inline-flex; align-items: center; justify-content: center;
       border: none; background: transparent; color: var(--vmaas-blue);
@@ -530,6 +557,16 @@
       color: var(--vmaas-text-subtle); font-size: 13px; text-align: center;
       margin: 8px 0;
     }
+    .util-empty {
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--vmaas-text-subtle);
+      font-size: 14px;
+      text-align: center;
+      padding: 24px 16px;
+    }
     .name-link--dotted {
       text-decoration: underline dotted;
       text-underline-offset: 3px;
@@ -542,6 +579,14 @@
       width: min(100vw - 24px, 18.75rem);
     }
     #nic-detail-popover.pf-m-open { display: block; }
+    #status-popover {
+      position: fixed;
+      z-index: 10000;
+      display: none;
+      width: min(100vw - 24px, 18.75rem);
+    }
+    #status-popover.pf-m-open { display: block; }
+    #status-popover[hidden] { display: none !important; }
     #nic-detail-popover .nic-detail-dl {
       display: grid;
       grid-template-columns: max-content 1fr;
@@ -1083,16 +1128,40 @@
     }
     .sg-select__option:hover { background: var(--vmaas-bg-subtle); }
     .nic-menu {
-      position: absolute; right: 0; top: 100%; z-index: 20; min-width: 160px;
+      position: absolute; inset-block-start: 100%; inset-inline-end: 0; z-index: 20; min-width: 12rem;
       background: #fff; border: 1px solid var(--vmaas-border); border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0,0,0,.12); padding: 4px 0;
+      text-align: start;
     }
     .nic-menu button {
-      display: block; width: 100%; text-align: left; border: none; background: none;
+      display: block; width: 100%; text-align: start; border: none; background: none;
       padding: 8px 12px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--vmaas-text);
     }
     .nic-menu button:hover { background: #f5f5f5; }
+    .nic-menu button:disabled { opacity: 0.5; cursor: not-allowed; }
     .nic-actions-wrap { position: relative; }
+    /* PF6 row action menu — left-aligned; Delete uses default (non-danger) color */
+    .overview-row-menu.pf-v6-c-menu {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline-end: 0;
+      z-index: 20;
+      width: max-content;
+      min-width: 12rem;
+      max-width: 16rem;
+      text-align: start;
+    }
+    .side-table td.side-table__actions .overview-row-menu,
+    .side-table td.side-table__actions .overview-row-menu .pf-v6-c-menu__item,
+    .side-table td.side-table__actions .overview-row-menu .pf-v6-c-menu__item-main,
+    .side-table td.side-table__actions .overview-row-menu .pf-v6-c-menu__item-text,
+    .side-table td.side-table__actions .overview-row-menu .pf-v6-c-menu__item-description {
+      text-align: start;
+    }
+    .overview-row-menu .pf-v6-c-menu__item-description {
+      white-space: normal;
+    }
 
     /* —— Manage columns modal —— */
     #columns-overlay:not(.pf-m-open) { display: none; }
@@ -1686,6 +1755,10 @@
     }
     .filter-select strong { font-weight: 600; }
     .filter-select i { margin-left: auto; font-size: 11px; color: var(--vmaas-text-subtle); }
+    .filter-select.filter-select--static {
+      cursor: default;
+      pointer-events: none;
+    }
     .filter-name-search {
       display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px; max-width: 280px;
       padding: 6px 10px; border: 1px solid var(--vmaas-border); border-radius: 6px; background: #fff;
@@ -1906,39 +1979,47 @@
     #vm-kebab-menu [data-flyout] > .pf-v6-c-menu__item[aria-expanded="true"] {
       background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
     }
-    #delete-vm-overlay:not(.pf-m-open) { display: none; }
-    #delete-vm-overlay.pf-m-open {
+    #delete-vm-overlay:not(.pf-m-open),
+    #delete-resource-overlay:not(.pf-m-open) { display: none; }
+    #delete-vm-overlay.pf-m-open,
+    #delete-resource-overlay.pf-m-open {
       display: flex; position: fixed; inset: 0; z-index: 700;
       align-items: center; justify-content: center;
       background: rgba(3, 3, 3, 0.5);
     }
-    #delete-vm-overlay .pf-v6-c-modal-box {
+    #delete-vm-overlay .pf-v6-c-modal-box,
+    #delete-resource-overlay .pf-v6-c-modal-box {
       width: min(480px, calc(100% - 2rem));
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
     }
-    #delete-vm-overlay .pf-v6-c-modal-box__title {
+    #delete-vm-overlay .pf-v6-c-modal-box__title,
+    #delete-resource-overlay .pf-v6-c-modal-box__title {
       display: flex;
       align-items: flex-start;
       gap: 8px;
     }
-    #delete-vm-overlay .pf-v6-c-modal-box__title-icon {
+    #delete-vm-overlay .pf-v6-c-modal-box__title-icon,
+    #delete-resource-overlay .pf-v6-c-modal-box__title-icon {
       color: #f0ab00;
       flex-shrink: 0;
       line-height: 1.3;
       margin-block-start: 0.15em;
     }
-    #delete-vm-overlay .pf-v6-c-button.pf-m-danger {
+    #delete-vm-overlay .pf-v6-c-button.pf-m-danger,
+    #delete-resource-overlay .pf-v6-c-button.pf-m-danger {
       background: #c9190b;
       border-color: #c9190b;
       color: #fff;
     }
-    #delete-vm-overlay .pf-v6-c-button.pf-m-danger:hover {
+    #delete-vm-overlay .pf-v6-c-button.pf-m-danger:hover,
+    #delete-resource-overlay .pf-v6-c-button.pf-m-danger:hover {
       background: #a30000;
       border-color: #a30000;
     }
-    #delete-vm-name {
+    #delete-vm-name,
+    #delete-resource-name {
       font-weight: 600;
     }
     /* PF6 default table density (not compact) — breathable row height */
@@ -1967,12 +2048,24 @@
       display: flex;
       position: absolute;
       inset-block: 0;
-      inset-inline-end: 0;
-      /* Full-page wizard in the content column; page nav stays visible. */
-      inset-inline-start: 220px;
+      inset-inline-end: var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      /* Align with glass content column: chrome + sidebar + gutter. */
+      inset-inline-start: calc(
+        var(--pf-t--global--spacer--inset--page-chrome, 24px)
+        + 18.125rem
+        + var(--pf-t--global--spacer--md, 16px)
+      );
+      inset-block-end: var(--pf-t--global--spacer--inset--page-chrome, 24px);
       z-index: 400;
-      background: var(--pf-t--global--background--color--primary--default, #fff);
-      min-height: 100%;
+      background: var(
+        --pf-t--global--background--color--floating--default,
+        rgba(255, 255, 255, 0.92)
+      );
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      overflow: hidden;
+      min-height: 0;
     }
     #overlay .pf-v6-c-wizard {
       --pf-v6-c-wizard--Height: 100%;
@@ -2665,6 +2758,14 @@
     .side-table__name-cell {
       display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
     }
+    .side-table th.side-table__actions,
+    .side-table td.side-table__actions {
+      width: 40px;
+      text-align: right;
+      padding-inline-end: 0;
+      vertical-align: middle;
+    }
+    .side-table .nic-actions-wrap { display: inline-flex; justify-content: flex-end; }
     .dv-source {
       display: inline-flex; align-items: center; gap: 6px; color: var(--vmaas-blue); font-weight: 500;
     }
@@ -3538,7 +3639,7 @@
       position: fixed;
       inset-block-start: var(--pf-t--global--spacer--md, 16px);
       inset-inline-end: var(--pf-t--global--spacer--md, 16px);
-      z-index: 1100;
+      z-index: 10050;
       width: min(420px, calc(100vw - 32px));
       margin: 0;
       padding: 0;
@@ -3697,7 +3798,7 @@
           <section class="view pf-m-active" id="view-vms">
             <div class="page-header">
               <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Virtual machines <button type="button" class="star" aria-label="Favorite">☆</button></h2>
-              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create">Create</button>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create">Create Virtual machine</button>
             </div>
 
             <!-- Global search -->
@@ -3840,7 +3941,7 @@
                         <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-action-delete-item">
                           <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="delete" disabled id="vm-action-delete-btn">
                             <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
-                            <span class="pf-v6-c-menu__item-description" id="vm-action-delete-desc">The VM is running</span>
+                            <span class="pf-v6-c-menu__item-description" id="vm-action-delete-desc">The Virtual machine is running</span>
                           </button>
                         </li>
                       </ul>
@@ -4049,6 +4150,33 @@
     </div>
   </div>
 
+  <div class="pf-v6-c-backdrop" id="delete-resource-overlay" aria-hidden="true">
+    <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
+      <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="delete-resource-title" aria-describedby="delete-resource-desc" id="delete-resource-modal">
+        <div class="pf-v6-c-modal-box__header">
+          <div class="pf-v6-c-modal-box__close">
+            <button type="button" class="pf-v6-c-button pf-m-plain" id="delete-resource-close" aria-label="Close">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+          <h1 class="pf-v6-c-modal-box__title" id="delete-resource-title">
+            <span class="pf-v6-c-modal-box__title-icon" aria-hidden="true">
+              <i class="fas fa-exclamation-triangle"></i>
+            </span>
+            <span class="pf-v6-c-modal-box__title-text" id="delete-resource-title-text">Delete?</span>
+          </h1>
+          <div class="pf-v6-c-modal-box__description" id="delete-resource-desc">
+            Are you sure you want to delete <span id="delete-resource-name">this item</span>? This action cannot be undone.
+          </div>
+        </div>
+        <div class="pf-v6-c-modal-box__footer">
+          <button type="button" class="pf-v6-c-button pf-m-danger" id="delete-resource-confirm">Delete</button>
+          <button type="button" class="pf-v6-c-button pf-m-link" id="delete-resource-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="pf-v6-c-menu pf-m-flyout" id="vm-kebab-menu" hidden role="menu" aria-label="VM actions">
     <div class="pf-v6-c-menu__content">
       <ul class="pf-v6-c-menu__list" role="menu">
@@ -4074,7 +4202,7 @@
         <li class="pf-v6-c-menu__list-item pf-m-disabled" role="none" id="vm-kebab-delete-item">
           <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-action="delete" disabled id="vm-kebab-delete-btn">
             <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
-            <span class="pf-v6-c-menu__item-description" id="vm-kebab-delete-desc">The VM is running</span>
+            <span class="pf-v6-c-menu__item-description" id="vm-kebab-delete-desc">The Virtual machine is running</span>
           </button>
         </li>
       </ul>
@@ -4206,7 +4334,6 @@
         ns: 'default',
         status: 'running',
         os: 'RHEL',
-        osFull: 'Red Hat Enterprise Linux 10.2 (Coughlan)',
         conditions: ['Ready=True', 'LiveMigratable=True'],
         node: 'master1',
         ip: '10.130.1.191',
@@ -4222,6 +4349,8 @@
         fqdn: 'indigo-quokka-89.headless.default.svc.cluster.local',
         sshPublicKey: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMockKeyForDemoOnly user@example.com',
         sshKeyFileName: 'id_ed25519.pub',
+        guestAgent: true,
+        osFull: 'Red Hat Enterprise Linux 9.5',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'], ip: '10.130.1.191' }],
         disks: [
           { name: 'rootdisk', drive: 'Disk', size: '30 GiB', interface: 'virtio' },
@@ -4229,11 +4358,11 @@
         ],
         utilization: { cpu: '0.73%', memory: '14.8%', storage: '2.55%', network: '0 Bps' },
       },
-      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'Other', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'default', status: 'running', os: 'RHEL', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29' },
-      { name: 'windows-golden-eider-58', ns: 'default', status: 'stopped', os: 'Windows', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
-      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49' },
-      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'PVC not found for boot disk' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
+      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: '', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'default', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29' },
+      { name: 'windows-golden-eider-58', ns: 'default', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
+      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49' },
+      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
     const FILTER_CATALOG = {
@@ -5203,7 +5332,7 @@
     }
 
     let NETWORKS = [
-      { id: 'net-pod', name: 'Pod networking', type: 'Pod', project: 'default', cidr: '—', status: 'Ready', vms: 5 },
+      { id: 'net-workload', name: 'tenant-workload', type: 'Isolated', project: 'default', cidr: '10.130.0.0/16', status: 'Ready', vms: 5 },
       { id: 'net-default', name: 'default', type: 'Provider', project: 'default', cidr: '10.128.0.0/14', status: 'Ready', vms: 3 },
       { id: 'net-app', name: 'app-tier', type: 'Isolated', project: 'yifat', cidr: '192.168.10.0/24', status: 'Ready', vms: 1 },
       { id: 'net-shared', name: 'org-shared', type: 'Shared', project: 'vmaas', cidr: '10.40.0.0/22', status: 'Ready', vms: 0 },
@@ -5268,9 +5397,9 @@
         sshKeyFileName: '',
         nics: [
           {
-            name: 'tenant-workload', model: 'virtio', network: 'Pod networking',
-            state: 'plugged', type: 'Masquerade', mac: '—',
-            binding: 'Masquerade', ipMode: 'DHCP', primary: true,
+            name: 'tenant-workload', model: 'virtio', network: 'tenant-workload',
+            state: 'plugged', type: 'Bridge', mac: '—',
+            binding: 'Bridge', ipMode: 'DHCP', primary: true,
           },
         ],
         disks: [],
@@ -5300,7 +5429,9 @@
       selectedVmName: null,
       vmDetailTab: 'overview', // overview | configuration | …
       vmConfigSection: 'details', // details | storage | network | …
-      nicMenuOpen: null, // nic name with open kebab
+      nicMenuOpen: null, // nic name with open kebab (unused)
+      overviewMenuOpen: null, // 'nic:<name>' | 'disk:<index>'
+      deleteResource: null, // { kind: 'nic'|'disk', name, index? }
       nicModal: null, // { context, view, name, model, network, bootSource, mac, linkState }
     };
     // Column catalog is defined below; defaults applied in getVmColumns()
@@ -6084,8 +6215,8 @@
       if (s === 'paused') {
         return `<button type="button" class="status-link" data-status-popover="paused"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('paused')}<span class="status-link__label">Paused</span></button>`;
       }
-      if (s === 'ErrorPvcNotFound') {
-        return `<button type="button" class="status-link" data-status-popover="error"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('error')}<span class="status-link__label">ErrorPvcNotFound</span></button>`;
+      if (s === 'ErrorPvcNotFound' || s === 'error') {
+        return `<button type="button" class="status-link" data-status-popover="error"${vmAttr} aria-haspopup="dialog" aria-expanded="false">${statusIcon('error')}<span class="status-link__label">Error</span></button>`;
       }
       if (s === 'starting') {
         return `<span class="status-static">${statusIcon('starting')} Starting</span>`;
@@ -6107,8 +6238,8 @@
         body: 'Virtual machine is currently Paused',
       },
       error: {
-        title: 'ErrorPvcNotFound',
-        body: 'Virtual machine has an error: PVC not found',
+        title: 'Error',
+        body: 'The boot disk is unavailable. Check storage configuration or contact your administrator.',
       },
     };
 
@@ -6142,30 +6273,26 @@
       trigger.setAttribute('aria-expanded', 'true');
       pop.hidden = false;
       pop.classList.add('pf-m-open');
-      // Position to the right of the trigger (arrow on left of popover)
+      // Fixed positioning uses viewport coords (no scroll offsets)
       const rect = trigger.getBoundingClientRect();
       const gap = 12;
-      let top = rect.top + window.scrollY + (rect.height / 2) - 40;
-      let left = rect.right + window.scrollX + gap;
-      pop.style.top = `${Math.max(8, top)}px`;
-      pop.style.left = `${left}px`;
-      // Keep on screen
+      pop.classList.add('pf-m-right');
+      pop.classList.remove('pf-m-left');
+      pop.style.top = `${Math.max(8, rect.top + (rect.height / 2) - 40)}px`;
+      pop.style.left = `${rect.right + gap}px`;
       requestAnimationFrame(() => {
         const pr = pop.getBoundingClientRect();
         if (pr.right > window.innerWidth - 8) {
-          // flip to left of trigger
           pop.classList.remove('pf-m-right');
           pop.classList.add('pf-m-left');
-          pop.style.left = `${Math.max(8, rect.left + window.scrollX - pr.width - gap)}px`;
-        } else {
-          pop.classList.add('pf-m-right');
-          pop.classList.remove('pf-m-left');
+          pop.style.left = `${Math.max(8, rect.left - pr.width - gap)}px`;
         }
         if (pr.bottom > window.innerHeight - 8) {
-          pop.style.top = `${Math.max(8, window.scrollY + window.innerHeight - pr.height - 8)}px`;
+          pop.style.top = `${Math.max(8, window.innerHeight - pr.height - 8)}px`;
         }
       });
-      document.getElementById('status-popover-close')?.focus();
+      // preventScroll: focusing close was scrolling the page and instantly closing via scroll listener
+      document.getElementById('status-popover-close')?.focus({ preventScroll: true });
     }
 
     function wireStatusPopover() {
@@ -6293,14 +6420,14 @@
         ? [
             { action: 'stop', label: 'Stop' },
             { action: 'pause', label: 'Pause' },
-            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM' },
-            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM' },
+            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the Virtual machine' },
+            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the Virtual machine' },
           ]
         : [
             { action: 'start', label: 'Start' },
             { action: 'pause', label: 'Pause', disabled: true },
-            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM', disabled: true },
-            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM', disabled: true },
+            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the Virtual machine', disabled: true },
+            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the Virtual machine', disabled: true },
           ];
 
       list.innerHTML = items.map(it => `
@@ -6323,7 +6450,7 @@
       btn.disabled = !canUse;
       btn.title = !role.canPower
         ? 'No power operations for this role'
-        : hasSelection ? '' : 'Select one or more VMs';
+        : hasSelection ? '' : 'Select one or more Virtual machines';
 
       if (!canUse) setVmActionsMenuOpen(false);
 
@@ -6338,7 +6465,7 @@
       setActionItemState('vm-action-console-item', 'vm-action-console-btn', 'vm-action-console-desc', {
         disabled: allStopped || !selected.length,
         description: allStopped
-          ? (single ? 'The VM is not running' : 'VMs are not running')
+          ? (single ? 'The Virtual machine is not running' : 'Virtual machines are not running')
           : 'Open console in new tab',
       });
 
@@ -6347,8 +6474,8 @@
       let deleteDesc = '';
       if (someRunning) {
         deleteDesc = single
-          ? 'The VM is running'
-          : 'Some VMs are running';
+          ? 'The Virtual machine is running'
+          : 'Some Virtual machines are running';
       }
       setActionItemState('vm-action-delete-item', 'vm-action-delete-btn', 'vm-action-delete-desc', {
         disabled: deleteBlocked,
@@ -6388,22 +6515,22 @@
         ? [
             { action: 'stop', label: 'Stop' },
             { action: 'pause', label: 'Pause' },
-            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM' },
-            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM' },
+            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the Virtual machine' },
+            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the Virtual machine' },
           ]
         : paused
         ? [
             { action: 'start', label: 'Start' },
             { action: 'stop', label: 'Stop' },
             { action: 'pause', label: 'Pause', disabled: true },
-            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM', disabled: true },
-            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM', disabled: true },
+            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the Virtual machine', disabled: true },
+            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the Virtual machine', disabled: true },
           ]
         : [
             { action: 'start', label: 'Start' },
             { action: 'pause', label: 'Pause', disabled: true },
-            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the VM', disabled: true },
-            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the VM', disabled: true },
+            { action: 'restart', label: 'Restart', desc: 'Shut down and reboot the Virtual machine', disabled: true },
+            { action: 'reset', label: 'Reset', desc: 'Hard power cycle on the Virtual machine', disabled: true },
           ];
       list.innerHTML = items.map(it => `
         <li class="pf-v6-c-menu__list-item${it.disabled ? ' pf-m-disabled' : ''}" role="none">
@@ -6422,12 +6549,12 @@
 
       setActionItemState('vm-kebab-console-item', 'vm-kebab-console-btn', 'vm-kebab-console-desc', {
         disabled: !running,
-        description: running ? 'Open console in new tab' : 'The VM is not running',
+        description: running ? 'Open console in new tab' : 'The Virtual machine is not running',
       });
 
       setActionItemState('vm-kebab-delete-item', 'vm-kebab-delete-btn', 'vm-kebab-delete-desc', {
         disabled: running,
-        description: running ? 'The VM is running' : '',
+        description: running ? 'The Virtual machine is running' : '',
         hideDesc: !running,
       });
     }
@@ -6735,6 +6862,44 @@
       };
     }
 
+    /** PF6 kebab menu for Overview Network/Storage row actions (Delete is not danger-styled). */
+    function overviewRowActionsMenu({
+      editAttr, editValue,
+      deleteEnabled, deleteReason, deleteAttr, deleteValue,
+    }) {
+      const deleteItem = deleteEnabled
+        ? `<li class="pf-v6-c-menu__list-item" role="none">
+             <button class="pf-v6-c-menu__item" type="button" role="menuitem" ${deleteAttr}="${deleteValue}">
+               <span class="pf-v6-c-menu__item-main">
+                 <span class="pf-v6-c-menu__item-text">Delete</span>
+               </span>
+             </button>
+           </li>`
+        : `<li class="pf-v6-c-menu__list-item pf-m-disabled" role="none">
+             <button class="pf-v6-c-menu__item" type="button" role="menuitem" disabled tabindex="-1">
+               <span class="pf-v6-c-menu__item-main">
+                 <span class="pf-v6-c-menu__item-text">Delete</span>
+               </span>
+               <span class="pf-v6-c-menu__item-description">${deleteReason}</span>
+             </button>
+           </li>`;
+      return `
+    <div class="pf-v6-c-menu overview-row-menu" role="menu">
+      <div class="pf-v6-c-menu__content">
+        <ul class="pf-v6-c-menu__list" role="menu">
+          <li class="pf-v6-c-menu__list-item" role="none">
+            <button class="pf-v6-c-menu__item" type="button" role="menuitem" ${editAttr}="${editValue}">
+              <span class="pf-v6-c-menu__item-main">
+                <span class="pf-v6-c-menu__item-text">Edit</span>
+              </span>
+            </button>
+          </li>
+          ${deleteItem}
+        </ul>
+      </div>
+    </div>`;
+    }
+
 
     let fsHelpPopoverTrigger = null;
 
@@ -6887,13 +7052,13 @@
         group: '—',
         timezone: 'UTC',
         fqdn: `${v.name}.headless.${v.ns || 'default'}.svc.cluster.local`,
-        guestAgent: false,
+        guestAgent: v.guestAgent === true,
         computeResource: 'small',
         alerts: [],
         gpuDevices: [],
         hostDevices: [],
         ...v,
-        osFull: v.osFull || osFullMap[v.os] || v.os || 'Linux',
+        osFull: v.osFull || (v.os ? (osFullMap[v.os] || v.os) : ''),
         nics: v.nics || [{
           name: 'tenant-workload',
           virtualNetwork: 'tenant-workload',
@@ -7097,7 +7262,7 @@
       if (!m?.name || !m.network) return;
       const existing = existingNicsForContext(m.context);
       if (existing.some(n => n.name === m.name)) {
-        toast(`Interface “${m.name}” already exists. Choose another name.`);
+        toast(`Network “${m.name}” already exists. Choose another name.`);
         return;
       }
       const nic = {
@@ -7105,7 +7270,7 @@
         model: m.model || 'virtio',
         network: m.network,
         state: m.linkState === 'Down' ? 'unplugged' : 'plugged',
-        type: m.network === 'Pod networking' ? 'Masquerade' : 'Bridge',
+        type: 'Bridge',
         mac: m.mac || '—',
         ip: '—',
         bootSource: m.bootSource,
@@ -7120,7 +7285,7 @@
         });
         closeAddNicModal();
         renderWizard();
-        toast(`Network interface “${nic.name}” added.`);
+        toast(`Network “${nic.name}” added.`);
         return;
       }
       const vm = VMS.find(v => v.name === state.selectedVmName);
@@ -7129,7 +7294,7 @@
       vm.nics.push(nic);
       closeAddNicModal();
       renderVmDetail();
-      toast(`Network interface “${nic.name}” added.`);
+      toast(`Network “${nic.name}” added.`);
     }
 
     function nextAutoNetworkName(d = state.data, virtualNetworkId = d.virtualNetwork) {
@@ -7142,6 +7307,8 @@
       const defaultNet = CONFIG_VIRTUAL_NETWORKS[0];
       state.networkModal = {
         context,
+        mode: 'add',
+        editName: null,
         virtualNetwork: defaultNet?.id || '',
         subnet: defaultNet?.subnets?.[0] || '',
         securityGroups: [DEFAULT_SECURITY_GROUP],
@@ -7150,6 +7317,32 @@
       };
       const title = document.getElementById('nic-modal-title');
       if (title) title.textContent = 'Add network';
+      renderAddNetworkModal();
+      const overlay = document.getElementById('nic-overlay');
+      overlay?.classList.add('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('net-f-virtual-network')?.focus(), 0);
+    }
+
+    function openEditNetworkModal(nicName) {
+      const vm = VMS.find(v => v.name === state.selectedVmName);
+      if (!vm?.nics) return;
+      const nic = vm.nics.find(n => (n.name || normalizeNic(n).name) === nicName);
+      if (!nic) return;
+      const detail = normalizeNic(nic);
+      state.nicModal = null;
+      state.networkModal = {
+        context: 'vm-detail',
+        mode: 'edit',
+        editName: detail.name,
+        virtualNetwork: detail.virtualNetwork,
+        subnet: detail.subnet,
+        securityGroups: [...(detail.securityGroups || [])],
+        sgMenuOpen: false,
+        error: '',
+      };
+      const title = document.getElementById('nic-modal-title');
+      if (title) title.textContent = 'Edit network';
       renderAddNetworkModal();
       const overlay = document.getElementById('nic-overlay');
       overlay?.classList.add('pf-m-open');
@@ -7185,9 +7378,11 @@
       m.securityGroups = m.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
       if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
       const canSave = canSaveNetworkModal(m);
-      const previewName = m.context === 'vm-detail'
-        ? networkAttachmentName(m.virtualNetwork, existingNicsForContext('vm-detail'))
-        : networkAttachmentName(m.virtualNetwork, state.data.extraNetworks || []);
+      const previewName = m.mode === 'edit' && m.editName
+        ? m.editName
+        : m.context === 'vm-detail'
+          ? networkAttachmentName(m.virtualNetwork, existingNicsForContext('vm-detail'))
+          : networkAttachmentName(m.virtualNetwork, state.data.extraNetworks || []);
       const chips = (m.securityGroups || []).map(sg => `
         <span class="sg-select__chip">
           ${sg}
@@ -7218,7 +7413,7 @@
               ).join('')}
             `,
           })}
-          <p class="form-helper">Network name will be <code>${previewName}</code>.</p>
+          <p class="form-helper">Network name ${m.mode === 'edit' ? 'is' : 'will be'} <code>${previewName}</code>.</p>
           ${CONFIG_VIRTUAL_NETWORKS.length ? '' : `
             <p class="nic-modal__error" role="alert" style="margin-top:12px;">
               <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
@@ -7276,7 +7471,7 @@
         </div>
       `;
       footer.innerHTML = `
-        <button type="button" class="pf-v6-c-button pf-m-primary" id="net-modal-save" ${canSave ? '' : 'disabled'}>Add</button>
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="net-modal-save" ${canSave ? '' : 'disabled'}>${m.mode === 'edit' ? 'Save' : 'Add'}</button>
         <button type="button" class="pf-v6-c-button pf-m-link" id="net-modal-cancel">Cancel</button>
       `;
 
@@ -7345,6 +7540,22 @@
         const vm = VMS.find(v => v.name === state.selectedVmName);
         if (!vm) return;
         if (!vm.nics) vm.nics = enrichVm(vm).nics.slice();
+        if (m.mode === 'edit' && m.editName) {
+          const idx = vm.nics.findIndex(n => (n.name || normalizeNic(n).name) === m.editName);
+          if (idx < 0) return;
+          const prev = vm.nics[idx];
+          vm.nics[idx] = {
+            ...prev,
+            name: m.editName,
+            virtualNetwork: m.virtualNetwork,
+            subnet: m.subnet,
+            securityGroups: [...(m.securityGroups || [])],
+          };
+          closeAddNetworkModal();
+          renderVmDetail();
+          toast(`Network “${m.editName}” updated.`, 'success');
+          return;
+        }
         const nic = {
           name: networkAttachmentName(m.virtualNetwork, vm.nics),
           virtualNetwork: m.virtualNetwork,
@@ -7359,9 +7570,10 @@
         return;
       }
       if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
+      const name = networkAttachmentName(m.virtualNetwork, state.data.extraNetworks || []);
       state.data.extraNetworks.push({
         id: `net-${Date.now()}`,
-        name: networkAttachmentName(m.virtualNetwork, state.data.extraNetworks || []),
+        name,
         virtualNetwork: m.virtualNetwork,
         virtualNetworkLabel: net?.label || m.virtualNetwork,
         subnet: m.subnet,
@@ -7369,7 +7581,7 @@
       });
       closeAddNetworkModal();
       renderWizard();
-      toast('Network added.', 'success');
+      toast(`Network “${name}” added.`, 'success');
     }
 
     /**
@@ -7480,6 +7692,8 @@
       const defaultTier = tiers[0];
       state.diskModal = {
         context,
+        mode: 'add',
+        editIndex: null,
         size: 30,
         unit: 'GiB',
         storageTierId: defaultTier?.id || '',
@@ -7487,6 +7701,35 @@
         tierFilter: '',
         error: '',
       };
+      const title = document.getElementById('disk-modal-title');
+      if (title) title.textContent = 'Add disk';
+      renderAddDiskModal();
+      const overlay = document.getElementById('disk-overlay');
+      overlay?.classList.add('pf-m-open');
+      overlay?.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('disk-f-size')?.focus(), 0);
+    }
+
+    function openEditDiskModal(diskIdx) {
+      const vm = VMS.find(v => v.name === state.selectedVmName);
+      if (!vm) return;
+      if (!vm.disks) vm.disks = enrichVm(vm).disks.slice();
+      const dsk = vm.disks[diskIdx];
+      if (!dsk) return;
+      const sizeNum = typeof dsk.size === 'number' ? dsk.size : parseFloat(String(dsk.size)) || 30;
+      state.diskModal = {
+        context: 'vm-detail',
+        mode: 'edit',
+        editIndex: diskIdx,
+        size: sizeNum,
+        unit: dsk.unit || 'GiB',
+        storageTierId: dsk.storageTierId || '',
+        tierOpen: false,
+        tierFilter: '',
+        error: '',
+      };
+      const title = document.getElementById('disk-modal-title');
+      if (title) title.textContent = 'Edit disk';
       renderAddDiskModal();
       const overlay = document.getElementById('disk-overlay');
       overlay?.classList.add('pf-m-open');
@@ -7496,6 +7739,8 @@
 
     function closeAddDiskModal() {
       state.diskModal = null;
+      const title = document.getElementById('disk-modal-title');
+      if (title) title.textContent = 'Add disk';
       const overlay = document.getElementById('disk-overlay');
       overlay?.classList.remove('pf-m-open');
       overlay?.setAttribute('aria-hidden', 'true');
@@ -7627,7 +7872,7 @@
         </div>
       `;
       footer.innerHTML = `
-        <button type="button" class="pf-v6-c-button pf-m-primary" id="disk-modal-save" ${canSave ? '' : 'disabled'}>Add</button>
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="disk-modal-save" ${canSave ? '' : 'disabled'}>${m.mode === 'edit' ? 'Save' : 'Add'}</button>
         <button type="button" class="pf-v6-c-button pf-m-link" id="disk-modal-cancel">Cancel</button>
       `;
 
@@ -7722,6 +7967,22 @@
         const vm = VMS.find(v => v.name === state.selectedVmName);
         if (!vm) return;
         if (!vm.disks) vm.disks = enrichVm(vm).disks.slice();
+        if (m.mode === 'edit' && m.editIndex != null) {
+          const dsk = vm.disks[m.editIndex];
+          if (!dsk) return;
+          const name = dsk.label || dsk.name || 'Disk';
+          vm.disks[m.editIndex] = {
+            ...dsk,
+            size: Number(m.size),
+            unit: m.unit || 'GiB',
+            storageTierId: m.storageTierId,
+            storageTierLabel: tierLabel,
+          };
+          closeAddDiskModal();
+          renderVmDetail();
+          toast(`Disk “${name}” updated.`, 'success');
+          return;
+        }
         const extra = vm.disks.filter(d => !(d.bootable || /boot/i.test(d.name || d.label || '')));
         const name = nextAutoDiskName({ name: vm.name, extraDisks: extra });
         vm.disks.push({
@@ -7835,7 +8096,7 @@
       const content = document.getElementById('pf-tooltip-content');
       if (!tip || !content || !trigger) return;
       const text = trigger.getAttribute('data-pf-tooltip');
-      if (!text || trigger.disabled) {
+      if (!text) {
         hidePfTooltip();
         return;
       }
@@ -7866,7 +8127,7 @@
       document.body.dataset.pfTooltipWired = '1';
       document.addEventListener('mouseover', e => {
         const trigger = e.target.closest('[data-pf-tooltip]');
-        if (!trigger || trigger.disabled) return;
+        if (!trigger) return;
         showPfTooltip(trigger);
       });
       document.addEventListener('mouseout', e => {
@@ -7878,13 +8139,79 @@
       });
       document.addEventListener('focusin', e => {
         const trigger = e.target.closest('[data-pf-tooltip]');
-        if (trigger && !trigger.disabled) showPfTooltip(trigger);
+        if (trigger) showPfTooltip(trigger);
       });
       document.addEventListener('focusout', e => {
         if (e.target.closest('[data-pf-tooltip]')) hidePfTooltip();
       });
       window.addEventListener('scroll', hidePfTooltip, true);
       window.addEventListener('resize', hidePfTooltip);
+    }
+
+    function openDeleteResourceModal(payload) {
+      state.deleteResource = payload;
+      state.overviewMenuOpen = null;
+      const overlay = document.getElementById('delete-resource-overlay');
+      const title = document.getElementById('delete-resource-title-text');
+      const nameEl = document.getElementById('delete-resource-name');
+      if (!overlay || !title || !nameEl) return;
+      const kindLabel = payload.kind === 'nic' ? 'network' : 'disk';
+      title.textContent = `Delete ${kindLabel}?`;
+      nameEl.textContent = payload.name || 'this item';
+      overlay.classList.add('pf-m-open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.getElementById('delete-resource-confirm')?.focus();
+    }
+
+    function closeDeleteResourceModal() {
+      const overlay = document.getElementById('delete-resource-overlay');
+      if (overlay) {
+        overlay.classList.remove('pf-m-open');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      state.deleteResource = null;
+    }
+
+    function confirmDeleteResource() {
+      const payload = state.deleteResource;
+      const vm = VMS.find(x => x.name === state.selectedVmName);
+      if (!payload || !vm) {
+        closeDeleteResourceModal();
+        return;
+      }
+      if (payload.kind === 'nic') {
+        if (!vm.nics || vm.nics.length < 2) {
+          closeDeleteResourceModal();
+          toast('At least one network is required.');
+          return;
+        }
+        vm.nics = vm.nics.filter(n => (n.name || normalizeNic(n).name) !== payload.name);
+        closeDeleteResourceModal();
+        toast(`Deleted network ${payload.name}.`);
+        renderVmDetail();
+        return;
+      }
+      if (payload.kind === 'disk') {
+        const disks = vm.disks || [];
+        const idx = payload.index;
+        const dsk = disks[idx];
+        if (!dsk) {
+          closeDeleteResourceModal();
+          return;
+        }
+        if (dsk.bootable || /boot/i.test(dsk.name || dsk.label || '')) {
+          closeDeleteResourceModal();
+          toast('Boot disk cannot be deleted.');
+          return;
+        }
+        disks.splice(idx, 1);
+        vm.disks = disks;
+        closeDeleteResourceModal();
+        toast(`Deleted disk ${payload.name}.`);
+        renderVmDetail();
+        return;
+      }
+      closeDeleteResourceModal();
     }
 
     function openVmDetail(name, tab = 'overview') {
@@ -7894,6 +8221,7 @@
       state.vmDetailTab = tab;
       state.vmConfigSection = 'details';
       state.nicMenuOpen = null;
+      state.overviewMenuOpen = null;
       setView('vm');
       renderVmDetail();
     }
@@ -7907,18 +8235,11 @@
         root.innerHTML = '<p class="muted">Virtual machine not found.</p>';
         return;
       }
-      // Detail section tabs hidden for now — Overview only
+      // Overview-only details (Configuration and other tabs removed for VMaaS)
       state.vmDetailTab = 'overview';
       const tab = 'overview';
       const tabs = [
         ['overview', 'Overview'],
-        ['metrics', 'Metrics'],
-        ['yaml', 'YAML'],
-        ['configuration', 'Configuration'],
-        ['events', 'Events'],
-        ['console', 'Console'],
-        ['snapshots', 'Snapshots'],
-        ['diagnostics', 'Diagnostics'],
       ];
       const running = v.status === 'running';
       const paused = v.status === 'paused';
@@ -7937,7 +8258,7 @@
               <span class="pf-v6-c-breadcrumb__item-divider">
                 <i class="fas fa-angle-right" aria-hidden="true"></i>
               </span>
-              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Virtual machine details</span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${v.name}</span>
             </li>
           </ol>
         </nav>
@@ -7951,18 +8272,36 @@
             <span class="vm-detail__status">${statusCell(v.status, v.name)}</span>
           </div>
           <div class="vm-detail__actions" role="group" aria-label="VM actions">
-            <button type="button" class="vm-action-icon" data-vm-action="stop" data-pf-tooltip="Stop" aria-label="Stop" ${canStop ? '' : 'disabled'}>
-              <i class="fa-solid fa-stop" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="vm-action-icon" data-vm-action="restart" data-pf-tooltip="Restart" aria-label="Restart" ${canRestart ? '' : 'disabled'}>
-              <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="vm-action-icon" data-vm-action="pause" data-pf-tooltip="Pause" aria-label="Pause" ${canPause ? '' : 'disabled'}>
-              <i class="fa-solid fa-pause" aria-hidden="true"></i>
-            </button>
-            <button type="button" class="vm-action-icon" data-vm-action="start" data-pf-tooltip="Start" aria-label="Start" ${canStart ? '' : 'disabled'}>
-              <i class="fa-solid fa-play" aria-hidden="true"></i>
-            </button>
+            ${(() => {
+              const startingReason = 'The Virtual machine is starting';
+              const notRunningReason = 'The Virtual machine is not running';
+              const runningReason = 'The Virtual machine is running';
+              const stopTip = canStop ? 'Stop' : (starting ? startingReason : notRunningReason);
+              const restartTip = canRestart ? 'Restart' : (starting ? startingReason : notRunningReason);
+              const pauseTip = canPause ? 'Pause' : (starting ? startingReason : notRunningReason);
+              const startTip = canStart ? 'Start' : (starting ? startingReason : runningReason);
+              return `
+            <span class="vm-action-icon-wrap" data-pf-tooltip="${stopTip}">
+              <button type="button" class="vm-action-icon" data-vm-action="stop" aria-label="Stop" ${canStop ? '' : 'disabled'}>
+                <i class="fa-solid fa-stop" aria-hidden="true"></i>
+              </button>
+            </span>
+            <span class="vm-action-icon-wrap" data-pf-tooltip="${restartTip}">
+              <button type="button" class="vm-action-icon" data-vm-action="restart" aria-label="Restart" ${canRestart ? '' : 'disabled'}>
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+              </button>
+            </span>
+            <span class="vm-action-icon-wrap" data-pf-tooltip="${pauseTip}">
+              <button type="button" class="vm-action-icon" data-vm-action="pause" aria-label="Pause" ${canPause ? '' : 'disabled'}>
+                <i class="fa-solid fa-pause" aria-hidden="true"></i>
+              </button>
+            </span>
+            <span class="vm-action-icon-wrap" data-pf-tooltip="${startTip}">
+              <button type="button" class="vm-action-icon" data-vm-action="start" aria-label="Start" ${canStart ? '' : 'disabled'}>
+                <i class="fa-solid fa-play" aria-hidden="true"></i>
+              </button>
+            </span>`;
+            })()}
             <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary vm-action-menu" id="vm-detail-actions-btn"
               data-vm-kebab="${v.name}" aria-expanded="false" aria-haspopup="menu" aria-controls="vm-kebab-menu">
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
@@ -7988,9 +8327,10 @@
         ];
         const projectRaw = v.project || v.ns || 'default';
         const projectDisplay = projectRaw === 'default' ? 'Default' : projectRaw;
-        const osDisplay = v.guestAgent === true
-          ? (v.osFull || v.os || '—')
-          : 'Guest agent is required.';
+        const osKnown = (v.osFull || v.os || '').trim();
+        const osDisplay = osKnown
+          ? osKnown
+          : `<span class="muted">—</span><span class="form-helper" style="display:block;margin-top:2px;">Guest agent not reporting</span>`;
         const cpuAbs = u.cpuAbs;
         const cpuOf = u.cpuOf;
         const cpuPct = parseFloat(String(u.cpu || '0').replace('%', '')) || 0;
@@ -8029,7 +8369,7 @@
                       <dt>Status</dt><dd>${statusCell(v.status, v.name)}</dd>
                       <dt>Created</dt><dd>${v.created || '—'}</dd>
                       <dt>Operating system</dt><dd>${osDisplay}</dd>
-                      <dt>Compute resources</dt>
+                      <dt>Compute resource</dt>
                       <dd>
                         <span class="vm-compute-row">
                           ${v.computeResource ? formatComputeDisplay(v.computeResource) : `${v.cpu || '1 CPU'} | ${v.mem || '128 MiB'} Memory`}
@@ -8042,12 +8382,17 @@
                       <dd>
                         ${/win/i.test(String(v.os || v.osFull || ''))
                           ? 'Not applicable'
-                          : `<span class="vm-compute-row">
-                              ${v.sshPublicKey && String(v.sshPublicKey).trim() ? 'Configured' : 'Not configured'}
+                          : `${(() => {
+                            const configured = !!(v.sshPublicKey && String(v.sshPublicKey).trim());
+                            return `<span class="vm-compute-row">
+                              ${configured
+                                ? 'Configured'
+                                : `<button type="button" class="name-link" data-edit-ssh>Not configured</button>`}
                               <button type="button" class="vm-edit-inline" data-edit-ssh aria-label="Edit SSH public key" title="Edit">
                                 <i class="fa-solid fa-pen" aria-hidden="true"></i>
                               </button>
-                            </span>`}
+                            </span>`;
+                          })()}`}
                       </dd>
                     </dl>
                     <div class="vm-vnc">
@@ -8067,8 +8412,9 @@
                         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                       </button>
                     </h3>
-                    <button type="button" class="filter-select">Last 5 minutes <i class="fa-solid fa-caret-down"></i></button>
+                    <span class="filter-select filter-select--static">Last 5 minutes <i class="fa-solid fa-caret-down"></i></span>
                   </div>
+                  ${v.status === 'running' ? `
                   <div class="util-grid">
                     <div class="util-tile">
                       <div class="util-tile__label">CPU</div>
@@ -8167,6 +8513,9 @@
                       </div>
                     </div>
                   </div>
+                  ` : `
+                  <div class="util-empty" role="status">Virtual machine is not running</div>
+                  `}
                 </div>
               </div>
               <aside>
@@ -8196,12 +8545,15 @@
                     <h3 class="vm-card__title">Network (${nics.length})</h3>
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net">Add network</button>
                   </div>
-                  <table class="side-table">
-                    <thead><tr><th>Name</th><th>IP address</th></tr></thead>
+                  <table class="side-table" aria-label="Networks">
+                    <thead><tr><th>Name</th><th>IP address</th><th class="side-table__actions"><span class="pf-v6-screen-reader">Actions</span></th></tr></thead>
                     <tbody>
                       ${nics.map(n => {
                         const detail = normalizeNic(n);
                         const payload = encodeURIComponent(JSON.stringify(detail));
+                        const menuKey = `nic:${detail.name}`;
+                        const menuOpen = state.overviewMenuOpen === menuKey;
+                        const canDeleteNic = nics.length >= 2;
                         return `
                         <tr>
                           <td>
@@ -8212,6 +8564,22 @@
                             </button>
                           </td>
                           <td>${detail.ip || '—'}</td>
+                          <td class="side-table__actions">
+                            <div class="nic-actions-wrap">
+                              <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-menu="${menuKey}"
+                                aria-label="Actions for ${detail.name}" aria-expanded="${menuOpen}" aria-haspopup="menu">
+                                <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                              </button>
+                              ${menuOpen ? overviewRowActionsMenu({
+                                editAttr: 'data-overview-edit-nic',
+                                editValue: detail.name,
+                                deleteEnabled: canDeleteNic,
+                                deleteReason: 'At least one network is required.',
+                                deleteAttr: 'data-overview-delete-nic',
+                                deleteValue: detail.name,
+                              }) : ''}
+                            </div>
+                          </td>
                         </tr>`;
                       }).join('')}
                     </tbody>
@@ -8222,11 +8590,13 @@
                     <h3 class="vm-card__title">Storage (${diskRows.length})</h3>
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk">Add disk</button>
                   </div>
-                  <table class="side-table">
-                    <thead><tr><th>Name</th><th>Size</th><th>Storage tier</th></tr></thead>
+                  <table class="side-table" aria-label="Storage disks">
+                    <thead><tr><th>Name</th><th>Size</th><th>Storage tier</th><th class="side-table__actions"><span class="pf-v6-screen-reader">Actions</span></th></tr></thead>
                     <tbody>
-                      ${diskRows.map(dsk => {
+                      ${diskRows.map((dsk, diskIdx) => {
                         const detail = normalizeDisk(dsk);
+                        const menuKey = `disk:${diskIdx}`;
+                        const menuOpen = state.overviewMenuOpen === menuKey;
                         return `
                         <tr>
                           <td>
@@ -8237,6 +8607,22 @@
                           </td>
                           <td>${detail.size}</td>
                           <td>${detail.storageTier}</td>
+                          <td class="side-table__actions">
+                            <div class="nic-actions-wrap">
+                              <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-menu="${menuKey}"
+                                aria-label="Actions for ${detail.name}" aria-expanded="${menuOpen}" aria-haspopup="menu">
+                                <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                              </button>
+                              ${menuOpen ? overviewRowActionsMenu({
+                                editAttr: 'data-overview-edit-disk',
+                                editValue: String(diskIdx),
+                                deleteEnabled: !detail.bootable,
+                                deleteReason: 'The boot disk cannot be deleted.',
+                                deleteAttr: 'data-overview-delete-disk',
+                                deleteValue: String(diskIdx),
+                              }) : ''}
+                            </div>
+                          </td>
                         </tr>`;
                       }).join('')}
                     </tbody>
@@ -8319,114 +8705,6 @@
           </div>
         `;
 
-      } else if (tab === 'configuration') {
-        const section = state.vmConfigSection || 'details';
-        const sections = [
-          ['details', 'Details'],
-          ['storage', 'Storage'],
-          ['network', 'Network'],
-          ['scheduling', 'Scheduling'],
-          ['ssh', 'SSH'],
-          ['initial', 'Initial run'],
-          ['metadata', 'Labels and annotations'],
-        ];
-        let panel = '';
-        if (section === 'network') {
-          const nicRows = v.nics.map(n => `
-            <tr class="pf-v6-c-table__tr">
-              <td class="pf-v6-c-table__td">${n.name}</td>
-              <td class="pf-v6-c-table__td">${n.model || 'virtio'}</td>
-              <td class="pf-v6-c-table__td">${n.network}</td>
-              <td class="pf-v6-c-table__td">
-                <span class="nic-state" title="Plugged" aria-label="Plugged">
-                  <i class="fa-solid fa-plug-circle-plus" aria-hidden="true"></i>
-                </span>
-              </td>
-              <td class="pf-v6-c-table__td">${n.type || 'Masquerade'}</td>
-              <td class="pf-v6-c-table__td">${n.mac || '—'}</td>
-              <td class="pf-v6-c-table__td">
-                <div class="nic-actions-wrap">
-                  <button type="button" class="kebab" data-nic-menu="${n.name}" aria-label="Actions for ${n.name}" aria-expanded="${state.nicMenuOpen === n.name}">
-                    <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
-                  </button>
-                  ${state.nicMenuOpen === n.name ? `
-                    <div class="nic-menu" role="menu">
-                      <button type="button" role="menuitem">Set link down</button>
-                      <button type="button" role="menuitem">Edit</button>
-                      <button type="button" role="menuitem" data-nic-delete="${n.name}">Delete</button>
-                    </div>
-                  ` : ''}
-                </div>
-              </td>
-            </tr>
-          `).join('');
-          panel = `
-            <div class="storage-section">
-              <h3 class="storage-section__title">Network interfaces</h3>
-              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-add-vm-nic">Add network</button>
-              <div class="nic-toolbar">
-                <button type="button" class="filter-btn"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filter</button>
-                <button type="button" class="nic-attr-select">Name <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
-                <div class="filter-name-search">
-                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                  <input type="search" placeholder="Search by name..." aria-label="Search interfaces by name" />
-                </div>
-              </div>
-              <div style="overflow-x:auto;">
-                <table class="pf-v6-c-table pf-m-compact vm-table" role="grid" aria-label="Network interfaces">
-                  <thead class="pf-v6-c-table__thead">
-                    <tr class="pf-v6-c-table__tr">
-                      <th class="pf-v6-c-table__th" scope="col">Name <span class="sort-hint">↕</span></th>
-                      <th class="pf-v6-c-table__th" scope="col">Model <span class="sort-hint">↕</span></th>
-                      <th class="pf-v6-c-table__th" scope="col">Network <span class="sort-hint">↕</span></th>
-                      <th class="pf-v6-c-table__th" scope="col">State <span class="sort-hint">↕</span></th>
-                      <th class="pf-v6-c-table__th" scope="col">Type <span class="sort-hint">↕</span></th>
-                      <th class="pf-v6-c-table__th" scope="col">MAC address <span class="sort-hint">↕</span></th>
-                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                    </tr>
-                  </thead>
-                  <tbody class="pf-v6-c-table__tbody">${nicRows}</tbody>
-                </table>
-              </div>
-              <p class="form-helper" style="margin-top:12px;">
-                Attach interfaces to an existing virtual network, subnet, and security groups. Manage virtual networks from the
-                <button type="button" class="name-link" id="vm-goto-networks">Virtual networks</button> page.
-              </p>
-            </div>
-          `;
-        } else {
-          panel = `<p class="muted" style="margin:0;">${sections.find(s => s[0] === section)?.[1] || 'Section'} (placeholder). Use <strong>Network</strong> to attach NICs.</p>`;
-        }
-        const tabsHtml = sections.map(([id, label]) => `
-          <li class="pf-v6-c-tabs__item ${section === id ? 'pf-m-current' : ''}" role="presentation">
-            <button type="button" class="pf-v6-c-tabs__link" role="tab"
-              id="vm-config-tab-${id}"
-              data-vm-config="${id}"
-              aria-selected="${section === id}"
-              aria-controls="vm-config-panel">
-              <span class="pf-v6-c-tabs__item-text">${label}</span>
-            </button>
-          </li>
-        `).join('');
-        body = `
-          <div class="filter-name-search" style="max-width:100%;margin-bottom:12px;">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" placeholder="Find settings" aria-label="Find settings" />
-          </div>
-          <div class="vm-config">
-            <div class="pf-v6-c-tabs pf-m-vertical" aria-label="Configuration sections">
-              <ul class="pf-v6-c-tabs__list" role="tablist">
-                ${tabsHtml}
-              </ul>
-            </div>
-            <div class="vm-config__panel">
-              <section class="pf-v6-c-tab-content" role="tabpanel" id="vm-config-panel"
-                aria-labelledby="vm-config-tab-${section}" tabindex="0">
-                ${panel}
-              </section>
-            </div>
-          </div>
-        `;
       } else {
         body = `<div class="vm-card"><p class="muted" style="margin:0;">${tabs.find(t => t[0] === tab)?.[1] || 'Tab'} (placeholder for mockup).</p></div>`;
       }
@@ -8452,25 +8730,6 @@
         openVmKebabMenu(v.name, e.currentTarget);
       });
 
-      root.querySelector('[data-goto-config-net]')?.addEventListener('click', () => {
-        toast('Network configuration coming soon.');
-      });
-      root.querySelectorAll('[data-vm-config]').forEach(b => {
-        b.onclick = () => {
-          state.vmConfigSection = b.dataset.vmConfig;
-          state.nicMenuOpen = null;
-          renderVmDetail();
-        };
-      });
-      root.querySelectorAll('[data-nic-menu]').forEach(b => {
-        b.onclick = e => {
-          e.stopPropagation();
-          const name = b.dataset.nicMenu;
-          state.nicMenuOpen = state.nicMenuOpen === name ? null : name;
-          renderVmDetail();
-        };
-      });
-      root.querySelector('#btn-add-vm-nic')?.addEventListener('click', () => openAddNetworkModal('vm-detail'));
       root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNetworkModal('vm-detail'));
       root.querySelector('#btn-overview-alerts')?.addEventListener('click', () => {
         toast('Diagnostics coming soon.');
@@ -8488,30 +8747,62 @@
       root.querySelector('#btn-overview-add-disk')?.addEventListener('click', () => {
         openAddDiskModal('vm-detail');
       });
+      root.querySelectorAll('[data-overview-menu]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          const key = b.dataset.overviewMenu;
+          state.overviewMenuOpen = state.overviewMenuOpen === key ? null : key;
+          renderVmDetail();
+          if (state.overviewMenuOpen) {
+            requestAnimationFrame(() => {
+              document.querySelectorAll('[data-overview-menu]').forEach(el => {
+                if (el.dataset.overviewMenu === key) el.focus({ preventScroll: true });
+              });
+            });
+          }
+        });
+      });
+      root.querySelectorAll('[data-overview-delete-nic]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          openDeleteResourceModal({ kind: 'nic', name: b.dataset.overviewDeleteNic });
+          renderVmDetail();
+        });
+      });
+      root.querySelectorAll('[data-overview-delete-disk]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          if (b.disabled) return;
+          const idx = Number(b.dataset.overviewDeleteDisk);
+          const dsk = (v.disks || [])[idx];
+          const detail = normalizeDisk(dsk || {});
+          openDeleteResourceModal({ kind: 'disk', name: detail.name, index: idx });
+          renderVmDetail();
+        });
+      });
+      root.querySelectorAll('[data-overview-edit-nic]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          state.overviewMenuOpen = null;
+          openEditNetworkModal(b.dataset.overviewEditNic);
+        });
+      });
+      root.querySelectorAll('[data-overview-edit-disk]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          state.overviewMenuOpen = null;
+          openEditDiskModal(Number(b.dataset.overviewEditDisk));
+        });
+      });
       root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
         openEditComputeModal();
       });
-      root.querySelector('[data-edit-ssh]')?.addEventListener('click', () => {
-        openEditSshModal();
-      });
+      root.querySelectorAll('[data-edit-ssh]').forEach(b => b.addEventListener('click', () => openEditSshModal()));
       root.querySelector('.vm-vnc__open')?.addEventListener('click', () => {
         openVmConsolePlaceholder(state.selectedVmName || v.name);
       });
       root.querySelector('.vm-console-preview')?.addEventListener('click', () => {
         openVmConsolePlaceholder(state.selectedVmName || v.name);
-      });
-      root.querySelector('#vm-goto-networks')?.addEventListener('click', () => setView('networks'));
-      root.querySelectorAll('[data-nic-delete]').forEach(b => {
-        b.onclick = () => {
-          const vm = VMS.find(x => x.name === state.selectedVmName);
-          if (!vm?.nics || vm.nics.length < 2) {
-            toast('At least one network interface is required.');
-            return;
-          }
-          vm.nics = vm.nics.filter(n => n.name !== b.dataset.nicDelete);
-          state.nicMenuOpen = null;
-          renderVmDetail();
-        };
       });
     }
 
@@ -10621,7 +10912,7 @@
             </details>
             <details class="review-section">
               <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Network</summary>
-              <p class="muted" style="margin:8px 0 0;font-size:13px;">Network interfaces are copied from the source Virtual machine.</p>
+              <p class="muted" style="margin:8px 0 0;font-size:13px;">Networks are copied from the source Virtual machine.</p>
             </details>
             <details class="review-section">
               <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Hardware devices</summary>
@@ -10865,6 +11156,7 @@
         closeWizard();
         if (!VMS.find(v => v.name === state.data.name)) {
           const osMap = { rhel: 'RHEL', windows: 'Windows', fedora: 'Fedora', centos: 'CentOS', other: 'Other' };
+          const osFullMapCreate = { RHEL: 'Red Hat Enterprise Linux', Fedora: 'Fedora Linux', Windows: 'Microsoft Windows', Other: 'Other Linux', CentOS: 'CentOS Stream' };
           const source = state.createType === 'clone'
             ? VMS.find(v => v.name === state.data.cloneSourceName)
             : null;
@@ -10906,11 +11198,13 @@
               storageTierLabel: disk.storageTierLabel,
             })),
           ];
+          const osLabel = source?.os || osMap[d.osFamily] || 'Other';
           VMS.unshift({
             name: d.name,
             ns: d.project || 'default',
             status: d.startAfter ? 'starting' : 'stopped',
-            os: source?.os || osMap[d.osFamily] || 'Other',
+            os: osLabel,
+            osFull: source?.osFull || osFullMapCreate[osLabel] || osLabel,
             conditions: ['Provisioning=True'],
             node: source?.node || 'cnvge-079.lab.eng.thv2.redhat.com',
             ip: '—',
@@ -10923,12 +11217,30 @@
           });
         }
         const createdName = state.data.name;
-        const createdMsg = state.createType === 'clone'
-          ? `Virtual machine “${createdName}” is being cloned.`
-          : `Virtual machine “${createdName}” is being created.`;
-        if (VMS.find(v => v.name === createdName)) {
+        const createdVm = VMS.find(v => v.name === createdName);
+        let createdMsg;
+        if (state.createType === 'clone') {
+          createdMsg = `Virtual machine “${createdName}” is being cloned.`;
+        } else if (state.data.startAfter) {
+          createdMsg = `Virtual machine “${createdName}” created and starting.`;
+        } else {
+          createdMsg = `Virtual machine “${createdName}” created.`;
+        }
+        if (createdVm) {
           openVmDetail(createdName, 'overview');
           toast(createdMsg, 'success');
+          if (state.data.startAfter && createdVm.status === 'starting') {
+            if (vmPowerActionTimer) {
+              clearTimeout(vmPowerActionTimer);
+              vmPowerActionTimer = null;
+            }
+            vmPowerActionTimer = setTimeout(() => {
+              setVmStatus(createdName, 'running');
+              refreshVmStatusViews();
+              toast(`“${createdName}” is Running.`, 'success');
+              vmPowerActionTimer = null;
+            }, 900);
+          }
         } else {
           setView('vms');
           renderVms(stripFilterAttributes(document.getElementById('vm-search-global')?.value || ''));
@@ -11251,6 +11563,12 @@
     document.getElementById('delete-vm-cancel')?.addEventListener('click', closeDeleteVm);
     document.getElementById('delete-vm-close')?.addEventListener('click', closeDeleteVm);
     document.getElementById('delete-vm-confirm')?.addEventListener('click', confirmDeleteVm);
+    document.getElementById('delete-resource-confirm')?.addEventListener('click', confirmDeleteResource);
+    document.getElementById('delete-resource-cancel')?.addEventListener('click', closeDeleteResourceModal);
+    document.getElementById('delete-resource-close')?.addEventListener('click', closeDeleteResourceModal);
+    document.getElementById('delete-resource-overlay')?.addEventListener('click', e => {
+      if (e.target === e.currentTarget || e.target.classList.contains('pf-v6-l-bullseye')) closeDeleteResourceModal();
+    });
     document.getElementById('delete-vm-overlay')?.addEventListener('click', e => {
       if (e.target.id === 'delete-vm-overlay' || (e.target.classList.contains('pf-v6-l-bullseye') && e.target.closest('#delete-vm-overlay'))) {
         closeDeleteVmModal();
@@ -11266,6 +11584,10 @@
         }
         if (document.getElementById('delete-vm-overlay')?.classList.contains('pf-m-open')) {
           closeDeleteVmModal();
+          return;
+        }
+        if (document.getElementById('delete-resource-overlay')?.classList.contains('pf-m-open')) {
+          closeDeleteResourceModal();
           return;
         }
         if (document.getElementById('columns-overlay')?.classList.contains('pf-m-open')) {
@@ -11322,8 +11644,9 @@
       openVmDetail(btn.dataset.openVm, 'overview');
     });
     document.addEventListener('click', e => {
-      if (state.nicMenuOpen && !e.target.closest('.nic-actions-wrap')) {
+      if ((state.nicMenuOpen || state.overviewMenuOpen) && !e.target.closest('.nic-actions-wrap')) {
         state.nicMenuOpen = null;
+        state.overviewMenuOpen = null;
         if (document.getElementById('view-vm')?.classList.contains('pf-m-active')) renderVmDetail();
       }
     });
