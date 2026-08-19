@@ -1,19 +1,25 @@
-# Create Virtual machine only — UX documentation
+# Create Virtual machine — UX documentation
 
 ### Contact: Yifat Friman Menchik, UXD
 
+## Handoff overview
+
+| | |
+|---|---|
+| **Scope of this doc** | Virtual machines **list** + **Create** wizard |
+| **Companion doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
+| **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — one mock covers list → create → details |
+| **Google Doc (this doc)** | [Create Virtual machine - UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
+| **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` |
+| **Regenerate screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
+
+**IA:** Select template → Details → Compute resource → Storage → Network → Review and create
+
+---
+
 ## Goal
 
-Document the Create Virtual machine flow. Virtual machines list + create wizard.
-
-**Mock:** `vmaas-create-vm-only.html` (Option 2 IA — no **Configure** nav item)  
-**Create VM only:** [https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — Virtual machines list first. Click Create to open the wizard.  
-**Same IA reference:** [https://yfrimanm.github.io/openshift-origin-design/vmaas-create-wizard-option-2.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-wizard-option-2.html)  
-**Google Doc:** [Create Virtual machine only — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit)  
-**Screenshots:** `videos/vmaas-create-vm-only-ux-doc/`  
-**Regenerate screenshots:** `node scripts/capture-vmaas-create-vm-only-screenshots.mjs`
-
-Select template → Details → Compute resource → Storage → Network → Review and create
+Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–first). List and create share one mock with VM details Overview; this doc covers **create only**.
 
 ---
 
@@ -21,116 +27,139 @@ Select template → Details → Compute resource → Storage → Network → Rev
 
 | Decision | Detail |
 |---|---|
-| **Scope** | List + Create wizard. VM names are links to the VM details Overview (CNV-aligned cards). |
-| **IA** | Same as Option 2: flat steps — no **Configure** parent in the wizard nav. |
-| **Wizard left nav** | PatternFly wizard step nav on the left (always visible in mock). |
-| **Role labels** | Masthead role dropdown: **VM Admin**, **VM User**, Console Access Only, Organization Administrator — no vApp aliases. |
-| **Search** | Regular search field only (no advanced filters / sliders icon). Attribute filters (Project / Status / OS) remain below. |
-| **Row kebab = Actions** | Same items and copy: Control ▸, Open console, Delete. Helper text uses **VM** (not Virtual machine). |
-| **Status popover** | Clicking **Running** (and other status links) opens a PF6 popover: title, body, **View diagnostic**, **Learn more**. |
-| **OS image** | Shown when selecting the template (and on Review). Not on Details. |
+| **Scope** | List + Create wizard. VM **Name** links open details Overview (see companion doc). |
+| **IA** | Flat wizard steps — no **Configure** parent in the nav. |
+| **Primary CTA** | **Create Virtual machine** |
+| **Role labels** | **VM Admin**, **VM User**, Console Access Only, Org Admin |
+| **Search** | Regular search + attribute filters (Project / Status / OS). No advanced search icon. |
+| **Row kebab / Actions** | Control ▸, Open console, Delete. Disabled reasons use **Virtual machine** wording. |
+| **Status** | Status is a link → PF6 popover (title, body, **Ask AI about this status** placeholder, Learn more). |
+| **OS image** | On template selection + Review — not on Details. |
 | **Access** | Optional SSH / cloud-init on **Details**. |
-| **Locked vs Editable** | Lock / pen icons. Prefer **Locked** / **Editable** (not Flexible / Fixed). |
-| **Project** | **Project** dropdown on **Select template** (left of Search); prefills from the list/workspace context; user can still change it. Also shown on Details. |
-| **Exit confirm** | Warning modal: Exit without saving / Continue creating. |
+| **Locked vs Editable** | Template governance: lock / pen. Prefer **Locked** / **Editable**. |
+| **Project** | Dropdown on Select template (prefilled from context); also on Details. |
+| **Exit confirm** | Exit without saving / Continue creating. |
+| **After create** | Opens the new VM details Overview + success toast (`created` or `created and starting` → Running). |
+| **Shell chrome** | PatternFly **Felt + Glass** (PF 6.6.1), aligned to Ethan’s [osac-bmaas](https://heyethankim.github.io/osac-bmaas/) — soft floating sidebar/main panels, Felt current nav accent (no hard nav divider). |
 
 ---
 
 ## Entry — Virtual machines list
 
-- Primary **Create** opens the wizard.
-- **Name** column: VM names are clickable links (blue, underlined) and open the VM details Overview.
-- Regular search + Save search / Saved searches.
-- Attribute filters: Project, Status, Operating system.
+- Primary **Create Virtual machine** opens the wizard.
+- **Name** column opens VM details Overview.
+- Search + Save search / Saved searches.
+- Filters: Project, Status, Operating system.
 - Toolbar **Actions** disabled until selection; matches row kebab when enabled.
 
-![01-vm-list](videos/vmaas-create-vm-only-ux-doc/01-vm-list.png)
+![Figure: Virtual machines list](videos/vmaas-create-vm-only-ux-doc/01-vm-list.png)
+
+Figure: Virtual machines list
 
 ### Row kebab / Actions menu
 
 - **Control** flyout: Start / Stop / Pause / Restart / Reset (state-dependent)
-- **Open console** — disabled when not running (*The VM is not running*)
-- **Delete** — disabled while running (*The VM is running*)
+- **Open console** — disabled when not running (*The Virtual machine is not running*)
+- **Delete** — disabled while running (*The Virtual machine is running*)
 
-![01b-vm-kebab](videos/vmaas-create-vm-only-ux-doc/01b-vm-kebab.png)
+![Figure: Row Actions kebab](videos/vmaas-create-vm-only-ux-doc/01b-vm-kebab.png)
+
+Figure: Row Actions kebab
 
 ---
 
 ## Step 1 — Select template
 
-Toolbar: **Project** dropdown (preselected from the previous page / list filter context; editable) · **Search** · list/card view toggles.
+Toolbar: **Project** · **Search** · list/card view.
 
-Browse templates as cards. Selecting a template opens a drawer with **Template settings**:
+Selecting a template opens a drawer (**Template settings**):
 
-- **Locked by this template** — OS image always; compute / boot disk when locked  
-- **Editable later** — fields the user can change on later steps  
+- **Locked by this template** — OS image always; compute / boot disk when locked
+- **Editable later** — fields the user can change on later steps
 
-**Editable** templates show starting CPU / memory / storage and pen icons. Locked SKUs show lock icons.
+![Figure: Select template](videos/vmaas-create-vm-only-ux-doc/02-select-template.png)
 
-![02-select-template](videos/vmaas-create-vm-only-ux-doc/02-select-template.png)
-
-![03-template-drawer-locked](videos/vmaas-create-vm-only-ux-doc/03-template-drawer-locked.png)
-
-![04-template-drawer-editable](videos/vmaas-create-vm-only-ux-doc/04-template-drawer-editable.png)
+Figure: Select template
 
 **Dev notes**
 
 - Per-field governance: `compute` / `bootDisk` = `locked` \| `editable`; image always locked.
 - Card cost may prefix hourly with **From** when size is editable.
 
+![Figure: Template drawer — locked](videos/vmaas-create-vm-only-ux-doc/03-template-drawer-locked.png)
+
+Figure: Template drawer — locked
+
+![Figure: Template drawer — editable](videos/vmaas-create-vm-only-ux-doc/04-template-drawer-editable.png)
+
+Figure: Template drawer — editable
+
 ---
 
 ## Step 2 — Details
 
-- Step help: *Name your Virtual machine, select a project, and optionally set access.*
+- Help: *Name your Virtual machine, select a project, and optionally set access.*
 - **Name** (required) + generate
 - **Description** (optional)
-- **Project** — Same value as Select template; editable here as well
-- **Access** (Optional) — SSH public key and cloud-init
+- **Project** — same as Select template; editable
+- **Access** (optional) — SSH public key and cloud-init
 
-![05-details](videos/vmaas-create-vm-only-ux-doc/05-details.png)
+![Figure: Details](videos/vmaas-create-vm-only-ux-doc/05-details.png)
+
+Figure: Details
 
 ---
 
 ## Step 3 — Compute resource
 
-- Compute resource (locked or editable per template)
-- Step help when editable: *Choose a compute size.*
-- When locked: *Compute size is locked by the template.*
-- OS image and Access are not on this step (they are on Details)
+- Compute resource locked or editable per template
+- Helper when locked: size is set by the template; can edit after create
+- OS image and Access are not on this step
 
-![06-compute-resource](videos/vmaas-create-vm-only-ux-doc/06-compute-resource.png)
+![Figure: Compute resource](videos/vmaas-create-vm-only-ux-doc/06-compute-resource.png)
+
+Figure: Compute resource
 
 ---
 
 ## Step 4 — Storage
 
-- Boot disk size (locked or editable)
-- **Additional disks** with Add disk; empty state *No additional disks yet.*
+- Boot disk size (locked or editable) + locked helper when applicable
+- **Additional disks** — Add disk; empty: *No additional disks yet.*
 
-![07-storage](videos/vmaas-create-vm-only-ux-doc/07-storage.png)
+![Figure: Storage](videos/vmaas-create-vm-only-ux-doc/07-storage.png)
 
-![08-add-disk-modal](videos/vmaas-create-vm-only-ux-doc/08-add-disk-modal.png)
+Figure: Storage
+
+![Figure: Add disk modal](videos/vmaas-create-vm-only-ux-doc/08-add-disk-modal.png)
+
+Figure: Add disk modal
 
 ---
 
 ## Step 5 — Network
 
 - Virtual network, subnet, security groups (required)
-- **Additional networks** with Add network; empty state *No additional networks yet.*
+- **Additional networks** — Add network; empty: *No additional networks yet.*
+- Terminology: **Network** (not “network interface”)
 
-![09-network](videos/vmaas-create-vm-only-ux-doc/09-network.png)
+![Figure: Network](videos/vmaas-create-vm-only-ux-doc/09-network.png)
+
+Figure: Network
 
 ---
 
 ## Step 6 — Review and create
 
-Grouped review: Details (includes Access) / Compute resource / Storage / Network with edit links. Cost panel on the right. Optional *Start this Virtual machine after creation*.
+Grouped review: Details (incl. Access) / Compute resource / Storage / Network with edit links. Cost panel. Optional *Start this Virtual machine after creation*.
 
-- Access: *Configured* / *Not configured* (filename when SSH uploaded)
-- Additional disks / networks: *Disk N* / *Network N* or *None*
+- Access: *Configured* / *Not configured*
+- Additional disks / networks listed or *None*
+- Create success: toast reflects Stopped vs starting → Running
 
-![10-review](videos/vmaas-create-vm-only-ux-doc/10-review.png)
+![Figure: Review and create](videos/vmaas-create-vm-only-ux-doc/10-review.png)
+
+Figure: Review and create
 
 ---
 
@@ -143,4 +172,13 @@ Grouped review: Details (includes Access) / Compute resource / Storage / Network
 | Primary | Exit without saving |
 | Secondary | Continue creating |
 
-![11-exit-modal](videos/vmaas-create-vm-only-ux-doc/11-exit-modal.png)
+![Figure: Exit confirmation](videos/vmaas-create-vm-only-ux-doc/11-exit-modal.png)
+
+Figure: Exit confirmation
+
+---
+
+## Related
+
+- **Details / Overview UX doc** — day-2 Overview cards, Network/Storage Add·Edit·Delete, Utilization empty state, SSH, Status → AI placeholder
+- **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html
