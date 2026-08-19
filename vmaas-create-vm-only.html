@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="pf-v6-theme-felt pf-v6-theme-glass">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VMaaS Create Virtual machine only — list + create (Option 2 IA)</title>
-  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.4.0/patternfly-addons.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly-addons.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -17,6 +17,11 @@
       --vmaas-bg-subtle: #f5f5f5;
       --vmaas-text: #151515;
       --vmaas-text-subtle: #6a6e73;
+      /* Project Felt + Glass (PF 6.6) — same assets as Andrew’s theme pass */
+      --pf-t--global--background--image--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Light.svg");
+      --pf-t--global--background--image--glass--dark: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Dark.svg");
+      --pf-t--global--background--image--felt--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Light.svg");
+      --pf-t--global--background--image--felt--glass--dark: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Dark.svg");
     }
     html, body {
       height: 100%;
@@ -26,7 +31,7 @@
     }
     body {
       margin: 0;
-      background: #fff;
+      background: transparent;
       font-family: "Red Hat Text", "Helvetica Neue", Arial, sans-serif;
       color: var(--vmaas-text);
     }
@@ -48,7 +53,7 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      background: #fff;
+      background: transparent;
       border: none;
       border-radius: 0;
       overflow: hidden;
@@ -58,8 +63,11 @@
     .console__masthead {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       flex: 0 0 auto;
-      padding: 8px 20px; border-bottom: 1px solid var(--vmaas-border-light); font-size: 13px;
-      background: #fff;
+      /* Ethan / PF glass: no hard chrome divider — soft page backdrop shows through */
+      padding: 8px var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      border-bottom: none;
+      font-size: 13px;
+      background: transparent;
     }
     .console__masthead-role {
       display: inline-flex;
@@ -206,21 +214,39 @@
     }
     .console__body {
       display: grid;
-      grid-template-columns: 220px 1fr;
+      /* Ethan / PF glass page: ~18.125rem sidebar + chrome gutters (not a hard 220px split) */
+      grid-template-columns: minmax(15rem, 18.125rem) minmax(0, 1fr);
+      column-gap: var(--pf-t--global--spacer--md, 16px);
+      padding-inline: var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      padding-block-end: var(--pf-t--global--spacer--inset--page-chrome, 24px);
       flex: 1 1 auto;
       min-height: 0;
       height: 100%;
       position: relative;
     }
-    /* Stakeholder mocks: keep Ethan's-style page nav visible (incl. during Create).
-       Density matches OpenShift console / PF spacer-sm (8px) — not xs. */
+    /* Ethan / PF glass sidebar-main: soft floating panel (no hard divider). */
     .console__nav {
-      border-right: 1px solid var(--vmaas-border-light);
-      background: var(--vmaas-bg-subtle);
-      padding: var(--pf-t--global--spacer--md, 16px) 0;
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      background: var(
+        --pf-t--global--background--color--floating--secondary--default,
+        rgba(255, 255, 255, 0.5)
+      );
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding-block: var(--pf-t--global--spacer--md, 16px);
+      padding-inline: var(--pf-t--global--spacer--xs, 4px);
+      overflow: auto;
+      min-height: 0;
+      align-self: stretch;
     }
+    /* Match Ethan osac-app-shell-nav padding; leave Felt hover/current tokens alone. */
     .console__nav.pf-v6-c-nav,
     .console__nav .pf-v6-c-nav {
+      --pf-v6-c-nav--PaddingInlineStart: var(--pf-t--global--spacer--xs, 4px);
+      --pf-v6-c-nav--PaddingInlineEnd: var(--pf-t--global--spacer--xs, 4px);
       --pf-v6-c-nav__link--FontSize: var(--pf-t--global--font--size--body--default, 14px);
       --pf-v6-c-nav__list--RowGap: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__item--RowGap: 0;
@@ -230,18 +256,12 @@
       --pf-v6-c-nav__subnav--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
       --pf-v6-c-nav__link--PaddingBlockStart: var(--pf-t--global--spacer--sm, 8px);
       --pf-v6-c-nav__link--PaddingBlockEnd: var(--pf-t--global--spacer--sm, 8px);
-      --pf-v6-c-nav__link--PaddingInlineStart: var(--pf-t--global--spacer--md, 16px);
-      --pf-v6-c-nav__link--PaddingInlineEnd: var(--pf-t--global--spacer--md, 16px);
-      --pf-v6-c-nav__link--BackgroundColor: transparent;
-      --pf-v6-c-nav__link--hover--BackgroundColor: rgba(0, 0, 0, 0.04);
-      --pf-v6-c-nav__link--m-current--BackgroundColor: transparent;
-      --pf-v6-c-nav__link--BorderRadius: 0;
-      --pf-v6-c-nav__link--BorderWidth: 0;
-      --pf-v6-c-nav__link--hover--BorderWidth: 0;
-      --pf-v6-c-nav__link--m-current--BorderWidth: 0;
-      --pf-v6-c-nav__link--Color: var(--vmaas-text);
-      --pf-v6-c-nav__link--hover--Color: var(--vmaas-text);
-      --pf-v6-c-nav__link--m-current--Color: var(--vmaas-text);
+      --pf-v6-c-nav__link--PaddingInlineStart: calc(
+        var(--pf-t--global--spacer--md, 16px) + var(--pf-t--global--spacer--xs, 4px)
+      );
+      --pf-v6-c-nav__link--PaddingInlineEnd: calc(
+        var(--pf-t--global--spacer--md, 16px) + var(--pf-t--global--spacer--xs, 4px)
+      );
       background: transparent;
     }
     /* Flex avoids PF grid + whitespace text nodes creating tall phantom rows. */
@@ -265,28 +285,17 @@
       min-height: 0 !important;
       text-align: left;
       cursor: pointer;
-      border: none;
-      background: transparent !important;
-      box-shadow: none !important;
-      padding-block: var(--pf-t--global--spacer--sm, 8px);
-      padding-inline: var(--pf-t--global--spacer--md, 16px);
       align-items: center;
       line-height: var(--pf-t--global--font--line-height--body, 1.5);
     }
-    .console__nav .pf-v6-c-nav__link::before,
-    .console__nav .pf-v6-c-nav__link::after {
+    .console__nav .pf-v6-c-nav__link:not(.pf-m-current)::before,
+    .console__nav .pf-v6-c-nav__link:not(.pf-m-current)::after {
       display: none !important;
       border: none !important;
       box-shadow: none !important;
     }
-    .console__nav .pf-v6-c-nav__link:hover,
-    .console__nav .pf-v6-c-nav__link:focus {
-      background: rgba(0, 0, 0, 0.04) !important;
-    }
     .console__nav .pf-v6-c-nav__link.pf-m-current {
-      background: transparent !important;
       font-weight: 600;
-      box-shadow: inset 3px 0 0 var(--vmaas-blue) !important;
     }
     .console__nav .pf-v6-c-nav__subnav {
       display: block !important;
@@ -299,7 +308,6 @@
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable > .pf-v6-c-nav__link {
       font-weight: 600;
-      color: var(--vmaas-text);
     }
     .console__nav .pf-v6-c-nav__link.pf-m-disabled,
     .console__nav .pf-v6-c-nav__link:disabled {
@@ -309,12 +317,23 @@
     .console__nav .pf-v6-c-nav__item.pf-m-expandable {
       display: block !important;
     }
+    /* Ethan / PF glass main container: soft panel, less contrasty than flat white. */
     .console__content {
       padding: 20px 24px 28px;
-      /* Grid default min-width:auto expands past the viewport; Create then sits off-screen. */
       min-width: 0;
       max-width: 100%;
       overflow-x: hidden;
+      overflow-y: auto;
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      background: var(
+        --pf-t--global--background--color--floating--default,
+        rgba(255, 255, 255, 0.72)
+      );
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .page-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -2029,12 +2048,24 @@
       display: flex;
       position: absolute;
       inset-block: 0;
-      inset-inline-end: 0;
-      /* Full-page wizard in the content column; page nav stays visible. */
-      inset-inline-start: 220px;
+      inset-inline-end: var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      /* Align with glass content column: chrome + sidebar + gutter. */
+      inset-inline-start: calc(
+        var(--pf-t--global--spacer--inset--page-chrome, 24px)
+        + 18.125rem
+        + var(--pf-t--global--spacer--md, 16px)
+      );
+      inset-block-end: var(--pf-t--global--spacer--inset--page-chrome, 24px);
       z-index: 400;
-      background: var(--pf-t--global--background--color--primary--default, #fff);
-      min-height: 100%;
+      background: var(
+        --pf-t--global--background--color--floating--default,
+        rgba(255, 255, 255, 0.92)
+      );
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      overflow: hidden;
+      min-height: 0;
     }
     #overlay .pf-v6-c-wizard {
       --pf-v6-c-wizard--Height: 100%;
@@ -3608,7 +3639,7 @@
       position: fixed;
       inset-block-start: var(--pf-t--global--spacer--md, 16px);
       inset-inline-end: var(--pf-t--global--spacer--md, 16px);
-      z-index: 1100;
+      z-index: 10050;
       width: min(420px, calc(100vw - 32px));
       margin: 0;
       padding: 0;
