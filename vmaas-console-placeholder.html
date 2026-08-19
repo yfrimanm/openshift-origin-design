@@ -1,20 +1,38 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="pf-v6-theme-felt pf-v6-theme-glass">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Console</title>
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly-addons.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
     :root {
       --vmaas-blue: #0066cc;
+      --vmaas-blue-hover: #004d99;
       --vmaas-text: #151515;
       --vmaas-text-subtle: #6a6e73;
       --vmaas-border: #c7c7c7;
       --vmaas-border-light: #d2d2d2;
-      --vmaas-bg: #f0f0f0;
-      --vmaas-surface: #fff;
+      --vmaas-bg-subtle: #f5f5f5;
+      /* Project Felt + Glass (PF 6.6) — same assets as Create / Overview shell */
+      --pf-t--global--background--image--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Light.svg");
+      --pf-t--global--background--image--glass--dark: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Dark.svg");
+      --pf-t--global--background--image--felt--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Light.svg");
+      --pf-t--global--background--image--felt--glass--dark: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Dark.svg");
+      --console-glass-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      --console-glass-border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      --console-glass-shadow: var(--pf-t--global--box-shadow--glass--default, none);
+      --console-glass-bg: var(
+        --pf-t--global--background--color--floating--default,
+        rgba(255, 255, 255, 0.72)
+      );
+      --console-glass-bg-secondary: var(
+        --pf-t--global--background--color--floating--secondary--default,
+        rgba(255, 255, 255, 0.5)
+      );
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
@@ -24,20 +42,24 @@
     body {
       font-family: "Red Hat Text", "Helvetica Neue", Arial, sans-serif;
       color: var(--vmaas-text);
-      background: var(--vmaas-bg);
+      background: transparent;
       display: flex;
       flex-direction: column;
       min-height: 100%;
     }
 
-    /* —— Full-page console chrome —— */
+    /* —— Full-page console chrome (Felt + Glass soft panels) —— */
     .console-app {
       display: flex;
       flex-direction: column;
       flex: 1;
       min-height: 0;
       height: 100%;
-      background: var(--vmaas-surface);
+      gap: var(--pf-t--global--spacer--md, 16px);
+      padding: var(--pf-t--global--spacer--md, 16px)
+        var(--pf-t--global--spacer--inset--page-chrome, 24px)
+        var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      background: transparent;
     }
     .console-toolbar {
       display: flex;
@@ -46,9 +68,13 @@
       gap: 16px 24px;
       flex-wrap: wrap;
       flex: 0 0 auto;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--vmaas-border-light);
-      background: var(--vmaas-bg);
+      padding: 12px 16px;
+      border: var(--console-glass-border);
+      border-radius: var(--console-glass-radius);
+      background: var(--console-glass-bg-secondary);
+      box-shadow: var(--console-glass-shadow);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .console-toolbar__left,
     .console-toolbar__right {
@@ -108,10 +134,12 @@
       width: min(360px, calc(100vw - 32px));
       padding: 16px;
       padding-inline-end: 40px;
-      background: #fff;
-      border: 1px solid var(--vmaas-border-light);
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      background: var(--console-glass-bg);
+      border: var(--console-glass-border);
+      border-radius: var(--pf-t--global--border--radius--medium, 8px);
+      box-shadow: var(--console-glass-shadow);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: var(--vmaas-text);
       font-size: 14px;
       font-weight: 400;
@@ -126,8 +154,7 @@
       bottom: 100%;
       left: 6px;
       border: 8px solid transparent;
-      border-bottom-color: #fff;
-      filter: drop-shadow(0 -1px 0 var(--vmaas-border-light));
+      border-bottom-color: var(--console-glass-bg);
     }
     .creds__popover-close {
       position: absolute;
@@ -188,7 +215,7 @@
       outline: none;
     }
     .creds__icon-btn.is-toggle {
-      background: #e7e7e7;
+      background: rgba(0, 0, 0, 0.08);
     }
 
     /* Tip to the right of the icon (avoids clipping at top of page) */
@@ -244,19 +271,21 @@
       padding: 6px 14px;
       border: 1px solid var(--vmaas-blue);
       border-radius: 999px;
-      background: var(--vmaas-surface);
+      background: var(--console-glass-bg);
       color: var(--vmaas-blue);
       font: inherit;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       white-space: nowrap;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
-    .tb-btn:hover:not(:disabled) { background: #e7f1fa; }
+    .tb-btn:hover:not(:disabled) { background: rgba(231, 241, 250, 0.9); }
     .tb-btn:disabled {
       border-color: var(--vmaas-border);
       color: #8a8d90;
-      background: #f5f5f5;
+      background: rgba(245, 245, 245, 0.72);
       cursor: not-allowed;
     }
     .tb-btn .fa-caret-down { font-size: 12px; margin-inline-start: 2px; }
@@ -270,10 +299,12 @@
       margin: 0;
       padding: 8px 0;
       list-style: none;
-      background: #fff;
-      border: 1px solid var(--vmaas-border-light);
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      background: var(--console-glass-bg);
+      border: var(--console-glass-border);
+      border-radius: var(--pf-t--global--border--radius--medium, 8px);
+      box-shadow: var(--console-glass-shadow);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .tb-menu[hidden] { display: none; }
     .tb-menu--start { right: auto; left: 0; }
@@ -303,7 +334,7 @@
     }
     .tb-menu__item:hover,
     .tb-menu__item:focus {
-      background: #f0f0f0;
+      background: rgba(0, 0, 0, 0.06);
       outline: none;
     }
     .tb-menu__item.is-selected { font-weight: 600; }
@@ -350,10 +381,12 @@
       margin: 0;
       padding: 8px;
       list-style: none;
-      background: #fff;
-      border: 1px solid var(--vmaas-border-light);
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      background: var(--console-glass-bg);
+      border: var(--console-glass-border);
+      border-radius: var(--pf-t--global--border--radius--medium, 8px);
+      box-shadow: var(--console-glass-shadow);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .tb-menu__submenu:hover > .tb-menu__flyout,
     .tb-menu__submenu:focus-within > .tb-menu__flyout,
@@ -368,8 +401,8 @@
       height: 32px;
       padding: 0 8px;
       border: 1px solid var(--vmaas-border);
-      border-radius: 4px;
-      background: #f0f0f0;
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      background: rgba(240, 240, 240, 0.85);
       color: var(--vmaas-text);
       font: inherit;
       font-size: 13px;
@@ -379,22 +412,30 @@
     }
     .tb-menu__fkey:hover,
     .tb-menu__fkey:focus-visible {
-      background: #e7e7e7;
+      background: rgba(231, 231, 231, 0.95);
       outline: none;
     }
 
-    /* Body */
+    /* Body — soft glass panel; dark session fills inside when connected */
     .console-body {
       flex: 1;
       min-height: 0;
       display: grid;
       place-items: center;
-      background: var(--vmaas-bg);
       position: relative;
+      overflow: hidden;
+      border: var(--console-glass-border);
+      border-radius: var(--console-glass-radius);
+      background: var(--console-glass-bg);
+      box-shadow: var(--console-glass-shadow);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .console-body.is-connected {
       place-items: stretch;
       background: #151515;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
     .connect-panel {
       text-align: center;
