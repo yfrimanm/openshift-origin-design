@@ -89,6 +89,7 @@
       padding: 0;
       cursor: help;
       font-size: 14px;
+      position: relative;
     }
     .creds__field {
       display: inline-flex;
@@ -128,20 +129,20 @@
       background: #e7e7e7;
     }
 
-    /* Tip (Copied / Show / Hide / Copy) */
+    /* Tip to the right of the icon (avoids clipping at top of page) */
     .tip {
       position: absolute;
-      left: 50%;
-      bottom: calc(100% + 8px);
-      transform: translateX(-50%);
-      z-index: 30;
+      left: calc(100% + 8px);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
       padding: 4px 8px;
       border-radius: 2px;
       background: #151515;
       color: #fff;
       font-size: 12px;
       font-weight: 500;
-      line-height: 1.3;
+      line-height: 1.35;
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
@@ -151,14 +152,24 @@
     .tip::after {
       content: "";
       position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%);
       border: 5px solid transparent;
-      border-top-color: #151515;
+      border-right-color: #151515;
+    }
+    .tip.tip--multiline {
+      white-space: normal;
+      width: max-content;
+      max-width: 220px;
+      text-align: left;
     }
     .creds__icon-btn:hover .tip:not(.tip--sticky),
     .creds__icon-btn:focus-visible .tip:not(.tip--sticky),
+    .creds__help:hover .tip,
+    .creds__help:focus-visible .tip,
+    .tb-menu__help:hover .tip,
+    .tb-menu__help:focus-visible .tip,
     .tip.tip--sticky {
       opacity: 1;
       visibility: visible;
@@ -245,6 +256,72 @@
       color: var(--vmaas-text-subtle);
       font-size: 12px;
     }
+    .tb-menu__item:disabled {
+      color: #8a8d90;
+      cursor: not-allowed;
+    }
+    .tb-menu__help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--vmaas-text-subtle);
+      padding: 0;
+      cursor: help;
+      font-size: 12px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .tb-menu__submenu {
+      position: relative;
+    }
+    .tb-menu__flyout {
+      position: absolute;
+      right: calc(100% + 4px);
+      top: 0;
+      z-index: 45;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 8px;
+      list-style: none;
+      background: #fff;
+      border: 1px solid var(--vmaas-border-light);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    .tb-menu__submenu:hover > .tb-menu__flyout,
+    .tb-menu__submenu:focus-within > .tb-menu__flyout,
+    .tb-menu__submenu.is-open > .tb-menu__flyout {
+      display: flex;
+    }
+    .tb-menu__fkey {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--vmaas-border);
+      border-radius: 4px;
+      background: #f0f0f0;
+      color: var(--vmaas-text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tb-menu__fkey:hover,
+    .tb-menu__fkey:focus-visible {
+      background: #e7e7e7;
+      outline: none;
+    }
 
     /* Body */
     .console-body {
@@ -324,8 +401,9 @@
         <div class="creds" aria-label="Guest login credentials">
           <div class="creds__label">
             Guest login credentials
-            <button type="button" class="creds__help" title="Guest OS login credentials for this Virtual machine" aria-label="Guest login credentials help">
+            <button type="button" class="creds__help" aria-label="Guest login credentials help">
               <i class="fas fa-circle-question" aria-hidden="true"></i>
+              <span class="tip tip--multiline">Guest OS login credentials for this Virtual machine</span>
             </button>
           </div>
 
@@ -364,19 +442,6 @@
         </button>
 
         <div class="tb-menu-wrap">
-          <button type="button" class="tb-btn" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false" aria-controls="lang-menu">
-            <span id="lang-label">en-us</span>
-            <i class="fas fa-caret-down" aria-hidden="true"></i>
-          </button>
-          <ul class="tb-menu tb-menu--start" id="lang-menu" role="listbox" aria-label="Keyboard layout" hidden>
-            <li role="none"><button type="button" class="tb-menu__item is-selected" role="option" data-lang="en-us" aria-selected="true">en-us <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
-            <li role="none"><button type="button" class="tb-menu__item" role="option" data-lang="en-gb" aria-selected="false">en-gb <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
-            <li role="none"><button type="button" class="tb-menu__item" role="option" data-lang="de-de" aria-selected="false">de-de <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
-            <li role="none"><button type="button" class="tb-menu__item" role="option" data-lang="fr-fr" aria-selected="false">fr-fr <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
-          </ul>
-        </div>
-
-        <div class="tb-menu-wrap">
           <button type="button" class="tb-btn" id="console-type-toggle" aria-haspopup="listbox" aria-expanded="false" aria-controls="console-type-menu">
             <span id="console-type-label">VNC console</span>
             <i class="fas fa-caret-down" aria-hidden="true"></i>
@@ -403,12 +468,33 @@
           <ul class="tb-menu" id="send-key-menu" role="menu" aria-label="Send key" hidden>
             <li class="tb-menu__heading" role="presentation">
               Key options
-              <i class="fas fa-circle-question" title="Send special key combinations to the guest" aria-hidden="true"></i>
+              <button type="button" class="tb-menu__help" aria-label="Key options help">
+                <i class="fas fa-circle-question" aria-hidden="true"></i>
+                <span class="tip tip--multiline">Send keyboard input directly to the VM, including special keys</span>
+              </button>
             </li>
             <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="Ctrl + Alt + Delete">Ctrl + Alt + Delete</button></li>
             <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="Ctrl + Alt + 1">Ctrl + Alt + 1</button></li>
             <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="Ctrl + Alt + 2">Ctrl + Alt + 2</button></li>
-            <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="more" disabled>More key options <i class="fas fa-angle-right" aria-hidden="true"></i></button></li>
+            <li class="tb-menu__submenu" role="none">
+              <button type="button" class="tb-menu__item" role="menuitem" aria-haspopup="true" aria-expanded="false" id="more-keys-toggle">
+                More key options <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </button>
+              <ul class="tb-menu__flyout" id="more-keys-flyout" role="menu" aria-label="Function keys">
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F1">F1</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F2">F2</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F3">F3</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F4">F4</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F5">F5</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F6">F6</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F7">F7</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F8">F8</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F9">F9</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F10">F10</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F11">F11</button></li>
+                <li role="none"><button type="button" class="tb-menu__fkey" role="menuitem" data-send-key="F12">F12</button></li>
+              </ul>
+            </li>
           </ul>
         </div>
 
@@ -467,11 +553,10 @@
       var typeToggle = document.getElementById('console-type-toggle');
       var typeMenu = document.getElementById('console-type-menu');
       var typeLabel = document.getElementById('console-type-label');
-      var langToggle = document.getElementById('lang-toggle');
-      var langMenu = document.getElementById('lang-menu');
-      var langLabel = document.getElementById('lang-label');
       var sendToggle = document.getElementById('send-key-toggle');
       var sendMenu = document.getElementById('send-key-menu');
+      var moreKeysToggle = document.getElementById('more-keys-toggle');
+      var moreKeysSubmenu = moreKeysToggle ? moreKeysToggle.closest('.tb-menu__submenu') : null;
       var toastEl = document.getElementById('toast');
       var toastTimer;
 
@@ -485,12 +570,27 @@
       }
 
       function closeMenus(except) {
-        [typeMenu, langMenu, sendMenu].forEach(function (menu) {
+        [typeMenu, sendMenu].forEach(function (menu) {
           if (menu !== except) menu.hidden = true;
         });
         typeToggle.setAttribute('aria-expanded', String(!typeMenu.hidden));
-        langToggle.setAttribute('aria-expanded', String(!langMenu.hidden));
         sendToggle.setAttribute('aria-expanded', String(!sendMenu.hidden));
+        if (moreKeysSubmenu && except !== sendMenu) {
+          moreKeysSubmenu.classList.remove('is-open');
+          moreKeysToggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      function sendKey(key) {
+        closeMenus();
+        if (!connected) {
+          showToast('Connect to the console before sending keys');
+          return;
+        }
+        if (consoleType === 'serial') {
+          serialLog.textContent += '[sent] ' + key + '\n';
+        }
+        showToast('Sent ' + key + ' (placeholder)');
       }
 
       function updateCredDisplay(kind) {
@@ -627,6 +727,7 @@
       });
 
       // Console type menu
+      typeMenu.addEventListener('click', function (e) { e.stopPropagation(); });
       typeToggle.addEventListener('click', function (e) {
         e.stopPropagation();
         var open = typeMenu.hidden;
@@ -642,29 +743,8 @@
         });
       });
 
-      // Language menu
-      langToggle.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var open = langMenu.hidden;
-        closeMenus(open ? langMenu : null);
-        langMenu.hidden = !open;
-        langToggle.setAttribute('aria-expanded', String(open));
-      });
-      document.querySelectorAll('[data-lang]').forEach(function (opt) {
-        opt.addEventListener('click', function () {
-          var lang = opt.getAttribute('data-lang');
-          langLabel.textContent = lang;
-          document.querySelectorAll('[data-lang]').forEach(function (o) {
-            var selected = o === opt;
-            o.classList.toggle('is-selected', selected);
-            o.setAttribute('aria-selected', String(selected));
-          });
-          closeMenus();
-          showToast('Keyboard layout: ' + lang);
-        });
-      });
-
       // Send key
+      sendMenu.addEventListener('click', function (e) { e.stopPropagation(); });
       sendToggle.addEventListener('click', function (e) {
         e.stopPropagation();
         var open = sendMenu.hidden;
@@ -672,19 +752,18 @@
         sendMenu.hidden = !open;
         sendToggle.setAttribute('aria-expanded', String(open));
       });
+      if (moreKeysToggle && moreKeysSubmenu) {
+        moreKeysToggle.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var open = !moreKeysSubmenu.classList.contains('is-open');
+          moreKeysSubmenu.classList.toggle('is-open', open);
+          moreKeysToggle.setAttribute('aria-expanded', String(open));
+        });
+      }
       document.querySelectorAll('[data-send-key]').forEach(function (opt) {
-        opt.addEventListener('click', function () {
-          var key = opt.getAttribute('data-send-key');
-          closeMenus();
-          if (key === 'more') return;
-          if (!connected) {
-            showToast('Connect to the console before sending keys');
-            return;
-          }
-          if (consoleType === 'serial') {
-            serialLog.textContent += '[sent] ' + key + '\n';
-          }
-          showToast('Sent ' + key + ' (placeholder)');
+        opt.addEventListener('click', function (e) {
+          e.stopPropagation();
+          sendKey(opt.getAttribute('data-send-key'));
         });
       });
 
