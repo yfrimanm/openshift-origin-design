@@ -75,6 +75,7 @@
       gap: 6px;
       font-weight: 600;
       white-space: nowrap;
+      position: relative;
     }
     .creds__help {
       display: inline-flex;
@@ -87,9 +88,70 @@
       background: transparent;
       color: var(--vmaas-text-subtle);
       padding: 0;
-      cursor: help;
+      cursor: pointer;
       font-size: 14px;
       position: relative;
+    }
+    .creds__help:hover,
+    .creds__help:focus-visible {
+      color: var(--vmaas-text);
+      outline: none;
+    }
+    .creds__help[aria-expanded="true"] {
+      color: var(--vmaas-blue);
+    }
+    .creds__popover {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 0;
+      z-index: 60;
+      width: min(360px, calc(100vw - 32px));
+      padding: 16px;
+      padding-inline-end: 40px;
+      background: #fff;
+      border: 1px solid var(--vmaas-border-light);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      color: var(--vmaas-text);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      text-align: left;
+      white-space: normal;
+    }
+    .creds__popover[hidden] { display: none; }
+    .creds__popover::before {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 6px;
+      border: 8px solid transparent;
+      border-bottom-color: #fff;
+      filter: drop-shadow(0 -1px 0 var(--vmaas-border-light));
+    }
+    .creds__popover-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--vmaas-text);
+      padding: 0;
+      cursor: pointer;
+    }
+    .creds__popover-close:hover,
+    .creds__popover-close:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+      outline: none;
+    }
+    .creds__popover p {
+      margin: 0;
     }
     .creds__field {
       display: inline-flex;
@@ -166,8 +228,6 @@
     }
     .creds__icon-btn:hover .tip:not(.tip--sticky),
     .creds__icon-btn:focus-visible .tip:not(.tip--sticky),
-    .creds__help:hover .tip,
-    .creds__help:focus-visible .tip,
     .tb-menu__help:hover .tip,
     .tb-menu__help:focus-visible .tip,
     .tip.tip--sticky {
@@ -401,10 +461,15 @@
         <div class="creds" aria-label="Guest login credentials">
           <div class="creds__label">
             Guest login credentials
-            <button type="button" class="creds__help" aria-label="Guest login credentials help">
+            <button type="button" class="creds__help" id="creds-help-toggle" aria-expanded="false" aria-controls="creds-help-popover" aria-label="Guest login credentials help">
               <i class="fas fa-circle-question" aria-hidden="true"></i>
-              <span class="tip tip--multiline">Guest OS login credentials for this Virtual machine</span>
             </button>
+            <div class="creds__popover" id="creds-help-popover" role="dialog" aria-label="Guest login credentials" hidden>
+              <button type="button" class="creds__popover-close" id="creds-help-close" aria-label="Close">
+                <i class="fas fa-times" aria-hidden="true"></i>
+              </button>
+              <p>The following credentials for this operating system were created via cloud-init. If unsuccessful, cloud-init could be improperly configured. Contact the image provider for more information.</p>
+            </div>
           </div>
 
           <div class="creds__field" data-cred="username">
@@ -557,6 +622,9 @@
       var sendMenu = document.getElementById('send-key-menu');
       var moreKeysToggle = document.getElementById('more-keys-toggle');
       var moreKeysSubmenu = moreKeysToggle ? moreKeysToggle.closest('.tb-menu__submenu') : null;
+      var credsHelpToggle = document.getElementById('creds-help-toggle');
+      var credsHelpPopover = document.getElementById('creds-help-popover');
+      var credsHelpClose = document.getElementById('creds-help-close');
       var toastEl = document.getElementById('toast');
       var toastTimer;
 
@@ -567,6 +635,11 @@
         toastTimer = setTimeout(function () {
           toastEl.classList.remove('pf-m-open');
         }, 2200);
+      }
+
+      function setCredsPopoverOpen(open) {
+        credsHelpPopover.hidden = !open;
+        credsHelpToggle.setAttribute('aria-expanded', String(open));
       }
 
       function closeMenus(except) {
@@ -581,14 +654,26 @@
         }
       }
 
+      function updateSendKeyAvailability() {
+        var disabled = consoleType === 'serial';
+        sendToggle.disabled = disabled;
+        sendToggle.setAttribute('aria-disabled', String(disabled));
+        if (disabled) {
+          sendMenu.hidden = true;
+          sendToggle.setAttribute('aria-expanded', 'false');
+          if (moreKeysSubmenu) {
+            moreKeysSubmenu.classList.remove('is-open');
+            moreKeysToggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
+
       function sendKey(key) {
+        if (consoleType === 'serial') return;
         closeMenus();
         if (!connected) {
           showToast('Connect to the console before sending keys');
           return;
-        }
-        if (consoleType === 'serial') {
-          serialLog.textContent += '[sent] ' + key + '\n';
         }
         showToast('Sent ' + key + ' (placeholder)');
       }
@@ -619,6 +704,7 @@
           opt.setAttribute('aria-selected', String(selected));
         });
         connectCopy.textContent = 'Click Connect to open the ' + labels[next] + '.';
+        updateSendKeyAvailability();
         if (!(opts && opts.skipHistory)) {
           var url = new URL(window.location.href);
           url.searchParams.set('type', next);
@@ -707,6 +793,18 @@
           copyText(credentials[kind], btn);
         });
       });
+      credsHelpToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setCredsPopoverOpen(credsHelpPopover.hidden);
+      });
+      credsHelpClose.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setCredsPopoverOpen(false);
+        credsHelpToggle.focus();
+      });
+      credsHelpPopover.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
 
       // Connect / disconnect / paste
       btnConnect.addEventListener('click', connect);
@@ -747,6 +845,7 @@
       sendMenu.addEventListener('click', function (e) { e.stopPropagation(); });
       sendToggle.addEventListener('click', function (e) {
         e.stopPropagation();
+        if (sendToggle.disabled) return;
         var open = sendMenu.hidden;
         closeMenus(open ? sendMenu : null);
         sendMenu.hidden = !open;
@@ -767,9 +866,15 @@
         });
       });
 
-      document.addEventListener('click', function () { closeMenus(); });
+      document.addEventListener('click', function () {
+        closeMenus();
+        setCredsPopoverOpen(false);
+      });
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeMenus();
+        if (e.key === 'Escape') {
+          closeMenus();
+          setCredsPopoverOpen(false);
+        }
       });
 
       setConsoleType(consoleType, { skipHistory: true });
