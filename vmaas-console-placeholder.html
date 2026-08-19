@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="pf-v6-theme-felt pf-v6-theme-glass">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,64 +11,191 @@
       --vmaas-blue: #0066cc;
       --vmaas-text: #151515;
       --vmaas-text-subtle: #6a6e73;
+      --vmaas-border: #c7c7c7;
       --vmaas-border-light: #d2d2d2;
-      --pf-t--global--background--image--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/PF-Bkg-Generic-Light.svg");
-      --pf-t--global--background--image--felt--glass: url("https://unpkg.com/@patternfly/patternfly@6.6.1/assets/images/Felt-Bkg-Generic-Light.svg");
+      --vmaas-bg: #f0f0f0;
+      --vmaas-surface: #fff;
     }
-    html, body { height: 100%; }
-    body {
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      height: 100%;
       margin: 0;
+    }
+    body {
       font-family: "Red Hat Text", "Helvetica Neue", Arial, sans-serif;
       color: var(--vmaas-text);
-      background: transparent;
+      background: var(--vmaas-bg);
       display: flex;
       flex-direction: column;
       min-height: 100%;
     }
-    .console-page {
+
+    /* —— Full-page console chrome —— */
+    .console-app {
       display: flex;
       flex-direction: column;
       flex: 1;
       min-height: 0;
-      margin: var(--pf-t--global--spacer--inset--page-chrome, 24px);
-      border: var(--pf-t--global--border--width--glass--default, 1px) solid
-        var(--pf-t--global--border--color--glass--default, transparent);
-      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
-      background: var(--pf-t--global--background--color--floating--default, rgba(255, 255, 255, 0.92));
-      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
-      overflow: hidden;
+      height: 100%;
+      background: var(--vmaas-surface);
     }
-    .console-page__toolbar {
+    .console-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 16px 24px;
       flex-wrap: wrap;
-      padding: 12px 16px;
+      flex: 0 0 auto;
+      padding: 10px 16px;
       border-bottom: 1px solid var(--vmaas-border-light);
+      background: var(--vmaas-bg);
     }
-    .console-page__title {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .console-page__title code {
-      font-weight: 600;
-      color: var(--vmaas-blue);
-    }
-    .console-page__actions {
+    .console-toolbar__left,
+    .console-toolbar__right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px 16px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .console-toolbar__right { margin-inline-start: auto; }
+
+    /* Guest credentials */
+    .creds {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      font-size: 14px;
+      min-width: 0;
+    }
+    .creds__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .creds__help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--vmaas-text-subtle);
+      padding: 0;
+      cursor: help;
+      font-size: 14px;
+    }
+    .creds__field {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .creds__field-label {
+      color: var(--vmaas-text);
+      white-space: nowrap;
+    }
+    .creds__value {
+      font-family: "Red Hat Mono", ui-monospace, monospace;
+      letter-spacing: 0.04em;
+      min-width: 4.5rem;
+    }
+    .creds__icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--vmaas-text);
+      padding: 0;
+      cursor: pointer;
       position: relative;
     }
-    .console-type { position: relative; }
-    .console-type__menu {
+    .creds__icon-btn:hover,
+    .creds__icon-btn:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+      outline: none;
+    }
+    .creds__icon-btn.is-toggle {
+      background: #e7e7e7;
+    }
+
+    /* Tip (Copied / Show / Hide / Copy) */
+    .tip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translateX(-50%);
+      z-index: 30;
+      padding: 4px 8px;
+      border-radius: 2px;
+      background: #151515;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.08s ease;
+    }
+    .tip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #151515;
+    }
+    .creds__icon-btn:hover .tip:not(.tip--sticky),
+    .creds__icon-btn:focus-visible .tip:not(.tip--sticky),
+    .tip.tip--sticky {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Toolbar action buttons / menus */
+    .tb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 6px 14px;
+      border: 1px solid var(--vmaas-blue);
+      border-radius: 999px;
+      background: var(--vmaas-surface);
+      color: var(--vmaas-blue);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tb-btn:hover:not(:disabled) { background: #e7f1fa; }
+    .tb-btn:disabled {
+      border-color: var(--vmaas-border);
+      color: #8a8d90;
+      background: #f5f5f5;
+      cursor: not-allowed;
+    }
+    .tb-btn .fa-caret-down { font-size: 12px; margin-inline-start: 2px; }
+    .tb-menu-wrap { position: relative; }
+    .tb-menu {
       position: absolute;
       top: calc(100% + 4px);
       right: 0;
-      z-index: 20;
-      min-width: 180px;
+      z-index: 40;
+      min-width: 200px;
       margin: 0;
       padding: 8px 0;
       list-style: none;
@@ -77,8 +204,18 @@
       border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
-    .console-type__menu[hidden] { display: none; }
-    .console-type__option {
+    .tb-menu[hidden] { display: none; }
+    .tb-menu--start { right: auto; left: 0; }
+    .tb-menu__heading {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--vmaas-text-subtle);
+    }
+    .tb-menu__item {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -93,162 +230,471 @@
       text-align: left;
       cursor: pointer;
     }
-    .console-type__option:hover,
-    .console-type__option:focus {
+    .tb-menu__item:hover,
+    .tb-menu__item:focus {
       background: #f0f0f0;
       outline: none;
     }
-    .console-type__option.is-selected { font-weight: 600; }
-    .console-type__check {
+    .tb-menu__item.is-selected { font-weight: 600; }
+    .tb-menu__check {
       color: var(--vmaas-blue);
       visibility: hidden;
     }
-    .console-type__option.is-selected .console-type__check { visibility: visible; }
-    .console-page__body {
+    .tb-menu__item.is-selected .tb-menu__check { visibility: visible; }
+    .tb-menu__item .fa-angle-right {
+      color: var(--vmaas-text-subtle);
+      font-size: 12px;
+    }
+
+    /* Body */
+    .console-body {
       flex: 1;
       min-height: 0;
       display: grid;
       place-items: center;
-      padding: 32px 24px;
-      background: #f5f5f5;
+      background: var(--vmaas-bg);
+      position: relative;
     }
-    .console-placeholder {
+    .console-body.is-connected {
+      place-items: stretch;
+      background: #151515;
+    }
+    .connect-panel {
       text-align: center;
-      max-width: 420px;
+      padding: 32px 24px;
     }
-    .console-placeholder h2 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      font-weight: 600;
-    }
-    .console-placeholder p {
+    .connect-panel p {
       margin: 0 0 16px;
-      font-size: 14px;
-      color: var(--vmaas-text-subtle);
-      line-height: 1.5;
+      font-size: 16px;
+      color: var(--vmaas-text);
     }
-    .console-placeholder[hidden] { display: none; }
+    .connect-panel[hidden],
+    .session-panel[hidden] { display: none; }
+    .session-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      width: 100%;
+      color: #f0f0f0;
+      font-family: "Red Hat Mono", ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      padding: 20px 24px;
+      overflow: auto;
+    }
+    .session-panel--serial {
+      background: #000;
+    }
+    .session-panel--vnc {
+      background: #151515;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+    }
+    .session-panel pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font: inherit;
+      color: inherit;
+    }
+    .session-panel__muted { color: #8a8d90; font-size: 13px; }
+    .toast {
+      position: fixed;
+      inset-block-start: 16px;
+      inset-inline-end: 16px;
+      z-index: 100;
+      min-width: 240px;
+      max-width: 360px;
+      padding: 12px 16px;
+      border-radius: 4px;
+      background: #151515;
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    .toast.pf-m-open { display: block; }
   </style>
 </head>
 <body>
-  <div class="console-page">
-    <div class="console-page__toolbar">
-      <h1 class="console-page__title">Console — <code id="vm-name">Virtual machine</code></h1>
-      <div class="console-page__actions">
-        <div class="console-type">
-          <button
-            type="button"
-            class="pf-v6-c-button pf-m-secondary"
-            id="console-type-toggle"
-            aria-haspopup="listbox"
-            aria-expanded="false"
-            aria-controls="console-type-menu"
-          >
-            <span id="console-type-label">VNC console</span>
-            <span class="pf-v6-c-button__icon pf-m-end" aria-hidden="true">
-              <i class="fas fa-caret-down"></i>
-            </span>
+  <div class="console-app">
+    <header class="console-toolbar">
+      <div class="console-toolbar__left">
+        <div class="creds" aria-label="Guest login credentials">
+          <div class="creds__label">
+            Guest login credentials
+            <button type="button" class="creds__help" title="Guest OS login credentials for this Virtual machine" aria-label="Guest login credentials help">
+              <i class="fas fa-circle-question" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="creds__field" data-cred="username">
+            <span class="creds__field-label">User name</span>
+            <span class="creds__value" data-cred-value aria-live="polite">••••••••••</span>
+            <button type="button" class="creds__icon-btn" data-copy="username" aria-label="Copy username to clipboard">
+              <i class="fas fa-copy" aria-hidden="true"></i>
+              <span class="tip" data-tip>Copy to clipboard</span>
+            </button>
+            <button type="button" class="creds__icon-btn is-toggle" data-reveal="username" aria-pressed="false" aria-label="Show username">
+              <i class="fas fa-eye" data-reveal-icon aria-hidden="true"></i>
+              <span class="tip" data-tip>Show username</span>
+            </button>
+          </div>
+
+          <div class="creds__field" data-cred="password">
+            <span class="creds__field-label">Password</span>
+            <span class="creds__value" data-cred-value aria-live="polite">••••••••••</span>
+            <button type="button" class="creds__icon-btn" data-copy="password" aria-label="Copy password to clipboard">
+              <i class="fas fa-copy" aria-hidden="true"></i>
+              <span class="tip" data-tip>Copy to clipboard</span>
+            </button>
+            <button type="button" class="creds__icon-btn is-toggle" data-reveal="password" aria-pressed="false" aria-label="Show password">
+              <i class="fas fa-eye" data-reveal-icon aria-hidden="true"></i>
+              <span class="tip" data-tip>Show password</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="console-toolbar__right">
+        <button type="button" class="tb-btn" id="btn-paste" aria-label="Paste to console">
+          <i class="fas fa-paste" aria-hidden="true"></i>
+          Paste to console
+        </button>
+
+        <div class="tb-menu-wrap">
+          <button type="button" class="tb-btn" id="lang-toggle" aria-haspopup="listbox" aria-expanded="false" aria-controls="lang-menu">
+            <span id="lang-label">en-us</span>
+            <i class="fas fa-caret-down" aria-hidden="true"></i>
           </button>
-          <ul class="console-type__menu" id="console-type-menu" role="listbox" aria-label="Console type" hidden>
+          <ul class="tb-menu tb-menu--start" id="lang-menu" role="listbox" aria-label="Keyboard layout" hidden>
+            <li role="none"><button type="button" class="tb-menu__item is-selected" role="option" data-lang="en-us" aria-selected="true">en-us <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
+            <li role="none"><button type="button" class="tb-menu__item" role="option" data-lang="en-gb" aria-selected="false">en-gb <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
+            <li role="none"><button type="button" class="tb-menu__item" role="option" data-lang="de-de" aria-selected="false">de-de <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
+            <li role="none"><button type="button" class="tb-menu__item" role="option" data-lang="fr-fr" aria-selected="false">fr-fr <i class="fas fa-check tb-menu__check" aria-hidden="true"></i></button></li>
+          </ul>
+        </div>
+
+        <div class="tb-menu-wrap">
+          <button type="button" class="tb-btn" id="console-type-toggle" aria-haspopup="listbox" aria-expanded="false" aria-controls="console-type-menu">
+            <span id="console-type-label">VNC console</span>
+            <i class="fas fa-caret-down" aria-hidden="true"></i>
+          </button>
+          <ul class="tb-menu" id="console-type-menu" role="listbox" aria-label="Console type" hidden>
             <li role="none">
-              <button type="button" class="console-type__option" role="option" data-console-type="serial" aria-selected="false">
-                <span>Serial console</span>
-                <i class="fas fa-check console-type__check" aria-hidden="true"></i>
+              <button type="button" class="tb-menu__item" role="option" data-console-type="serial" aria-selected="false">
+                Serial console <i class="fas fa-check tb-menu__check" aria-hidden="true"></i>
               </button>
             </li>
             <li role="none">
-              <button type="button" class="console-type__option is-selected" role="option" data-console-type="vnc" aria-selected="true">
-                <span>VNC console</span>
-                <i class="fas fa-check console-type__check" aria-hidden="true"></i>
+              <button type="button" class="tb-menu__item is-selected" role="option" data-console-type="vnc" aria-selected="true">
+                VNC console <i class="fas fa-check tb-menu__check" aria-hidden="true"></i>
               </button>
             </li>
           </ul>
         </div>
+
+        <div class="tb-menu-wrap">
+          <button type="button" class="tb-btn" id="send-key-toggle" aria-haspopup="menu" aria-expanded="false" aria-controls="send-key-menu">
+            Send key
+            <i class="fas fa-caret-down" aria-hidden="true"></i>
+          </button>
+          <ul class="tb-menu" id="send-key-menu" role="menu" aria-label="Send key" hidden>
+            <li class="tb-menu__heading" role="presentation">
+              Key options
+              <i class="fas fa-circle-question" title="Send special key combinations to the guest" aria-hidden="true"></i>
+            </li>
+            <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="Ctrl + Alt + Delete">Ctrl + Alt + Delete</button></li>
+            <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="Ctrl + Alt + 1">Ctrl + Alt + 1</button></li>
+            <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="Ctrl + Alt + 2">Ctrl + Alt + 2</button></li>
+            <li role="none"><button type="button" class="tb-menu__item" role="menuitem" data-send-key="more" disabled>More key options <i class="fas fa-angle-right" aria-hidden="true"></i></button></li>
+          </ul>
+        </div>
+
+        <button type="button" class="tb-btn" id="btn-disconnect" disabled>Disconnect</button>
       </div>
-    </div>
-    <div class="console-page__body">
-      <div class="console-placeholder" id="panel-vnc" data-console-panel="vnc">
-        <h2>VNC console</h2>
-        <p id="vnc-copy">Placeholder — VNC console would connect here.</p>
-        <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-connect-vnc">Connect</button>
+    </header>
+
+    <main class="console-body" id="console-body">
+      <div class="connect-panel" id="connect-panel">
+        <p id="connect-copy">Click Connect to open the VNC console.</p>
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-connect">Connect</button>
       </div>
-      <div class="console-placeholder" id="panel-serial" data-console-panel="serial" hidden>
-        <h2>Serial console</h2>
-        <p id="serial-copy">Placeholder — Serial console would connect here.</p>
-        <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-connect-serial">Connect</button>
+
+      <div class="session-panel session-panel--vnc" id="session-vnc" hidden>
+        <div style="font-size:18px;font-weight:600;">VNC console connected</div>
+        <div class="session-panel__muted">Placeholder session for <span data-vm-label></span></div>
       </div>
-    </div>
+
+      <div class="session-panel session-panel--serial" id="session-serial" hidden>
+        <pre id="serial-log"></pre>
+      </div>
+    </main>
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
       var vmName = params.get('vm') || 'Virtual machine';
-      var initialType = params.get('type') === 'serial' ? 'serial' : 'vnc';
-      var type = initialType;
-      var nameEl = document.getElementById('vm-name');
-      nameEl.textContent = vmName;
-      document.title = 'Console — ' + vmName;
-
-      var toggle = document.getElementById('console-type-toggle');
-      var menu = document.getElementById('console-type-menu');
-      var label = document.getElementById('console-type-label');
-      var options = Array.prototype.slice.call(document.querySelectorAll('[data-console-type]'));
-      var panels = {
-        vnc: document.getElementById('panel-vnc'),
-        serial: document.getElementById('panel-serial')
+      var consoleType = params.get('type') === 'serial' ? 'serial' : 'vnc';
+      var connected = false;
+      var revealed = { username: false, password: false };
+      var credentials = {
+        username: params.get('user') || 'rhel',
+        password: params.get('password') || 'ChangeMe-Placeholder1'
       };
+      var MASK = '••••••••••';
       var labels = { vnc: 'VNC console', serial: 'Serial console' };
+      var copyTimers = {};
 
-      document.getElementById('vnc-copy').textContent =
-        'Placeholder — VNC console for ' + vmName + ' would connect here.';
-      document.getElementById('serial-copy').textContent =
-        'Placeholder — Serial console for ' + vmName + ' would connect here.';
+      document.title = 'Console — ' + vmName;
+      document.querySelectorAll('[data-vm-label]').forEach(function (el) {
+        el.textContent = vmName;
+      });
 
-      function setMenuOpen(open) {
-        menu.hidden = !open;
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var body = document.getElementById('console-body');
+      var connectPanel = document.getElementById('connect-panel');
+      var connectCopy = document.getElementById('connect-copy');
+      var sessionVnc = document.getElementById('session-vnc');
+      var sessionSerial = document.getElementById('session-serial');
+      var serialLog = document.getElementById('serial-log');
+      var btnConnect = document.getElementById('btn-connect');
+      var btnDisconnect = document.getElementById('btn-disconnect');
+      var btnPaste = document.getElementById('btn-paste');
+      var typeToggle = document.getElementById('console-type-toggle');
+      var typeMenu = document.getElementById('console-type-menu');
+      var typeLabel = document.getElementById('console-type-label');
+      var langToggle = document.getElementById('lang-toggle');
+      var langMenu = document.getElementById('lang-menu');
+      var langLabel = document.getElementById('lang-label');
+      var sendToggle = document.getElementById('send-key-toggle');
+      var sendMenu = document.getElementById('send-key-menu');
+      var toastEl = document.getElementById('toast');
+      var toastTimer;
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('pf-m-open');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove('pf-m-open');
+        }, 2200);
       }
 
-      function setConsoleType(next) {
-        type = next;
-        label.textContent = labels[next];
-        options.forEach(function (opt) {
+      function closeMenus(except) {
+        [typeMenu, langMenu, sendMenu].forEach(function (menu) {
+          if (menu !== except) menu.hidden = true;
+        });
+        typeToggle.setAttribute('aria-expanded', String(!typeMenu.hidden));
+        langToggle.setAttribute('aria-expanded', String(!langMenu.hidden));
+        sendToggle.setAttribute('aria-expanded', String(!sendMenu.hidden));
+      }
+
+      function updateCredDisplay(kind) {
+        var field = document.querySelector('[data-cred="' + kind + '"]');
+        if (!field) return;
+        var valueEl = field.querySelector('[data-cred-value]');
+        var revealBtn = field.querySelector('[data-reveal]');
+        var icon = revealBtn.querySelector('[data-reveal-icon]');
+        var tip = revealBtn.querySelector('[data-tip]');
+        var isShown = revealed[kind];
+        valueEl.textContent = isShown ? credentials[kind] : MASK;
+        revealBtn.setAttribute('aria-pressed', String(isShown));
+        revealBtn.setAttribute('aria-label', isShown ? ('Hide ' + kind) : ('Show ' + kind));
+        tip.textContent = isShown
+          ? (kind === 'username' ? 'Hide username' : 'Hide password')
+          : (kind === 'username' ? 'Show username' : 'Show password');
+        icon.className = isShown ? 'fas fa-eye-slash' : 'fas fa-eye';
+      }
+
+      function setConsoleType(next, opts) {
+        consoleType = next;
+        typeLabel.textContent = labels[next];
+        document.querySelectorAll('[data-console-type]').forEach(function (opt) {
           var selected = opt.getAttribute('data-console-type') === next;
           opt.classList.toggle('is-selected', selected);
-          opt.setAttribute('aria-selected', selected ? 'true' : 'false');
+          opt.setAttribute('aria-selected', String(selected));
         });
-        Object.keys(panels).forEach(function (key) {
-          panels[key].hidden = key !== next;
-        });
-        var url = new URL(window.location.href);
-        url.searchParams.set('type', next);
-        window.history.replaceState({}, '', url);
-        setMenuOpen(false);
+        connectCopy.textContent = 'Click Connect to open the ' + labels[next] + '.';
+        if (!(opts && opts.skipHistory)) {
+          var url = new URL(window.location.href);
+          url.searchParams.set('type', next);
+          window.history.replaceState({}, '', url);
+        }
+        if (connected) renderConnected();
+        closeMenus();
       }
 
-      toggle.addEventListener('click', function (e) {
-        e.stopPropagation();
-        setMenuOpen(menu.hidden);
-      });
-      options.forEach(function (opt) {
-        opt.addEventListener('click', function () {
-          setConsoleType(opt.getAttribute('data-console-type'));
+      function renderConnected() {
+        connectPanel.hidden = true;
+        body.classList.add('is-connected');
+        btnDisconnect.disabled = false;
+        if (consoleType === 'vnc') {
+          sessionVnc.hidden = false;
+          sessionSerial.hidden = true;
+        } else {
+          sessionVnc.hidden = true;
+          sessionSerial.hidden = false;
+          serialLog.textContent =
+            'Serial console connected to ' + vmName + '\n' +
+            'login: ' + credentials.username + '\n' +
+            '[placeholder] guest serial session ready.\n';
+        }
+      }
+
+      function renderDisconnected() {
+        connected = false;
+        connectPanel.hidden = false;
+        sessionVnc.hidden = true;
+        sessionSerial.hidden = true;
+        body.classList.remove('is-connected');
+        btnDisconnect.disabled = true;
+        connectCopy.textContent = 'Click Connect to open the ' + labels[consoleType] + '.';
+      }
+
+      function connect() {
+        connected = true;
+        renderConnected();
+        showToast(labels[consoleType] + ' connected (placeholder)');
+      }
+
+      function disconnect() {
+        renderDisconnected();
+        showToast('Disconnected');
+      }
+
+      async function copyText(text, btn) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        var tip = btn.querySelector('[data-tip]');
+        if (!tip) return;
+        tip.textContent = 'Copied';
+        tip.classList.add('tip--sticky');
+        var key = btn.getAttribute('data-copy');
+        clearTimeout(copyTimers[key]);
+        copyTimers[key] = setTimeout(function () {
+          tip.textContent = 'Copy to clipboard';
+          tip.classList.remove('tip--sticky');
+        }, 1600);
+      }
+
+      // Credentials
+      updateCredDisplay('username');
+      updateCredDisplay('password');
+      document.querySelectorAll('[data-reveal]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var kind = btn.getAttribute('data-reveal');
+          revealed[kind] = !revealed[kind];
+          updateCredDisplay(kind);
         });
       });
-      document.addEventListener('click', function () { setMenuOpen(false); });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') setMenuOpen(false);
-      });
-      document.getElementById('btn-connect-vnc').addEventListener('click', function () {
-        document.getElementById('vnc-copy').textContent =
-          'Connected (placeholder) — VNC session for ' + vmName + '.';
-      });
-      document.getElementById('btn-connect-serial').addEventListener('click', function () {
-        document.getElementById('serial-copy').textContent =
-          'Connected (placeholder) — Serial session for ' + vmName + '.';
+      document.querySelectorAll('[data-copy]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var kind = btn.getAttribute('data-copy');
+          copyText(credentials[kind], btn);
+        });
       });
 
-      setConsoleType(initialType);
+      // Connect / disconnect / paste
+      btnConnect.addEventListener('click', connect);
+      btnDisconnect.addEventListener('click', function () {
+        if (!btnDisconnect.disabled) disconnect();
+      });
+      btnPaste.addEventListener('click', async function () {
+        var text = '';
+        try { text = await navigator.clipboard.readText(); } catch (e) { /* ignore */ }
+        if (!connected) {
+          showToast('Connect to the console before pasting');
+          return;
+        }
+        if (consoleType === 'serial') {
+          serialLog.textContent += (text || '[clipboard empty]') + '\n';
+        }
+        showToast(text ? 'Pasted to console (placeholder)' : 'Clipboard is empty');
+      });
+
+      // Console type menu
+      typeToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = typeMenu.hidden;
+        closeMenus(open ? typeMenu : null);
+        typeMenu.hidden = !open;
+        typeToggle.setAttribute('aria-expanded', String(open));
+      });
+      document.querySelectorAll('[data-console-type]').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          var next = opt.getAttribute('data-console-type');
+          if (connected && next !== consoleType) disconnect();
+          setConsoleType(next);
+        });
+      });
+
+      // Language menu
+      langToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = langMenu.hidden;
+        closeMenus(open ? langMenu : null);
+        langMenu.hidden = !open;
+        langToggle.setAttribute('aria-expanded', String(open));
+      });
+      document.querySelectorAll('[data-lang]').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          var lang = opt.getAttribute('data-lang');
+          langLabel.textContent = lang;
+          document.querySelectorAll('[data-lang]').forEach(function (o) {
+            var selected = o === opt;
+            o.classList.toggle('is-selected', selected);
+            o.setAttribute('aria-selected', String(selected));
+          });
+          closeMenus();
+          showToast('Keyboard layout: ' + lang);
+        });
+      });
+
+      // Send key
+      sendToggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = sendMenu.hidden;
+        closeMenus(open ? sendMenu : null);
+        sendMenu.hidden = !open;
+        sendToggle.setAttribute('aria-expanded', String(open));
+      });
+      document.querySelectorAll('[data-send-key]').forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          var key = opt.getAttribute('data-send-key');
+          closeMenus();
+          if (key === 'more') return;
+          if (!connected) {
+            showToast('Connect to the console before sending keys');
+            return;
+          }
+          if (consoleType === 'serial') {
+            serialLog.textContent += '[sent] ' + key + '\n';
+          }
+          showToast('Sent ' + key + ' (placeholder)');
+        });
+      });
+
+      document.addEventListener('click', function () { closeMenus(); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenus();
+      });
+
+      setConsoleType(consoleType, { skipHistory: true });
+      renderDisconnected();
     })();
   </script>
 </body>
