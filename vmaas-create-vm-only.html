@@ -6596,32 +6596,245 @@
     function openVmConsolePlaceholder(vmName) {
       const safeName = String(vmName || 'Virtual machine').replace(/[<>&"]/g, '');
       const html = `<!doctype html>
-<html lang="en">
+<html lang="en" class="pf-v6-theme-felt pf-v6-theme-glass">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Console — ${safeName}</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <style>
-    body { margin: 0; font-family: "Red Hat Text", Helvetica, Arial, sans-serif;
-      background: #151515; color: #f0f0f0; display: grid; place-items: center; min-height: 100vh; }
-    .box { text-align: center; padding: 32px; max-width: 420px; }
-    h1 { font-size: 20px; margin: 0 0 8px; font-weight: 600; }
-    p { margin: 0; font-size: 14px; color: #c7c7c7; line-height: 1.5; }
-    code { color: #bee1f4; }
+    :root {
+      --vmaas-blue: #0066cc;
+      --vmaas-text: #151515;
+      --vmaas-text-subtle: #6a6e73;
+      --vmaas-border-light: #d2d2d2;
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "Red Hat Text", "Helvetica Neue", Arial, sans-serif;
+      color: var(--vmaas-text);
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+    .console-page {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      margin: var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      background: var(--pf-t--global--background--color--floating--default, rgba(255, 255, 255, 0.92));
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
+      overflow: hidden;
+    }
+    .console-page__toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--vmaas-border-light);
+    }
+    .console-page__title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .console-page__title code {
+      font-weight: 600;
+      color: var(--vmaas-blue);
+    }
+    .console-page__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .console-type {
+      position: relative;
+    }
+    .console-type__menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 20;
+      min-width: 180px;
+      margin: 0;
+      padding: 8px 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid var(--vmaas-border-light);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    .console-type__menu[hidden] { display: none; }
+    .console-type__option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      border: none;
+      background: none;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--vmaas-text);
+      text-align: left;
+      cursor: pointer;
+    }
+    .console-type__option:hover,
+    .console-type__option:focus {
+      background: #f0f0f0;
+      outline: none;
+    }
+    .console-type__option.is-selected {
+      font-weight: 600;
+    }
+    .console-type__check {
+      color: var(--vmaas-blue);
+      visibility: hidden;
+    }
+    .console-type__option.is-selected .console-type__check {
+      visibility: visible;
+    }
+    .console-page__body {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 32px 24px;
+      background: #f5f5f5;
+    }
+    .console-placeholder {
+      text-align: center;
+      max-width: 420px;
+    }
+    .console-placeholder h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .console-placeholder p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: var(--vmaas-text-subtle);
+      line-height: 1.5;
+    }
+    .console-placeholder[hidden] { display: none; }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Console placeholder</h1>
-    <p>Console for <code>${safeName}</code> would open here.</p>
+  <div class="console-page">
+    <div class="console-page__toolbar">
+      <h1 class="console-page__title">Console — <code>${safeName}</code></h1>
+      <div class="console-page__actions">
+        <div class="console-type">
+          <button
+            type="button"
+            class="pf-v6-c-button pf-m-secondary"
+            id="console-type-toggle"
+            aria-haspopup="listbox"
+            aria-expanded="false"
+            aria-controls="console-type-menu"
+          >
+            <span id="console-type-label">VNC console</span>
+            <span class="pf-v6-c-button__icon pf-m-end" aria-hidden="true">
+              <i class="fas fa-caret-down"></i>
+            </span>
+          </button>
+          <ul class="console-type__menu" id="console-type-menu" role="listbox" aria-label="Console type" hidden>
+            <li role="none">
+              <button type="button" class="console-type__option" role="option" data-console-type="serial" aria-selected="false">
+                <span>Serial console</span>
+                <i class="fas fa-check console-type__check" aria-hidden="true"></i>
+              </button>
+            </li>
+            <li role="none">
+              <button type="button" class="console-type__option is-selected" role="option" data-console-type="vnc" aria-selected="true">
+                <span>VNC console</span>
+                <i class="fas fa-check console-type__check" aria-hidden="true"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="console-page__body">
+      <div class="console-placeholder" id="panel-vnc" data-console-panel="vnc">
+        <h2>VNC console</h2>
+        <p>Placeholder — VNC console for <strong>${safeName}</strong> would connect here.</p>
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-connect-vnc">Connect</button>
+      </div>
+      <div class="console-placeholder" id="panel-serial" data-console-panel="serial" hidden>
+        <h2>Serial console</h2>
+        <p>Placeholder — Serial console for <strong>${safeName}</strong> would connect here.</p>
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-connect-serial">Connect</button>
+      </div>
+    </div>
   </div>
+  <script>
+    (function () {
+      var type = 'vnc';
+      var toggle = document.getElementById('console-type-toggle');
+      var menu = document.getElementById('console-type-menu');
+      var label = document.getElementById('console-type-label');
+      var options = Array.prototype.slice.call(document.querySelectorAll('[data-console-type]'));
+      var panels = {
+        vnc: document.getElementById('panel-vnc'),
+        serial: document.getElementById('panel-serial')
+      };
+      var labels = { vnc: 'VNC console', serial: 'Serial console' };
 
+      function setMenuOpen(open) {
+        menu.hidden = !open;
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
 
-  <div class="pf-v6-c-tooltip pf-m-top" id="pf-tooltip" role="tooltip" hidden>
-    <div class="pf-v6-c-tooltip__arrow"></div>
-    <div class="pf-v6-c-tooltip__content" id="pf-tooltip-content"></div>
-  </div>
+      function setConsoleType(next) {
+        type = next;
+        label.textContent = labels[next];
+        options.forEach(function (opt) {
+          var selected = opt.getAttribute('data-console-type') === next;
+          opt.classList.toggle('is-selected', selected);
+          opt.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        Object.keys(panels).forEach(function (key) {
+          panels[key].hidden = key !== next;
+        });
+        setMenuOpen(false);
+      }
 
+      toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setMenuOpen(menu.hidden);
+      });
+      options.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          setConsoleType(opt.getAttribute('data-console-type'));
+        });
+      });
+      document.addEventListener('click', function () { setMenuOpen(false); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setMenuOpen(false);
+      });
+      document.getElementById('btn-connect-vnc').addEventListener('click', function () {
+        panels.vnc.querySelector('p').textContent =
+          'Connected (placeholder) — VNC session for ${safeName}.';
+      });
+      document.getElementById('btn-connect-serial').addEventListener('click', function () {
+        panels.serial.querySelector('p').textContent =
+          'Connected (placeholder) — Serial session for ${safeName}.';
+      });
+    })();
+  </script>
 </body>
 </html>`;
       const blob = new Blob([html], { type: 'text/html' });

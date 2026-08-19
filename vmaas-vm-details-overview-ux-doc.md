@@ -64,7 +64,7 @@ Figure: Overview — running
 | **Operating system** | Metadata OS, or soft empty (*Guest agent not reporting*) |
 | **Compute resource** | Summary + edit |
 | **SSH public key** | Configured / Not configured (link) + pencil |
-| **VNC console** | Open web console + preview |
+| **VNC console** | Open web console + preview. New tab is a placeholder with a **Serial console** / **VNC console** dropdown (CNV parity; our PF shell styling). |
 
 Name lives in the page header (not duplicated in the DL), with arch badge (**amd64**).
 
