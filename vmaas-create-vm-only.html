@@ -6604,7 +6604,7 @@
       consoleUrl.searchParams.set('vm', safeName);
       consoleUrl.searchParams.set('type', 'vnc');
       // Bust CDN / browser cache so stakeholders always get the latest placeholder.
-      consoleUrl.searchParams.set('v', '2026-08-19-console-full');
+      consoleUrl.searchParams.set('v', '2026-08-19-console-tips-flyout');
       const win = window.open(consoleUrl.toString(), '_blank', 'noopener');
       if (!win) toast('Allow pop-ups to open the console.');
     }
