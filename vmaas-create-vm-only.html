@@ -835,7 +835,8 @@
       scroll-margin-top: 12px;
     }
     .vm-config__fields > .pf-v6-c-button { margin-top: 0; }
-    .vm-config__fields .form-helper {
+    .vm-config__fields .form-helper,
+    .vm-config__fields .pf-v6-c-form__helper-text {
       margin-top: var(--pf-t--global--spacer--sm, 8px);
       max-width: none;
     }
@@ -845,6 +846,17 @@
       border-top: 1px solid var(--vmaas-border-light);
       font-size: 14px;
       font-weight: 600;
+      color: var(--vmaas-text);
+      scroll-margin-top: 12px;
+    }
+    /* Ethan Node Sets section title: h3 / lg, no hairline */
+    .vm-config__fields .config-sets-title {
+      margin: var(--pf-t--global--spacer--lg, 24px) 0 0;
+      padding: 0;
+      border: none;
+      font-size: var(--pf-t--global--font--size--lg, 1.125rem);
+      font-weight: var(--pf-t--global--font--weight--heading--bold, 600);
+      line-height: var(--pf-t--global--font--line-height--heading, 1.3);
       color: var(--vmaas-text);
       scroll-margin-top: 12px;
     }
@@ -933,9 +945,9 @@
     .inline-sets {
       display: flex;
       flex-direction: column;
-      gap: var(--pf-t--global--spacer--lg, 24px);
+      gap: var(--pf-t--global--spacer--md, 16px);
       max-width: 560px;
-      margin: 0 0 var(--pf-t--global--spacer--sm, 8px);
+      margin: var(--pf-t--global--spacer--sm, 8px) 0;
     }
     .inline-set {
       display: flex;
@@ -949,12 +961,13 @@
       gap: 12px;
       margin: 0;
     }
+    /* Ethan node-set heading: body bold + subtle */
     .inline-set__title {
       margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--vmaas-text);
-      line-height: 1.4;
+      font-size: var(--pf-t--global--font--size--body--default, 14px);
+      font-weight: var(--pf-t--global--font--weight--body--bold, 600);
+      line-height: var(--pf-t--global--font--line-height--body, 1.5);
+      color: var(--pf-t--global--text--color--subtle, var(--vmaas-text-subtle));
     }
     /* Match Ethan: PF link+inline dashed underline under the label (not the icon) */
     .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline,
@@ -6109,6 +6122,19 @@
       `;
     }
 
+    /** Ethan FormHelperText → HelperText → HelperTextItem markup. */
+    function pfHelperText(html, id = '') {
+      return `
+        <div class="pf-v6-c-form__helper-text"${id ? ` id="${id}"` : ''}>
+          <div class="pf-v6-c-helper-text">
+            <div class="pf-v6-c-helper-text__item">
+              <span class="pf-v6-c-helper-text__item-text">${html}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function pfGroupSelect({ id, optionsHtml }) {
       return `
         <span class="pf-v6-c-form-control folder-search pf-m-placeholder">
@@ -10693,13 +10719,13 @@
                 }
                 return `
                 <div class="inline-set" data-disk-set="${disk.id}">
-                    <div class="inline-set__header">
-                    <h5 class="inline-set__title">Disk ${idx + 1}</h5>
+                  <div class="inline-set__header">
+                    <p class="inline-set__title">Disk set ${idx + 1}</p>
                     ${pfInlineLinkButton({
                       label: 'Remove',
                       icon: 'minus',
                       danger: true,
-                      ariaLabel: `Remove disk ${idx + 1}`,
+                      ariaLabel: `Remove disk set ${idx + 1}`,
                       extraAttrs: `data-remove-disk="${disk.id}"`,
                     })}
                   </div>
@@ -10708,20 +10734,20 @@
                     <input type="number" id="f-disk-size-${disk.id}" class="unit-size-input"
                       data-disk-size="${disk.id}" value="${sizeVal}"
                       min="${diskMin}" max="${diskMax}" step="1" required
-                      aria-label="Disk ${idx + 1} size in GiB" />
-                    <p class="form-helper">Disk name will be <code>${String(disk.name || '').replace(/</g, '&lt;')}</code>.</p>
+                      aria-label="Disk set ${idx + 1} size in GiB" />
+                    ${pfHelperText(`Disk name will be <code>${String(disk.name || '').replace(/</g, '&lt;')}</code>.`)}
                   </div>
                   <div class="form-field">
                     <label for="f-disk-tier-${disk.id}">Storage tier <span class="req">*</span></label>
                     ${pfSelect({
                       id: `f-disk-tier-${disk.id}`,
-                      ariaLabel: `Disk ${idx + 1} storage tier`,
+                      ariaLabel: `Disk set ${idx + 1} storage tier`,
                       required: true,
                       optionsHtml: tiers.map(t =>
                         `<option value="${t.id}" ${disk.storageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
                       ).join('') || '<option value="">No storage tiers available</option>',
                     })}
-                    <p class="form-helper">Storage tiers are defined by your cloud provider administrator.</p>
+                    ${pfHelperText('Storage tiers are defined by your cloud provider administrator.')}
                   </div>
                 </div>
               `;
@@ -10740,7 +10766,7 @@
                 <input type="number" id="f-boot-disk" class="unit-size-input" value="${diskVal}"
                   min="${diskMin}" max="${diskMax}" step="1" required
                   aria-label="Boot disk size in GiB" />
-                <p class="form-helper">Starting default from the template.</p>
+                ${pfHelperText('Starting default from the template.')}
               </div>
           ` : `
               <div class="form-field">
@@ -10751,7 +10777,7 @@
                 <input type="number" id="f-boot-disk" class="unit-size-input" value="${diskVal}"
                   disabled aria-disabled="true" aria-label="Boot disk size in GiB"
                   aria-describedby="f-boot-locked-help" />
-                <p class="form-helper" id="f-boot-locked-help">Boot disk size is set by the template and can’t be changed during create. Add additional disks below if you need more storage.</p>
+                ${pfHelperText('Boot disk size is set by the template and can’t be changed during create. Add additional disks below if you need more storage.', 'f-boot-locked-help')}
               </div>
           `;
           const addDiskHtml = `
@@ -10772,8 +10798,7 @@
             <p class="step-help">${storageStepHelp}</p>
             <div class="vm-config__fields">
               ${bootFieldHtml}
-              <h4 class="config-section-title">Additional disks</h4>
-              <p class="step-help" style="margin-top:-8px;">Disk size and storage tier are editable. Add more disks if this Virtual machine needs extra storage.</p>
+              <h3 class="config-sets-title">Additional disks</h3>
               ${diskSetsHtml}
               ${addDiskHtml}
             </div>
@@ -10925,10 +10950,9 @@
                   ` : ''}
                 </div>
                 ${fieldErrorHtml('securityGroups')}
-                <p class="form-helper">Firewall rules for inbound and outbound traffic. A project default is preselected.</p>
+                ${pfHelperText('Firewall rules for inbound and outbound traffic. A project default is preselected.')}
               </div>
-              <h4 class="config-section-title">Additional networks</h4>
-              <p class="step-help" style="margin-top:-8px;">Virtual network, subnet, and security groups are editable. Add more networks if this Virtual machine needs them.</p>
+              <h3 class="config-sets-title">Additional networks</h3>
               ${(d.extraNetworks || []).length ? `
               <div class="inline-sets" aria-label="Additional networks">
                 ${(d.extraNetworks || []).map((netItem, idx) => {
@@ -10955,12 +10979,12 @@
                   return `
                   <div class="inline-set" data-network-set="${netItem.id}">
                     <div class="inline-set__header">
-                      <h5 class="inline-set__title">Network ${idx + 1}</h5>
+                      <p class="inline-set__title">Network set ${idx + 1}</p>
                       ${pfInlineLinkButton({
                         label: 'Remove',
                         icon: 'minus',
                         danger: true,
-                        ariaLabel: `Remove network ${idx + 1}`,
+                        ariaLabel: `Remove network set ${idx + 1}`,
                         extraAttrs: `data-remove-network="${netItem.id}"`,
                       })}
                     </div>
@@ -10968,7 +10992,7 @@
                       <label for="f-extra-vn-${netItem.id}">Virtual network <span class="req">*</span></label>
                       ${pfSelect({
                         id: `f-extra-vn-${netItem.id}`,
-                        ariaLabel: `Network ${idx + 1} virtual network`,
+                        ariaLabel: `Network set ${idx + 1} virtual network`,
                         required: true,
                         extraClass: netItem.virtualNetwork ? '' : 'pf-m-placeholder',
                         optionsHtml: `
@@ -10978,13 +11002,13 @@
                           ).join('')}
                         `,
                       })}
-                      <p class="form-helper">Network name will be <code>${String(netItem.name || '—').replace(/</g, '&lt;')}</code>.</p>
+                      ${pfHelperText(`Network name will be <code>${String(netItem.name || '—').replace(/</g, '&lt;')}</code>.`)}
                     </div>
                     <div class="form-field">
                       <label for="f-extra-subnet-${netItem.id}">Subnet <span class="req">*</span></label>
                       ${pfSelect({
                         id: `f-extra-subnet-${netItem.id}`,
-                        ariaLabel: `Network ${idx + 1} subnet`,
+                        ariaLabel: `Network set ${idx + 1} subnet`,
                         required: true,
                         disabled: !netItem.virtualNetwork,
                         extraClass: netItem.subnet ? '' : 'pf-m-placeholder',
@@ -11029,7 +11053,7 @@
                           </div>
                         ` : ''}
                       </div>
-                      <p class="form-helper">Firewall rules for inbound and outbound traffic.</p>
+                      ${pfHelperText('Firewall rules for inbound and outbound traffic.')}
                     </div>
                   </div>
                 `;
