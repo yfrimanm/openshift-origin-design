@@ -10,7 +10,7 @@
 | **Companion doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — one mock covers list → create → details |
 | **Google Doc (this doc)** | [Create Virtual machine - UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
-| **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` |
+| **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [GitHub Pages](https://yfrimanm.github.io/openshift-origin-design/screenshots/create/) |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
 
 **IA:** Select template → Details → Compute resource → Storage → Network → Review and create
@@ -40,7 +40,9 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **Project** | Dropdown on Select template (prefilled from context); also on Details. |
 | **Exit confirm** | Exit without saving / Continue creating. |
 | **After create** | Opens the new VM details Overview + success toast (`created` or `created and starting` → Running). |
+| **Start after create** | Review checkbox **Start this Virtual machine after creation** — checked by default (CNV parity). |
 | **Shell chrome** | PatternFly **Felt + Glass** (PF 6.6.1), aligned to Ethan’s [osac-bmaas](https://heyethankim.github.io/osac-bmaas/) — soft floating sidebar/main panels, Felt current nav accent (no hard nav divider). |
+| **Additional disk / network** | Wizard uses **inline** Add / Remove sets (Disk set N / Network set N). Overview cards still use **Add** modals. |
 
 ---
 
@@ -124,34 +126,42 @@ Figure: Compute resource
 
 ## Step 4 — Storage
 
-- Boot disk size (locked or editable) + locked helper when applicable
-- **Additional disks** — Add disk; empty: *No additional disks yet.*
+- Boot disk size (locked or editable) + PF helper text when locked / editable
+- **Additional disks** — inline **Add disk** (PF link + PlusCircle; dashed underline on the label only). Empty: no sets yet.
+- Each added disk is a **Disk set N** with Size, Storage tier (helpers), and **Remove** (danger link + MinusCircle)
+- Matches Ethan’s OSAC config-sets pattern (no Add disk modal on this step). Overview **Add disk** still uses a modal.
 
 ![Figure: Storage](videos/vmaas-create-vm-only-ux-doc/07-storage.png)
 
 Figure: Storage
 
-![Figure: Add disk modal](videos/vmaas-create-vm-only-ux-doc/08-add-disk-modal.png)
+![Figure: Additional disk set](videos/vmaas-create-vm-only-ux-doc/08-additional-disk-set.png)
 
-Figure: Add disk modal
+Figure: Additional disk set (inline Add / Remove)
 
 ---
 
 ## Step 5 — Network
 
 - Virtual network, subnet, security groups (required)
-- **Additional networks** — Add network; empty: *No additional networks yet.*
+- **Additional networks** — inline **Add network** (same link pattern as Storage). Empty: no sets yet.
+- Each added network is a **Network set N** with Virtual network / Subnet / Security groups + **Remove**
 - Terminology: **Network** (not “network interface”)
+- Overview **Add network** still uses a modal.
 
 ![Figure: Network](videos/vmaas-create-vm-only-ux-doc/09-network.png)
 
 Figure: Network
 
+![Figure: Additional network set](videos/vmaas-create-vm-only-ux-doc/09b-additional-network-set.png)
+
+Figure: Additional network set (inline Add / Remove)
+
 ---
 
 ## Step 6 — Review and create
 
-Grouped review: Details (incl. Access) / Compute resource / Storage / Network with edit links. Cost panel. Optional *Start this Virtual machine after creation*.
+Grouped review: Details (incl. Access) / Compute resource / Storage / Network with edit links. Cost panel. *Start this Virtual machine after creation* — **checked by default** (CNV parity).
 
 - Access: *Configured* / *Not configured*
 - Additional disks / networks listed or *None*

@@ -34,7 +34,8 @@ async function clickNext(page) {
 }
 
 async function waitStep(page, title) {
-  await page.locator('#wiz-panel h3').filter({ hasText: title }).waitFor({ timeout: 8000 });
+  // Prefer the step title (first matching h3), not nested section titles like "Additional networks".
+  await page.locator('#wiz-panel h3').filter({ hasText: new RegExp(`^${title}$`) }).first().waitFor({ timeout: 8000 });
 }
 
 async function closeDrawer(page) {
@@ -116,20 +117,23 @@ async function main() {
   await page.waitForTimeout(300);
   await shotPage(page, '07-storage');
 
-  await page.getByRole('button', { name: 'Add disk' }).click();
-  await page.waitForSelector('#disk-overlay.pf-m-open', { timeout: 5000 });
+  // Inline Add disk → Disk set (Ethan's config-sets pattern; no modal)
+  await page.locator('#f-add-disk').click();
+  await page.waitForSelector('.inline-set[data-disk-set]', { timeout: 5000 });
   await page.waitForTimeout(350);
-  const diskModal = page.locator('#disk-overlay .pf-v6-c-modal-box, #disk-modal').first();
-  if (await diskModal.count()) await shotEl(page, '#disk-overlay .pf-v6-c-modal-box, #disk-modal', '08-add-disk-modal');
-  else await shotPage(page, '08-add-disk-modal');
-  await page.locator('#disk-modal-cancel').click({ force: true });
-  await page.waitForSelector('#disk-overlay:not(.pf-m-open)', { timeout: 5000 }).catch(() => {});
-  await page.waitForTimeout(250);
+  await shotPage(page, '08-additional-disk-set');
 
   await clickNext(page);
   await waitStep(page, 'Network');
   await page.waitForTimeout(300);
+  // Primary network fields + Additional networks (empty Add link)
   await shotPage(page, '09-network');
+
+  // Inline Add network → Network set
+  await page.locator('#f-add-network').click();
+  await page.waitForSelector('.inline-set[data-network-set]', { timeout: 5000 });
+  await page.waitForTimeout(350);
+  await shotPage(page, '09b-additional-network-set');
 
   await clickNext(page);
   await waitStep(page, 'Review and create');
