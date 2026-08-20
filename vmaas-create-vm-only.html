@@ -969,15 +969,21 @@
       line-height: var(--pf-t--global--font--line-height--body, 1.5);
       color: var(--pf-t--global--text--color--subtle, var(--vmaas-text-subtle));
     }
-    /* Match Ethan: PF link+inline dashed underline under the label (not the icon) */
+    /* Match Ethan: dashed underline on the label only (not the flex button — avoids ghost lines) */
     .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline,
-    .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline {
+    .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline,
+    .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline {
       padding-inline-start: 0;
+      text-decoration: none;
+      text-decoration-line: none;
+      -webkit-text-decoration-line: none;
     }
     .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline {
       flex-shrink: 0;
     }
-    .pf-v6-c-button.pf-m-link.pf-m-inline > .pf-v6-c-button__text {
+    .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline > .pf-v6-c-button__text,
+    .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline > .pf-v6-c-button__text,
+    .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline > .pf-v6-c-button__text {
       text-decoration-line: var(
         --pf-t--global--text-decoration--link--line--default,
         underline
@@ -992,8 +998,12 @@
         0.28em
       );
     }
-    .pf-v6-c-button.pf-m-link.pf-m-inline:hover > .pf-v6-c-button__text,
-    .pf-v6-c-button.pf-m-link.pf-m-inline:focus-visible > .pf-v6-c-button__text {
+    .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline:hover > .pf-v6-c-button__text,
+    .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline:focus-visible > .pf-v6-c-button__text,
+    .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline:hover > .pf-v6-c-button__text,
+    .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline:focus-visible > .pf-v6-c-button__text,
+    .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline:hover > .pf-v6-c-button__text,
+    .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline:focus-visible > .pf-v6-c-button__text {
       text-decoration-line: var(
         --pf-t--global--text-decoration--link--line--hover,
         underline
