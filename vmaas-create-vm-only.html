@@ -929,6 +929,86 @@
       margin: 0 0 var(--pf-t--global--spacer--md, 16px);
       max-width: 560px;
     }
+    /* Ethan-style inline repeating sets (Add link expands fields; Remove on each set) */
+    .inline-sets {
+      display: flex;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--lg, 24px);
+      max-width: 560px;
+      margin: 0 0 var(--pf-t--global--spacer--sm, 8px);
+    }
+    .inline-set {
+      display: flex;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--md, 16px);
+    }
+    .inline-set__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0;
+    }
+    .inline-set__title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--vmaas-text);
+      line-height: 1.4;
+    }
+    .inline-set__remove {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--pf-t--global--color--status--danger--default, #c9190b);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .inline-set__remove:hover,
+    .inline-set__remove:focus-visible {
+      text-decoration: underline;
+      outline: none;
+    }
+    .inline-set__remove i {
+      font-size: 14px;
+    }
+    .inline-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--vmaas-blue);
+      cursor: pointer;
+    }
+    .inline-add:hover,
+    .inline-add:focus-visible {
+      text-decoration: underline;
+      color: var(--vmaas-blue-hover, #004d99);
+      outline: none;
+    }
+    .inline-add .pf-v6-c-button__icon,
+    .inline-add i {
+      font-size: 14px;
+    }
+    .add-disk-action .inline-add,
+    .add-network-action .inline-add,
+    .add-disk-action .pf-v6-c-button.pf-m-link,
+    .add-network-action .pf-v6-c-button.pf-m-link {
+      padding-inline: 0;
+    }
     .form-field input.unit-size-input,
     .form-field input[type="number"].unit-size-input {
       width: 100%;
@@ -7664,6 +7744,39 @@
       return candidate;
     }
 
+    /** Wizard: append an inline disk set (Ethan catalog pattern — no modal). */
+    function addWizardExtraDisk() {
+      if (!Array.isArray(state.data.extraDisks)) state.data.extraDisks = [];
+      const tiers = getStorageTiers();
+      const defaultTier = tiers[0];
+      const name = nextAutoDiskName(state.data);
+      state.data.extraDisks.push({
+        id: `disk-${Date.now()}`,
+        name,
+        size: 30,
+        unit: 'GiB',
+        storageTierId: defaultTier?.id || '',
+        storageTierLabel: defaultTier?.name || '',
+      });
+      renderWizard();
+    }
+
+    /** Wizard: append an inline network set (Ethan catalog pattern — no modal). */
+    function addWizardExtraNetwork() {
+      if (!Array.isArray(state.data.extraNetworks)) state.data.extraNetworks = [];
+      const defaultNet = CONFIG_VIRTUAL_NETWORKS[0];
+      const name = networkAttachmentName(defaultNet?.id || '', state.data.extraNetworks);
+      state.data.extraNetworks.push({
+        id: `net-${Date.now()}`,
+        name,
+        virtualNetwork: defaultNet?.id || '',
+        virtualNetworkLabel: defaultNet?.label || '',
+        subnet: defaultNet?.subnets?.[0] || '',
+        securityGroups: [DEFAULT_SECURITY_GROUP],
+      });
+      renderWizard();
+    }
+
     function openAddDiskModal(context = 'wizard') {
       if (context === 'wizard' && !Array.isArray(state.data.extraDisks)) state.data.extraDisks = [];
       const tiers = getStorageTiers();
@@ -10548,28 +10661,50 @@
           d.bootDiskUnit = 'GiB';
           if (!Array.isArray(d.extraDisks)) d.extraDisks = [];
           const extraDisks = d.extraDisks;
-          const diskListHtml = extraDisks.length ? `
-            <ul class="disk-list" aria-label="Additional disks">
-              ${extraDisks.map(disk => `
-                <li class="disk-list__item">
-                  <div class="disk-list__meta">
-                    <span class="disk-list__name">${disk.name}</span>
-                    <span class="disk-list__size">
-                      ${disk.size} ${disk.unit || 'GiB'}
-                      ${disk.storageTierLabel || disk.storageTierId ? ` · ${disk.storageTierLabel || disk.storageTierId}` : ''}
-                    </span>
+          const tiers = getStorageTiers();
+          const diskSetsHtml = extraDisks.length ? `
+            <div class="inline-sets" aria-label="Additional disks">
+              ${extraDisks.map((disk, idx) => {
+                const sizeVal = Math.min(diskMax, Math.max(diskMin, Number(disk.size) || 30));
+                if (!disk.storageTierId || !tiers.some(t => t.id === disk.storageTierId)) {
+                  disk.storageTierId = tiers[0]?.id || '';
+                  disk.storageTierLabel = tiers[0]?.name || '';
+                }
+                return `
+                <div class="inline-set" data-disk-set="${disk.id}">
+                  <div class="inline-set__header">
+                    <h5 class="inline-set__title">Disk ${idx + 1}</h5>
+                    <button type="button" class="inline-set__remove" data-remove-disk="${disk.id}"
+                      aria-label="Remove disk ${idx + 1}">
+                      <i class="fas fa-minus-circle" aria-hidden="true"></i>
+                      Remove
+                    </button>
                   </div>
-                  <button type="button" class="pf-v6-c-button pf-m-plain pf-m-small" data-remove-disk="${disk.id}"
-                    aria-label="Remove disk ${disk.name}">
-                    <span class="pf-v6-c-button__icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
-                  </button>
-                </li>
-              `).join('')}
-            </ul>
+                  <div class="form-field">
+                    <label for="f-disk-size-${disk.id}">Disk size (GiB) <span class="req">*</span></label>
+                    <input type="number" id="f-disk-size-${disk.id}" class="unit-size-input"
+                      data-disk-size="${disk.id}" value="${sizeVal}"
+                      min="${diskMin}" max="${diskMax}" step="1" required
+                      aria-label="Disk ${idx + 1} size in GiB" />
+                    <p class="form-helper">Disk name will be <code>${String(disk.name || '').replace(/</g, '&lt;')}</code>.</p>
+                  </div>
+                  <div class="form-field">
+                    <label for="f-disk-tier-${disk.id}">Storage tier <span class="req">*</span></label>
+                    ${pfSelect({
+                      id: `f-disk-tier-${disk.id}`,
+                      ariaLabel: `Disk ${idx + 1} storage tier`,
+                      required: true,
+                      optionsHtml: tiers.map(t =>
+                        `<option value="${t.id}" ${disk.storageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
+                      ).join('') || '<option value="">No storage tiers available</option>',
+                    })}
+                    <p class="form-helper">Storage tiers are defined by your cloud provider administrator.</p>
+                  </div>
+                </div>
+              `;
+              }).join('')}
+            </div>
           ` : '';
-          const diskEmptyHtml = extraDisks.length
-            ? ''
-            : `<p class="disk-list-empty" aria-live="polite">No additional disks yet.</p>`;
           const selectedTpl = TEMPLATES.find(t => t.id === d.templateId);
           const fieldBeh = getTemplateFields(selectedTpl || d.catalogPreset);
           const bootEditable = fieldBeh.bootDisk === 'editable';
@@ -10598,7 +10733,10 @@
           `;
           const addDiskHtml = `
               <div class="add-disk-action">
-                <button type="button" class="pf-v6-c-button pf-m-secondary" id="f-add-disk">Add disk</button>
+                <button type="button" class="pf-v6-c-button pf-m-link inline-add" id="f-add-disk">
+                  <span class="pf-v6-c-button__icon"><i class="fas fa-plus-circle" aria-hidden="true"></i></span>
+                  Add disk
+                </button>
               </div>
           `;
           const storageStepHelp = bootEditable
@@ -10611,8 +10749,8 @@
             <div class="vm-config__fields">
               ${bootFieldHtml}
               <h4 class="config-section-title">Additional disks</h4>
-              ${diskListHtml}
-              ${diskEmptyHtml}
+              <p class="step-help" style="margin-top:-8px;">Disk size and storage tier are editable. Add more disks if this Virtual machine needs extra storage.</p>
+              ${diskSetsHtml}
               ${addDiskHtml}
             </div>
           `;
@@ -10636,13 +10774,37 @@
             panel.querySelector('#f-boot-disk')?.addEventListener('input', e => syncBootDisk(e.target.value));
             panel.querySelector('#f-boot-disk')?.addEventListener('change', e => syncBootDisk(e.target.value));
           }
-          panel.querySelector('#f-add-disk')?.addEventListener('click', openAddDiskModal);
+          panel.querySelector('#f-add-disk')?.addEventListener('click', addWizardExtraDisk);
+          panel.querySelectorAll('[data-disk-size]').forEach(input => {
+            const syncExtra = (raw) => {
+              const disk = (d.extraDisks || []).find(x => x.id === input.dataset.diskSize);
+              if (!disk) return;
+              let n = Number(raw);
+              if (Number.isNaN(n)) n = disk.size || 30;
+              n = Math.min(diskMax, Math.max(diskMin, n));
+              disk.size = n;
+              disk.unit = 'GiB';
+              if (input.value !== String(n)) input.value = String(n);
+              updateCostEstimate(key);
+            };
+            input.addEventListener('input', e => syncExtra(e.target.value));
+            input.addEventListener('change', e => syncExtra(e.target.value));
+          });
+          panel.querySelectorAll('select[id^="f-disk-tier-"]').forEach(sel => {
+            sel.addEventListener('change', e => {
+              const id = sel.id.replace(/^f-disk-tier-/, '');
+              const disk = (d.extraDisks || []).find(x => x.id === id);
+              if (!disk) return;
+              disk.storageTierId = e.target.value;
+              disk.storageTierLabel = tiers.find(t => t.id === e.target.value)?.name || e.target.value;
+              updateCostEstimate(key);
+            });
+          });
           panel.querySelectorAll('[data-remove-disk]').forEach(btn => {
             btn.addEventListener('click', () => {
               const id = btn.dataset.removeDisk;
               d.extraDisks = (d.extraDisks || []).filter(disk => disk.id !== id);
               renderWizard();
-              toast('Disk removed.', 'success');
             });
           });
         } else if (stepKey === 'config-network') {
@@ -10742,33 +10904,117 @@
                 <p class="form-helper">Firewall rules for inbound and outbound traffic. A project default is preselected.</p>
               </div>
               <h4 class="config-section-title">Additional networks</h4>
+              <p class="step-help" style="margin-top:-8px;">Virtual network, subnet, and security groups are editable. Add more networks if this Virtual machine needs them.</p>
               ${(d.extraNetworks || []).length ? `
-              <ul class="disk-list" aria-label="Additional networks">
-                ${(d.extraNetworks || []).map(net => `
-                  <li class="disk-list__item">
-                    <div class="disk-list__meta">
-                      <span class="disk-list__name">${(net.name || '—').replace(/</g, '&lt;')}</span>
-                      <span class="disk-list__size">
-                        ${(net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;')}
-                        ${net.subnet ? ` · ${String(net.subnet).replace(/</g, '&lt;')}` : ''}
-                        ${(net.securityGroups || []).length
-                          ? ` · ${net.securityGroups.map(sg => String(sg).replace(/</g, '&lt;')).join(', ')}`
-                          : ''}
-                      </span>
+              <div class="inline-sets" aria-label="Additional networks">
+                ${(d.extraNetworks || []).map((netItem, idx) => {
+                  const netCfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === netItem.virtualNetwork);
+                  const subnetOpts = netCfg ? netCfg.subnets : [];
+                  if (netItem.virtualNetwork && (!netItem.subnet || !subnetOpts.includes(netItem.subnet))) {
+                    netItem.subnet = subnetOpts[0] || '';
+                  }
+                  if (!Array.isArray(netItem.securityGroups)) netItem.securityGroups = [];
+                  netItem.securityGroups = netItem.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
+                  if (netItem.subnet && !netItem.securityGroups.length) {
+                    netItem.securityGroups = [DEFAULT_SECURITY_GROUP];
+                  }
+                  const sgEnabled = !!netItem.virtualNetwork && !!netItem.subnet;
+                  const sgOpen = state.extraSgMenuOpen === netItem.id && sgEnabled;
+                  const netChips = (netItem.securityGroups || []).map(sg => `
+                    <span class="sg-select__chip">
+                      ${sg}
+                      <button type="button" data-extra-sg-remove="${netItem.id}" data-sg="${sg}" aria-label="Remove ${sg}">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                      </button>
+                    </span>
+                  `).join('');
+                  return `
+                  <div class="inline-set" data-network-set="${netItem.id}">
+                    <div class="inline-set__header">
+                      <h5 class="inline-set__title">Network ${idx + 1}</h5>
+                      <button type="button" class="inline-set__remove" data-remove-network="${netItem.id}"
+                        aria-label="Remove network ${idx + 1}">
+                        <i class="fas fa-minus-circle" aria-hidden="true"></i>
+                        Remove
+                      </button>
                     </div>
-                    <button type="button" class="pf-v6-c-button pf-m-plain pf-m-small" data-remove-network="${net.id}"
-                      aria-label="Remove network ${String(net.name || '').replace(/"/g, '&quot;')}">
-                      <span class="pf-v6-c-button__icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
-                    </button>
-                  </li>
-                `).join('')}
-              </ul>
+                    <div class="form-field">
+                      <label for="f-extra-vn-${netItem.id}">Virtual network <span class="req">*</span></label>
+                      ${pfSelect({
+                        id: `f-extra-vn-${netItem.id}`,
+                        ariaLabel: `Network ${idx + 1} virtual network`,
+                        required: true,
+                        extraClass: netItem.virtualNetwork ? '' : 'pf-m-placeholder',
+                        optionsHtml: `
+                          <option value="" ${!netItem.virtualNetwork ? 'selected' : ''} disabled hidden>Select a virtual network</option>
+                          ${CONFIG_VIRTUAL_NETWORKS.map(n =>
+                            `<option value="${n.id}" ${netItem.virtualNetwork === n.id ? 'selected' : ''}>${n.label}</option>`
+                          ).join('')}
+                        `,
+                      })}
+                      <p class="form-helper">Network name will be <code>${String(netItem.name || '—').replace(/</g, '&lt;')}</code>.</p>
+                    </div>
+                    <div class="form-field">
+                      <label for="f-extra-subnet-${netItem.id}">Subnet <span class="req">*</span></label>
+                      ${pfSelect({
+                        id: `f-extra-subnet-${netItem.id}`,
+                        ariaLabel: `Network ${idx + 1} subnet`,
+                        required: true,
+                        disabled: !netItem.virtualNetwork,
+                        extraClass: netItem.subnet ? '' : 'pf-m-placeholder',
+                        optionsHtml: `
+                          <option value="" ${!netItem.subnet ? 'selected' : ''} disabled hidden>Select a subnet</option>
+                          ${subnetOpts.map(s =>
+                            `<option value="${s}" ${netItem.subnet === s ? 'selected' : ''}>${s}</option>`
+                          ).join('')}
+                        `,
+                      })}
+                    </div>
+                    <div class="form-field">
+                      <label id="f-extra-sg-label-${netItem.id}">Security groups <span class="req">*</span></label>
+                      <div class="sg-select ${sgEnabled ? '' : 'pf-m-disabled'} ${sgOpen ? 'pf-m-focus' : ''}"
+                        id="f-extra-sg-${netItem.id}" role="combobox"
+                        aria-labelledby="f-extra-sg-label-${netItem.id}"
+                        aria-expanded="${sgOpen}" aria-disabled="${!sgEnabled}"
+                        data-extra-sg-root="${netItem.id}">
+                        ${netChips || `<span class="sg-select__placeholder">Select security groups</span>`}
+                        <span class="sg-select__actions">
+                          ${(netItem.securityGroups || []).length ? `
+                            <button type="button" data-extra-sg-clear="${netItem.id}" aria-label="Clear security groups">
+                              <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                          ` : ''}
+                          <button type="button" data-extra-sg-toggle="${netItem.id}" aria-label="Toggle security groups" ${sgEnabled ? '' : 'disabled'}>
+                            <i class="fas fa-caret-down" aria-hidden="true"></i>
+                          </button>
+                        </span>
+                        ${sgOpen ? `
+                          <div class="sg-select__menu" role="listbox" aria-label="Security groups">
+                            ${CONFIG_SECURITY_GROUPS.map(sg => {
+                              const checked = (netItem.securityGroups || []).includes(sg);
+                              return `
+                                <button type="button" class="sg-select__option" role="option"
+                                  data-extra-sg-opt="${netItem.id}" data-sg="${sg}" aria-selected="${checked}">
+                                  <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
+                                  ${sg}
+                                </button>
+                              `;
+                            }).join('')}
+                          </div>
+                        ` : ''}
+                      </div>
+                      <p class="form-helper">Firewall rules for inbound and outbound traffic.</p>
+                    </div>
+                  </div>
+                `;
+                }).join('')}
+              </div>
               ` : ''}
-              ${(d.extraNetworks || []).length
-                ? ''
-                : `<p class="disk-list-empty" aria-live="polite">No additional networks yet.</p>`}
               <div class="add-network-action">
-                <button type="button" class="pf-v6-c-button pf-m-secondary" id="f-add-network">Add network</button>
+                <button type="button" class="pf-v6-c-button pf-m-link inline-add" id="f-add-network">
+                  <span class="pf-v6-c-button__icon"><i class="fas fa-plus-circle" aria-hidden="true"></i></span>
+                  Add network
+                </button>
               </div>
             </div>
           `;
@@ -10779,6 +11025,7 @@
               d.virtualNetwork = e.target.value;
               applyNetworkingSmartDefaults(d, { networkChanged: true });
               state.sgMenuOpen = false;
+              state.extraSgMenuOpen = null;
               if (d.virtualNetwork) clearFieldError('virtualNetwork');
               if (d.subnet) clearFieldError('subnet');
               if (d.securityGroups?.length) clearFieldError('securityGroups');
@@ -10793,15 +11040,34 @@
               d.securityGroups = [];
               applyNetworkingSmartDefaults(d, { subnetChanged: true });
               state.sgMenuOpen = false;
+              state.extraSgMenuOpen = null;
               if (d.subnet) clearFieldError('subnet');
               if (d.securityGroups?.length) clearFieldError('securityGroups');
               renderWizard();
             });
           }
           const sgRoot = panel.querySelector('#f-security-groups');
+          if (panel._sgAbort) panel._sgAbort.abort();
+          const ac = new AbortController();
+          panel._sgAbort = ac;
+          document.addEventListener('mousedown', e => {
+            if (sgRoot && sgEnabledLive && !sgRoot.contains(e.target) && state.sgMenuOpen) {
+              state.sgMenuOpen = false;
+              renderWizard();
+              return;
+            }
+            const openExtra = state.extraSgMenuOpen
+              ? panel.querySelector(`[data-extra-sg-root="${state.extraSgMenuOpen}"]`)
+              : null;
+            if (openExtra && !openExtra.contains(e.target)) {
+              state.extraSgMenuOpen = null;
+              renderWizard();
+            }
+          }, { signal: ac.signal });
           if (sgRoot && sgEnabledLive) {
             const openMenu = (open) => {
               state.sgMenuOpen = open;
+              if (open) state.extraSgMenuOpen = null;
               renderWizard();
             };
             panel.querySelector('#f-sg-toggle')?.addEventListener('click', e => {
@@ -10835,23 +11101,88 @@
                 renderWizard();
               });
             });
-            if (panel._sgAbort) panel._sgAbort.abort();
-            const ac = new AbortController();
-            panel._sgAbort = ac;
-            document.addEventListener('mousedown', e => {
-              if (!sgRoot.contains(e.target) && state.sgMenuOpen) {
-                state.sgMenuOpen = false;
-                renderWizard();
-              }
-            }, { signal: ac.signal });
           }
-          panel.querySelector('#f-add-network')?.addEventListener('click', openAddNetworkModal);
+          panel.querySelectorAll('select[id^="f-extra-vn-"]').forEach(sel => {
+            sel.addEventListener('change', e => {
+              const id = sel.id.replace(/^f-extra-vn-/, '');
+              const item = (d.extraNetworks || []).find(n => n.id === id);
+              if (!item) return;
+              item.virtualNetwork = e.target.value;
+              const cfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === item.virtualNetwork);
+              item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
+              item.subnet = cfg?.subnets?.[0] || '';
+              item.securityGroups = item.subnet ? [DEFAULT_SECURITY_GROUP] : [];
+              item.name = networkAttachmentName(item.virtualNetwork, (d.extraNetworks || []).filter(n => n.id !== id));
+              state.extraSgMenuOpen = null;
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('select[id^="f-extra-subnet-"]').forEach(sel => {
+            sel.addEventListener('change', e => {
+              const id = sel.id.replace(/^f-extra-subnet-/, '');
+              const item = (d.extraNetworks || []).find(n => n.id === id);
+              if (!item) return;
+              item.subnet = e.target.value;
+              if (!item.securityGroups?.length) item.securityGroups = [DEFAULT_SECURITY_GROUP];
+              state.extraSgMenuOpen = null;
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-toggle]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const id = btn.dataset.extraSgToggle;
+              state.sgMenuOpen = false;
+              state.extraSgMenuOpen = state.extraSgMenuOpen === id ? null : id;
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-root]').forEach(root => {
+            root.addEventListener('click', e => {
+              if (e.target.closest('[data-extra-sg-remove]') || e.target.closest('[data-extra-sg-clear]')
+                || e.target.closest('[data-extra-sg-toggle]') || e.target.closest('[data-extra-sg-opt]')) return;
+              const id = root.dataset.extraSgRoot;
+              state.sgMenuOpen = false;
+              state.extraSgMenuOpen = state.extraSgMenuOpen === id ? null : id;
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-clear]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgClear);
+              if (item) item.securityGroups = [];
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-remove]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgRemove);
+              if (!item) return;
+              item.securityGroups = (item.securityGroups || []).filter(x => x !== btn.dataset.sg);
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-opt]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgOpt);
+              if (!item) return;
+              const set = new Set(item.securityGroups || []);
+              const sg = btn.dataset.sg;
+              if (set.has(sg)) set.delete(sg); else set.add(sg);
+              item.securityGroups = [...set];
+              renderWizard();
+            });
+          });
+          panel.querySelector('#f-add-network')?.addEventListener('click', addWizardExtraNetwork);
           panel.querySelectorAll('[data-remove-network]').forEach(btn => {
             btn.addEventListener('click', () => {
               const id = btn.dataset.removeNetwork;
               d.extraNetworks = (d.extraNetworks || []).filter(net => net.id !== id);
+              if (state.extraSgMenuOpen === id) state.extraSgMenuOpen = null;
               renderWizard();
-              toast('Network removed.', 'success');
             });
           });
         }
