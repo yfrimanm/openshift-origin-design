@@ -4162,7 +4162,7 @@
         <footer class="pf-v6-c-wizard__footer wiz-footer">
           <div class="wiz-footer__start" id="wiz-start-bar" hidden>
             <label class="form-check">
-              <input type="checkbox" id="f-start" />
+              <input type="checkbox" id="f-start" checked />
               Start this Virtual machine after creation
             </label>
           </div>
@@ -5468,7 +5468,7 @@
         size: 'u1.medium',
         templateId: null,
         cloneSourceName: null,
-        startAfter: false,
+        startAfter: true,
         hostname: '',
         headless: false,
         guestLog: true,
@@ -9021,7 +9021,7 @@
       state.data.description = '';
       state.data.project = createContextProject();
       state.data.group = '';
-      state.data.startAfter = false;
+      state.data.startAfter = true;
       state.data.templateId = null;
       state.data.cloneSourceName = null;
       state.data.catalogPreset = null;
