@@ -956,58 +956,13 @@
       color: var(--vmaas-text);
       line-height: 1.4;
     }
-    .inline-set__remove {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin: 0;
-      padding: 0;
-      border: none;
-      background: none;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--pf-t--global--color--status--danger--default, #c9190b);
-      cursor: pointer;
-      white-space: nowrap;
+    /* Match Ethan: PF link + inline; no extra padding on the add control */
+    .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline,
+    .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline {
+      padding-inline-start: 0;
     }
-    .inline-set__remove:hover,
-    .inline-set__remove:focus-visible {
-      text-decoration: underline;
-      outline: none;
-    }
-    .inline-set__remove i {
-      font-size: 14px;
-    }
-    .inline-add {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin: 0;
-      padding: 0;
-      border: none;
-      background: none;
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--vmaas-blue);
-      cursor: pointer;
-    }
-    .inline-add:hover,
-    .inline-add:focus-visible {
-      text-decoration: underline;
-      color: var(--vmaas-blue-hover, #004d99);
-      outline: none;
-    }
-    .inline-add .pf-v6-c-button__icon,
-    .inline-add i {
-      font-size: 14px;
-    }
-    .add-disk-action .inline-add,
-    .add-network-action .inline-add,
-    .add-disk-action .pf-v6-c-button.pf-m-link,
-    .add-network-action .pf-v6-c-button.pf-m-link {
-      padding-inline: 0;
+    .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline {
+      flex-shrink: 0;
     }
     .form-field input.unit-size-input,
     .form-field input[type="number"].unit-size-input {
@@ -6088,6 +6043,42 @@
       `;
     }
 
+    /** PatternFly PlusCircleIcon / MinusCircleIcon (same SVGs Ethan uses). */
+    const PF_ICON_PLUS_CIRCLE = `<svg class="pf-v6-svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true" role="img" width="1em" height="1em"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"></path></svg>`;
+    const PF_ICON_MINUS_CIRCLE = `<svg class="pf-v6-svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true" role="img" width="1em" height="1em"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zM124 296c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h264c6.6 0 12 5.4 12 12v56c0 6.6-5.4 12-12 12H124z"></path></svg>`;
+
+    /**
+     * Ethan catalog pattern: PF Button variant="link" isInline (+ optional isDanger).
+     * Renders identical markup to PatternFly React Button with Plus/MinusCircleIcon.
+     */
+    function pfInlineLinkButton({
+      id = '',
+      label,
+      icon = 'plus',
+      danger = false,
+      ariaLabel = '',
+      extraAttrs = '',
+      extraClass = '',
+    }) {
+      const classes = [
+        'pf-v6-c-button',
+        'pf-m-link',
+        'pf-m-inline',
+        danger ? 'pf-m-danger' : '',
+        extraClass,
+      ].filter(Boolean).join(' ');
+      const svg = icon === 'minus' ? PF_ICON_MINUS_CIRCLE : PF_ICON_PLUS_CIRCLE;
+      return `
+        <button type="button" class="${classes}"
+          ${id ? `id="${id}"` : ''}
+          ${ariaLabel ? `aria-label="${ariaLabel}"` : ''}
+          ${extraAttrs}>
+          <span class="pf-v6-c-button__icon pf-m-start">${svg}</span>
+          <span class="pf-v6-c-button__text">${label}</span>
+        </button>
+      `;
+    }
+
     function pfGroupSelect({ id, optionsHtml }) {
       return `
         <span class="pf-v6-c-form-control folder-search pf-m-placeholder">
@@ -10672,13 +10663,15 @@
                 }
                 return `
                 <div class="inline-set" data-disk-set="${disk.id}">
-                  <div class="inline-set__header">
+                    <div class="inline-set__header">
                     <h5 class="inline-set__title">Disk ${idx + 1}</h5>
-                    <button type="button" class="inline-set__remove" data-remove-disk="${disk.id}"
-                      aria-label="Remove disk ${idx + 1}">
-                      <i class="fas fa-minus-circle" aria-hidden="true"></i>
-                      Remove
-                    </button>
+                    ${pfInlineLinkButton({
+                      label: 'Remove',
+                      icon: 'minus',
+                      danger: true,
+                      ariaLabel: `Remove disk ${idx + 1}`,
+                      extraAttrs: `data-remove-disk="${disk.id}"`,
+                    })}
                   </div>
                   <div class="form-field">
                     <label for="f-disk-size-${disk.id}">Disk size (GiB) <span class="req">*</span></label>
@@ -10733,10 +10726,11 @@
           `;
           const addDiskHtml = `
               <div class="add-disk-action">
-                <button type="button" class="pf-v6-c-button pf-m-link inline-add" id="f-add-disk">
-                  <span class="pf-v6-c-button__icon"><i class="fas fa-plus-circle" aria-hidden="true"></i></span>
-                  Add disk
-                </button>
+                ${pfInlineLinkButton({
+                  id: 'f-add-disk',
+                  label: 'Add disk',
+                  icon: 'plus',
+                })}
               </div>
           `;
           const storageStepHelp = bootEditable
@@ -10932,11 +10926,13 @@
                   <div class="inline-set" data-network-set="${netItem.id}">
                     <div class="inline-set__header">
                       <h5 class="inline-set__title">Network ${idx + 1}</h5>
-                      <button type="button" class="inline-set__remove" data-remove-network="${netItem.id}"
-                        aria-label="Remove network ${idx + 1}">
-                        <i class="fas fa-minus-circle" aria-hidden="true"></i>
-                        Remove
-                      </button>
+                      ${pfInlineLinkButton({
+                        label: 'Remove',
+                        icon: 'minus',
+                        danger: true,
+                        ariaLabel: `Remove network ${idx + 1}`,
+                        extraAttrs: `data-remove-network="${netItem.id}"`,
+                      })}
                     </div>
                     <div class="form-field">
                       <label for="f-extra-vn-${netItem.id}">Virtual network <span class="req">*</span></label>
@@ -11011,10 +11007,12 @@
               </div>
               ` : ''}
               <div class="add-network-action">
-                <button type="button" class="pf-v6-c-button pf-m-link inline-add" id="f-add-network">
-                  <span class="pf-v6-c-button__icon"><i class="fas fa-plus-circle" aria-hidden="true"></i></span>
-                  Add network
-                </button>
+                ${pfInlineLinkButton({
+                  id: 'f-add-network',
+                  label: 'Add network',
+                  icon: 'plus',
+                  extraClass: 'tenant-user-launch-wizard__add-node-set',
+                })}
               </div>
             </div>
           `;
