@@ -956,13 +956,43 @@
       color: var(--vmaas-text);
       line-height: 1.4;
     }
-    /* Match Ethan: PF link + inline; no extra padding on the add control */
+    /* Match Ethan: PF link+inline dashed underline under the label (not the icon) */
     .add-disk-action .pf-v6-c-button.pf-m-link.pf-m-inline,
     .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline {
       padding-inline-start: 0;
     }
     .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline {
       flex-shrink: 0;
+    }
+    .pf-v6-c-button.pf-m-link.pf-m-inline > .pf-v6-c-button__text {
+      text-decoration-line: var(
+        --pf-t--global--text-decoration--link--line--default,
+        underline
+      );
+      text-decoration-style: var(
+        --pf-t--global--text-decoration--link--style--default,
+        dashed
+      );
+      text-decoration-color: currentColor;
+      text-underline-offset: max(
+        var(--pf-t--global--text-decoration--offset--default, 0.28em),
+        0.28em
+      );
+    }
+    .pf-v6-c-button.pf-m-link.pf-m-inline:hover > .pf-v6-c-button__text,
+    .pf-v6-c-button.pf-m-link.pf-m-inline:focus-visible > .pf-v6-c-button__text {
+      text-decoration-line: var(
+        --pf-t--global--text-decoration--link--line--hover,
+        underline
+      );
+      text-decoration-style: var(
+        --pf-t--global--text-decoration--link--style--hover,
+        dashed
+      );
+      text-underline-offset: max(
+        var(--pf-t--global--text-decoration--offset--hover, 0.33em),
+        0.33em
+      );
     }
     .form-field input.unit-size-input,
     .form-field input[type="number"].unit-size-input {
