@@ -974,9 +974,16 @@
     .add-network-action .pf-v6-c-button.pf-m-link.pf-m-inline,
     .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline {
       padding-inline-start: 0;
-      text-decoration: none;
-      text-decoration-line: none;
-      -webkit-text-decoration-line: none;
+      /* Kill PF flex-button decoration — it can leave a ghost dashed line after re-render */
+      text-decoration: none !important;
+      -webkit-text-decoration-line: none !important;
+      text-decoration-line: none !important;
+      --pf-v6-c-button--TextDecorationLine: none;
+      --pf-v6-c-button--hover--TextDecorationLine: none;
+      --pf-v6-c-button--m-clicked--TextDecorationLine: none;
+      --pf-v6-c-button--m-link--m-inline--TextDecorationLine: none;
+      --pf-v6-c-button--m-link--m-inline--hover--TextDecorationLine: none;
+      --pf-v6-c-button--m-link--m-inline--m-clicked--TextDecorationLine: none;
     }
     .inline-set__header .pf-v6-c-button.pf-m-link.pf-m-inline {
       flex-shrink: 0;
