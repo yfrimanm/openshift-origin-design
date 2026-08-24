@@ -10,7 +10,7 @@
 | **Companion doc** | [Create Virtual machine — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
 | **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — list → create → details in one mock |
 | **Google Doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
-| **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` |
+| **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` · [GitHub Pages](https://yfrimanm.github.io/openshift-origin-design/screenshots/details/) |
 | **Entry** | List **Name** link, or after Create finishes |
 
 ---
@@ -64,7 +64,7 @@ Figure: Overview — running
 | **Operating system** | Metadata OS, or soft empty (*Guest agent not reporting*) |
 | **Compute resource** | Summary + edit |
 | **SSH public key** | Configured / Not configured (link) + pencil |
-| **VNC console** | Open web console + preview. New tab is a placeholder with a **Serial console** / **VNC console** dropdown (CNV parity; our PF shell styling). |
+| **VNC console** | Open web console + preview. Opens full-page console (see **Web console** below). |
 
 Name lives in the page header (not duplicated in the DL), with arch badge (**amd64**).
 
@@ -75,6 +75,61 @@ Figure: Status popover
 ![Figure: SSH Not configured](videos/vmaas-vm-details-overview-ux-doc/06-ssh-not-configured.png)
 
 Figure: SSH Not configured
+
+### Edit compute resources
+
+Opens from the Compute resource pencil on the Details card.
+
+| Element | Copy / behavior |
+|---|---|
+| Title | Edit compute resources |
+| Description | Choose a compute size for this Virtual machine. |
+| Field | **Compute resource** (required) |
+| Actions | **Save** · **Cancel** |
+
+![Figure: Edit compute resources](videos/vmaas-vm-details-overview-ux-doc/09-edit-compute-modal.png)
+
+Figure: Edit compute resources
+
+### Edit SSH public key
+
+Opens from **Not configured** / pencil (Linux). Not used for Windows (*Not applicable*).
+
+| Element | Copy / behavior |
+|---|---|
+| Title | Edit SSH public key |
+| Description | Paste a public SSH key or upload a file for this Virtual machine. |
+| Actions | **Save** · **Cancel** |
+
+![Figure: Edit SSH public key](videos/vmaas-vm-details-overview-ux-doc/10-edit-ssh-modal.png)
+
+Figure: Edit SSH public key
+
+---
+
+## Web console
+
+Full-page console placeholder (`vmaas-console-placeholder.html`), Felt + Glass chrome (soft floating toolbar / session panels; no hard toolbar divider).
+
+| Area | Behavior |
+|---|---|
+| **Guest login credentials** | Username / password with show + copy. **?** opens a closable cloud-init popover (credentials created via cloud-init; contact image provider if unsuccessful). |
+| **Paste to console** | Pastes clipboard into the session (placeholder toast). |
+| **Console type** | **VNC console** / **Serial console** switcher (no language dropdown). |
+| **Send key** | Ctrl+Alt+Del and special keys; **More key options** flyout for F1–F12. Disabled on **Serial console**. Tips sit to the **right** of icons (avoid top clipping). |
+| **Disconnect** | Ends the session. |
+
+![Figure: VNC console](videos/vmaas-vm-details-overview-ux-doc/08-console-vnc.png)
+
+Figure: VNC console
+
+![Figure: Credentials help popover](videos/vmaas-vm-details-overview-ux-doc/08b-console-creds-help.png)
+
+Figure: Guest credentials help (cloud-init)
+
+![Figure: Serial console](videos/vmaas-vm-details-overview-ux-doc/08c-console-serial.png)
+
+Figure: Serial console (Send key disabled)
 
 ---
 
@@ -91,6 +146,30 @@ Figure: SSH Not configured
 
 Figure: Network row actions
 
+### Add / Edit network modal
+
+Same modal; title switches **Add network** ↔ **Edit network**. Fields: Virtual network, Subnet, Security groups (required). Footer: **Save** / **Add** · **Cancel**.
+
+![Figure: Add network](videos/vmaas-vm-details-overview-ux-doc/11-add-network-modal.png)
+
+Figure: Add network
+
+![Figure: Edit network](videos/vmaas-vm-details-overview-ux-doc/12-edit-network-modal.png)
+
+Figure: Edit network
+
+### Delete network confirmation
+
+| Element | Copy |
+|---|---|
+| Title | Delete network? |
+| Body | Are you sure you want to delete **{name}**? This action cannot be undone. |
+| Actions | **Delete** (danger) · **Cancel** |
+
+![Figure: Delete network](videos/vmaas-vm-details-overview-ux-doc/15-delete-network-modal.png)
+
+Figure: Delete network
+
 ---
 
 ## Storage card
@@ -104,6 +183,18 @@ Figure: Network row actions
 ![Figure: Boot disk Delete disabled](videos/vmaas-vm-details-overview-ux-doc/04-storage-boot-delete.png)
 
 Figure: Boot disk Delete disabled
+
+### Add / Edit disk modal
+
+Same modal; title switches **Add disk** ↔ **Edit disk**. Fields include size and storage tier (and name as applicable). Footer: **Save** / **Add** · **Cancel**.
+
+![Figure: Add disk](videos/vmaas-vm-details-overview-ux-doc/13-add-disk-modal.png)
+
+Figure: Add disk
+
+![Figure: Edit disk](videos/vmaas-vm-details-overview-ux-doc/14-edit-disk-modal.png)
+
+Figure: Edit disk
 
 ---
 
@@ -142,6 +233,20 @@ Disabled icon tooltips match Actions menu reasons (*The Virtual machine is start
 ![Figure: Error status](videos/vmaas-vm-details-overview-ux-doc/07-error-status.png)
 
 Figure: Error status
+
+### Delete Virtual machine
+
+From Actions → **Delete** when the VM is not running.
+
+| Element | Copy |
+|---|---|
+| Title | Delete Virtual machine? |
+| Body | Are you sure you want to delete **{VM name}**? This action cannot be undone. |
+| Actions | **Delete** (danger) · **Cancel** |
+
+![Figure: Delete Virtual machine](videos/vmaas-vm-details-overview-ux-doc/16-delete-vm-modal.png)
+
+Figure: Delete Virtual machine
 
 ---
 
