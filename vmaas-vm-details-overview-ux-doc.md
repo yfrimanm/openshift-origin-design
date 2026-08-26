@@ -10,7 +10,7 @@
 | **Companion doc** | [Create Virtual machine — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
 | **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — list → create → details in one mock |
 | **Google Doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
-| **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` · [GitHub Pages](https://yfrimanm.github.io/openshift-origin-design/screenshots/details/) |
+| **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` · [GitHub](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/details) |
 | **Entry** | List **Name** link, or after Create finishes |
 
 ---
@@ -247,14 +247,6 @@ From Actions → **Delete** when the VM is not running.
 ![Figure: Delete Virtual machine](videos/vmaas-vm-details-overview-ux-doc/16-delete-vm-modal.png)
 
 Figure: Delete Virtual machine
-
----
-
-## Out of scope in this mock
-
-- Configuration vertical nav (removed for VMaaS Overview-first)
-- Full Metrics / YAML / Events / Snapshots / Diagnostics tabs
-- Wired AI assistant (Status popover CTA is a placeholder)
 
 ---
 

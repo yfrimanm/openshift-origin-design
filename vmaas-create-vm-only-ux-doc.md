@@ -10,7 +10,7 @@
 | **Companion doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — one mock covers list → create → details |
 | **Google Doc (this doc)** | [Create Virtual machine - UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
-| **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [GitHub Pages](https://yfrimanm.github.io/openshift-origin-design/screenshots/create/) |
+| **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [GitHub](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
 
 **IA:** Select template → Details → Compute resource → Storage → Network → Review and create
@@ -30,7 +30,9 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **Scope** | List + Create wizard. VM **Name** links open details Overview (see companion doc). |
 | **IA** | Flat wizard steps — no **Configure** parent in the nav. |
 | **Primary CTA** | **Create Virtual machine** |
-| **Role labels** | **VM Admin**, **VM User**, Console Access Only, Org Admin |
+| **Role labels** | **Tenant Admin**, **Tenant User** (OSAC personas). Demo switcher only — gates Create / power / networks. |
+| **Tenant Admin** | Create VM, power actions, create/view networks (incl. Shared / Provider). Default for Create demos. |
+| **Tenant User** | No Create; power/console on VMs; view networks. |
 | **Search** | Regular search + attribute filters (Project / Status / OS). No advanced search icon. |
 | **Row kebab / Actions** | Control ▸, Open console, Delete. Disabled reasons use **Virtual machine** wording. |
 | **Status** | Status is a link → PF6 popover (title, body, **Ask AI about this status** placeholder, Learn more). |
