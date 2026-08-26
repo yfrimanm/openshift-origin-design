@@ -31,11 +31,12 @@ Document OSAC VMaaS **Virtual machine details Overview**: CNV-inspired card layo
 | **Power icons** | Stop / Restart / Pause / Start — disabled states show **Virtual machine** tooltips (same reasons as Actions menu). |
 | **Actions** | Control ▸, Open console, Delete — disabled copy uses **Virtual machine** / **Virtual machines**. |
 | **Operating system** | Show OS from create/template metadata when known. If unknown: **—** + *Guest agent not reporting*. |
-| **SSH** | *Configured* + pencil, or ***Not configured*** as a link (+ pencil) → edit modal. Windows: *Not applicable*. |
-| **Compute** | **Compute resource** + edit pencil. |
-| **Network / Storage** | Card **Add** + row kebab **Edit** / **Delete**. Delete disabled in-menu with reason (last network / boot disk). Terminology: **Network**. |
+| **SSH** | *Configured* + pencil, or ***Not configured*** as a link (+ pencil) → edit modal. Windows: *Not applicable*. **Tenant User:** pencil / link disabled. |
+| **Compute** | **Compute resource** + edit pencil. **Tenant User:** pencil disabled. |
+| **Network / Storage** | Card **Add** + row kebab **Edit** / **Delete**. Delete disabled in-menu with reason (last network / boot disk). Terminology: **Network**. **Tenant User:** Add + row kebabs disabled. |
 | **Utilization** | Metrics only when status is **Running**. Otherwise: *Virtual machine is not running*. Time range shown as static “Last 5 minutes”. |
 | **After create** | Lands on this Overview with success toast. |
+| **Roles** | Same shared mock shell: **Tenant Admin** (can edit Overview config) / **Tenant User** (read-only Overview config; power/console OK). Full matrix in Create doc. |
 | **Shell chrome** | Same shared mock as Create: PatternFly **Felt + Glass** (PF 6.6.1), aligned to Ethan’s [osac-bmaas](https://heyethankim.github.io/osac-bmaas/) — soft floating sidebar/main panels. |
 
 ---

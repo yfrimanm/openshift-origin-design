@@ -30,9 +30,9 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **Scope** | List + Create wizard. VM **Name** links open details Overview (see companion doc). |
 | **IA** | Flat wizard steps — no **Configure** parent in the nav. |
 | **Primary CTA** | **Create Virtual machine** |
-| **Role labels** | **Tenant Admin**, **Tenant User** (OSAC personas). Demo switcher only — gates Create / power / networks. |
-| **Tenant Admin** | Create VM, power actions, create/view networks (incl. Shared / Provider). Default for Create demos. |
-| **Tenant User** | No Create; power/console on VMs; view networks. |
+| **Role labels** | **Tenant Admin**, **Tenant User** (OSAC personas). Demo switcher only — gates Create / power / networks / Overview config edit. |
+| **Tenant Admin** | Create VM, power, **edit** config, create/view networks (incl. Shared / Provider — same network create as prior author/orgadmin). Default for Create demos. |
+| **Tenant User** | No Create; power/console on VMs; view networks; **read-only** Overview config (no edit / Add / Delete on compute, SSH, network, disk). |
 | **Search** | Regular search + attribute filters (Project / Status / OS). No advanced search icon. |
 | **Row kebab / Actions** | Control ▸, Open console, Delete. Disabled reasons use **Virtual machine** wording. |
 | **Status** | Status is a link → PF6 popover (title, body, **Ask AI about this status** placeholder, Learn more). |
