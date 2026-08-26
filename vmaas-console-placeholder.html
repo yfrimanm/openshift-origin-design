@@ -75,6 +75,9 @@
       box-shadow: var(--console-glass-shadow);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      /* Keep creds help / menus above .console-body (sibling stacking context from backdrop-filter) */
+      position: relative;
+      z-index: 2;
     }
     .console-toolbar__left,
     .console-toolbar__right {
@@ -130,7 +133,7 @@
       position: absolute;
       top: calc(100% + 10px);
       left: 0;
-      z-index: 60;
+      z-index: 100;
       width: min(360px, calc(100vw - 32px));
       padding: 16px;
       padding-inline-end: 40px;
