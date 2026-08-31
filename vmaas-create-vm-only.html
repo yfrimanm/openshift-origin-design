@@ -1832,21 +1832,7 @@
     .nic-modal__search > select:invalid,
     .nic-modal__search > select option[value=""] { color: #8a8d90; }
 
-    /* —— VMs list (CNV-style) —— */
-    .vm-search-row {
-      display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px;
-      margin-bottom: 12px;
-    }
-    .vm-search-main {
-      display: flex; flex: 1; min-width: 240px; align-items: center;
-      border: 1px solid var(--vmaas-border); border-radius: 6px; background: #fff; overflow: hidden;
-    }
-    .vm-search-main__icon {
-      padding: 0 10px; color: var(--vmaas-text-subtle); display: inline-flex;
-    }
-    .vm-search-main input {
-      flex: 1; border: none; padding: 8px 8px 8px 0; font-size: 14px; outline: none; min-width: 0;
-    }
+    /* —— VMs list filters (OSAC / Ethan filter-row pattern) —— */
     .filter-bar {
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
       margin-bottom: 12px;
@@ -1871,13 +1857,27 @@
     .filter-name-search input {
       flex: 1; border: none; outline: none; font-size: 14px; min-width: 0; background: transparent;
     }
-    /* Search-language attribute filter dropdowns (Project / Status / OS) */
+    /* Attribute filters + compact search */
     .filter-row {
       display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
       margin-bottom: 12px;
     }
     .filter-dd-wrap { position: relative; overflow: visible !important; }
-    .filter-dd-btn { white-space: nowrap; background: #fff; }
+    .filter-dd-btn {
+      white-space: nowrap; background: #fff;
+      min-height: 36px;
+    }
+    .filter-dd-btn--project {
+      border-radius: 999px;
+      padding-inline-start: 12px;
+      gap: 8px;
+    }
+    .filter-dd-btn__folder {
+      color: var(--vmaas-text);
+      font-size: 14px;
+      width: 1em;
+      text-align: center;
+    }
     .filter-dd-menu {
       display: none;
       position: absolute;
@@ -1890,6 +1890,18 @@
     }
     .filter-dd-menu.pf-m-open { display: block; }
     .filter-dd-badge { margin: 0 4px; }
+    .filter-dd-badge[hidden] { display: none !important; }
+    .filter-search {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1 1 200px; min-width: 180px; max-width: 280px;
+      min-height: 36px; padding: 6px 10px;
+      border: 1px solid var(--vmaas-border); border-radius: 6px; background: #fff;
+    }
+    .filter-search i { color: var(--vmaas-text-subtle); font-size: 13px; flex: 0 0 auto; }
+    .filter-search input {
+      flex: 1; border: none; outline: none; font-size: 14px; min-width: 0; background: transparent;
+      color: var(--vmaas-text);
+    }
     .filter-chips {
       display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start;
       margin: -4px 0 12px;
@@ -3903,23 +3915,14 @@
               <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create">Create Virtual machine</button>
             </div>
 
-            <!-- Global search -->
-            <div class="vm-search-row">
-              <div class="vm-search-main">
-                <span class="vm-search-main__icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
-                <input type="search" id="vm-search-global" placeholder="Search virtual machines" aria-label="Search virtual machines" />
-              </div>
-              <button type="button" class="pf-v6-c-button pf-m-secondary">Save search</button>
-              <button type="button" class="pf-v6-c-button pf-m-secondary">Saved searches <i class="fa-solid fa-caret-down" style="margin-left:6px;"></i></button>
-            </div>
-
-            <!-- Attribute filters (search-language pattern) -->
+            <!-- Filters (OSAC / Ethan row) + compact search -->
             <div class="filter-row" id="vm-filter-row">
               <div class="filter-dd-wrap" id="projectWrap">
-                <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn" type="button"
-                  id="btnProjectFilter" aria-expanded="false" aria-haspopup="listbox">
-                  <span class="pf-v6-c-menu-toggle__text">Project</span>
-                  <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="projectBadge">All</span>
+                <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn filter-dd-btn--project" type="button"
+                  id="btnProjectFilter" aria-expanded="false" aria-haspopup="listbox"
+                  aria-label="Filter by project">
+                  <i class="fa-solid fa-folder filter-dd-btn__folder" aria-hidden="true"></i>
+                  <span class="pf-v6-c-menu-toggle__text" id="projectFilterLabel">Project: All projects</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
                       <i class="fas fa-caret-down"></i>
@@ -3931,32 +3934,53 @@
 
               <div class="filter-dd-wrap" id="statusWrap">
                 <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn" type="button"
-                  id="btnStatusFilter" aria-expanded="false" aria-haspopup="listbox">
-                  <span class="pf-v6-c-menu-toggle__text">Status</span>
-                  <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="statusBadge">All</span>
+                  id="btnStatusFilter" aria-expanded="false" aria-haspopup="listbox"
+                  aria-label="Filter by power state">
+                  <span class="pf-v6-c-menu-toggle__text" id="statusFilterLabel">All power states</span>
+                  <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="statusBadge" hidden>0</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
                       <i class="fas fa-caret-down"></i>
                     </span>
                   </span>
                 </button>
-                <div class="pf-v6-c-menu filter-dd-menu" id="statusFilterMenu" role="listbox" aria-label="Status filter" style="min-width:220px;"></div>
+                <div class="pf-v6-c-menu filter-dd-menu" id="statusFilterMenu" role="listbox" aria-label="Power state filter" style="min-width:220px;"></div>
               </div>
 
               <div class="filter-dd-wrap" id="osWrap">
                 <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn" type="button"
-                  id="btnOsFilter" aria-expanded="false" aria-haspopup="listbox">
-                  <span class="pf-v6-c-menu-toggle__text">Operating system</span>
-                  <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="osBadge">All</span>
+                  id="btnOsFilter" aria-expanded="false" aria-haspopup="listbox"
+                  aria-label="Filter by operating system">
+                  <span class="pf-v6-c-menu-toggle__text" id="osFilterLabel">All operating systems</span>
+                  <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="osBadge" hidden>0</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
                       <i class="fas fa-caret-down"></i>
                     </span>
                   </span>
                 </button>
-                <div class="pf-v6-c-menu filter-dd-menu" id="osFilterMenu" role="listbox" aria-label="OS filter" style="min-width:200px;"></div>
+                <div class="pf-v6-c-menu filter-dd-menu" id="osFilterMenu" role="listbox" aria-label="Operating system filter" style="min-width:200px;"></div>
               </div>
 
+              <div class="filter-dd-wrap" id="hwWrap">
+                <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn" type="button"
+                  id="btnHwFilter" aria-expanded="false" aria-haspopup="listbox"
+                  aria-label="Filter by hardware devices">
+                  <span class="pf-v6-c-menu-toggle__text" id="hwFilterLabel">Hardware devices</span>
+                  <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="hwBadge" hidden>0</span>
+                  <span class="pf-v6-c-menu-toggle__controls">
+                    <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
+                      <i class="fas fa-caret-down"></i>
+                    </span>
+                  </span>
+                </button>
+                <div class="pf-v6-c-menu filter-dd-menu" id="hwFilterMenu" role="listbox" aria-label="Hardware devices filter" style="min-width:200px;"></div>
+              </div>
+
+              <div class="filter-search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" id="vm-search-global" placeholder="Search virtual machines" aria-label="Search virtual machines" />
+              </div>
             </div>
 
             <div class="filter-chips" id="vm-filter-chips" hidden aria-label="Active filters"></div>
@@ -4453,6 +4477,7 @@
         sshKeyFileName: 'id_ed25519.pub',
         guestAgent: true,
         osFull: 'Red Hat Enterprise Linux 9.5',
+        gpuDevices: [{ name: 'nvidia.com/GPUMIG80GB' }],
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'], ip: '10.130.1.191' }],
         disks: [
           { name: 'rootdisk', drive: 'Disk', size: '30 GiB', interface: 'virtio' },
@@ -4461,9 +4486,9 @@
         utilization: { cpu: '0.73%', memory: '14.8%', storage: '2.55%', network: '0 Bps' },
       },
       { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: '', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'default', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'default', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', gpuDevices: [{ name: 'nvidia.com/GPU' }], hostDevices: [{ name: 'host-pci-1' }] },
       { name: 'windows-golden-eider-58', ns: 'default', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
-      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49' },
+      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
       { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
@@ -5525,7 +5550,7 @@
       kebabVmName: null,
       deleteVmName: null,
       vmFilter: '',
-      filters: { project: [], status: [], os: [] },
+      filters: { project: [], status: [], os: [], hardware: [] },
       vmColumns: null, // set from DEFAULT_VM_COLUMNS
       vmColumnsDraft: null,
       selectedVmName: null,
@@ -5751,43 +5776,44 @@
 
     const FILTER_CHIP_LABELS = {
       project: 'Project',
-      status: 'Status',
+      status: 'Power state',
       os: 'Operating system',
+      hardware: 'Hardware devices',
     };
 
-    function stripFilterAttributes(q) {
-      return String(q || '')
-        .replace(/\b(project|status|os):("[^"]+"|\S+)/gi, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
+    const HARDWARE_FILTER_OPTIONS = [
+      { id: 'gpu', label: 'GPU devices' },
+      { id: 'host', label: 'Host devices' },
+    ];
 
-    function buildFilterQueryString() {
-      const parts = [];
-      (state.filters.project || []).forEach(v => parts.push(`project:${v}`));
-      (state.filters.status || []).forEach(v => parts.push(`status:${v.includes(' ') ? `"${v}"` : v}`));
-      (state.filters.os || []).forEach(v => parts.push(`os:${v}`));
-      return parts.join(' ');
+    function projectDisplayName(ns) {
+      if (!ns || ns === 'default') return 'Default';
+      return ns;
     }
 
     function syncSearchFromFilters() {
-      const input = document.getElementById('vm-search-global');
-      if (!input) return;
-      const free = stripFilterAttributes(input.value);
-      const attrs = buildFilterQueryString();
-      input.value = [attrs, free].filter(Boolean).join(' ');
+      // Search box is free-text only (name / IP / OS / project); dropdowns stay separate.
     }
 
     function syncFilterBadges() {
+      const projectLabel = document.getElementById('projectFilterLabel');
+      const projects = state.filters.project || [];
+      if (projectLabel) {
+        if (!projects.length) projectLabel.textContent = 'Project: All projects';
+        else if (projects.length === 1) projectLabel.textContent = `Project: ${projectDisplayName(projects[0])}`;
+        else projectLabel.textContent = `Project: ${projects.length} projects`;
+      }
+
       [
-        { key: 'project', id: 'projectBadge' },
         { key: 'status', id: 'statusBadge' },
         { key: 'os', id: 'osBadge' },
+        { key: 'hardware', id: 'hwBadge' },
       ].forEach(({ key, id }) => {
         const badge = document.getElementById(id);
         if (!badge) return;
-        const n = state.filters[key].length;
-        badge.textContent = n ? String(n) : 'All';
+        const n = (state.filters[key] || []).length;
+        badge.textContent = String(n);
+        badge.hidden = n === 0;
       });
       renderFilterChips();
     }
@@ -5799,6 +5825,13 @@
         { key: 'project', values: state.filters.project || [] },
         { key: 'status', values: state.filters.status || [] },
         { key: 'os', values: state.filters.os || [] },
+        {
+          key: 'hardware',
+          values: (state.filters.hardware || []).map(id =>
+            HARDWARE_FILTER_OPTIONS.find(o => o.id === id)?.label || id
+          ),
+          rawValues: state.filters.hardware || [],
+        },
       ].filter(g => g.values.length);
       if (!groups.length) {
         root.hidden = true;
@@ -5808,7 +5841,9 @@
       root.hidden = false;
       root.innerHTML = groups.map(g => {
         const label = FILTER_CHIP_LABELS[g.key] || g.key;
-        const chips = g.values.map(v => `
+        const chips = g.values.map((v, i) => {
+          const raw = g.rawValues ? g.rawValues[i] : v;
+          return `
           <li class="pf-v6-c-label-group__list-item">
             <span class="pf-v6-c-label pf-m-outline">
               <span class="pf-v6-c-label__content">
@@ -5817,7 +5852,7 @@
               <span class="pf-v6-c-label__actions">
                 <button class="pf-v6-c-button pf-m-plain pf-v6-c-label__actions-remove"
                   type="button" aria-label="Remove ${label} filter ${v}"
-                  data-chip-key="${g.key}" data-chip-val="${v}">
+                  data-chip-key="${g.key}" data-chip-val="${raw}">
                   <span class="pf-v6-c-label__actions-icon">
                     <i class="fas fa-times" aria-hidden="true"></i>
                   </span>
@@ -5825,7 +5860,8 @@
               </span>
             </span>
           </li>
-        `).join('');
+        `;
+        }).join('');
         return `
           <div class="pf-v6-c-label-group pf-m-category" data-chip-group="${g.key}">
             <div class="pf-v6-c-label-group__main">
@@ -5851,21 +5887,24 @@
       state.filters[key] = selected;
       syncFilterBadges();
       if (syncSearch) syncSearchFromFilters();
-      const free = stripFilterAttributes(document.getElementById('vm-search-global')?.value || '');
+      const free = document.getElementById('vm-search-global')?.value || '';
       renderVms(free);
     }
 
-    function buildMultiSelectMenu(menuId, filterKey, values) {
+    function buildMultiSelectMenu(menuId, filterKey, values, { labelFor } = {}) {
       const menu = document.getElementById(menuId);
       if (!menu) return;
-      const ulItems = values.map(v => `
+      const ulItems = values.map(v => {
+        const label = labelFor ? labelFor(v) : v;
+        return `
         <li class="pf-v6-c-menu__list-item" role="none" style="list-style:none;">
           <button class="status-multi-item" type="button" data-value="${v}">
             <input type="checkbox" class="multi-cb" data-key="${filterKey}" data-val="${v}" />
-            <span style="flex:1;">${v}</span>
+            <span style="flex:1;">${label}</span>
           </button>
         </li>
-      `).join('');
+      `;
+      }).join('');
       menu.innerHTML = `<div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list" role="none" style="padding:4px 0;">${ulItems}</ul></div>`;
       if (menu.dataset.wired) return;
       menu.dataset.wired = '1';
@@ -5983,12 +6022,21 @@
     }
 
     function initVmFilterDropdowns() {
-      buildMultiSelectMenu('projectFilterMenu', 'project', FILTER_CATALOG.project);
+      buildMultiSelectMenu('projectFilterMenu', 'project', FILTER_CATALOG.project, {
+        labelFor: projectDisplayName,
+      });
       buildStatusMenu();
       buildMultiSelectMenu('osFilterMenu', 'os', FILTER_CATALOG.os);
+      buildMultiSelectMenu(
+        'hwFilterMenu',
+        'hardware',
+        HARDWARE_FILTER_OPTIONS.map(o => o.id),
+        { labelFor: id => HARDWARE_FILTER_OPTIONS.find(o => o.id === id)?.label || id },
+      );
       wireFilterToggle('btnProjectFilter', 'projectFilterMenu', m => syncMultiSelectMenu(m, 'project'));
       wireFilterToggle('btnOsFilter', 'osFilterMenu', m => syncMultiSelectMenu(m, 'os'));
       wireFilterToggle('btnStatusFilter', 'statusFilterMenu', () => syncStatusMenuCheckboxes());
+      wireFilterToggle('btnHwFilter', 'hwFilterMenu', m => syncMultiSelectMenu(m, 'hardware'));
       // Keep menus open while selecting; only close on outside click / Escape / other toggle
       document.querySelectorAll('#vm-filter-row .filter-dd-menu').forEach(menu => {
         menu.addEventListener('click', e => e.stopPropagation());
@@ -6495,14 +6543,40 @@
       return c ? `<span class="cond-pill">${c}</span>` : '<span class="muted">—</span>';
     }
 
+    function stripFilterAttributes(q) {
+      // Legacy no-op: search is free-text only (no project:/status:/os: tokens).
+      return String(q || '').trim();
+    }
+
+    function vmMatchesSearch(v, q) {
+      const needle = String(q || '').trim().toLowerCase();
+      if (!needle) return true;
+      const hay = [
+        v.name,
+        v.ip,
+        v.os,
+        v.osFull,
+        v.ns,
+        projectDisplayName(v.ns),
+      ].map(x => String(x || '').toLowerCase());
+      return hay.some(h => h.includes(needle));
+    }
+
+    function vmMatchesHardwareFilter(v, hardware) {
+      if (!hardware?.length) return true;
+      const hasGpu = Array.isArray(v.gpuDevices) && v.gpuDevices.length > 0;
+      const hasHost = Array.isArray(v.hostDevices) && v.hostDevices.length > 0;
+      return hardware.some(id => (id === 'gpu' && hasGpu) || (id === 'host' && hasHost));
+    }
+
     function filteredVms(q = state.vmFilter) {
-      const { project, status, os } = state.filters;
-      const nameQ = stripFilterAttributes(q);
+      const { project, status, os, hardware } = state.filters;
       return VMS.filter(v => {
-        if (nameQ && !v.name.toLowerCase().includes(nameQ.toLowerCase())) return false;
+        if (!vmMatchesSearch(v, q)) return false;
         if (project.length && !project.includes(v.ns)) return false;
         if (status.length && !status.includes(statusFilterLabel(v.status))) return false;
         if (os.length && !os.includes(v.os)) return false;
+        if (!vmMatchesHardwareFilter(v, hardware)) return false;
         return true;
       });
     }
@@ -11756,30 +11830,9 @@
         closeAddDiskModal();
       }
     });
-    const parseSearchAttributes = (q) => {
-      const project = [...String(q || '').matchAll(/\bproject:("[^"]+"|\S+)/gi)].map(m => m[1].replace(/^"|"$/g, ''));
-      const status = [...String(q || '').matchAll(/\bstatus:("[^"]+"|\S+)/gi)].map(m => m[1].replace(/^"|"$/g, ''));
-      const os = [...String(q || '').matchAll(/\bos:("[^"]+"|\S+)/gi)].map(m => m[1].replace(/^"|"$/g, ''));
-      return { project, status, os };
-    };
-
-    const sameFilterList = (a = [], b = []) =>
-      a.length === b.length && a.every((v, i) => v === b[i]);
-
     const filterVms = () => {
       const q = document.getElementById('vm-search-global')?.value || '';
-      const parsed = parseSearchAttributes(q);
-      let changed = false;
-      // Keep dropdown filters in sync when users type / edit attribute queries
-      ['project', 'status', 'os'].forEach(key => {
-        const next = parsed[key];
-        if (!sameFilterList(state.filters[key], next)) {
-          state.filters[key] = next;
-          changed = true;
-        }
-      });
-      if (changed) syncFilterBadges();
-      renderVms(stripFilterAttributes(q));
+      renderVms(q);
     };
     document.getElementById('vm-search-global').addEventListener('input', filterVms);
     document.getElementById('net-search')?.addEventListener('input', e => renderNetworks(e.target.value));
