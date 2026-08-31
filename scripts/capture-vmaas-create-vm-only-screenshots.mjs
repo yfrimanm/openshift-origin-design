@@ -77,6 +77,13 @@ async function main() {
   // Select template grid — no drawer open (avoids cards cut by drawer)
   await shotPage(page, '02-select-template');
 
+  // Empty project (yifat / vmaas have no templates)
+  await page.locator('#f-tpl-project').selectOption('yifat');
+  await page.waitForTimeout(400);
+  await shotPage(page, '02b-select-template-empty');
+  await page.locator('#f-tpl-project').selectOption('default');
+  await page.waitForTimeout(350);
+
   // Locked template — shoot drawer panel only
   const lockedCard = page.locator('.tpl-card').filter({ hasNotText: 'Editable' }).first();
   if (await lockedCard.count()) await lockedCard.click();

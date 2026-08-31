@@ -2844,6 +2844,19 @@
     }
     .nic-empty__title { margin: 0 0 6px; font-size: 16px; font-weight: 600; }
     .nic-empty__body { margin: 0 0 16px; font-size: 14px; color: var(--vmaas-text-subtle); line-height: 1.45; max-width: 28rem; margin-inline: auto; }
+    .tpl-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; padding: 48px 24px; text-align: center; min-height: 220px;
+      border: 1px solid var(--vmaas-border-light); border-radius: 8px;
+      background: var(--vmaas-bg-subtle);
+    }
+    .tpl-empty__icon {
+      color: var(--vmaas-text-subtle); font-size: 28px; line-height: 1; margin-bottom: 4px;
+    }
+    .tpl-empty__title { margin: 0; font-size: 16px; font-weight: 600; color: var(--vmaas-text); }
+    .tpl-empty__body {
+      margin: 0; font-size: 14px; color: var(--vmaas-text-subtle); line-height: 1.45; max-width: 28rem;
+    }
     .nic-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
 
     .subtabs {
@@ -5423,7 +5436,7 @@
       }
       const id =
         field === 'name' ? 'f-name'
-        : field === 'project' ? 'f-project'
+        : field === 'project' ? (document.getElementById('f-tpl-project') ? 'f-tpl-project' : 'f-project')
         : field === 'osImage' ? 'f-os-image'
         : field === 'virtualNetwork' ? 'f-virtual-network'
         : field === 'subnet' ? 'f-subnet'
@@ -5542,6 +5555,8 @@
         computeResource: 'small',
         bootDiskGiB: 20,
         bootDiskUnit: 'GiB',
+        bootStorageTierId: 'st-balanced-01',
+        bootStorageTierLabel: 'Balanced',
         virtualNetwork: '',
         subnet: '',
         securityGroups: [],
@@ -9152,6 +9167,8 @@
       state.data.computeResource = 'small';
       state.data.bootDiskGiB = 20;
       state.data.bootDiskUnit = 'GiB';
+      state.data.bootStorageTierId = 'st-balanced-01';
+      state.data.bootStorageTierLabel = 'Balanced';
       state.data.cloudInit = '';
       state.data.sshPublicKey = '';
       state.data.sshKeyFileName = '';
@@ -9456,7 +9473,7 @@
       if (size) d.size = size.value;
       const start = document.getElementById('f-start');
       if (start) d.startAfter = start.checked;
-      const project = document.getElementById('f-project');
+      const project = document.getElementById('f-project') || document.getElementById('f-tpl-project');
       if (project) d.project = project.value;
       const group = document.getElementById('f-group');
       if (group) d.group = group.value;
@@ -9468,6 +9485,12 @@
         if (!Number.isNaN(n)) d.bootDiskGiB = n;
       }
       d.bootDiskUnit = 'GiB';
+      const bootTier = document.getElementById('f-boot-tier');
+      if (bootTier && bootTier.value) {
+        d.bootStorageTierId = bootTier.value;
+        const tier = getStorageTiers().find(t => t.id === bootTier.value);
+        d.bootStorageTierLabel = tier?.name || bootTier.value;
+      }
       // OS image is always locked by the template — never overwrite from Configure.
       const compute = document.getElementById('f-compute-resource');
       if (compute && compute.tagName === 'SELECT') {
@@ -9719,7 +9742,13 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your Virtual machine, select a project, and optionally set access.</p>
+            <p class="step-help">Name your Virtual machine and optionally set access.</p>
+            <div class="project-context pf-v6-c-alert pf-m-inline pf-m-info" role="status">
+              <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
+              <div class="pf-v6-c-alert__title">
+                Your Virtual machine will be created in <strong>${String(d.project || 'default').replace(/</g, '&lt;')}</strong>
+              </div>
+            </div>
             ` : '<h3 class="section-label">General info</h3>'}
             <div class="form-field ${state.fieldErrors.name ? 'pf-m-error' : ''}" data-field="name">
               <label for="f-name">Name <span class="req">*</span></label>
@@ -9742,27 +9771,6 @@
               <textarea id="f-desc" placeholder="">${d.description}</textarea>
             </div>
             ${isCatalogFlow ? `
-            <div class="form-field ${state.fieldErrors.project ? 'pf-m-error' : ''}" data-field="project">
-              <label for="f-project">Project</label>
-              ${(() => {
-                const currentProject = d.project || 'default';
-                const projectOpts = PROJECTS.includes(currentProject)
-                  ? PROJECTS
-                  : [currentProject, ...PROJECTS];
-                return pfSelect({
-                  id: 'f-project',
-                  ariaLabel: 'Project',
-                  describedBy: state.fieldErrors.project ? 'f-project-help err-project' : 'f-project-help',
-                  optionsHtml: projectOpts.map(p =>
-                    `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
-                  ).join(''),
-                });
-              })()}
-              <p class="form-helper" id="f-project-help">
-                Your Virtual machine will be created in project <strong>${(d.project || 'default').replace(/</g, '&lt;')}</strong>
-              </p>
-              ${fieldErrorHtml('project')}
-            </div>
             <h4 class="config-section-title label-with-optional">
               Access
               <span class="pf-v6-c-label pf-m-outline">
@@ -9827,14 +9835,6 @@
         });
         panel.querySelector('#f-desc')?.addEventListener('input', e => { d.description = e.target.value; });
         if (isCatalogFlow) {
-          panel.querySelector('#f-project')?.addEventListener('change', e => {
-            d.project = e.target.value || 'default';
-            clearFieldError('project');
-            const help = panel.querySelector('#f-project-help');
-            if (help) {
-              help.innerHTML = `Your Virtual machine will be created in project <strong>${String(d.project).replace(/</g, '&lt;')}</strong>`;
-            }
-          });
           const cloudEl = panel.querySelector('#f-cloud-init');
           if (cloudEl) {
             const syncCloudHeight = () => {
@@ -10243,12 +10243,23 @@
         });
         panel.querySelector('#f-size').addEventListener('change', e => { d.size = e.target.value; });
       } else if (key === 'catalog' || key === 'template') {
+        const currentProject = d.project || createContextProject() || 'default';
+        d.project = currentProject;
         const q = (state.tplFilter || '').toLowerCase();
-        const list = TEMPLATES.filter(t => {
+        const projectTemplates = TEMPLATES.filter(t => (t.project || 'default') === currentProject);
+        const list = projectTemplates.filter(t => {
           if (!q) return true;
           const hay = `${t.name} ${t.osImage || ''} ${t.description || ''} ${t.cpu || ''} ${t.mem || ''} ${t.storage || ''} ${t.bootDiskGiB || ''}`.toLowerCase();
           return hay.includes(q);
         });
+        const noTemplatesInProject = projectTemplates.length === 0;
+        const noSearchMatches = !noTemplatesInProject && list.length === 0;
+        // Drop selection if the template is not available in the selected project
+        if (d.templateId && !projectTemplates.some(t => t.id === d.templateId)) {
+          d.templateId = null;
+          d.catalogPreset = null;
+          state.tplDrawerOpen = false;
+        }
         const view = state.tplView || 'cards';
         const iconFa = {
           centos: 'fa-brands fa-linux',
@@ -10291,6 +10302,17 @@
           }
           if (tpl.computeResource) d.computeResource = tpl.computeResource;
           if (tpl.bootDiskGiB != null) d.bootDiskGiB = tpl.bootDiskGiB;
+          const tplBootDisk = (tpl.disks || []).find(disk =>
+            disk.bootable || disk.name === 'Boot disk' || disk.name === 'rootdisk'
+          );
+          const defaultTiers = getStorageTiers();
+          d.bootStorageTierId = tplBootDisk?.storageTierId
+            || defaultTiers[0]?.id
+            || 'st-balanced-01';
+          d.bootStorageTierLabel = tplBootDisk?.storageTierLabel
+            || defaultTiers.find(t => t.id === d.bootStorageTierId)?.name
+            || defaultTiers[0]?.name
+            || 'Balanced';
           // Catalog overlay: locked image + per-field compute/disk behavior — Network later
           d.catalogPreset = {
             templateId: tpl.id,
@@ -10300,6 +10322,8 @@
             computeResource: tpl.computeResource || null,
             bootDiskGiB: tpl.bootDiskGiB != null ? tpl.bootDiskGiB : null,
             bootDiskUnit: 'GiB',
+            bootStorageTierId: d.bootStorageTierId,
+            bootStorageTierLabel: d.bootStorageTierLabel,
           };
           if (tpl.bootDiskGiB != null) d.bootDiskUnit = 'GiB';
         };
@@ -10323,7 +10347,7 @@
           return `${rates.hour} ${rates.month}`;
         };
         const cardIcon = (t) => iconFa[t.osKey] || 'fa-solid fa-cube';
-        const selected = TEMPLATES.find(t => t.id === d.templateId);
+        const selected = TEMPLATES.find(t => t.id === d.templateId && (t.project || 'default') === currentProject);
         const drawerOpen = state.tplDrawerOpen && selected;
         const cards = list.map(t => {
           const rates = cardRates(t);
@@ -10532,49 +10556,21 @@
             </aside>
           `;
         }
-        panel.innerHTML = `
-          <div class="tpl-step">
-            <div>
-              <h3>Select template</h3>
-              <p class="step-help">Select a template to review details, then click Next to continue.</p>
-              ${state.fieldErrors.catalog ? `
-                <p class="field-error tpl-step__error" id="err-catalog" role="alert">
-                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-                  <span>${state.fieldErrors.catalog}</span>
-                </p>
-              ` : ''}
-            </div>
-            <div class="tpl-toolbar">
-              <div class="tpl-toolbar__project">
-                <label for="f-tpl-project">Project</label>
-                ${(() => {
-                  const currentProject = d.project || createContextProject() || 'default';
-                  d.project = currentProject;
-                  const projectOpts = PROJECTS.includes(currentProject)
-                    ? PROJECTS
-                    : [currentProject, ...PROJECTS];
-                  return pfSelect({
-                    id: 'f-tpl-project',
-                    ariaLabel: 'Project',
-                    optionsHtml: projectOpts.map(p =>
-                      `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
-                    ).join(''),
-                  });
-                })()}
-              </div>
-              <div class="filter-name-search">
-                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                <input type="search" id="tpl-filter" placeholder="Search" aria-label="Search" value="${state.tplFilter || ''}" />
-              </div>
-              <div class="tpl-view-toggle" role="group" aria-label="Template view">
-                <button type="button" data-tpl-view="list" class="${view === 'list' ? 'pf-m-selected' : ''}" aria-label="List view" title="List view"><i class="fa-solid fa-list"></i></button>
-                <button type="button" data-tpl-view="cards" class="${view === 'cards' ? 'pf-m-selected' : ''}" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large"></i></button>
-              </div>
-            </div>
-            <div class="tpl-body tpl-body--no-filters">
-              ${view === 'cards' ? `
+        const tplEmptyHtml = noTemplatesInProject ? `
+          <div class="tpl-empty" role="status">
+            <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
+            <p class="tpl-empty__title">No Templates found in this project</p>
+            <p class="tpl-empty__body">Select a different project, or ask an administrator to add templates.</p>
+          </div>
+        ` : '';
+        const tplSearchEmpty = noSearchMatches
+          ? (view === 'cards'
+            ? '<p class="muted">No templates match your search.</p>'
+            : '<tr><td colspan="5" class="muted">No templates match your search.</td></tr>')
+          : '';
+        const tplCatalogHtml = noTemplatesInProject ? tplEmptyHtml : (view === 'cards' ? `
                 <div class="tpl-cards" role="listbox" aria-label="Templates">
-                  ${cards || '<p class="muted">No templates match your search.</p>'}
+                  ${cards || tplSearchEmpty}
                 </div>
               ` : `
                 <div class="tpl-list">
@@ -10589,11 +10585,51 @@
                       </tr>
                     </thead>
                     <tbody>
-                      ${listRows || '<tr><td colspan="5" class="muted">No templates match your search.</td></tr>'}
+                      ${listRows || tplSearchEmpty}
                     </tbody>
                   </table>
                 </div>
-              `}
+              `);
+        panel.innerHTML = `
+          <div class="tpl-step">
+            <div>
+              <h3>Select template</h3>
+              <p class="step-help">Choose a project to see the templates available to you there. The Virtual machine will be created in that project. Then select a template to review details and click Next.</p>
+              ${state.fieldErrors.catalog ? `
+                <p class="field-error tpl-step__error" id="err-catalog" role="alert">
+                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                  <span>${state.fieldErrors.catalog}</span>
+                </p>
+              ` : ''}
+            </div>
+            <div class="tpl-toolbar">
+              <div class="tpl-toolbar__project">
+                <label for="f-tpl-project">Project</label>
+                ${(() => {
+                  const projectOpts = PROJECTS.includes(currentProject)
+                    ? PROJECTS
+                    : [currentProject, ...PROJECTS];
+                  return pfSelect({
+                    id: 'f-tpl-project',
+                    ariaLabel: 'Project',
+                    optionsHtml: projectOpts.map(p =>
+                      `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
+                    ).join(''),
+                  });
+                })()}
+              </div>
+              <div class="filter-name-search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" id="tpl-filter" placeholder="Search" aria-label="Search" value="${state.tplFilter || ''}"
+                  ${noTemplatesInProject ? 'disabled' : ''} />
+              </div>
+              <div class="tpl-view-toggle" role="group" aria-label="Template view">
+                <button type="button" data-tpl-view="list" class="${view === 'list' ? 'pf-m-selected' : ''}" aria-label="List view" title="List view" ${noTemplatesInProject ? 'disabled' : ''}><i class="fa-solid fa-list"></i></button>
+                <button type="button" data-tpl-view="cards" class="${view === 'cards' ? 'pf-m-selected' : ''}" aria-label="Card view" title="Card view" ${noTemplatesInProject ? 'disabled' : ''}><i class="fa-solid fa-table-cells-large"></i></button>
+              </div>
+            </div>
+            <div class="tpl-body tpl-body--no-filters">
+              ${tplCatalogHtml}
               ${drawer}
             </div>
           </div>
@@ -10645,6 +10681,12 @@
         }
         panel.querySelector('#f-tpl-project')?.addEventListener('change', e => {
           d.project = e.target.value || 'default';
+          d.templateId = null;
+          d.catalogPreset = null;
+          state.tplDrawerOpen = false;
+          state.tplFilter = '';
+          clearFieldError('catalog');
+          renderWizard();
         });
         panel.querySelectorAll('[data-tpl-view]').forEach(b => {
           b.onclick = () => { state.tplView = b.dataset.tplView; renderWizard(); };
@@ -10892,7 +10934,11 @@
           const selectedTpl = TEMPLATES.find(t => t.id === d.templateId);
           const fieldBeh = getTemplateFields(selectedTpl || d.catalogPreset);
           const bootEditable = fieldBeh.bootDisk === 'editable';
-          const bootFieldHtml = bootEditable ? `
+          if (!d.bootStorageTierId || !tiers.some(t => t.id === d.bootStorageTierId)) {
+            d.bootStorageTierId = tiers[0]?.id || '';
+            d.bootStorageTierLabel = tiers[0]?.name || '';
+          }
+          const bootSizeFieldHtml = bootEditable ? `
               <div class="form-field">
                 <label for="f-boot-disk" class="label-with-optional">
                   <span>Boot disk size (GiB) <span class="req">*</span></span>
@@ -10915,6 +10961,21 @@
                 ${pfHelperText('Boot disk size is set by the template and can’t be changed during create. Add additional disks below if you need more storage.', 'f-boot-locked-help')}
               </div>
           `;
+          const bootTierFieldHtml = `
+              <div class="form-field">
+                <label for="f-boot-tier">Storage tier <span class="req">*</span></label>
+                ${pfSelect({
+                  id: 'f-boot-tier',
+                  ariaLabel: 'Boot disk storage tier',
+                  required: true,
+                  optionsHtml: tiers.map(t =>
+                    `<option value="${t.id}" ${d.bootStorageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
+                  ).join('') || '<option value="">No storage tiers available</option>',
+                })}
+                ${pfHelperText('Storage tiers are defined by your cloud provider administrator.')}
+              </div>
+          `;
+          const bootFieldHtml = `${bootSizeFieldHtml}${bootTierFieldHtml}`;
           const addDiskHtml = `
               <div class="add-disk-action">
                 ${pfInlineLinkButton({
@@ -10925,8 +10986,8 @@
               </div>
           `;
           const storageStepHelp = bootEditable
-            ? 'Set the boot disk size. Add additional disks if you need more storage.'
-            : 'Boot disk size is locked by the template. You can add additional disks below.';
+            ? 'Set the boot disk size and storage tier. Add additional disks if you need more storage.'
+            : 'Boot disk size is locked by the template. Choose a storage tier, and add additional disks below if needed.';
 
           panel.innerHTML = `
             <h3>Storage</h3>
@@ -10954,10 +11015,23 @@
             }
             updateCostEstimate(key);
           };
+          const syncBootTier = (tierId) => {
+            d.bootStorageTierId = tierId;
+            d.bootStorageTierLabel = tiers.find(t => t.id === tierId)?.name || tierId;
+            if (Array.isArray(d.disks)) {
+              const root = d.disks.find(disk => disk.name === 'rootdisk' || disk.bootable || disk.name === 'Boot disk');
+              if (root) {
+                root.storageTierId = d.bootStorageTierId;
+                root.storageTierLabel = d.bootStorageTierLabel;
+              }
+            }
+            updateCostEstimate(key);
+          };
           if (bootEditable) {
             panel.querySelector('#f-boot-disk')?.addEventListener('input', e => syncBootDisk(e.target.value));
             panel.querySelector('#f-boot-disk')?.addEventListener('change', e => syncBootDisk(e.target.value));
           }
+          panel.querySelector('#f-boot-tier')?.addEventListener('change', e => syncBootTier(e.target.value));
           panel.querySelector('#f-add-disk')?.addEventListener('click', addWizardExtraDisk);
           panel.querySelectorAll('[data-disk-size]').forEach(input => {
             const syncExtra = (raw) => {
@@ -11434,8 +11508,11 @@
         const bootDiskNum = d.bootDiskGiB != null
           ? d.bootDiskGiB
           : (tpl?.bootDiskGiB != null ? tpl.bootDiskGiB : null);
+        const bootTierLabel = d.bootStorageTierLabel
+          || d.bootStorageTierId
+          || '—';
         const bootDisk = bootDiskNum != null
-          ? `${bootDiskNum} ${d.bootDiskUnit || 'GiB'}`
+          ? `${bootDiskNum} ${d.bootDiskUnit || 'GiB'} | ${bootTierLabel}`
           : '—';
         const cloudInitVal = (d.cloudInit && d.cloudInit.trim())
           ? 'Configured'
@@ -11476,7 +11553,10 @@
           && Number(d.bootDiskGiB) !== Number(preset.bootDiskGiB);
         const diskUnitChanged = !!preset
           && (preset.bootDiskUnit || 'GiB') !== (d.bootDiskUnit || 'GiB');
-        const diskChanged = diskSizeChanged || diskUnitChanged;
+        const bootTierChanged = !!preset?.bootStorageTierId
+          && d.bootStorageTierId
+          && d.bootStorageTierId !== preset.bootStorageTierId;
+        const diskChanged = diskSizeChanged || diskUnitChanged || bootTierChanged;
         const reviewValue = (value, changed) =>
           changed ? `${value} <span class="muted">(customized)</span>` : value;
         const windowsAccess = isWindowsOs(d);

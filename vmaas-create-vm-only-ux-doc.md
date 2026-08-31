@@ -40,7 +40,7 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **OS image** | On template selection + Review — not on Details. |
 | **Access** | Optional SSH / cloud-init on **Details**. |
 | **Locked vs Editable** | Template governance: lock / pen. Prefer **Locked** / **Editable**. |
-| **Project** | Dropdown on Select template (prefilled from context); also on Details. |
+| **Project** | On Select template only — filters available templates and sets where the VM is created. Users see projects they can access. Not on Details. |
 | **Exit confirm** | Exit without saving / Continue creating. |
 | **After create** | Opens the new VM details Overview + success toast (`created` or `created and starting` → Running). |
 | **Start after create** | Review checkbox **Start this Virtual machine after creation** — checked by default (CNV parity). |
@@ -77,6 +77,10 @@ Figure: Row Actions kebab
 
 Toolbar: **Project** · **Search** · list/card view.
 
+- **Project** defines which templates are available and where the new VM will be created (users only see projects they can access).
+- Helper: *Choose a project to see the templates available to you there. The Virtual machine will be created in that project. Then select a template to review details and click Next.*
+- **Empty state** (`yifat` / `vmaas` in the mock): *No Templates found in this project. Select a different project, or ask an administrator to add templates.*
+
 Selecting a template opens a drawer (**Template settings**):
 
 - **Locked by this template** — OS image always; compute / boot disk when locked
@@ -86,10 +90,15 @@ Selecting a template opens a drawer (**Template settings**):
 
 Figure: Select template
 
+![Figure: Select template — empty project](videos/vmaas-create-vm-only-ux-doc/02b-select-template-empty.png)
+
+Figure: Select template — no templates in project
+
 **Dev notes**
 
 - Per-field governance: `compute` / `bootDisk` = `locked` \| `editable`; image always locked.
 - Card cost may prefix hourly with **From** when size is editable.
+- Templates are filtered by `template.project === selected project`.
 
 ![Figure: Template drawer — locked](videos/vmaas-create-vm-only-ux-doc/03-template-drawer-locked.png)
 
@@ -103,10 +112,11 @@ Figure: Template drawer — editable
 
 ## Step 2 — Details
 
-- Help: *Name your Virtual machine, select a project, and optionally set access.*
+- Help: *Name your Virtual machine and optionally set access.*
+- Context note (not a dropdown): *Your Virtual machine will be created in **{project}***
 - **Name** (required) + generate
 - **Description** (optional)
-- **Project** — same as Select template; editable
+- Project is chosen on Select template (not editable here)
 - **Access** (optional) — SSH public key and cloud-init
 
 ![Figure: Details](videos/vmaas-create-vm-only-ux-doc/05-details.png)
@@ -129,7 +139,7 @@ Figure: Compute resource
 
 ## Step 4 — Storage
 
-- Boot disk size (locked or editable) + PF helper text when locked / editable
+- Boot disk size (locked or editable) + **Storage tier** (same control as additional disks) + PF helper text
 - **Additional disks** — inline **Add disk** (PF link + PlusCircle; dashed underline on the label only). Empty: no sets yet.
 - Each added disk is a **Disk set N** with Size, Storage tier (helpers), and **Remove** (danger link + MinusCircle)
 - Matches Ethan’s OSAC config-sets pattern (no Add disk modal on this step). Overview **Add disk** still uses a modal.
