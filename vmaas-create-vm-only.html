@@ -530,6 +530,14 @@
     .vm-details-grid > .pf-v6-c-divider.pf-m-vertical {
       align-self: stretch;
       flex: 0 0 auto;
+      /* PF vertical divider uses height:inherit; force stretch in this flex row */
+      height: auto !important;
+      min-height: 100%;
+      width: var(--pf-v6-c-divider--Size, 1px);
+      background-color: var(--pf-t--global--border--color--default, var(--vmaas-border-light, #d2d2d2));
+      border: none;
+      margin: 0;
+      padding: 0;
     }
     .vm-details-grid > .vm-vnc {
       flex: 0.75 1 200px;
