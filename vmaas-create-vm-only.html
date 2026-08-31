@@ -849,8 +849,11 @@
     }
     /* Details — project is context awareness, not a disabled control */
     .project-context {
-      margin: 0;
+      margin: 0 0 var(--pf-t--global--spacer--lg, 24px);
       max-width: 560px;
+    }
+    .step-help:has(+ .project-context) {
+      margin-bottom: var(--pf-t--global--spacer--md, 16px);
     }
     .project-context .pf-v6-c-alert__title {
       font-size: 14px;
@@ -9746,7 +9749,7 @@
             <div class="project-context pf-v6-c-alert pf-m-inline pf-m-info" role="status">
               <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
               <div class="pf-v6-c-alert__title">
-                Your Virtual machine will be created in <strong>${String(d.project || 'default').replace(/</g, '&lt;')}</strong>
+                Your Virtual machine will be created in project: <strong>${String(d.project || 'default').replace(/</g, '&lt;')}</strong>
               </div>
             </div>
             ` : '<h3 class="section-label">General info</h3>'}

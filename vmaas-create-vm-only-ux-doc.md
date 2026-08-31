@@ -113,7 +113,7 @@ Figure: Template drawer — editable
 ## Step 2 — Details
 
 - Help: *Name your Virtual machine and optionally set access.*
-- Context note (not a dropdown): *Your Virtual machine will be created in **{project}***
+- Context note (not a dropdown): *Your Virtual machine will be created in project: **{project}***
 - **Name** (required) + generate
 - **Description** (optional)
 - Project is chosen on Select template (not editable here)
