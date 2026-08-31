@@ -1898,15 +1898,19 @@
       min-height: 36px;
     }
     .filter-dd-btn--project {
+      /* Match Ethan project-scope-switcher: default MenuToggle padding (not compact/small) */
       border-radius: 999px;
-      padding-inline-start: 12px;
-      gap: 8px;
+      min-height: 36px;
+      padding-block: var(--pf-t--global--spacer--control--vertical--default, 8px);
+      padding-inline: var(--pf-t--global--spacer--control--horizontal--default, 16px);
+      gap: var(--pf-t--global--spacer--gap--text-to-element--default, 8px);
     }
     .filter-dd-btn__folder {
       color: var(--vmaas-text);
       font-size: 14px;
       width: 1em;
       text-align: center;
+      flex-shrink: 0;
     }
     .filter-dd-menu {
       display: none;
@@ -3961,10 +3965,10 @@
             <!-- Filters (OSAC / Ethan row) + compact search -->
             <div class="filter-row" id="vm-filter-row">
               <div class="filter-dd-wrap" id="projectWrap">
-                <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn filter-dd-btn--project" type="button"
+                <button class="pf-v6-c-menu-toggle filter-dd-btn filter-dd-btn--project" type="button"
                   id="btnProjectFilter" aria-expanded="false" aria-haspopup="listbox"
                   aria-label="Filter by project">
-                  <i class="fa-solid fa-folder filter-dd-btn__folder" aria-hidden="true"></i>
+                  <i class="fa-solid fa-folder-open filter-dd-btn__folder" aria-hidden="true"></i>
                   <span class="pf-v6-c-menu-toggle__text" id="projectFilterLabel">Project: All projects</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
