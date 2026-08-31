@@ -516,44 +516,32 @@
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;
     }
     .vm-card__title-row .vm-card__title { margin: 0; }
+    /* Same proportions as before the divider: 1.35fr details | 0.75fr VNC.
+       Two 10px gaps ≈ original single 20px gap so VNC width stays the same. */
     .vm-details-grid {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) auto minmax(200px, 0.75fr);
+      column-gap: 10px;
       align-items: stretch;
-      gap: 0;
       min-width: 0;
-    }
-    .vm-details-grid > .vm-dl {
-      flex: 1.35 1 0;
-      min-width: 0;
-      padding-inline-end: 20px;
     }
     .vm-details-grid > .pf-v6-c-divider.pf-m-vertical {
-      align-self: stretch;
-      flex: 0 0 auto;
-      /* PF vertical divider uses height:inherit; force stretch in this flex row */
+      /* PF vertical divider uses height:inherit; stretch to grid row */
       height: auto !important;
-      min-height: 100%;
+      align-self: stretch;
       width: var(--pf-v6-c-divider--Size, 1px);
       background-color: var(--pf-t--global--border--color--default, var(--vmaas-border-light, #d2d2d2));
       border: none;
       margin: 0;
       padding: 0;
     }
+    .vm-details-grid > .vm-dl,
     .vm-details-grid > .vm-vnc {
-      flex: 0.75 1 200px;
-      min-width: 200px;
-      max-width: 360px;
-      padding-inline-start: 20px;
+      min-width: 0;
     }
     @media (max-width: 800px) {
       .vm-details-grid {
-        flex-direction: column;
-      }
-      .vm-details-grid > .vm-dl,
-      .vm-details-grid > .vm-vnc {
-        flex: 1 1 auto;
-        max-width: none;
-        padding-inline: 0;
+        grid-template-columns: 1fr;
       }
       .vm-details-grid > .pf-v6-c-divider.pf-m-vertical {
         display: none;
