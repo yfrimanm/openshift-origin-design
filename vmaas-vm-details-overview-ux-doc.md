@@ -33,6 +33,7 @@ Document OSAC VMaaS **Virtual machine details Overview**: CNV-inspired card layo
 | **Operating system** | Show OS from create/template metadata when known. If unknown: **—** + *Guest agent not reporting*. |
 | **SSH** | *Configured* + pencil, or ***Not configured*** as a link (+ pencil) → edit modal. Windows: *Not applicable*. **Tenant User:** pencil / link disabled. |
 | **Compute** | **Compute resource** + edit pencil. **Tenant User:** pencil disabled. |
+| **Console** | VNC console stays in the Details card (right), separated from the DL by a PF6 **vertical divider** — same card/grid, clearer identity vs access. |
 | **Network / Storage** | Card **Add** + row kebab **Edit** / **Delete**. Delete disabled in-menu with reason (last network / boot disk). Terminology: **Network**. **Tenant User:** Add + row kebabs disabled. |
 | **Utilization** | Metrics only when status is **Running**. Otherwise: *Virtual machine is not running*. Time range shown as static “Last 5 minutes”. |
 | **After create** | Lands on this Overview with success toast. |
@@ -65,7 +66,7 @@ Figure: Overview — running
 | **Operating system** | Metadata OS, or soft empty (*Guest agent not reporting*) |
 | **Compute resource** | Summary + edit |
 | **SSH public key** | Configured / Not configured (link) + pencil |
-| **VNC console** | Open web console + preview. Opens full-page console (see **Web console** below). |
+| **VNC console** | Open web console + preview (right of DL). Separated by PF6 vertical divider within the same Details card. Opens full-page console (see **Web console** below). |
 
 Name lives in the page header (not duplicated in the DL), with arch badge (**amd64**).
 
