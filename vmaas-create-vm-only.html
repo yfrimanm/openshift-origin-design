@@ -516,12 +516,13 @@
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;
     }
     .vm-card__title-row .vm-card__title { margin: 0; }
-    /* Same proportions as before the divider: 1.35fr details | 0.75fr VNC.
-       Two 10px gaps ≈ original single 20px gap so VNC width stays the same. */
+    /* Same proportions: 1.35fr details | 0.75fr VNC.
+       18px gaps match .vm-card horizontal padding so space left of VNC
+       (after divider) equals space right of VNC (to card edge). */
     .vm-details-grid {
       display: grid;
       grid-template-columns: minmax(0, 1.35fr) auto minmax(200px, 0.75fr);
-      column-gap: 10px;
+      column-gap: 18px;
       align-items: stretch;
       min-width: 0;
     }
