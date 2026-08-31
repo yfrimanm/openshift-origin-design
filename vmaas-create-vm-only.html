@@ -517,10 +517,40 @@
     }
     .vm-card__title-row .vm-card__title { margin: 0; }
     .vm-details-grid {
-      display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(200px, 0.75fr); gap: 20px;
+      display: flex;
       align-items: stretch;
+      gap: 0;
+      min-width: 0;
     }
-    @media (max-width: 800px) { .vm-details-grid { grid-template-columns: 1fr; } }
+    .vm-details-grid > .vm-dl {
+      flex: 1.35 1 0;
+      min-width: 0;
+      padding-inline-end: 20px;
+    }
+    .vm-details-grid > .pf-v6-c-divider.pf-m-vertical {
+      align-self: stretch;
+      flex: 0 0 auto;
+    }
+    .vm-details-grid > .vm-vnc {
+      flex: 0.75 1 200px;
+      min-width: 200px;
+      max-width: 360px;
+      padding-inline-start: 20px;
+    }
+    @media (max-width: 800px) {
+      .vm-details-grid {
+        flex-direction: column;
+      }
+      .vm-details-grid > .vm-dl,
+      .vm-details-grid > .vm-vnc {
+        flex: 1 1 auto;
+        max-width: none;
+        padding-inline: 0;
+      }
+      .vm-details-grid > .pf-v6-c-divider.pf-m-vertical {
+        display: none;
+      }
+    }
     .vm-dl {
       display: grid; grid-template-columns: max-content 1fr; gap: 10px 28px;
       margin: 0; font-size: 14px; align-items: baseline;
@@ -8640,6 +8670,7 @@
                           })()}`}
                       </dd>
                     </dl>
+                    <hr class="pf-v6-c-divider pf-m-vertical" aria-hidden="true" />
                     <div class="vm-vnc">
                       <h4 class="vm-vnc__title">VNC console</h4>
                       <button type="button" class="name-link vm-vnc__open">Open web console <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;" aria-hidden="true"></i></button>
