@@ -33,7 +33,8 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **Role labels** | **Tenant Admin**, **Tenant User** (OSAC personas). Demo switcher only — gates Create / power / networks / Overview config edit. |
 | **Tenant Admin** | Create VM, power, **edit** config, create/view networks (incl. Shared / Provider — same network create as prior author/orgadmin). Default for Create demos. |
 | **Tenant User** | No Create; power/console on VMs; view networks; **read-only** Overview config (no edit / Add / Delete on compute, SSH, network, disk). |
-| **Search** | Regular search + attribute filters (Project / Status / OS). No advanced search icon. |
+| **Search** | Compact filter-row search (Ethan/OSAC): matches **name / IP / OS / project**. No CNV Save search / Saved searches. |
+| **List filters** | `Project: All projects` (folder) · `All power states` · `All operating systems` · `Hardware devices` (GPU / Host) · search. Multi-select menus kept. |
 | **Row kebab / Actions** | Control ▸, Open console, Delete. Disabled reasons use **Virtual machine** wording. |
 | **Status** | Status is a link → PF6 popover (title, body, **Ask AI about this status** placeholder, Learn more). |
 | **OS image** | On template selection + Review — not on Details. |
@@ -52,8 +53,8 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 
 - Primary **Create Virtual machine** opens the wizard.
 - **Name** column opens VM details Overview.
-- Search + Save search / Saved searches.
-- Filters: Project, Status, Operating system.
+- Filter row (OSAC / Ethan): **Project: All projects** · **All power states** · **All operating systems** · **Hardware devices** · **Search virtual machines**.
+- Search matches name / IP / OS / project. No Save search / Saved searches.
 - Toolbar **Actions** disabled until selection; matches row kebab when enabled.
 
 ![Figure: Virtual machines list](videos/vmaas-create-vm-only-ux-doc/01-vm-list.png)
@@ -194,3 +195,19 @@ Figure: Exit confirmation
 
 - **Details / Overview UX doc** — day-2 Overview cards, Network/Storage Add·Edit·Delete, Utilization empty state, SSH, Status → AI placeholder
 - **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html
+
+---
+
+## Appendix — Personas: can vs cannot
+
+- **Tenant Admin** — create and manage VMs and networks (edit config).
+- **Tenant User** — use VMs they can access (power + console); view only for config and networks.
+
+| | Tenant Admin | Tenant User |
+|---|---|---|
+| **Create Virtual machine** | Can | Can not |
+| **Power** (Start / Stop / Pause / Restart) | Can | Can |
+| **Open console** | Can | Can |
+| **Edit Overview config** (compute, SSH, Add/Edit/Delete network or disk) | Can | Can not — controls disabled |
+| **Create networks** (Isolated / Shared / Provider) | Can | Can not |
+| **View networks** | Can | Can |
