@@ -81,7 +81,7 @@ async function main() {
   await page.locator('#f-tpl-project').selectOption('yifat');
   await page.waitForTimeout(400);
   await shotPage(page, '02b-select-template-empty');
-  await page.locator('#f-tpl-project').selectOption('default');
+  await page.locator('#f-tpl-project').selectOption('project-a');
   await page.waitForTimeout(350);
 
   // Locked template — shoot drawer panel only
