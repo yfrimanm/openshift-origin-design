@@ -4504,7 +4504,7 @@
     const VMS = [
       {
         name: 'indigo-quokka-89',
-        ns: 'default',
+        ns: 'project-a',
         status: 'running',
         os: 'RHEL',
         conditions: ['Ready=True', 'LiveMigratable=True'],
@@ -4533,14 +4533,14 @@
         utilization: { cpu: '0.73%', memory: '14.8%', storage: '2.55%', network: '0 Bps' },
       },
       { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: '', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'default', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', gpuDevices: [{ name: 'nvidia.com/GPU' }], hostDevices: [{ name: 'host-pci-1' }] },
-      { name: 'windows-golden-eider-58', ns: 'default', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', gpuDevices: [{ name: 'nvidia.com/GPU' }], hostDevices: [{ name: 'host-pci-1' }] },
+      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
       { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
       { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
     const FILTER_CATALOG = {
-      project: ['default', 'openshift', 'testuser', 'vmaas', 'yifat'],
+      project: ['project-a', 'openshift', 'testuser', 'vmaas', 'yifat'],
       os: ['CentOS', 'Fedora', 'Other', 'RHEL', 'Windows'],
     };
 
@@ -4607,7 +4607,7 @@
         id: 'catalog-item-1',
         name: 'rhel.10',
         slug: 'catalog-item-1',
-        project: 'default',
+        project: 'project-a',
         osImage: 'rhel.10',
         os: 'Red Hat Enterprise Linux 10',
         osKey: 'rhel',
@@ -4629,7 +4629,7 @@
         id: 'catalog-item-2',
         name: 'rhel.9',
         slug: 'catalog-item-2',
-        project: 'default',
+        project: 'project-a',
         osImage: 'rhel.9',
         os: 'Red Hat Enterprise Linux 9',
         osKey: 'rhel',
@@ -4651,7 +4651,7 @@
         id: 'catalog-item-3',
         name: 'Windows.2k25',
         slug: 'catalog-item-3',
-        project: 'default',
+        project: 'project-a',
         osImage: 'Windows.2k25',
         os: 'Microsoft Windows Server 2025',
         osKey: 'windows',
@@ -4673,7 +4673,7 @@
         id: 'catalog-item-4',
         name: 'fedora',
         slug: 'catalog-item-4',
-        project: 'default',
+        project: 'project-a',
         osImage: 'fedora',
         os: 'Fedora Linux',
         osKey: 'fedora',
@@ -4695,7 +4695,7 @@
         id: 'catalog-custom-1',
         name: 'RHEL 10 Editable',
         slug: 'rhel10-editable',
-        project: 'default',
+        project: 'project-a',
         osImage: 'rhel.10',
         os: 'Red Hat Enterprise Linux 10',
         osKey: 'rhel',
@@ -4717,7 +4717,7 @@
         id: 'catalog-custom-2',
         name: 'RHEL 10 Editable (XL)',
         slug: 'rhel10-editable-xl',
-        project: 'default',
+        project: 'project-a',
         osImage: 'rhel.10',
         os: 'Red Hat Enterprise Linux 10',
         osKey: 'rhel',
@@ -5506,14 +5506,14 @@
     }
 
     let NETWORKS = [
-      { id: 'net-workload', name: 'tenant-workload', type: 'Isolated', project: 'default', cidr: '10.130.0.0/16', status: 'Ready', vms: 5 },
-      { id: 'net-default', name: 'default', type: 'Provider', project: 'default', cidr: '10.128.0.0/14', status: 'Ready', vms: 3 },
+      { id: 'net-workload', name: 'tenant-workload', type: 'Isolated', project: 'project-a', cidr: '10.130.0.0/16', status: 'Ready', vms: 5 },
+      { id: 'net-default', name: 'default', type: 'Provider', project: 'project-a', cidr: '10.128.0.0/14', status: 'Ready', vms: 3 },
       { id: 'net-app', name: 'app-tier', type: 'Isolated', project: 'yifat', cidr: '192.168.10.0/24', status: 'Ready', vms: 1 },
       { id: 'net-shared', name: 'org-shared', type: 'Shared', project: 'vmaas', cidr: '10.40.0.0/22', status: 'Ready', vms: 0 },
     ];
 
     /** Mutable catalogs for creatable Project / Group selects in Create VM */
-    const PROJECTS = ['default', 'yifat', 'vmaas'];
+    const PROJECTS = ['project-a', 'yifat', 'vmaas'];
     const GROUPS = ['production', 'staging', 'workloads'];
     const state = {
       wizard: 'vm', // vm | network
@@ -5567,7 +5567,7 @@
         virtualNetwork: '',
         subnet: '',
         securityGroups: [],
-        project: 'default',
+        project: 'project-a',
         group: '',
         sshPublicKey: '',
         sshKeyFileName: '',
@@ -5589,7 +5589,7 @@
         type: 'isolated', // isolated | shared | provider
         name: '',
         description: '',
-        project: 'default',
+        project: 'project-a',
         cidr: '192.168.20.0/24',
         gateway: '',
         dns: '',
@@ -5657,8 +5657,8 @@
     function createContextProject() {
       const selected = state.filters.project || [];
       if (selected.length === 1) return selected[0];
-      // All projects (or multi-select): mock uses default as the active project.
-      return 'default';
+      // All projects (or multi-select): mock uses project-a as the active project.
+      return 'project-a';
     }
 
     function visibleVmColumns() {
@@ -5836,7 +5836,7 @@
     ];
 
     function projectDisplayName(ns) {
-      if (!ns || ns === 'default') return 'Default';
+      if (!ns) return 'project-a';
       return ns;
     }
 
@@ -6396,7 +6396,7 @@
         // Defer so menu mousedown can select first
         setTimeout(() => {
           if (root.contains(document.activeElement)) return;
-          if (!input.value.trim() && !allowEmpty) input.value = committed || 'default';
+          if (!input.value.trim() && !allowEmpty) input.value = committed || 'project-a';
           else if (!input.value.trim() && allowEmpty) committed = '';
           root.querySelector('.pf-v6-c-form-control')?.classList.toggle('pf-m-placeholder', !input.value);
         }, 120);
@@ -7303,7 +7303,7 @@
         hostname: v.name,
         group: '—',
         timezone: 'UTC',
-        fqdn: `${v.name}.headless.${v.ns || 'default'}.svc.cluster.local`,
+        fqdn: `${v.name}.headless.${v.ns || 'project-a'}.svc.cluster.local`,
         guestAgent: v.guestAgent === true,
         computeResource: 'small',
         alerts: [],
@@ -8610,8 +8610,8 @@
           { name: 'vda2', type: 'vfat', mount: '/boot/efi', total: '199.8 MiB', used: '8.95 MiB' },
           { name: 'vda3', type: 'xfs', mount: '/', total: formatStorageAmount(bootGiB), used: formatStorageAmount(rootUsed) },
         ];
-        const projectRaw = v.project || v.ns || 'default';
-        const projectDisplay = projectRaw === 'default' ? 'Default' : projectRaw;
+        const projectRaw = v.project || v.ns || 'project-a';
+        const projectDisplay = projectRaw;
         const osKnown = (v.osFull || v.os || '').trim();
         const osDisplay = osKnown
           ? osKnown
@@ -9205,7 +9205,7 @@
         type: role.canCreateOrgNetwork ? 'shared' : 'isolated',
         name: '',
         description: '',
-        project: state.data.project || 'default',
+        project: state.data.project || 'project-a',
         cidr: '192.168.20.0/24',
         gateway: '',
         dns: '',
@@ -9573,7 +9573,7 @@
               id: 'f-net-project',
               required: true,
               optionsHtml: `
-                <option value="default" ${n.project === 'default' ? 'selected' : ''}>default</option>
+                <option value="project-a" ${n.project === 'project-a' ? 'selected' : ''}>project-a</option>
                 <option value="yifat" ${n.project === 'yifat' ? 'selected' : ''}>yifat</option>
                 <option value="vmaas" ${n.project === 'vmaas' ? 'selected' : ''}>vmaas</option>
               `,
@@ -9753,7 +9753,7 @@
             <div class="project-context pf-v6-c-alert pf-m-inline pf-m-info" role="status">
               <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
               <div class="pf-v6-c-alert__title">
-                Your Virtual machine will be created in project: <strong>${String(d.project || 'default').replace(/</g, '&lt;')}</strong>
+                Your Virtual machine will be created in project: <strong>${String(d.project || 'project-a').replace(/</g, '&lt;')}</strong>
               </div>
             </div>
             ` : '<h3 class="section-label">General info</h3>'}
@@ -9800,7 +9800,7 @@
                 ${pfCreatableSearch({
                   id: 'f-project',
                   placeholder: 'Search project',
-                  value: d.project || 'default',
+                  value: d.project || 'project-a',
                   ariaLabel: 'Search project',
                 })}
               </div>
@@ -9820,7 +9820,7 @@
         `;
         const syncLocation = () => {
           const projectVal = document.getElementById('f-project')?.value?.trim() || '';
-          d.project = projectVal || 'default';
+          d.project = projectVal || 'project-a';
           d.group = document.getElementById('f-group')?.value?.trim() || '';
           if (isCatalogFlow) syncWizardNextDisabled();
         };
@@ -10250,10 +10250,10 @@
         });
         panel.querySelector('#f-size').addEventListener('change', e => { d.size = e.target.value; });
       } else if (key === 'catalog' || key === 'template') {
-        const currentProject = d.project || createContextProject() || 'default';
+        const currentProject = d.project || createContextProject() || 'project-a';
         d.project = currentProject;
         const q = (state.tplFilter || '').toLowerCase();
-        const projectTemplates = TEMPLATES.filter(t => (t.project || 'default') === currentProject);
+        const projectTemplates = TEMPLATES.filter(t => (t.project || 'project-a') === currentProject);
         const list = projectTemplates.filter(t => {
           if (!q) return true;
           const hay = `${t.name} ${t.osImage || ''} ${t.description || ''} ${t.cpu || ''} ${t.mem || ''} ${t.storage || ''} ${t.bootDiskGiB || ''}`.toLowerCase();
@@ -10354,7 +10354,7 @@
           return `${rates.hour} ${rates.month}`;
         };
         const cardIcon = (t) => iconFa[t.osKey] || 'fa-solid fa-cube';
-        const selected = TEMPLATES.find(t => t.id === d.templateId && (t.project || 'default') === currentProject);
+        const selected = TEMPLATES.find(t => t.id === d.templateId && (t.project || 'project-a') === currentProject);
         const drawerOpen = state.tplDrawerOpen && selected;
         const cards = list.map(t => {
           const rates = cardRates(t);
@@ -10687,7 +10687,7 @@
           state.tplRestoreCardFocus = false;
         }
         panel.querySelector('#f-tpl-project')?.addEventListener('change', e => {
-          d.project = e.target.value || 'default';
+          d.project = e.target.value || 'project-a';
           d.templateId = null;
           d.catalogPreset = null;
           state.tplDrawerOpen = false;
@@ -11478,7 +11478,7 @@
               <dl class="review-dl">
                 <dt>Source VM</dt><dd>${source ? source.name : (d.cloneSourceName || '—')}</dd>
                 <dt>Cluster</dt><dd>—</dd>
-                <dt>Project</dt><dd>${d.project || 'default'}</dd>
+                <dt>Project</dt><dd>${d.project || 'project-a'}</dd>
                 <dt>Group</dt><dd>${d.group || '—'}</dd>
               </dl>
             </details>
@@ -11783,7 +11783,7 @@
           const osLabel = source?.os || osMap[d.osFamily] || 'Other';
           VMS.unshift({
             name: d.name,
-            ns: d.project || 'default',
+            ns: d.project || 'project-a',
             status: d.startAfter ? 'starting' : 'stopped',
             os: osLabel,
             osFull: source?.osFull || osFullMapCreate[osLabel] || osLabel,
