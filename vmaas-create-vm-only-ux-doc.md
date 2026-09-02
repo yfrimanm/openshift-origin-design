@@ -139,7 +139,7 @@ Figure: Compute resource
 
 ## Step 4 — Storage
 
-- Boot disk size (locked or editable) + **Storage tier** (same control as additional disks) + PF helper text
+- Boot disk size (locked or editable) + **Storage tier** (locked or editable with size — same control as additional disks when editable) + PF helper text
 - **Additional disks** — inline **Add disk** (PF link + PlusCircle; dashed underline on the label only). Empty: no sets yet.
 - Each added disk is a **Disk set N** with Size, Storage tier (helpers), and **Remove** (danger link + MinusCircle)
 - Matches Ethan’s OSAC config-sets pattern (no Add disk modal on this step). Overview **Add disk** still uses a modal.
