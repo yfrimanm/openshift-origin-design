@@ -635,29 +635,88 @@
       vertical-align: middle;
     }
 
-    /* Instance type details — Details left / GPU right; field rows match VM .vm-dl */
-    .it-detail-grid {
+    /* Instance type details — Ethan subnet-details pattern:
+       single panel, multi-column sections, stacked label-above-value fields */
+    .ethan-detail-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px 24px;
+      margin-bottom: 16px;
+    }
+    .ethan-detail-header__main { min-width: 0; flex: 1 1 auto; }
+    .ethan-detail-header__title {
+      margin: 0;
+    }
+    .ethan-detail-header__subtitle {
+      margin: 4px 0 0;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-weight: 400;
+    }
+    .ethan-detail-header__actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ethan-detail-panel {
+      background: #fff;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    .ethan-detail-cols {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px 48px;
       align-items: start;
     }
     @media (max-width: 900px) {
-      .it-detail-grid { grid-template-columns: 1fr; }
+      .ethan-detail-cols { grid-template-columns: 1fr; gap: 28px; }
     }
-    .it-detail-grid > .vm-card {
-      margin-bottom: 0;
-      height: 100%;
+    .ethan-detail-col__title {
+      margin: 0 0 16px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--vmaas-text, #151515);
     }
+    .ethan-detail-field {
+      margin: 0 0 16px;
+    }
+    .ethan-detail-field:last-child { margin-bottom: 0; }
+    .ethan-detail-field__label {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.3;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .ethan-detail-field__value {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--vmaas-text, #151515);
+      word-break: break-word;
+    }
+    /* Actions menu — Ethan pattern: Delete is danger/red */
     #it-actions-menu:not(.pf-m-open) { display: none; }
     #it-actions-menu.pf-m-open {
       display: block;
       position: fixed;
       z-index: 450;
-      min-width: 14rem;
-      max-width: 18rem;
+      min-width: 16.5rem;
+      max-width: 20rem;
     }
-    #it-actions-menu .pf-v6-c-menu__item.pf-m-danger {
+    #it-actions-menu .pf-v6-c-divider {
+      margin-block: 0.25rem;
+    }
+    #it-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text {
       color: var(--pf-t--global--text--color--status--danger--default, #c9190b);
     }
 
@@ -5853,6 +5912,7 @@
       selectedVmName: null,
       selectedInstanceTypeName: null,
       itActionsOpen: false,
+      itActionsName: null, // instance type targeted by #it-actions-menu (detail Actions or list kebab)
       vmDetailTab: 'overview', // overview | configuration | …
       vmConfigSection: 'details', // details | storage | network | …
       nicMenuOpen: null, // nic name with open kebab (unused)
@@ -12255,7 +12315,10 @@
     }
 
     function itField(label, valueHtml) {
-      return `<dt>${label}</dt><dd>${valueHtml}</dd>`;
+      return `<div class="ethan-detail-field">
+        <div class="ethan-detail-field__label">${label}</div>
+        <div class="ethan-detail-field__value">${valueHtml}</div>
+      </div>`;
     }
 
     function normalizeInstanceTypeLifecycle(state) {
@@ -12285,37 +12348,42 @@
 
     function closeInstanceTypeActionsMenu() {
       const menu = document.getElementById('it-actions-menu');
-      const btn = document.getElementById('it-detail-actions-btn');
       if (menu) {
         menu.hidden = true;
         menu.classList.remove('pf-m-open');
       }
-      if (btn) {
+      document.querySelectorAll('#it-detail-actions-btn.pf-m-expanded, [data-it-kebab].pf-m-expanded').forEach(btn => {
         btn.classList.remove('pf-m-expanded');
         btn.setAttribute('aria-expanded', 'false');
-      }
+      });
       state.itActionsOpen = false;
+      state.itActionsName = null;
     }
 
-    function openInstanceTypeActionsMenu(btn) {
+    function openInstanceTypeActionsMenu(btn, itName) {
       const menu = document.getElementById('it-actions-menu');
       const list = document.getElementById('it-actions-menu-list');
-      const it = INSTANCE_TYPES.find(x => x.name === state.selectedInstanceTypeName);
+      const name = itName || state.selectedInstanceTypeName;
+      const it = INSTANCE_TYPES.find(x => x.name === name);
       if (!menu || !list || !btn || !it) return;
 
-      const alreadyOpen = state.itActionsOpen && menu.classList.contains('pf-m-open');
+      const alreadyOpen = state.itActionsOpen && state.itActionsName === name;
       closeInstanceTypeActionsMenu();
       closeVmKebabMenu();
       if (alreadyOpen) return;
 
+      // Ethan subnet Actions pattern — Delete uses danger/red
       const actions = instanceTypeLifecycleActions(it.lifecycle);
       list.innerHTML = actions.map((a, i) => {
         const sep = a.id === 'delete' && i > 0
           ? `<li class="pf-v6-c-divider" role="separator"></li>`
           : '';
+        const dangerClass = a.danger ? ' pf-m-danger' : '';
         return `${sep}<li class="pf-v6-c-menu__list-item" role="none">
-          <button class="pf-v6-c-menu__item${a.danger ? ' pf-m-danger' : ''}" type="button" role="menuitem" data-it-action="${a.id}">
-            <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">${a.label}</span></span>
+          <button class="pf-v6-c-menu__item${dangerClass}" type="button" role="menuitem" data-it-action="${a.id}">
+            <span class="pf-v6-c-menu__item-main">
+              <span class="pf-v6-c-menu__item-text">${a.label}</span>
+            </span>
           </button>
         </li>`;
       }).join('');
@@ -12325,22 +12393,34 @@
       btn.classList.add('pf-m-expanded');
       btn.setAttribute('aria-expanded', 'true');
       state.itActionsOpen = true;
+      state.itActionsName = name;
 
       const rect = btn.getBoundingClientRect();
-      const menuWidth = Math.max(menu.offsetWidth || 224, 224);
-      let left = rect.right - menuWidth;
-      if (left < 8) left = 8;
+      const menuWidth = Math.max(menu.offsetWidth || 264, 264);
+      const left = Math.min(window.innerWidth - menuWidth - 8, Math.max(8, rect.right - menuWidth));
       let top = rect.bottom + 4;
-      const menuHeight = menu.offsetHeight || 160;
-      if (top + menuHeight > window.innerHeight - 8) {
-        top = Math.max(8, rect.top - menuHeight - 4);
+      menu.style.left = `${left}px`;
+      menu.style.top = `${top}px`;
+      requestAnimationFrame(() => {
+        const h = menu.offsetHeight || 0;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 4);
+          menu.style.top = `${top}px`;
+        }
+      });
+    }
+
+    function refreshInstanceTypeViews(name) {
+      const onDetail = document.getElementById('view-instance-type')?.classList.contains('pf-m-active')
+        && state.selectedInstanceTypeName === name;
+      if (onDetail) renderInstanceTypeDetail();
+      if (document.getElementById('view-instance-types')?.classList.contains('pf-m-active')) {
+        renderInstanceTypes();
       }
-      menu.style.left = `${Math.round(left)}px`;
-      menu.style.top = `${Math.round(top)}px`;
     }
 
     function applyInstanceTypeLifecycleAction(actionId) {
-      const name = state.selectedInstanceTypeName;
+      const name = state.itActionsName || state.selectedInstanceTypeName;
       const idx = INSTANCE_TYPES.findIndex(x => x.name === name);
       if (idx < 0) return;
       const it = INSTANCE_TYPES[idx];
@@ -12349,24 +12429,24 @@
       if (actionId === 'set-active') {
         it.lifecycle = 'Active';
         toast(`Instance type ${name} set to Active.`);
-        renderInstanceTypeDetail();
+        refreshInstanceTypeViews(name);
         return;
       }
       if (actionId === 'deprecate') {
         it.lifecycle = 'Deprecated';
         toast(`Instance type ${name} deprecated.`);
-        renderInstanceTypeDetail();
+        refreshInstanceTypeViews(name);
         return;
       }
       if (actionId === 'mark-obsolete') {
         it.lifecycle = 'Obsolete';
         toast(`Instance type ${name} marked Obsolete.`);
-        renderInstanceTypeDetail();
+        refreshInstanceTypeViews(name);
         return;
       }
       if (actionId === 'delete') {
         INSTANCE_TYPES.splice(idx, 1);
-        state.selectedInstanceTypeName = null;
+        if (state.selectedInstanceTypeName === name) state.selectedInstanceTypeName = null;
         toast(`Deleted instance type ${name}.`);
         setView('instance-types');
         renderInstanceTypes();
@@ -12394,6 +12474,7 @@
       const gpuCount = it.gpus == null ? '—' : String(it.gpus);
       const gpuPci = it.gpuPci ? String(it.gpuPci).replace(/</g, '&lt;') : '—';
       const gpuResource = it.gpuResource ? String(it.gpuResource).replace(/</g, '&lt;') : '—';
+      const subtitle = `${it.cpu} CPU cores · ${it.memoryGiB} GiB`;
 
       root.innerHTML = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
@@ -12409,13 +12490,13 @@
             </li>
           </ol>
         </nav>
-        <div class="vm-detail__header">
-          <div class="vm-detail__title-row">
-            <h2 class="vm-detail__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safeName}</h2>
-            <span class="vm-detail__status">${lifecycleLabelHtml(it.lifecycle)}</span>
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safeName}</h2>
+            <p class="ethan-detail-header__subtitle">${subtitle}</p>
           </div>
-          <div class="vm-detail__actions" role="group" aria-label="Instance type actions">
-            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary vm-action-menu" id="it-detail-actions-btn"
+          <div class="ethan-detail-header__actions" role="group" aria-label="Instance type actions">
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="it-detail-actions-btn"
               aria-expanded="false" aria-haspopup="menu" aria-controls="it-actions-menu">
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
               <span class="pf-v6-c-menu-toggle__controls">
@@ -12426,28 +12507,25 @@
             </button>
           </div>
         </div>
-        <div class="it-detail-grid">
-          <div class="vm-card">
-            <div class="vm-card__title-row">
-              <h3 class="vm-card__title">Details</h3>
-            </div>
-            <dl class="vm-dl">
-              ${itField('Name', safeName)}
+        <div class="ethan-detail-panel">
+          <div class="ethan-detail-cols">
+            <section class="ethan-detail-col" aria-labelledby="it-overview-title">
+              <h3 class="ethan-detail-col__title" id="it-overview-title">Overview</h3>
               ${itField('Lifecycle state', lifecycleLabelHtml(it.lifecycle))}
+              ${itField('Name', safeName)}
               ${itField('Created', String(it.created || '—').replace(/</g, '&lt;'))}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="it-compute-title">
+              <h3 class="ethan-detail-col__title" id="it-compute-title">Compute</h3>
               ${itField('CPU cores', String(it.cpu))}
               ${itField('Memory (GiB)', String(it.memoryGiB))}
-            </dl>
-          </div>
-          <div class="vm-card">
-            <div class="vm-card__title-row">
-              <h3 class="vm-card__title">GPU</h3>
-            </div>
-            <dl class="vm-dl">
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="it-gpu-title">
+              <h3 class="ethan-detail-col__title" id="it-gpu-title">GPU</h3>
               ${itField('Count', gpuCount)}
               ${itField('PCI device selector', gpuPci)}
               ${itField('Resource name', gpuResource)}
-            </dl>
+            </section>
           </div>
         </div>
       `;
@@ -12461,7 +12539,7 @@
       });
       root.querySelector('#it-detail-actions-btn')?.addEventListener('click', e => {
         e.stopPropagation();
-        openInstanceTypeActionsMenu(e.currentTarget);
+        openInstanceTypeActionsMenu(e.currentTarget, state.selectedInstanceTypeName);
       });
     }
 
@@ -12476,7 +12554,7 @@
           <td class="pf-v6-c-table__td">${it.memoryGiB}</td>
           <td class="pf-v6-c-table__td">${it.gpus == null ? '—' : it.gpus}</td>
           <td class="pf-v6-c-table__td">${it.created}</td>
-          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${String(it.name).replace(/"/g, '&quot;')}"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
+          <td class="pf-v6-c-table__td"><button type="button" class="kebab" data-it-kebab="${String(it.name).replace(/"/g, '&quot;')}" aria-label="Actions for ${String(it.name).replace(/"/g, '&quot;')}" aria-haspopup="menu" aria-expanded="false" aria-controls="it-actions-menu"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
         </tr>
       `).join('');
     }
@@ -12838,6 +12916,13 @@
       toast('Create disk image is not implemented in this mock.');
     });
     document.getElementById('instance-types-tbody')?.addEventListener('click', e => {
+      const kebab = e.target.closest('[data-it-kebab]');
+      if (kebab) {
+        e.preventDefault();
+        e.stopPropagation();
+        openInstanceTypeActionsMenu(kebab, kebab.dataset.itKebab);
+        return;
+      }
       const link = e.target.closest('[data-instance-type]');
       if (!link) return;
       e.preventDefault();
@@ -12862,7 +12947,8 @@
       }
       if (state.itActionsOpen
         && !e.target.closest('#it-actions-menu')
-        && !e.target.closest('#it-detail-actions-btn')) {
+        && !e.target.closest('#it-detail-actions-btn')
+        && !e.target.closest('[data-it-kebab]')) {
         closeInstanceTypeActionsMenu();
       }
     });
