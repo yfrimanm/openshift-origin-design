@@ -635,40 +635,19 @@
       vertical-align: middle;
     }
 
-    /* Instance type details — stacked label/value fields in a 2-col card grid */
-    .it-fields {
+    /* Instance type details — Details left / GPU right; field rows match VM .vm-dl */
+    .it-detail-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 20px 48px;
+      gap: 16px;
       align-items: start;
     }
-    @media (max-width: 640px) {
-      .it-fields { grid-template-columns: 1fr; }
+    @media (max-width: 900px) {
+      .it-detail-grid { grid-template-columns: 1fr; }
     }
-    .it-fields__col {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      min-width: 0;
-    }
-    .it-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-    .it-field__label {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--vmaas-text);
-    }
-    .it-field__value {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--vmaas-text);
-      word-break: break-word;
+    .it-detail-grid > .vm-card {
+      margin-bottom: 0;
+      height: 100%;
     }
     #it-actions-menu:not(.pf-m-open) { display: none; }
     #it-actions-menu.pf-m-open {
@@ -12276,10 +12255,7 @@
     }
 
     function itField(label, valueHtml) {
-      return `<div class="it-field">
-        <div class="it-field__label">${label}</div>
-        <div class="it-field__value">${valueHtml}</div>
-      </div>`;
+      return `<dt>${label}</dt><dd>${valueHtml}</dd>`;
     }
 
     function normalizeInstanceTypeLifecycle(state) {
@@ -12450,36 +12426,28 @@
             </button>
           </div>
         </div>
-        <div class="vm-overview">
+        <div class="it-detail-grid">
           <div class="vm-card">
             <div class="vm-card__title-row">
               <h3 class="vm-card__title">Details</h3>
             </div>
-            <div class="it-fields">
-              <div class="it-fields__col">
-                ${itField('Name', safeName)}
-                ${itField('Lifecycle state', lifecycleLabelHtml(it.lifecycle))}
-                ${itField('Created', String(it.created || '—').replace(/</g, '&lt;'))}
-              </div>
-              <div class="it-fields__col">
-                ${itField('CPU cores', String(it.cpu))}
-                ${itField('Memory (GiB)', String(it.memoryGiB))}
-              </div>
-            </div>
+            <dl class="vm-dl">
+              ${itField('Name', safeName)}
+              ${itField('Lifecycle state', lifecycleLabelHtml(it.lifecycle))}
+              ${itField('Created', String(it.created || '—').replace(/</g, '&lt;'))}
+              ${itField('CPU cores', String(it.cpu))}
+              ${itField('Memory (GiB)', String(it.memoryGiB))}
+            </dl>
           </div>
           <div class="vm-card">
             <div class="vm-card__title-row">
               <h3 class="vm-card__title">GPU</h3>
             </div>
-            <div class="it-fields">
-              <div class="it-fields__col">
-                ${itField('Count', gpuCount)}
-                ${itField('Resource name', gpuResource)}
-              </div>
-              <div class="it-fields__col">
-                ${itField('PCI device selector', gpuPci)}
-              </div>
-            </div>
+            <dl class="vm-dl">
+              ${itField('Count', gpuCount)}
+              ${itField('PCI device selector', gpuPci)}
+              ${itField('Resource name', gpuResource)}
+            </dl>
           </div>
         </div>
       `;
