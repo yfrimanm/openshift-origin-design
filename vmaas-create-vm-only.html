@@ -63,9 +63,10 @@
     .console__masthead {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       flex: 0 0 auto;
-      /* Ethan masthead: solid top bar (not frosted — avoids looking cut against the backdrop) */
-      padding-block: var(--pf-t--global--spacer--md, 16px);
+      /* Ethan masthead: solid top bar with clear space above controls */
+      padding-block: 20px;
       padding-inline: var(--pf-t--global--spacer--inset--page-chrome, 24px);
+      padding-top: max(20px, env(safe-area-inset-top, 0px));
       border-bottom: var(--pf-t--global--border--width--regular, 1px) solid
         var(--pf-t--global--border--color--default, var(--vmaas-border-light));
       font-size: 13px;
