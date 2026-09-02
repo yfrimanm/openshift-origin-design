@@ -1389,17 +1389,9 @@
       margin: 4px 0 0; font-size: 14px; color: var(--vmaas-text-subtle);
     }
     .columns-modal__body { padding: 8px 24px 8px; }
-    .columns-modal__alert {
-      display: flex; gap: 12px; align-items: flex-start;
-      padding: 12px 16px; margin-bottom: 20px;
-      border: 1px solid #b2a3ff; border-radius: 8px;
-      background: #f2f0fc; color: var(--vmaas-text);
+    .columns-modal__body > .pf-v6-c-alert {
+      margin-bottom: 20px;
     }
-    .columns-modal__alert-icon {
-      color: #5752d1; font-size: 16px; margin-top: 2px; flex-shrink: 0;
-    }
-    .columns-modal__alert strong { display: block; font-size: 14px; margin-bottom: 2px; }
-    .columns-modal__alert p { margin: 0; font-size: 14px; color: var(--vmaas-text); }
     .columns-modal__grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 24px 40px;
     }
@@ -4600,10 +4592,10 @@
           </button>
         </div>
         <div class="columns-modal__body">
-          <div class="columns-modal__alert" role="note">
-            <i class="fa-solid fa-circle-info columns-modal__alert-icon" aria-hidden="true"></i>
-            <div>
-              <strong>You can select up to 10 columns</strong>
+          <div class="pf-v6-c-alert pf-m-inline pf-m-info" role="status">
+            <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
+            <div class="pf-v6-c-alert__title">You can select up to 10 columns</div>
+            <div class="pf-v6-c-alert__description">
               <p>The project column is only shown when in "All projects"</p>
             </div>
           </div>
