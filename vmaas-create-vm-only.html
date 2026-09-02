@@ -314,7 +314,10 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-    .console__nav .pf-v6-c-nav__item.pf-m-expandable {
+    .console__nav .pf-v6-c-nav__item[hidden],
+    .console__nav .pf-v6-c-nav__link[hidden] {
+      display: none !important;
+    }
       display: block !important;
     }
     /* Ethan / PF glass main container: soft panel, less contrasty than flat white. */
@@ -344,6 +347,52 @@
     }
     .page-header .page-title { min-width: 0; flex: 1 1 auto; }
     .page-header > .pf-v6-c-button { flex: 0 0 auto; }
+    .page-header--with-desc { align-items: flex-start; }
+    .page-header__text { min-width: 0; flex: 1 1 auto; }
+    .page-header__text .page-title { flex: none; margin-bottom: 4px; }
+    .page-desc {
+      margin: 0;
+      max-width: 52rem;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle);
+    }
+    .lifecycle-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 0 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .lifecycle-label.pf-m-active { color: #0f2808; background: #bde5b8; }
+    .lifecycle-label.pf-m-obsolete { color: #1f1f1f; background: #f0f0f0; }
+    .lifecycle-label.pf-m-deprecated { color: #795600; background: #f9e0a2; }
+    .create-it-page {
+      max-width: 560px;
+    }
+    .create-it-page .page-title {
+      margin-bottom: 20px;
+    }
+    .create-it-page .form-field textarea {
+      min-height: 88px;
+    }
+    .create-it-section-title {
+      margin: 8px 0 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--vmaas-text);
+    }
+    .create-it-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
     .page-title {
       margin: 0; display: flex; align-items: center; gap: 8px;
       /* Size/weight from pf-v6-c-title pf-m-2xl pf-m-page-title (24px / bold) */
@@ -1078,6 +1127,22 @@
     }
     .form-field input[type="number"].unit-size-input:hover:not(:disabled) {
       border-color: var(--pf-t--global--border--color--hover, #2b9af3);
+    }
+    /* Wizard-style size fields: show native steppers on hover/focus */
+    .form-field input[type="number"].unit-size-input::-webkit-outer-spin-button,
+    .form-field input[type="number"].unit-size-input::-webkit-inner-spin-button {
+      -webkit-appearance: inner-spin-button;
+      appearance: auto;
+      opacity: 0;
+      margin: 0;
+      height: 26px;
+      cursor: pointer;
+    }
+    .form-field input[type="number"].unit-size-input:hover:not(:disabled)::-webkit-outer-spin-button,
+    .form-field input[type="number"].unit-size-input:hover:not(:disabled)::-webkit-inner-spin-button,
+    .form-field input[type="number"].unit-size-input:focus:not(:disabled)::-webkit-outer-spin-button,
+    .form-field input[type="number"].unit-size-input:focus:not(:disabled)::-webkit-inner-spin-button {
+      opacity: 1;
     }
     .form-field input.unit-size-input:disabled,
     .form-field input[type="number"].unit-size-input:disabled {
@@ -3884,10 +3949,11 @@
         <span class="muted" id="role-badge">Tenant Admin</span>
         <div class="console__masthead-role">
           <span class="demo-bar__label">Role</span>
-          <span class="pf-v6-c-form-control" style="width:auto;min-width:220px;">
+          <span class="pf-v6-c-form-control" style="width:auto;min-width:260px;">
             <select id="role-select" aria-label="OSAC persona">
               <option value="admin" selected>Tenant Admin</option>
               <option value="user">Tenant User</option>
+              <option value="provider">Cloud provider admin</option>
             </select>
             <span class="pf-v6-c-form-control__utilities">
               <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
@@ -3946,6 +4012,26 @@
                   </li>
                   <li class="pf-v6-c-nav__item">
                     <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="security-groups">Security groups</button>
+                  </li>
+                </ul>
+              </section>
+            </li>
+            <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded" id="nav-infrastructure" hidden>
+              <button type="button" class="pf-v6-c-nav__link" id="nav-infrastructure-toggle" aria-expanded="true" aria-controls="nav-infrastructure-sub">
+                Infrastructure
+                <span class="pf-v6-c-nav__toggle">
+                  <span class="pf-v6-c-nav__toggle-icon">
+                    <i class="fas fa-angle-right" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </button>
+              <section class="pf-v6-c-nav__subnav" id="nav-infrastructure-sub" aria-label="Infrastructure">
+                <ul class="pf-v6-c-nav__list">
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link" data-nav="instance-types">Instance types</button>
+                  </li>
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link" data-nav="disk-images">Disk images</button>
                   </li>
                 </ul>
               </section>
@@ -4186,6 +4272,125 @@
             <div class="page-header">
               <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Templates</h2>
               <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-tpl">Create</button>
+            </div>
+          </section>
+
+          <section class="view" id="view-instance-types">
+            <div class="page-header page-header--with-desc">
+              <div class="page-header__text">
+                <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Instance types</h2>
+                <p class="page-desc">Manage provider-defined instance types for this cloud platform.</p>
+              </div>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-instance-type">Create instance type</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr">
+                    <th class="pf-v6-c-table__th" scope="col">Name</th>
+                    <th class="pf-v6-c-table__th" scope="col">Lifecycle state</th>
+                    <th class="pf-v6-c-table__th" scope="col">CPU cores</th>
+                    <th class="pf-v6-c-table__th" scope="col">Memory (GiB)</th>
+                    <th class="pf-v6-c-table__th" scope="col">Disks</th>
+                    <th class="pf-v6-c-table__th" scope="col">Created</th>
+                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody" id="instance-types-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="view" id="view-disk-images">
+            <div class="page-header page-header--with-desc">
+              <div class="page-header__text">
+                <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Disk images</h2>
+                <p class="page-desc">Manage provider-defined disk images for this cloud platform.</p>
+              </div>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-disk-image">Create disk image</button>
+            </div>
+            <p class="muted" style="margin:0;font-size:14px;">No disk images in this mock yet.</p>
+          </section>
+
+          <section class="view" id="view-create-instance-type">
+            <div class="create-it-page">
+              <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+                <ol class="pf-v6-c-breadcrumb__list">
+                  <li class="pf-v6-c-breadcrumb__item">
+                    <a href="#" class="pf-v6-c-breadcrumb__link" id="create-it-crumb-list">Instance types</a>
+                    <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                      <i class="fas fa-angle-right"></i>
+                    </span>
+                  </li>
+                  <li class="pf-v6-c-breadcrumb__item">
+                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create</span>
+                  </li>
+                </ol>
+              </nav>
+              <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Create instance type</h2>
+              <form id="create-it-form" novalidate>
+                <div class="form-field" id="create-it-name-field">
+                  <label for="create-it-name">Name <span class="req">*</span></label>
+                  <input type="text" id="create-it-name" name="name" autocomplete="off" required />
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">Name must be a valid DNS label (RFC 1035)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="create-it-description">Description</label>
+                  <textarea id="create-it-description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-field">
+                  <label for="create-it-cpu">CPU cores <span class="req">*</span></label>
+                  <input type="number" id="create-it-cpu" class="unit-size-input" name="cpu" min="1" step="1" value="1" required />
+                </div>
+                <div class="form-field">
+                  <label for="create-it-memory">Memory (GiB) <span class="req">*</span></label>
+                  <input type="number" id="create-it-memory" class="unit-size-input" name="memory" min="1" step="1" value="2" required />
+                </div>
+                <h3 class="create-it-section-title">GPU</h3>
+                <div class="form-field">
+                  <label for="create-it-gpu-count">GPU count</label>
+                  <input type="number" id="create-it-gpu-count" class="unit-size-input" name="gpuCount" min="0" step="1" value="0" />
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">Number of GPU devices of this type</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="create-it-gpu-resource">Resource name</label>
+                  <input type="text" id="create-it-gpu-resource" name="gpuResource" placeholder="e.g nvidia.com/A100" autocomplete="off" />
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">Kubernetes device plugin resource name.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="create-it-gpu-pci">PCI device selector</label>
+                  <input type="text" id="create-it-gpu-pci" name="gpuPci" placeholder="2080" autocomplete="off" />
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">PCI device selector identifying the GPU hardware.</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="create-it-actions">
+                  <button type="submit" class="pf-v6-c-button pf-m-primary" id="create-it-submit">Create</button>
+                  <button type="button" class="pf-v6-c-button pf-m-link" id="create-it-cancel">Cancel</button>
+                </div>
+              </form>
             </div>
           </section>
         </div>
@@ -5622,14 +5827,12 @@
         { id: 'ip', label: 'IP address', sortable: false },
       ],
       additional: [
-        { id: 'conditions', label: 'Conditions', sortable: false },
-        { id: 'node', label: 'Node', sortable: true },
         { id: 'created', label: 'Created', sortable: true },
         { id: 'memory', label: 'Memory', sortable: false },
         { id: 'cpu', label: 'CPU', sortable: false },
         { id: 'network', label: 'Network', sortable: false },
         { id: 'deletionProtection', label: 'Deletion protection', sortable: false },
-        { id: 'storageClass', label: 'Storage class', sortable: false },
+        { id: 'storageClass', label: 'Storage tier', sortable: false },
       ],
     };
     const VM_COLUMN_META = Object.fromEntries(
@@ -5644,7 +5847,7 @@
 
     function getVmColumns() {
       const selected = Array.isArray(state.vmColumns) && state.vmColumns.length
-        ? state.vmColumns.slice()
+        ? state.vmColumns.filter(id => VM_COLUMN_META[id]).slice()
         : VM_COLUMN_DEFAULT.slice();
       return orderVmColumns(selected);
     }
@@ -6983,10 +7186,93 @@
 
     function setView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.toggle('pf-m-active', v.id === `view-${id}`));
-      const navId = id === 'vm' ? 'vms' : id;
+      const navId = id === 'vm' ? 'vms'
+        : id === 'create-instance-type' ? 'instance-types'
+        : id;
       document.querySelectorAll('.console__nav [data-nav]').forEach(n => {
         n.classList.toggle('pf-m-current', n.dataset.nav === navId);
       });
+    }
+
+    function formatInstanceTypeCreated(date = new Date()) {
+      const m = date.getMonth() + 1;
+      const d = date.getDate();
+      const y = date.getFullYear();
+      const hh = String(date.getHours()).padStart(2, '0');
+      const mm = String(date.getMinutes()).padStart(2, '0');
+      return `${m}/${d}/${y}, ${hh}:${mm}`;
+    }
+
+    function resetCreateInstanceTypeForm() {
+      const form = document.getElementById('create-it-form');
+      if (!form) return;
+      form.reset();
+      const cpu = document.getElementById('create-it-cpu');
+      const memory = document.getElementById('create-it-memory');
+      const gpuCount = document.getElementById('create-it-gpu-count');
+      if (cpu) cpu.value = '1';
+      if (memory) memory.value = '2';
+      if (gpuCount) gpuCount.value = '0';
+      document.getElementById('create-it-name-field')?.classList.remove('pf-m-error');
+    }
+
+    function openCreateInstanceType() {
+      resetCreateInstanceTypeForm();
+      setView('create-instance-type');
+      document.getElementById('create-it-name')?.focus();
+    }
+
+    function closeCreateInstanceType() {
+      setView('instance-types');
+      renderInstanceTypes();
+    }
+
+    function isValidDnsLabel(name) {
+      return /^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/.test(name);
+    }
+
+    function submitCreateInstanceType(e) {
+      e.preventDefault();
+      const nameField = document.getElementById('create-it-name-field');
+      const name = (document.getElementById('create-it-name')?.value || '').trim();
+      const cpu = Number(document.getElementById('create-it-cpu')?.value);
+      const memoryGiB = Number(document.getElementById('create-it-memory')?.value);
+      const gpuCount = Number(document.getElementById('create-it-gpu-count')?.value || 0);
+      const gpuResource = (document.getElementById('create-it-gpu-resource')?.value || '').trim();
+      const gpuPci = (document.getElementById('create-it-gpu-pci')?.value || '').trim();
+      const description = (document.getElementById('create-it-description')?.value || '').trim();
+
+      if (!name || !isValidDnsLabel(name)) {
+        nameField?.classList.add('pf-m-error');
+        document.getElementById('create-it-name')?.focus();
+        toast('Enter a valid DNS label for Name (RFC 1035).');
+        return;
+      }
+      nameField?.classList.remove('pf-m-error');
+      if (!Number.isFinite(cpu) || cpu < 1 || !Number.isFinite(memoryGiB) || memoryGiB < 1) {
+        toast('CPU cores and Memory (GiB) are required.');
+        return;
+      }
+      if (INSTANCE_TYPES.some(it => it.name === name)) {
+        nameField?.classList.add('pf-m-error');
+        toast(`Instance type ${name} already exists.`);
+        return;
+      }
+
+      INSTANCE_TYPES.unshift({
+        name,
+        lifecycle: 'Active',
+        cpu,
+        memoryGiB,
+        disks: null,
+        gpus: gpuCount > 0 ? gpuCount : null,
+        gpuResource: gpuResource || null,
+        gpuPci: gpuPci || null,
+        description: description || null,
+        created: formatInstanceTypeCreated(),
+      });
+      toast(`Created instance type ${name}.`);
+      closeCreateInstanceType();
     }
 
 
@@ -10968,9 +11254,12 @@
                 ${pfHelperText('Boot disk size is set by the template and can’t be changed during create. Add additional disks below if you need more storage.', 'f-boot-locked-help')}
               </div>
           `;
-          const bootTierFieldHtml = `
+          const bootTierFieldHtml = bootEditable ? `
               <div class="form-field">
-                <label for="f-boot-tier">Storage tier <span class="req">*</span></label>
+                <label for="f-boot-tier" class="label-with-optional">
+                  <span>Storage tier <span class="req">*</span></span>
+                  ${fieldGovLabel('editable')}
+                </label>
                 ${pfSelect({
                   id: 'f-boot-tier',
                   ariaLabel: 'Boot disk storage tier',
@@ -10980,6 +11269,23 @@
                   ).join('') || '<option value="">No storage tiers available</option>',
                 })}
                 ${pfHelperText('Storage tiers are defined by your cloud provider administrator.')}
+              </div>
+          ` : `
+              <div class="form-field">
+                <label for="f-boot-tier" class="label-with-optional">
+                  <span>Storage tier</span>
+                  ${fieldGovLabel('locked')}
+                </label>
+                ${pfSelect({
+                  id: 'f-boot-tier',
+                  ariaLabel: 'Boot disk storage tier',
+                  disabled: true,
+                  describedBy: 'f-boot-tier-locked-help',
+                  optionsHtml: tiers.map(t =>
+                    `<option value="${t.id}" ${d.bootStorageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
+                  ).join('') || '<option value="">No storage tiers available</option>',
+                })}
+                ${pfHelperText('Storage tier is set by the template and can’t be changed during create.', 'f-boot-tier-locked-help')}
               </div>
           `;
           const bootFieldHtml = `${bootSizeFieldHtml}${bootTierFieldHtml}`;
@@ -10994,7 +11300,7 @@
           `;
           const storageStepHelp = bootEditable
             ? 'Set the boot disk size and storage tier. Add additional disks if you need more storage.'
-            : 'Boot disk size is locked by the template. Choose a storage tier, and add additional disks below if needed.';
+            : 'Boot disk size and storage tier are locked by the template. Add additional disks below if needed.';
 
           panel.innerHTML = `
             <h3>Storage</h3>
@@ -11023,6 +11329,7 @@
             updateCostEstimate(key);
           };
           const syncBootTier = (tierId) => {
+            if (!bootEditable) return;
             d.bootStorageTierId = tierId;
             d.bootStorageTierLabel = tiers.find(t => t.id === tierId)?.name || tierId;
             if (Array.isArray(d.disks)) {
@@ -11037,8 +11344,8 @@
           if (bootEditable) {
             panel.querySelector('#f-boot-disk')?.addEventListener('input', e => syncBootDisk(e.target.value));
             panel.querySelector('#f-boot-disk')?.addEventListener('change', e => syncBootDisk(e.target.value));
+            panel.querySelector('#f-boot-tier')?.addEventListener('change', e => syncBootTier(e.target.value));
           }
-          panel.querySelector('#f-boot-tier')?.addEventListener('change', e => syncBootTier(e.target.value));
           panel.querySelector('#f-add-disk')?.addEventListener('click', addWizardExtraDisk);
           panel.querySelectorAll('[data-disk-size]').forEach(input => {
             const syncExtra = (raw) => {
@@ -11858,6 +12165,7 @@
         canCreateNetwork: true,
         canCreateOrgNetwork: true,
         canViewNetworks: true,
+        canManageInfrastructure: false,
       },
       user: {
         label: 'Tenant User',
@@ -11867,8 +12175,56 @@
         canCreateNetwork: false,
         canCreateOrgNetwork: false,
         canViewNetworks: true,
+        canManageInfrastructure: false,
+      },
+      provider: {
+        label: 'Cloud provider admin',
+        canCreate: false,
+        canPower: false,
+        canEditConfig: false,
+        canCreateNetwork: false,
+        canCreateOrgNetwork: false,
+        canViewNetworks: false,
+        canManageInfrastructure: true,
       },
     };
+
+    const INSTANCE_TYPES = [
+      { name: 'aaa', lifecycle: 'Active', cpu: 10, memoryGiB: 100, disks: null, created: '8/13/2024, 16:13' },
+      { name: 'bbb', lifecycle: 'Obsolete', cpu: 1, memoryGiB: 2, disks: 2, created: '8/12/2024, 22:52' },
+      { name: 'ddd', lifecycle: 'Active', cpu: 4, memoryGiB: 16, disks: null, created: '8/11/2024, 09:40' },
+      { name: 'Large_R_12', lifecycle: 'Deprecated', cpu: 8, memoryGiB: 32, disks: null, created: '8/10/2024, 21:22' },
+      { name: 'vm-type-1-018e6188-f805-7', lifecycle: 'Active', cpu: 4, memoryGiB: 16, disks: null, created: '11/14/2023, 12:37' },
+      { name: 'vm-type-1-small', lifecycle: 'Active', cpu: 1, memoryGiB: 2, disks: null, created: '11/17/2023, 10:35' },
+      { name: 'vm-type-1-medium', lifecycle: 'Active', cpu: 2, memoryGiB: 10, disks: null, created: '11/13/2023, 15:23' },
+      { name: 'vm-type-1-large', lifecycle: 'Active', cpu: 4, memoryGiB: 16, disks: null, created: '11/13/2023, 14:13' },
+      { name: 'vm-type-1-xlarge', lifecycle: 'Active', cpu: 4, memoryGiB: 32, disks: null, created: '11/13/2023, 14:05' },
+    ];
+
+    function lifecycleLabelHtml(state) {
+      const key = String(state || '').toLowerCase();
+      const mod = key === 'active' ? 'pf-m-active'
+        : key === 'obsolete' ? 'pf-m-obsolete'
+        : key === 'deprecated' ? 'pf-m-deprecated'
+        : 'pf-m-obsolete';
+      return `<span class="lifecycle-label ${mod}">${String(state || '—').replace(/</g, '&lt;')}</span>`;
+    }
+
+    function renderInstanceTypes() {
+      const tbody = document.getElementById('instance-types-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = INSTANCE_TYPES.map(it => `
+        <tr class="pf-v6-c-table__tr">
+          <td class="pf-v6-c-table__td"><a href="#" class="pf-v6-c-button pf-m-link pf-m-inline" data-instance-type="${String(it.name).replace(/"/g, '&quot;')}">${String(it.name).replace(/</g, '&lt;')}</a></td>
+          <td class="pf-v6-c-table__td">${lifecycleLabelHtml(it.lifecycle)}</td>
+          <td class="pf-v6-c-table__td">${it.cpu}</td>
+          <td class="pf-v6-c-table__td">${it.memoryGiB}</td>
+          <td class="pf-v6-c-table__td">${it.disks == null ? '—' : it.disks}</td>
+          <td class="pf-v6-c-table__td">${it.created}</td>
+          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${String(it.name).replace(/"/g, '&quot;')}"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
+        </tr>
+      `).join('');
+    }
 
     function applyRole() {
       const key = document.getElementById('role-select').value;
@@ -11878,10 +12234,12 @@
       const createTpl = document.getElementById('btn-create-tpl');
       const createNet = document.getElementById('btn-create-network');
       const navNetworks = document.querySelector('[data-nav="networks"]');
+      const navInfrastructure = document.getElementById('nav-infrastructure');
       createBtn.hidden = !role.canCreate;
       if (createTpl) createTpl.hidden = !role.canCreate;
       if (createNet) createNet.hidden = !role.canCreateNetwork;
       if (navNetworks) navNetworks.hidden = !role.canViewNetworks;
+      if (navInfrastructure) navInfrastructure.hidden = !role.canManageInfrastructure;
       syncVmActions();
       // Refresh Overview so config edit controls match the role
       if (state.selectedVmName && document.getElementById('view-vm')?.classList.contains('pf-m-active')) {
@@ -11890,6 +12248,18 @@
       }
       // If Networks hidden while viewing it, bounce to VMs
       if (!role.canViewNetworks && document.getElementById('view-networks')?.classList.contains('pf-m-active')) {
+        setView('vms');
+      }
+      // Cloud provider admin lands on Instance types; leave infra pages when switching away
+      const onInfra = document.getElementById('view-instance-types')?.classList.contains('pf-m-active')
+        || document.getElementById('view-disk-images')?.classList.contains('pf-m-active')
+        || document.getElementById('view-create-instance-type')?.classList.contains('pf-m-active');
+      if (role.canManageInfrastructure) {
+        if (!onInfra) {
+          setView('instance-types');
+          renderInstanceTypes();
+        }
+      } else if (onInfra) {
         setView('vms');
       }
     }
@@ -12188,8 +12558,31 @@
         closeWizard();
       }
       state.selectedVmName = null;
-      setView(b.dataset.nav);
+      const nav = b.dataset.nav;
+      setView(nav);
+      if (nav === 'instance-types') renderInstanceTypes();
     }));
+    document.getElementById('btn-create-instance-type')?.addEventListener('click', () => {
+      openCreateInstanceType();
+    });
+    document.getElementById('create-it-form')?.addEventListener('submit', submitCreateInstanceType);
+    document.getElementById('create-it-cancel')?.addEventListener('click', closeCreateInstanceType);
+    document.getElementById('create-it-crumb-list')?.addEventListener('click', e => {
+      e.preventDefault();
+      closeCreateInstanceType();
+    });
+    document.getElementById('create-it-name')?.addEventListener('input', () => {
+      document.getElementById('create-it-name-field')?.classList.remove('pf-m-error');
+    });
+    document.getElementById('btn-create-disk-image')?.addEventListener('click', () => {
+      toast('Create disk image is not implemented in this mock.');
+    });
+    document.getElementById('instance-types-tbody')?.addEventListener('click', e => {
+      const link = e.target.closest('[data-instance-type]');
+      if (!link) return;
+      e.preventDefault();
+      toast(`Instance type details for ${link.dataset.instanceType} are not implemented in this mock.`);
+    });
     document.getElementById('vm-tbody')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-open-vm]');
       if (!btn) return;
@@ -12214,10 +12607,12 @@
     }
     bindNavExpandable('nav-services-toggle', 'nav-services');
     bindNavExpandable('nav-networking-toggle', 'nav-networking');
+    bindNavExpandable('nav-infrastructure-toggle', 'nav-infrastructure');
 
     applyRole();
     initVmFilterDropdowns();
     renderVms();
+    renderInstanceTypes();
     wireStatusPopover();
     wireEditComputeModal();
     wireEditSshModal();
