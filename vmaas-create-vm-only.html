@@ -63,19 +63,15 @@
     .console__masthead {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       flex: 0 0 auto;
-      /* Ethan / PF glass masthead: frosted bar with room above controls */
+      /* Ethan masthead: solid top bar (not frosted — avoids looking cut against the backdrop) */
       padding-block: var(--pf-t--global--spacer--md, 16px);
       padding-inline: var(--pf-t--global--spacer--inset--page-chrome, 24px);
-      border-bottom: var(--pf-t--global--border--width--glass--default, 1px) solid
-        var(--pf-t--global--border--color--glass--default, transparent);
+      border-bottom: var(--pf-t--global--border--width--regular, 1px) solid
+        var(--pf-t--global--border--color--default, var(--vmaas-border-light));
       font-size: 13px;
-      background: var(
-        --pf-t--global--background--color--glass--primary--default,
-        hsla(0, 0%, 100%, 0.5)
-      );
-      backdrop-filter: var(--pf-t--global--background--filter--glass--blur--primary, blur(16px));
-      -webkit-backdrop-filter: var(--pf-t--global--background--filter--glass--blur--primary, blur(16px));
-      /* No upward box-shadow — .console overflow:hidden was clipping it and looked cut off */
+      background: var(--pf-t--global--background--color--floating--default, #fff);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       box-shadow: none;
       z-index: 1;
     }
