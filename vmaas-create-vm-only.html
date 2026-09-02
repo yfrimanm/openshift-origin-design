@@ -63,11 +63,18 @@
     .console__masthead {
       display: flex; align-items: center; justify-content: space-between; gap: 16px;
       flex: 0 0 auto;
-      /* Ethan / PF glass: no hard chrome divider — soft page backdrop shows through */
+      /* Ethan / PF glass masthead: soft frosted bar over page backdrop */
       padding: 8px var(--pf-t--global--spacer--inset--page-chrome, 24px);
-      border-bottom: none;
+      border-bottom: var(--pf-t--global--border--width--glass--default, 1px) solid
+        var(--pf-t--global--border--color--glass--default, transparent);
       font-size: 13px;
-      background: transparent;
+      background: var(
+        --pf-t--global--background--color--glass--primary--default,
+        hsla(0, 0%, 100%, 0.5)
+      );
+      backdrop-filter: var(--pf-t--global--background--filter--glass--blur--primary, blur(16px));
+      -webkit-backdrop-filter: var(--pf-t--global--background--filter--glass--blur--primary, blur(16px));
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, none);
     }
     .console__masthead-role {
       display: inline-flex;
@@ -262,7 +269,6 @@
       --pf-v6-c-nav__link--PaddingInlineEnd: calc(
         var(--pf-t--global--spacer--md, 16px) + var(--pf-t--global--spacer--xs, 4px)
       );
-      background: transparent;
     }
     /* Flex avoids PF grid + whitespace text nodes creating tall phantom rows. */
     .console__nav > .pf-v6-c-nav__list,
@@ -303,8 +309,19 @@
       overflow: visible;
       opacity: 1;
       translate: none;
+      visibility: visible;
       padding-block: var(--pf-t--global--spacer--sm, 8px);
       padding-inline-start: var(--pf-t--global--spacer--md, 16px);
+    }
+    /* Allow collapse: density overrides above must not keep subnav permanently open. */
+    .console__nav .pf-v6-c-nav__item.pf-m-expandable:not(.pf-m-expanded) > .pf-v6-c-nav__subnav,
+    .console__nav .pf-v6-c-nav__subnav[hidden] {
+      display: none !important;
+      max-height: 0 !important;
+      padding-block: 0 !important;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
     }
     .console__nav .pf-v6-c-nav__item.pf-m-expandable > .pf-v6-c-nav__link {
       font-weight: 600;
@@ -317,8 +334,6 @@
     .console__nav .pf-v6-c-nav__item[hidden],
     .console__nav .pf-v6-c-nav__link[hidden] {
       display: none !important;
-    }
-      display: block !important;
     }
     /* Ethan / PF glass main container: soft panel, less contrasty than flat white. */
     .console__content {
@@ -381,7 +396,7 @@
       min-height: 88px;
     }
     .create-it-section-title {
-      margin: 8px 0 16px;
+      margin: 28px 0 16px;
       font-size: 16px;
       font-weight: 600;
       color: var(--vmaas-text);
@@ -4283,7 +4298,7 @@
                     <th class="pf-v6-c-table__th" scope="col">Lifecycle state</th>
                     <th class="pf-v6-c-table__th" scope="col">CPU cores</th>
                     <th class="pf-v6-c-table__th" scope="col">Memory (GiB)</th>
-                    <th class="pf-v6-c-table__th" scope="col">Disks</th>
+                    <th class="pf-v6-c-table__th" scope="col">GPUs</th>
                     <th class="pf-v6-c-table__th" scope="col">Created</th>
                     <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
                   </tr>
@@ -4310,11 +4325,11 @@
                 <ol class="pf-v6-c-breadcrumb__list">
                   <li class="pf-v6-c-breadcrumb__item">
                     <a href="#" class="pf-v6-c-breadcrumb__link" id="create-it-crumb-list">Instance types</a>
-                    <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
-                      <i class="fas fa-angle-right"></i>
-                    </span>
                   </li>
                   <li class="pf-v6-c-breadcrumb__item">
+                    <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                      <i class="fas fa-angle-right" aria-hidden="true"></i>
+                    </span>
                     <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create</span>
                   </li>
                 </ol>
@@ -7256,7 +7271,6 @@
         lifecycle: 'Active',
         cpu,
         memoryGiB,
-        disks: null,
         gpus: gpuCount > 0 ? gpuCount : null,
         gpuResource: gpuResource || null,
         gpuPci: gpuPci || null,
@@ -12182,15 +12196,15 @@
     };
 
     const INSTANCE_TYPES = [
-      { name: 'aaa', lifecycle: 'Active', cpu: 10, memoryGiB: 100, disks: null, created: '8/13/2024, 16:13' },
-      { name: 'bbb', lifecycle: 'Obsolete', cpu: 1, memoryGiB: 2, disks: 2, created: '8/12/2024, 22:52' },
-      { name: 'ddd', lifecycle: 'Active', cpu: 4, memoryGiB: 16, disks: null, created: '8/11/2024, 09:40' },
-      { name: 'Large_R_12', lifecycle: 'Deprecated', cpu: 8, memoryGiB: 32, disks: null, created: '8/10/2024, 21:22' },
-      { name: 'vm-type-1-018e6188-f805-7', lifecycle: 'Active', cpu: 4, memoryGiB: 16, disks: null, created: '11/14/2023, 12:37' },
-      { name: 'vm-type-1-small', lifecycle: 'Active', cpu: 1, memoryGiB: 2, disks: null, created: '11/17/2023, 10:35' },
-      { name: 'vm-type-1-medium', lifecycle: 'Active', cpu: 2, memoryGiB: 10, disks: null, created: '11/13/2023, 15:23' },
-      { name: 'vm-type-1-large', lifecycle: 'Active', cpu: 4, memoryGiB: 16, disks: null, created: '11/13/2023, 14:13' },
-      { name: 'vm-type-1-xlarge', lifecycle: 'Active', cpu: 4, memoryGiB: 32, disks: null, created: '11/13/2023, 14:05' },
+      { name: 'aaa', lifecycle: 'Active', cpu: 10, memoryGiB: 100, gpus: null, created: '8/13/2024, 16:13' },
+      { name: 'bbb', lifecycle: 'Obsolete', cpu: 1, memoryGiB: 2, gpus: 2, created: '8/12/2024, 22:52' },
+      { name: 'ddd', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, created: '8/11/2024, 09:40' },
+      { name: 'Large_R_12', lifecycle: 'Deprecated', cpu: 8, memoryGiB: 32, gpus: null, created: '8/10/2024, 21:22' },
+      { name: 'vm-type-1-018e6188-f805-7', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, created: '11/14/2023, 12:37' },
+      { name: 'vm-type-1-small', lifecycle: 'Active', cpu: 1, memoryGiB: 2, gpus: null, created: '11/17/2023, 10:35' },
+      { name: 'vm-type-1-medium', lifecycle: 'Active', cpu: 2, memoryGiB: 10, gpus: null, created: '11/13/2023, 15:23' },
+      { name: 'vm-type-1-large', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, created: '11/13/2023, 14:13' },
+      { name: 'vm-type-1-xlarge', lifecycle: 'Active', cpu: 4, memoryGiB: 32, gpus: null, created: '11/13/2023, 14:05' },
     ];
 
     function lifecycleLabelHtml(state) {
@@ -12211,7 +12225,7 @@
           <td class="pf-v6-c-table__td">${lifecycleLabelHtml(it.lifecycle)}</td>
           <td class="pf-v6-c-table__td">${it.cpu}</td>
           <td class="pf-v6-c-table__td">${it.memoryGiB}</td>
-          <td class="pf-v6-c-table__td">${it.disks == null ? '—' : it.disks}</td>
+          <td class="pf-v6-c-table__td">${it.gpus == null ? '—' : it.gpus}</td>
           <td class="pf-v6-c-table__td">${it.created}</td>
           <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${String(it.name).replace(/"/g, '&quot;')}"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
         </tr>
@@ -12595,6 +12609,11 @@
         const expanded = !item.classList.contains('pf-m-expanded');
         item.classList.toggle('pf-m-expanded', expanded);
         toggle.setAttribute('aria-expanded', String(expanded));
+        const subId = toggle.getAttribute('aria-controls');
+        const subnav = subId
+          ? document.getElementById(subId)
+          : item.querySelector(':scope > .pf-v6-c-nav__subnav');
+        if (subnav) subnav.hidden = !expanded;
       });
     }
     bindNavExpandable('nav-services-toggle', 'nav-services');
