@@ -635,6 +635,53 @@
       vertical-align: middle;
     }
 
+    /* Instance type details — stacked label/value fields in a 2-col card grid */
+    .it-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px 48px;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .it-fields { grid-template-columns: 1fr; }
+    }
+    .it-fields__col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+    .it-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .it-field__label {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vmaas-text);
+    }
+    .it-field__value {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--vmaas-text);
+      word-break: break-word;
+    }
+    #it-actions-menu:not(.pf-m-open) { display: none; }
+    #it-actions-menu.pf-m-open {
+      display: block;
+      position: fixed;
+      z-index: 450;
+      min-width: 14rem;
+      max-width: 18rem;
+    }
+    #it-actions-menu .pf-v6-c-menu__item.pf-m-danger {
+      color: var(--pf-t--global--text--color--status--danger--default, #c9190b);
+    }
+
     .vm-compute-row {
       display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
@@ -4308,6 +4355,10 @@
             </div>
           </section>
 
+          <section class="view" id="view-instance-type">
+            <div id="it-detail-root"></div>
+          </section>
+
           <section class="view" id="view-disk-images">
             <div class="page-header page-header--with-desc">
               <div class="page-header__text">
@@ -4591,6 +4642,12 @@
           </button>
         </li>
       </ul>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-menu" id="it-actions-menu" hidden role="menu" aria-label="Instance type actions">
+    <div class="pf-v6-c-menu__content">
+      <ul class="pf-v6-c-menu__list" role="menu" id="it-actions-menu-list"></ul>
     </div>
   </div>
 
@@ -5815,6 +5872,8 @@
       vmColumns: null, // set from DEFAULT_VM_COLUMNS
       vmColumnsDraft: null,
       selectedVmName: null,
+      selectedInstanceTypeName: null,
+      itActionsOpen: false,
       vmDetailTab: 'overview', // overview | configuration | …
       vmConfigSection: 'details', // details | storage | network | …
       nicMenuOpen: null, // nic name with open kebab (unused)
@@ -7194,7 +7253,7 @@
     function setView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.toggle('pf-m-active', v.id === `view-${id}`));
       const navId = id === 'vm' ? 'vms'
-        : id === 'create-instance-type' ? 'instance-types'
+        : (id === 'create-instance-type' || id === 'instance-type') ? 'instance-types'
         : id;
       document.querySelectorAll('.console__nav [data-nav]').forEach(n => {
         n.classList.toggle('pf-m-current', n.dataset.nav === navId);
@@ -12196,15 +12255,15 @@
     };
 
     const INSTANCE_TYPES = [
-      { name: 'aaa', lifecycle: 'Active', cpu: 10, memoryGiB: 100, gpus: null, created: '8/13/2024, 16:13' },
-      { name: 'bbb', lifecycle: 'Obsolete', cpu: 1, memoryGiB: 2, gpus: 2, created: '8/12/2024, 22:52' },
-      { name: 'ddd', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, created: '8/11/2024, 09:40' },
-      { name: 'Large_R_12', lifecycle: 'Deprecated', cpu: 8, memoryGiB: 32, gpus: null, created: '8/10/2024, 21:22' },
-      { name: 'vm-type-1-018e6188-f805-7', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, created: '11/14/2023, 12:37' },
-      { name: 'vm-type-1-small', lifecycle: 'Active', cpu: 1, memoryGiB: 2, gpus: null, created: '11/17/2023, 10:35' },
-      { name: 'vm-type-1-medium', lifecycle: 'Active', cpu: 2, memoryGiB: 10, gpus: null, created: '11/13/2023, 15:23' },
-      { name: 'vm-type-1-large', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, created: '11/13/2023, 14:13' },
-      { name: 'vm-type-1-xlarge', lifecycle: 'Active', cpu: 4, memoryGiB: 32, gpus: null, created: '11/13/2023, 14:05' },
+      { name: 'aaa', lifecycle: 'Active', cpu: 10, memoryGiB: 100, gpus: null, gpuPci: null, gpuResource: null, created: '8/13/2024, 16:13' },
+      { name: 'bbb', lifecycle: 'Obsolete', cpu: 1, memoryGiB: 2, gpus: 2, gpuPci: '20B0', gpuResource: 'nvidia.com/A100', created: '8/12/2024, 22:52' },
+      { name: 'ddd', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, gpuPci: null, gpuResource: null, created: '8/11/2024, 09:40' },
+      { name: 'Large_R_12', lifecycle: 'Deprecated', cpu: 8, memoryGiB: 32, gpus: 1, gpuPci: '2080', gpuResource: 'nvidia.com/T4', created: '8/10/2024, 21:22' },
+      { name: 'vm-type-1-018e6188-f805-7', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, gpuPci: null, gpuResource: null, created: '11/14/2023, 12:37' },
+      { name: 'vm-type-1-small', lifecycle: 'Active', cpu: 1, memoryGiB: 2, gpus: null, gpuPci: null, gpuResource: null, created: '11/17/2023, 10:35' },
+      { name: 'vm-type-1-medium', lifecycle: 'Active', cpu: 2, memoryGiB: 10, gpus: null, gpuPci: null, gpuResource: null, created: '11/13/2023, 15:23' },
+      { name: 'vm-type-1-large', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, gpuPci: null, gpuResource: null, created: '11/13/2023, 14:13' },
+      { name: 'vm-type-1-xlarge', lifecycle: 'Active', cpu: 4, memoryGiB: 32, gpus: null, gpuPci: null, gpuResource: null, created: '11/13/2023, 14:05' },
     ];
 
     function lifecycleLabelHtml(state) {
@@ -12214,6 +12273,228 @@
         : key === 'deprecated' ? 'pf-m-deprecated'
         : 'pf-m-obsolete';
       return `<span class="lifecycle-label ${mod}">${String(state || '—').replace(/</g, '&lt;')}</span>`;
+    }
+
+    function itField(label, valueHtml) {
+      return `<div class="it-field">
+        <div class="it-field__label">${label}</div>
+        <div class="it-field__value">${valueHtml}</div>
+      </div>`;
+    }
+
+    function normalizeInstanceTypeLifecycle(state) {
+      const key = String(state || '').toLowerCase();
+      if (key === 'active') return 'Active';
+      if (key === 'deprecated') return 'Deprecated';
+      if (key === 'obsolete') return 'Obsolete';
+      return state || 'Active';
+    }
+
+    /** Lifecycle actions from the product state table. Delete is available in every state. */
+    function instanceTypeLifecycleActions(lifecycle) {
+      const current = normalizeInstanceTypeLifecycle(lifecycle);
+      const actions = [];
+      if (current !== 'Active') {
+        actions.push({ id: 'set-active', label: 'Set Active' });
+      }
+      if (current !== 'Deprecated') {
+        actions.push({ id: 'deprecate', label: 'Deprecate' });
+      }
+      if (current !== 'Obsolete') {
+        actions.push({ id: 'mark-obsolete', label: 'Mark Obsolete' });
+      }
+      actions.push({ id: 'delete', label: 'Delete', danger: true });
+      return actions;
+    }
+
+    function closeInstanceTypeActionsMenu() {
+      const menu = document.getElementById('it-actions-menu');
+      const btn = document.getElementById('it-detail-actions-btn');
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('pf-m-open');
+      }
+      if (btn) {
+        btn.classList.remove('pf-m-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+      state.itActionsOpen = false;
+    }
+
+    function openInstanceTypeActionsMenu(btn) {
+      const menu = document.getElementById('it-actions-menu');
+      const list = document.getElementById('it-actions-menu-list');
+      const it = INSTANCE_TYPES.find(x => x.name === state.selectedInstanceTypeName);
+      if (!menu || !list || !btn || !it) return;
+
+      const alreadyOpen = state.itActionsOpen && menu.classList.contains('pf-m-open');
+      closeInstanceTypeActionsMenu();
+      closeVmKebabMenu();
+      if (alreadyOpen) return;
+
+      const actions = instanceTypeLifecycleActions(it.lifecycle);
+      list.innerHTML = actions.map((a, i) => {
+        const sep = a.id === 'delete' && i > 0
+          ? `<li class="pf-v6-c-divider" role="separator"></li>`
+          : '';
+        return `${sep}<li class="pf-v6-c-menu__list-item" role="none">
+          <button class="pf-v6-c-menu__item${a.danger ? ' pf-m-danger' : ''}" type="button" role="menuitem" data-it-action="${a.id}">
+            <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">${a.label}</span></span>
+          </button>
+        </li>`;
+      }).join('');
+
+      menu.hidden = false;
+      menu.classList.add('pf-m-open');
+      btn.classList.add('pf-m-expanded');
+      btn.setAttribute('aria-expanded', 'true');
+      state.itActionsOpen = true;
+
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = Math.max(menu.offsetWidth || 224, 224);
+      let left = rect.right - menuWidth;
+      if (left < 8) left = 8;
+      let top = rect.bottom + 4;
+      const menuHeight = menu.offsetHeight || 160;
+      if (top + menuHeight > window.innerHeight - 8) {
+        top = Math.max(8, rect.top - menuHeight - 4);
+      }
+      menu.style.left = `${Math.round(left)}px`;
+      menu.style.top = `${Math.round(top)}px`;
+    }
+
+    function applyInstanceTypeLifecycleAction(actionId) {
+      const name = state.selectedInstanceTypeName;
+      const idx = INSTANCE_TYPES.findIndex(x => x.name === name);
+      if (idx < 0) return;
+      const it = INSTANCE_TYPES[idx];
+      closeInstanceTypeActionsMenu();
+
+      if (actionId === 'set-active') {
+        it.lifecycle = 'Active';
+        toast(`Instance type ${name} set to Active.`);
+        renderInstanceTypeDetail();
+        return;
+      }
+      if (actionId === 'deprecate') {
+        it.lifecycle = 'Deprecated';
+        toast(`Instance type ${name} deprecated.`);
+        renderInstanceTypeDetail();
+        return;
+      }
+      if (actionId === 'mark-obsolete') {
+        it.lifecycle = 'Obsolete';
+        toast(`Instance type ${name} marked Obsolete.`);
+        renderInstanceTypeDetail();
+        return;
+      }
+      if (actionId === 'delete') {
+        INSTANCE_TYPES.splice(idx, 1);
+        state.selectedInstanceTypeName = null;
+        toast(`Deleted instance type ${name}.`);
+        setView('instance-types');
+        renderInstanceTypes();
+      }
+    }
+
+    function openInstanceTypeDetail(name) {
+      const it = INSTANCE_TYPES.find(x => x.name === name);
+      if (!it) return;
+      state.selectedInstanceTypeName = name;
+      closeInstanceTypeActionsMenu();
+      setView('instance-type');
+      renderInstanceTypeDetail();
+    }
+
+    function renderInstanceTypeDetail() {
+      const root = document.getElementById('it-detail-root');
+      if (!root) return;
+      const it = INSTANCE_TYPES.find(x => x.name === state.selectedInstanceTypeName);
+      if (!it) {
+        root.innerHTML = '<p class="muted">Instance type not found.</p>';
+        return;
+      }
+      const safeName = String(it.name).replace(/</g, '&lt;');
+      const gpuCount = it.gpus == null ? '—' : String(it.gpus);
+      const gpuPci = it.gpuPci ? String(it.gpuPci).replace(/</g, '&lt;') : '—';
+      const gpuResource = it.gpuResource ? String(it.gpuResource).replace(/</g, '&lt;') : '—';
+
+      root.innerHTML = `
+        <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol class="pf-v6-c-breadcrumb__list">
+            <li class="pf-v6-c-breadcrumb__item">
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-instance-types>Instance types</a>
+            </li>
+            <li class="pf-v6-c-breadcrumb__item">
+              <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeName}</span>
+            </li>
+          </ol>
+        </nav>
+        <div class="vm-detail__header">
+          <div class="vm-detail__title-row">
+            <h2 class="vm-detail__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safeName}</h2>
+            <span class="vm-detail__status">${lifecycleLabelHtml(it.lifecycle)}</span>
+          </div>
+          <div class="vm-detail__actions" role="group" aria-label="Instance type actions">
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary vm-action-menu" id="it-detail-actions-btn"
+              aria-expanded="false" aria-haspopup="menu" aria-controls="it-actions-menu">
+              <span class="pf-v6-c-menu-toggle__text">Actions</span>
+              <span class="pf-v6-c-menu-toggle__controls">
+                <span class="pf-v6-c-menu-toggle__toggle-icon">
+                  <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="vm-overview">
+          <div class="vm-card">
+            <div class="vm-card__title-row">
+              <h3 class="vm-card__title">Details</h3>
+            </div>
+            <div class="it-fields">
+              <div class="it-fields__col">
+                ${itField('Name', safeName)}
+                ${itField('Lifecycle state', lifecycleLabelHtml(it.lifecycle))}
+                ${itField('Created', String(it.created || '—').replace(/</g, '&lt;'))}
+              </div>
+              <div class="it-fields__col">
+                ${itField('CPU cores', String(it.cpu))}
+                ${itField('Memory (GiB)', String(it.memoryGiB))}
+              </div>
+            </div>
+          </div>
+          <div class="vm-card">
+            <div class="vm-card__title-row">
+              <h3 class="vm-card__title">GPU</h3>
+            </div>
+            <div class="it-fields">
+              <div class="it-fields__col">
+                ${itField('Count', gpuCount)}
+                ${itField('Resource name', gpuResource)}
+              </div>
+              <div class="it-fields__col">
+                ${itField('PCI device selector', gpuPci)}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      root.querySelector('[data-breadcrumb-instance-types]')?.addEventListener('click', e => {
+        e.preventDefault();
+        closeInstanceTypeActionsMenu();
+        state.selectedInstanceTypeName = null;
+        setView('instance-types');
+        renderInstanceTypes();
+      });
+      root.querySelector('#it-detail-actions-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        openInstanceTypeActionsMenu(e.currentTarget);
+      });
     }
 
     function renderInstanceTypes() {
@@ -12258,6 +12539,7 @@
       }
       // Cloud provider admin lands on Instance types; leave infra pages when switching away
       const onInfra = document.getElementById('view-instance-types')?.classList.contains('pf-m-active')
+        || document.getElementById('view-instance-type')?.classList.contains('pf-m-active')
         || document.getElementById('view-disk-images')?.classList.contains('pf-m-active')
         || document.getElementById('view-create-instance-type')?.classList.contains('pf-m-active');
       if (role.canManageInfrastructure) {
@@ -12266,6 +12548,8 @@
           renderInstanceTypes();
         }
       } else if (onInfra) {
+        state.selectedInstanceTypeName = null;
+        closeInstanceTypeActionsMenu();
         setView('vms');
       }
     }
@@ -12564,6 +12848,8 @@
         closeWizard();
       }
       state.selectedVmName = null;
+      state.selectedInstanceTypeName = null;
+      closeInstanceTypeActionsMenu();
       const nav = b.dataset.nav;
       setView(nav);
       if (nav === 'instance-types') renderInstanceTypes();
@@ -12587,7 +12873,13 @@
       const link = e.target.closest('[data-instance-type]');
       if (!link) return;
       e.preventDefault();
-      toast(`Instance type details for ${link.dataset.instanceType} are not implemented in this mock.`);
+      openInstanceTypeDetail(link.dataset.instanceType);
+    });
+    document.getElementById('it-actions-menu')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-it-action]');
+      if (!btn) return;
+      e.preventDefault();
+      applyInstanceTypeLifecycleAction(btn.dataset.itAction);
     });
     document.getElementById('vm-tbody')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-open-vm]');
@@ -12599,6 +12891,11 @@
         state.nicMenuOpen = null;
         state.overviewMenuOpen = null;
         if (document.getElementById('view-vm')?.classList.contains('pf-m-active')) renderVmDetail();
+      }
+      if (state.itActionsOpen
+        && !e.target.closest('#it-actions-menu')
+        && !e.target.closest('#it-detail-actions-btn')) {
+        closeInstanceTypeActionsMenu();
       }
     });
     function bindNavExpandable(toggleId, itemId) {
