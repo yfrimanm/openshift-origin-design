@@ -13731,9 +13731,16 @@
     renderNetworks();
 
     try {
-      const createParam = new URLSearchParams(window.location.search).get('create');
-      if (createParam === '1') {
+      const params = new URLSearchParams(window.location.search);
+      const createParam = params.get('create');
+      const vmParam = params.get('vm');
+      const viewParam = params.get('view');
+      if (createParam === '1' || viewParam === 'create') {
         openWizard('template');
+      } else if (vmParam || viewParam === 'overview') {
+        const vmName = vmParam || 'azure-baboon-27';
+        const exists = VMS.some(v => v.name === vmName);
+        openVmDetail(exists ? vmName : 'azure-baboon-27', 'overview');
       }
     } catch (e) { /* ignore */ }
   </script>
