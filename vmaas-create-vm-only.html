@@ -732,8 +732,10 @@
       word-break: break-word;
     }
     /* Actions / kebab menus — Ethan / Instance type pattern: Delete is danger/red */
-    #it-actions-menu:not(.pf-m-open) { display: none; }
-    #it-actions-menu.pf-m-open {
+    #it-actions-menu:not(.pf-m-open),
+    #di-actions-menu:not(.pf-m-open) { display: none; }
+    #it-actions-menu.pf-m-open,
+    #di-actions-menu.pf-m-open {
       display: block;
       position: fixed;
       z-index: 450;
@@ -741,18 +743,95 @@
       max-width: 20rem;
     }
     #it-actions-menu .pf-v6-c-divider,
+    #di-actions-menu .pf-v6-c-divider,
     #vm-kebab-menu .pf-v6-c-divider,
     #vm-actions-menu .pf-v6-c-divider,
     .overview-row-menu .pf-v6-c-divider {
       margin-block: 0.25rem;
     }
     #it-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
+    #di-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     #vm-kebab-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     #vm-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     .actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     .overview-row-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text {
       color: var(--pf-t--global--text--color--status--danger--default, #c9190b);
     }
+    .infra-list-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin: 0 0 16px;
+    }
+    .infra-list-toolbar .form-check {
+      margin: 0;
+      font-size: 14px;
+    }
+    .create-it-page .form-field select,
+    .create-it-page .form-readonly {
+      width: 100%;
+      padding: 6px 12px;
+      font-size: 14px;
+      min-height: 36px;
+      box-sizing: border-box;
+      border: 1px solid var(--vmaas-border);
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      background: #fff;
+      color: var(--vmaas-text);
+    }
+    .create-it-page .form-readonly {
+      display: flex;
+      align-items: center;
+      color: var(--vmaas-text);
+      background: var(--pf-t--global--background--color--secondary--default, #fafafa);
+    }
+    .arch-multi {
+      position: relative;
+    }
+    .arch-multi__toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 14px;
+      min-height: 36px;
+      box-sizing: border-box;
+      border: 1px solid var(--vmaas-border);
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      background: #fff;
+      color: var(--vmaas-text);
+      cursor: pointer;
+      text-align: left;
+    }
+    .arch-multi__toggle .placeholder { color: var(--vmaas-text-subtle, #6a6e73); }
+    .arch-multi__menu {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      margin: 0;
+      padding: 8px 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid var(--vmaas-border);
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .arch-multi__menu[hidden] { display: none; }
+    .arch-multi__menu label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 6px 12px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .arch-multi__menu label:hover { background: var(--pf-t--global--background--color--secondary--default, #f0f0f0); }
 
     .vm-compute-row {
       display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -2649,6 +2728,8 @@
     /* Validation error — danger border wins over default/focus blue (MTV Create plan pattern). */
     .form-field.pf-m-error > input,
     .form-field.pf-m-error > textarea,
+    .form-field.pf-m-error > select,
+    .form-field.pf-m-error > .arch-multi__toggle,
     .form-field.pf-m-error > .pf-v6-c-form-control,
     .form-field.pf-m-error > .create-search .pf-v6-c-form-control,
     .form-field.pf-m-error > .sg-select,
@@ -4440,7 +4521,106 @@
               </div>
               <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-disk-image">Create disk image</button>
             </div>
-            <p class="muted" style="margin:0;font-size:14px;">No disk images in this mock yet.</p>
+            <div class="infra-list-toolbar">
+              <label class="form-check">
+                <input type="checkbox" id="di-show-obsolete" />
+                Show obsolete
+              </label>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr">
+                    <th class="pf-v6-c-table__th" scope="col">Name</th>
+                    <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
+                    <th class="pf-v6-c-table__th" scope="col">Guest OS family</th>
+                    <th class="pf-v6-c-table__th" scope="col">Architecture</th>
+                    <th class="pf-v6-c-table__th" scope="col">Scope</th>
+                    <th class="pf-v6-c-table__th" scope="col">Created</th>
+                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="view" id="view-disk-image">
+            <div id="di-detail-root"></div>
+          </section>
+
+          <section class="view" id="view-create-disk-image">
+            <div class="create-it-page">
+              <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+                <ol class="pf-v6-c-breadcrumb__list">
+                  <li class="pf-v6-c-breadcrumb__item">
+                    <a href="#" class="pf-v6-c-breadcrumb__link" id="create-di-crumb-list">Disk images</a>
+                  </li>
+                  <li class="pf-v6-c-breadcrumb__item">
+                    <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                      <i class="fas fa-angle-right" aria-hidden="true"></i>
+                    </span>
+                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create</span>
+                  </li>
+                </ol>
+              </nav>
+              <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Create disk image</h2>
+              <form id="create-di-form" novalidate>
+                <div class="form-field" id="create-di-name-field">
+                  <label for="create-di-name">Name <span class="req">*</span></label>
+                  <input type="text" id="create-di-name" name="name" autocomplete="off" required />
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">Name must be a valid DNS label (RFC 1035).</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="create-di-source-type">Source type</label>
+                  <div class="form-readonly" id="create-di-source-type">Registry</div>
+                </div>
+                <div class="form-field" id="create-di-source-ref-field">
+                  <label for="create-di-source-ref">Source reference <span class="req">*</span></label>
+                  <input type="text" id="create-di-source-ref" name="sourceRef" autocomplete="off" required />
+                </div>
+                <div class="form-field">
+                  <label for="create-di-guest-os">Guest OS family <span class="req">*</span></label>
+                  <select id="create-di-guest-os" name="guestOsFamily" required>
+                    <option value="Linux" selected>Linux</option>
+                    <option value="Windows">Windows</option>
+                  </select>
+                </div>
+                <div class="form-field" id="create-di-arch-field">
+                  <label id="create-di-arch-label">Architecture <span class="req">*</span></label>
+                  <div class="arch-multi" id="create-di-arch">
+                    <button type="button" class="arch-multi__toggle" id="create-di-arch-toggle" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="create-di-arch-label">
+                      <span class="placeholder" id="create-di-arch-label-text">Select options</span>
+                      <i class="fas fa-caret-down" aria-hidden="true"></i>
+                    </button>
+                    <ul class="arch-multi__menu" id="create-di-arch-menu" role="listbox" aria-labelledby="create-di-arch-label" hidden>
+                      <li><label><input type="checkbox" name="architecture" value="amd64" /> amd64</label></li>
+                      <li><label><input type="checkbox" name="architecture" value="arm64" /> arm64</label></li>
+                      <li><label><input type="checkbox" name="architecture" value="s390x" /> s390x</label></li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="create-di-scope">Scope</label>
+                  <select id="create-di-scope" name="scope">
+                    <option value="Global" selected>Global</option>
+                    <option value="project-a">project-a</option>
+                    <option value="yifat">yifat</option>
+                    <option value="vmaas">vmaas</option>
+                  </select>
+                </div>
+                <div class="create-it-actions">
+                  <button type="submit" class="pf-v6-c-button pf-m-primary" id="create-di-submit">Create</button>
+                  <button type="button" class="pf-v6-c-button pf-m-link" id="create-di-cancel">Cancel</button>
+                </div>
+              </form>
+            </div>
           </section>
 
           <section class="view" id="view-create-instance-type">
@@ -4722,6 +4902,12 @@
   <div class="pf-v6-c-menu" id="it-actions-menu" hidden role="menu" aria-label="Instance type actions">
     <div class="pf-v6-c-menu__content">
       <ul class="pf-v6-c-menu__list" role="menu" id="it-actions-menu-list"></ul>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-menu" id="di-actions-menu" hidden role="menu" aria-label="Disk image actions">
+    <div class="pf-v6-c-menu__content">
+      <ul class="pf-v6-c-menu__list" role="menu" id="di-actions-menu-list"></ul>
     </div>
   </div>
 
@@ -5949,6 +6135,10 @@
       selectedInstanceTypeName: null,
       itActionsOpen: false,
       itActionsName: null, // instance type targeted by #it-actions-menu (detail Actions or list kebab)
+      selectedDiskImageName: null,
+      diActionsOpen: false,
+      diActionsName: null,
+      diShowObsolete: false,
       vmDetailTab: 'overview', // overview | configuration | …
       vmConfigSection: 'details', // details | storage | network | …
       nicMenuOpen: null, // nic name with open kebab (unused)
@@ -7329,6 +7519,7 @@
       document.querySelectorAll('.view').forEach(v => v.classList.toggle('pf-m-active', v.id === `view-${id}`));
       const navId = id === 'vm' ? 'vms'
         : (id === 'create-instance-type' || id === 'instance-type') ? 'instance-types'
+        : (id === 'create-disk-image' || id === 'disk-image') ? 'disk-images'
         : id;
       document.querySelectorAll('.console__nav [data-nav]').forEach(n => {
         n.classList.toggle('pf-m-current', n.dataset.nav === navId);
@@ -7360,6 +7551,7 @@
     function openCreateInstanceType() {
       closeVmKebabMenu();
       closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
       setVmActionsMenuOpen(false);
       resetCreateInstanceTypeForm();
       setView('create-instance-type');
@@ -12348,7 +12540,7 @@
 
     function lifecycleLabelHtml(state) {
       const key = String(state || '').toLowerCase();
-      const mod = key === 'active' ? 'pf-m-active'
+      const mod = (key === 'active' || key === 'available') ? 'pf-m-active'
         : key === 'obsolete' ? 'pf-m-obsolete'
         : key === 'deprecated' ? 'pf-m-deprecated'
         : 'pf-m-obsolete';
@@ -12410,6 +12602,7 @@
 
       const alreadyOpen = state.itActionsOpen && state.itActionsName === name;
       closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
       closeVmKebabMenu();
       if (alreadyOpen) return;
 
@@ -12600,6 +12793,457 @@
       `).join('');
     }
 
+    const DISK_IMAGES = [
+      {
+        name: 'rhel-9-5',
+        lifecycle: 'Available',
+        guestOs: 'Linux',
+        architecture: ['amd64', 'arm64'],
+        scope: 'Global',
+        sourceType: 'Registry',
+        sourceRef: 'quay.io/osac/rhel-guest-image:9.5',
+        created: '8/2/2026, 10:01',
+        deprecationTs: null,
+        obsolescenceTs: null,
+      },
+      {
+        name: 'rhel-9-4',
+        lifecycle: 'Deprecated',
+        guestOs: 'Linux',
+        architecture: ['amd64'],
+        scope: 'Global',
+        sourceType: 'Registry',
+        sourceRef: 'quay.io/osac/rhel-guest-image:9.4',
+        created: '3/12/2026, 09:20',
+        deprecationTs: 'Aug 1, 2026, 12:00 PM',
+        obsolescenceTs: null,
+      },
+      {
+        name: 'windows-2022',
+        lifecycle: 'Available',
+        guestOs: 'Windows',
+        architecture: ['amd64'],
+        scope: 'project-a',
+        sourceType: 'Registry',
+        sourceRef: 'quay.io/osac/windows-guest-image:2022',
+        created: '7/18/2026, 14:45',
+        deprecationTs: null,
+        obsolescenceTs: null,
+      },
+      {
+        name: 'centos-stream-9',
+        lifecycle: 'Available',
+        guestOs: 'Linux',
+        architecture: ['amd64', 's390x'],
+        scope: 'Global',
+        sourceType: 'Registry',
+        sourceRef: 'quay.io/osac/centos-stream:9',
+        created: '6/1/2026, 11:00',
+        deprecationTs: null,
+        obsolescenceTs: null,
+      },
+      {
+        name: 'fedora-39',
+        lifecycle: 'Obsolete',
+        guestOs: 'Linux',
+        architecture: ['amd64'],
+        scope: 'yifat',
+        sourceType: 'Registry',
+        sourceRef: 'quay.io/osac/fedora:39',
+        created: '1/5/2025, 08:10',
+        deprecationTs: 'Jan 1, 2026, 12:00 AM',
+        obsolescenceTs: 'Jun 1, 2026, 12:00 AM',
+      },
+    ];
+
+    function normalizeDiskImageLifecycle(state) {
+      const key = String(state || '').toLowerCase();
+      if (key === 'available') return 'Available';
+      if (key === 'deprecated') return 'Deprecated';
+      if (key === 'obsolete') return 'Obsolete';
+      return state || 'Available';
+    }
+
+    /** Disk image lifecycle actions — mirrors getDiskImageLifecycleActions in osac-ui. */
+    function diskImageLifecycleActions(lifecycle) {
+      const current = normalizeDiskImageLifecycle(lifecycle);
+      const actions = [];
+      if (current === 'Available') {
+        actions.push({ id: 'deprecate', label: 'Deprecate' });
+      }
+      if (current === 'Available' || current === 'Deprecated') {
+        actions.push({ id: 'obsolete', label: 'Obsolete' });
+      }
+      if (current === 'Deprecated' || current === 'Obsolete') {
+        actions.push({ id: 'reactivate', label: 'Reactivate' });
+      }
+      if (current === 'Obsolete') {
+        actions.push({ id: 'delete', label: 'Delete', danger: true });
+      }
+      return actions;
+    }
+
+    function closeDiskImageActionsMenu() {
+      const menu = document.getElementById('di-actions-menu');
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('pf-m-open');
+      }
+      document.querySelectorAll('#di-detail-actions-btn.pf-m-expanded, [data-di-kebab].pf-m-expanded').forEach(btn => {
+        btn.classList.remove('pf-m-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      state.diActionsOpen = false;
+      state.diActionsName = null;
+    }
+
+    function openDiskImageActionsMenu(btn, diName) {
+      const menu = document.getElementById('di-actions-menu');
+      const list = document.getElementById('di-actions-menu-list');
+      const name = diName || state.selectedDiskImageName;
+      const di = DISK_IMAGES.find(x => x.name === name);
+      if (!menu || !list || !btn || !di) return;
+
+      const alreadyOpen = state.diActionsOpen && state.diActionsName === name;
+      closeDiskImageActionsMenu();
+      closeInstanceTypeActionsMenu();
+      closeVmKebabMenu();
+      if (alreadyOpen) return;
+
+      const actions = diskImageLifecycleActions(di.lifecycle);
+      if (!actions.length) return;
+
+      list.innerHTML = actions.map((a, i) => {
+        const sep = a.id === 'delete' && i > 0
+          ? `<li class="pf-v6-c-divider" role="separator"></li>`
+          : '';
+        const dangerClass = a.danger ? ' pf-m-danger' : '';
+        return `${sep}<li class="pf-v6-c-menu__list-item" role="none">
+          <button class="pf-v6-c-menu__item${dangerClass}" type="button" role="menuitem" data-di-action="${a.id}">
+            <span class="pf-v6-c-menu__item-main">
+              <span class="pf-v6-c-menu__item-text">${a.label}</span>
+            </span>
+          </button>
+        </li>`;
+      }).join('');
+
+      menu.hidden = false;
+      menu.classList.add('pf-m-open');
+      btn.classList.add('pf-m-expanded');
+      btn.setAttribute('aria-expanded', 'true');
+      state.diActionsOpen = true;
+      state.diActionsName = name;
+
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = Math.max(menu.offsetWidth || 264, 264);
+      const left = Math.min(window.innerWidth - menuWidth - 8, Math.max(8, rect.right - menuWidth));
+      let top = rect.bottom + 4;
+      menu.style.left = `${left}px`;
+      menu.style.top = `${top}px`;
+      requestAnimationFrame(() => {
+        const h = menu.offsetHeight || 0;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 4);
+          menu.style.top = `${top}px`;
+        }
+      });
+    }
+
+    function refreshDiskImageViews(name) {
+      const onDetail = document.getElementById('view-disk-image')?.classList.contains('pf-m-active')
+        && state.selectedDiskImageName === name;
+      if (onDetail) renderDiskImageDetail();
+      if (document.getElementById('view-disk-images')?.classList.contains('pf-m-active')) {
+        renderDiskImages();
+      }
+    }
+
+    function applyDiskImageLifecycleAction(actionId) {
+      const name = state.diActionsName || state.selectedDiskImageName;
+      const idx = DISK_IMAGES.findIndex(x => x.name === name);
+      if (idx < 0) return;
+      const di = DISK_IMAGES[idx];
+      closeDiskImageActionsMenu();
+
+      if (actionId === 'deprecate') {
+        di.lifecycle = 'Deprecated';
+        if (!di.deprecationTs) di.deprecationTs = formatInstanceTypeCreated();
+        toast(`Disk image ${name} deprecated.`);
+        refreshDiskImageViews(name);
+        return;
+      }
+      if (actionId === 'obsolete') {
+        di.lifecycle = 'Obsolete';
+        if (!di.obsolescenceTs) di.obsolescenceTs = formatInstanceTypeCreated();
+        toast(`Disk image ${name} marked Obsolete.`);
+        refreshDiskImageViews(name);
+        return;
+      }
+      if (actionId === 'reactivate') {
+        di.lifecycle = 'Available';
+        di.deprecationTs = null;
+        di.obsolescenceTs = null;
+        toast(`Disk image ${name} reactivated.`);
+        refreshDiskImageViews(name);
+        return;
+      }
+      if (actionId === 'delete') {
+        DISK_IMAGES.splice(idx, 1);
+        if (state.selectedDiskImageName === name) state.selectedDiskImageName = null;
+        toast(`Deleted disk image ${name}.`);
+        setView('disk-images');
+        renderDiskImages();
+      }
+    }
+
+    function openDiskImageDetail(name) {
+      const di = DISK_IMAGES.find(x => x.name === name);
+      if (!di) return;
+      state.selectedDiskImageName = name;
+      closeDiskImageActionsMenu();
+      setView('disk-image');
+      renderDiskImageDetail();
+    }
+
+    function renderDiskImageDetail() {
+      const root = document.getElementById('di-detail-root');
+      if (!root) return;
+      const di = DISK_IMAGES.find(x => x.name === state.selectedDiskImageName);
+      if (!di) {
+        root.innerHTML = '<p class="muted">Disk image not found.</p>';
+        return;
+      }
+      const safeName = String(di.name).replace(/</g, '&lt;');
+      const arch = (di.architecture || []).join(', ') || '—';
+      const subtitle = `${di.guestOs} · ${arch}`;
+      const actions = diskImageLifecycleActions(di.lifecycle);
+      const actionsBtn = actions.length
+        ? `<button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="di-detail-actions-btn"
+              aria-expanded="false" aria-haspopup="menu" aria-controls="di-actions-menu">
+              <span class="pf-v6-c-menu-toggle__text">Actions</span>
+              <span class="pf-v6-c-menu-toggle__controls">
+                <span class="pf-v6-c-menu-toggle__toggle-icon">
+                  <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                </span>
+              </span>
+            </button>`
+        : '';
+
+      let overviewFields = `
+        ${itField('Lifecycle', lifecycleLabelHtml(di.lifecycle))}
+        ${itField('Scope', String(di.scope || '—').replace(/</g, '&lt;'))}
+        ${itField('Created', String(di.created || '—').replace(/</g, '&lt;'))}
+      `;
+      if (di.deprecationTs) {
+        overviewFields += itField('Deprecation timestamp', String(di.deprecationTs).replace(/</g, '&lt;'));
+      }
+      if (di.obsolescenceTs) {
+        overviewFields += itField('Obsolescence timestamp', String(di.obsolescenceTs).replace(/</g, '&lt;'));
+      }
+
+      root.innerHTML = `
+        <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol class="pf-v6-c-breadcrumb__list">
+            <li class="pf-v6-c-breadcrumb__item">
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-disk-images>Disk images</a>
+            </li>
+            <li class="pf-v6-c-breadcrumb__item">
+              <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeName}</span>
+            </li>
+          </ol>
+        </nav>
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safeName}</h2>
+            <p class="ethan-detail-header__subtitle">${subtitle}</p>
+          </div>
+          <div class="ethan-detail-header__actions" role="group" aria-label="Disk image actions">
+            ${actionsBtn}
+          </div>
+        </div>
+        <div class="ethan-detail-panel">
+          <div class="ethan-detail-cols ethan-detail-cols--2">
+            <section class="ethan-detail-col" aria-labelledby="di-overview-title">
+              <h3 class="ethan-detail-col__title" id="di-overview-title">Overview</h3>
+              ${overviewFields}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="di-image-title">
+              <h3 class="ethan-detail-col__title" id="di-image-title">Image</h3>
+              ${itField('Source type', String(di.sourceType || '—').replace(/</g, '&lt;'))}
+              ${itField('Source reference', `<code>${String(di.sourceRef || '—').replace(/</g, '&lt;')}</code>`)}
+              ${itField('Guest OS family', String(di.guestOs || '—').replace(/</g, '&lt;'))}
+              ${itField('Architecture', String(arch).replace(/</g, '&lt;'))}
+            </section>
+          </div>
+        </div>
+      `;
+
+      root.querySelector('[data-breadcrumb-disk-images]')?.addEventListener('click', e => {
+        e.preventDefault();
+        closeDiskImageActionsMenu();
+        state.selectedDiskImageName = null;
+        setView('disk-images');
+        renderDiskImages();
+      });
+      root.querySelector('#di-detail-actions-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        openDiskImageActionsMenu(e.currentTarget, state.selectedDiskImageName);
+      });
+    }
+
+    function renderDiskImages() {
+      const tbody = document.getElementById('disk-images-tbody');
+      if (!tbody) return;
+      const showObsolete = !!state.diShowObsolete;
+      const rows = DISK_IMAGES.filter(di => showObsolete || normalizeDiskImageLifecycle(di.lifecycle) !== 'Obsolete');
+      if (!rows.length) {
+        tbody.innerHTML = `<tr class="pf-v6-c-table__tr">
+          <td class="pf-v6-c-table__td" colspan="7">
+            <div class="muted" style="padding:24px;text-align:center;">
+              ${DISK_IMAGES.length ? 'No disk images match the current filters.' : 'No disk images yet. Create a disk image to make it available for provisioning.'}
+            </div>
+          </td>
+        </tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(di => {
+        const arch = (di.architecture || []).join(', ') || '—';
+        const hasActions = diskImageLifecycleActions(di.lifecycle).length > 0;
+        const kebab = hasActions
+          ? `<button type="button" class="kebab" data-di-kebab="${String(di.name).replace(/"/g, '&quot;')}" aria-label="Actions for ${String(di.name).replace(/"/g, '&quot;')}" aria-haspopup="menu" aria-expanded="false" aria-controls="di-actions-menu"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button>`
+          : '';
+        return `
+        <tr class="pf-v6-c-table__tr">
+          <td class="pf-v6-c-table__td"><a href="#" class="pf-v6-c-button pf-m-link pf-m-inline" data-disk-image="${String(di.name).replace(/"/g, '&quot;')}">${String(di.name).replace(/</g, '&lt;')}</a></td>
+          <td class="pf-v6-c-table__td">${lifecycleLabelHtml(di.lifecycle)}</td>
+          <td class="pf-v6-c-table__td">${String(di.guestOs || '—').replace(/</g, '&lt;')}</td>
+          <td class="pf-v6-c-table__td">${String(arch).replace(/</g, '&lt;')}</td>
+          <td class="pf-v6-c-table__td">${String(di.scope || '—').replace(/</g, '&lt;')}</td>
+          <td class="pf-v6-c-table__td">${String(di.created || '—').replace(/</g, '&lt;')}</td>
+          <td class="pf-v6-c-table__td">${kebab}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function getSelectedArchitectures() {
+      return [...document.querySelectorAll('#create-di-arch-menu input[name="architecture"]:checked')]
+        .map(el => el.value);
+    }
+
+    function syncArchitectureToggleLabel() {
+      const label = document.getElementById('create-di-arch-label-text');
+      if (!label) return;
+      const selected = getSelectedArchitectures();
+      if (!selected.length) {
+        label.textContent = 'Select options';
+        label.classList.add('placeholder');
+      } else {
+        label.textContent = selected.join(', ');
+        label.classList.remove('placeholder');
+      }
+    }
+
+    function setArchitectureMenuOpen(open) {
+      const menu = document.getElementById('create-di-arch-menu');
+      const toggle = document.getElementById('create-di-arch-toggle');
+      if (!menu || !toggle) return;
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function resetCreateDiskImageForm() {
+      const form = document.getElementById('create-di-form');
+      if (!form) return;
+      form.reset();
+      const guestOs = document.getElementById('create-di-guest-os');
+      const scope = document.getElementById('create-di-scope');
+      if (guestOs) guestOs.value = 'Linux';
+      if (scope) scope.value = 'Global';
+      document.querySelectorAll('#create-di-arch-menu input[name="architecture"]').forEach(el => { el.checked = false; });
+      syncArchitectureToggleLabel();
+      setArchitectureMenuOpen(false);
+      document.getElementById('create-di-name-field')?.classList.remove('pf-m-error');
+      document.getElementById('create-di-source-ref-field')?.classList.remove('pf-m-error');
+      document.getElementById('create-di-arch-field')?.classList.remove('pf-m-error');
+    }
+
+    function openCreateDiskImage() {
+      closeVmKebabMenu();
+      closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
+      setVmActionsMenuOpen(false);
+      resetCreateDiskImageForm();
+      setView('create-disk-image');
+      document.getElementById('create-di-name')?.focus();
+    }
+
+    function closeCreateDiskImage() {
+      setArchitectureMenuOpen(false);
+      setView('disk-images');
+      renderDiskImages();
+    }
+
+    function submitCreateDiskImage(e) {
+      e.preventDefault();
+      const nameField = document.getElementById('create-di-name-field');
+      const sourceRefField = document.getElementById('create-di-source-ref-field');
+      const archField = document.getElementById('create-di-arch-field');
+      const name = (document.getElementById('create-di-name')?.value || '').trim();
+      const sourceRef = (document.getElementById('create-di-source-ref')?.value || '').trim();
+      const guestOs = document.getElementById('create-di-guest-os')?.value || 'Linux';
+      const scope = document.getElementById('create-di-scope')?.value || 'Global';
+      const architecture = getSelectedArchitectures();
+
+      let valid = true;
+      if (!name || !isValidDnsLabel(name)) {
+        nameField?.classList.add('pf-m-error');
+        valid = false;
+      } else {
+        nameField?.classList.remove('pf-m-error');
+      }
+      if (!sourceRef) {
+        sourceRefField?.classList.add('pf-m-error');
+        valid = false;
+      } else {
+        sourceRefField?.classList.remove('pf-m-error');
+      }
+      if (!architecture.length) {
+        archField?.classList.add('pf-m-error');
+        valid = false;
+      } else {
+        archField?.classList.remove('pf-m-error');
+      }
+      if (!valid) {
+        toast('Fill in required fields with valid values.');
+        return;
+      }
+      if (DISK_IMAGES.some(di => di.name === name)) {
+        nameField?.classList.add('pf-m-error');
+        toast(`Disk image ${name} already exists.`);
+        return;
+      }
+
+      DISK_IMAGES.unshift({
+        name,
+        lifecycle: 'Available',
+        guestOs,
+        architecture,
+        scope,
+        sourceType: 'Registry',
+        sourceRef,
+        created: formatInstanceTypeCreated(),
+        deprecationTs: null,
+        obsolescenceTs: null,
+      });
+      toast(`Created disk image ${name}.`);
+      state.selectedDiskImageName = name;
+      setView('disk-image');
+      renderDiskImageDetail();
+    }
+
     function applyRole() {
       const key = document.getElementById('role-select').value;
       const role = ROLES[key];
@@ -12628,7 +13272,9 @@
       const onInfra = document.getElementById('view-instance-types')?.classList.contains('pf-m-active')
         || document.getElementById('view-instance-type')?.classList.contains('pf-m-active')
         || document.getElementById('view-disk-images')?.classList.contains('pf-m-active')
-        || document.getElementById('view-create-instance-type')?.classList.contains('pf-m-active');
+        || document.getElementById('view-disk-image')?.classList.contains('pf-m-active')
+        || document.getElementById('view-create-instance-type')?.classList.contains('pf-m-active')
+        || document.getElementById('view-create-disk-image')?.classList.contains('pf-m-active');
       if (role.canManageInfrastructure) {
         if (!onInfra) {
           setView('instance-types');
@@ -12636,7 +13282,9 @@
         }
       } else if (onInfra) {
         state.selectedInstanceTypeName = null;
+        state.selectedDiskImageName = null;
         closeInstanceTypeActionsMenu();
+        closeDiskImageActionsMenu();
         setView('vms');
       }
     }
@@ -12936,10 +13584,13 @@
       }
       state.selectedVmName = null;
       state.selectedInstanceTypeName = null;
+      state.selectedDiskImageName = null;
       closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
       const nav = b.dataset.nav;
       setView(nav);
       if (nav === 'instance-types') renderInstanceTypes();
+      if (nav === 'disk-images') renderDiskImages();
     }));
     document.getElementById('btn-create-instance-type')?.addEventListener('click', () => {
       openCreateInstanceType();
@@ -12954,7 +13605,33 @@
       document.getElementById('create-it-name-field')?.classList.remove('pf-m-error');
     });
     document.getElementById('btn-create-disk-image')?.addEventListener('click', () => {
-      toast('Create disk image is not implemented in this mock.');
+      openCreateDiskImage();
+    });
+    document.getElementById('create-di-form')?.addEventListener('submit', submitCreateDiskImage);
+    document.getElementById('create-di-cancel')?.addEventListener('click', closeCreateDiskImage);
+    document.getElementById('create-di-crumb-list')?.addEventListener('click', e => {
+      e.preventDefault();
+      closeCreateDiskImage();
+    });
+    document.getElementById('create-di-name')?.addEventListener('input', () => {
+      document.getElementById('create-di-name-field')?.classList.remove('pf-m-error');
+    });
+    document.getElementById('create-di-source-ref')?.addEventListener('input', () => {
+      document.getElementById('create-di-source-ref-field')?.classList.remove('pf-m-error');
+    });
+    document.getElementById('create-di-arch-toggle')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const menu = document.getElementById('create-di-arch-menu');
+      setArchitectureMenuOpen(!!menu?.hidden);
+    });
+    document.getElementById('create-di-arch-menu')?.addEventListener('change', () => {
+      syncArchitectureToggleLabel();
+      document.getElementById('create-di-arch-field')?.classList.remove('pf-m-error');
+    });
+    document.getElementById('di-show-obsolete')?.addEventListener('change', e => {
+      state.diShowObsolete = !!e.target.checked;
+      renderDiskImages();
     });
     document.getElementById('instance-types-tbody')?.addEventListener('click', e => {
       const kebab = e.target.closest('[data-it-kebab]');
@@ -12969,11 +13646,30 @@
       e.preventDefault();
       openInstanceTypeDetail(link.dataset.instanceType);
     });
+    document.getElementById('disk-images-tbody')?.addEventListener('click', e => {
+      const kebab = e.target.closest('[data-di-kebab]');
+      if (kebab) {
+        e.preventDefault();
+        e.stopPropagation();
+        openDiskImageActionsMenu(kebab, kebab.dataset.diKebab);
+        return;
+      }
+      const link = e.target.closest('[data-disk-image]');
+      if (!link) return;
+      e.preventDefault();
+      openDiskImageDetail(link.dataset.diskImage);
+    });
     document.getElementById('it-actions-menu')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-it-action]');
       if (!btn) return;
       e.preventDefault();
       applyInstanceTypeLifecycleAction(btn.dataset.itAction);
+    });
+    document.getElementById('di-actions-menu')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-di-action]');
+      if (!btn) return;
+      e.preventDefault();
+      applyDiskImageLifecycleAction(btn.dataset.diAction);
     });
     document.getElementById('vm-tbody')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-open-vm]');
@@ -12991,6 +13687,15 @@
         && !e.target.closest('#it-detail-actions-btn')
         && !e.target.closest('[data-it-kebab]')) {
         closeInstanceTypeActionsMenu();
+      }
+      if (state.diActionsOpen
+        && !e.target.closest('#di-actions-menu')
+        && !e.target.closest('#di-detail-actions-btn')
+        && !e.target.closest('[data-di-kebab]')) {
+        closeDiskImageActionsMenu();
+      }
+      if (!e.target.closest('#create-di-arch')) {
+        setArchitectureMenuOpen(false);
       }
     });
     function bindNavExpandable(toggleId, itemId) {
