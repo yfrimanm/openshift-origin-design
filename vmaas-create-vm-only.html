@@ -703,28 +703,31 @@
       .ethan-detail-cols--2 { grid-template-columns: 1fr; gap: 28px; }
     }
     .ethan-detail-col__title {
-      margin: 0 0 16px;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.3;
+      /* Ethan section title (Overview / Configuration): ~32px to first label */
+      margin: 0 0 32px;
+      font-size: var(--pf-t--global--font--size--heading--h4, 1rem); /* 16px */
+      font-weight: var(--pf-t--global--font--weight--heading--bold, 700);
+      line-height: var(--pf-t--global--font--line-height--heading, 1.3);
       color: var(--vmaas-text, #151515);
     }
     .ethan-detail-field {
-      margin: 0 0 16px;
+      /* Ethan: ~24–32px between groups (value → next label) */
+      margin: 0 0 24px;
     }
     .ethan-detail-field:last-child { margin-bottom: 0; }
     .ethan-detail-field__label {
-      margin: 0 0 4px;
-      font-size: 14px;
+      /* Ethan: smaller gray term above value */
+      margin: 0 0 8px;
+      font-size: var(--pf-t--global--font--size--body--sm, 0.75rem); /* 12px */
       font-weight: 400;
       line-height: 1.3;
       color: var(--vmaas-text-subtle, #6a6e73);
     }
     .ethan-detail-field__value {
       margin: 0;
-      font-size: 14px;
+      font-size: var(--pf-t--global--font--size--body--default, 0.875rem); /* 14px */
       font-weight: 400;
-      line-height: 1.4;
+      line-height: 1.5;
       color: var(--vmaas-text, #151515);
       word-break: break-word;
     }
