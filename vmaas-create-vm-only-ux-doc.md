@@ -8,7 +8,7 @@
 |---|---|
 | **Scope of this doc** | Virtual machines **list** + **Create** wizard |
 | **Companion doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
-| **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — one mock covers list → create → details |
+| **Shared interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html) — one mock covers list → create → details |
 | **Google Doc (this doc)** | [Create Virtual machine - UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
 | **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [GitHub](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
@@ -204,7 +204,7 @@ Figure: Exit confirmation
 ## Related
 
 - **Details / Overview UX doc** — day-2 Overview cards, Network/Storage Add·Edit·Delete, Utilization empty state, SSH, Status → AI placeholder
-- **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html
+- **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html
 
 ---
 

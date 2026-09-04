@@ -8,7 +8,7 @@
 |---|---|
 | **Scope of this doc** | Single-VM **details Overview** (day-2) |
 | **Companion doc** | [Create Virtual machine — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
-| **Shared interactive mock** | [vmaas-create-vm-only.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html) — list → create → details in one mock |
+| **Shared interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html) — list → create → details in one mock |
 | **Google Doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` · [GitHub](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/details) |
 | **Entry** | List **Name** link, or after Create finishes |
@@ -255,4 +255,4 @@ Figure: Delete Virtual machine
 ## Related
 
 - **Create UX doc** — list + wizard handoff
-- **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-create-vm-only.html
+- **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html

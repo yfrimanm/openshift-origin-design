@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, 'videos', 'vmaas-vm-details-overview-ux-doc');
-const htmlPath = path.join(root, 'vmaas-create-vm-only.html');
+const htmlPath = path.join(root, 'vmaas-ux-prototype.html');
 const fileUrl = `file://${htmlPath}`;
 
 async function shotPage(page, name, { fullPage = true } = {}) {
