@@ -140,6 +140,50 @@
     .pf-v6-c-form-control__toggle-icon i {
       color: inherit;
     }
+    .pf-v6-c-menu-toggle__toggle-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pf-v6-c-menu-toggle__toggle-icon--Color, currentColor);
+      font-size: var(--pf-t--global--icon--size--font--body--default, 14px);
+      line-height: 1;
+    }
+    .pf-v6-c-menu-toggle__toggle-icon svg {
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
+    }
+    .pf-v6-c-wizard__toggle-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pf-v6-c-wizard__toggle-icon--Color, var(--pf-t--global--icon--color--regular, var(--vmaas-text)));
+      font-size: var(--pf-t--global--icon--size--font--body--default, 14px);
+      line-height: 1;
+    }
+    .pf-v6-c-wizard__toggle-icon svg {
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
+    }
+    /* PF6 Felt + Glass — unified dropdown caret (RhMicronsCaretDownFill) */
+    .vmaas-pf-caret,
+    .pf-v6-c-form-control__toggle-icon svg,
+    .pf-v6-c-menu-toggle__toggle-icon svg,
+    .pf-v6-c-wizard__toggle-icon svg,
+    .sg-select__actions button svg,
+    .filter-select > svg,
+    .os-type-toggle__btn svg,
+    .arch-multi__toggle .pf-v6-c-form-control__toggle-icon svg {
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .sg-select__actions button,
+    .os-type-toggle__btn {
+      color: var(--pf-v6-c-form-control__toggle-icon--Color, var(--pf-t--global--icon--color--regular, var(--vmaas-text)));
+    }
     .pf-v6-c-form-control.pf-m-placeholder > select:invalid,
     .pf-v6-c-form-control.pf-m-placeholder > select option[value=""] {
       color: var(--pf-t--global--text--color--placeholder, var(--vmaas-text-subtle));
@@ -768,7 +812,11 @@
       margin: 0;
       font-size: 14px;
     }
-    .create-it-page .form-field select,
+    .create-it-page .form-field .pf-v6-c-form-control {
+      width: 100%;
+      max-width: none;
+    }
+    .create-it-page .form-field > select,
     .create-it-page .form-readonly {
       width: 100%;
       padding: 6px 12px;
@@ -799,14 +847,19 @@
       font-size: 14px;
       min-height: 36px;
       box-sizing: border-box;
-      border: 1px solid var(--vmaas-border);
-      border-radius: var(--pf-t--global--border--radius--small, 4px);
-      background: #fff;
+      border: var(--pf-v6-c-form-control--BorderWidth, 1px) solid var(--pf-v6-c-form-control--BorderColor, var(--vmaas-border));
+      border-radius: var(--pf-v6-c-form-control--BorderRadius, var(--pf-t--global--border--radius--small, 4px));
+      background: var(--pf-v6-c-form-control--BackgroundColor, var(--pf-t--global--background--color--floating--default, #fff));
       color: var(--vmaas-text);
       cursor: pointer;
       text-align: left;
     }
     .arch-multi__toggle .placeholder { color: var(--vmaas-text-subtle, #6a6e73); }
+    .arch-multi__toggle .pf-v6-c-form-control__toggle-icon {
+      flex-shrink: 0;
+      margin-inline-start: auto;
+      pointer-events: none;
+    }
     .arch-multi__menu {
       position: absolute;
       z-index: 20;
@@ -1500,8 +1553,11 @@
     }
     .sg-select {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-      min-height: 36px; padding: 4px 8px; border: 1px solid var(--vmaas-border);
-      border-radius: 6px; background: #fff; cursor: pointer; position: relative;
+      min-height: 36px; padding: 4px 8px;
+      border: var(--pf-v6-c-form-control--BorderWidth, 1px) solid var(--pf-v6-c-form-control--BorderColor, var(--vmaas-border));
+      border-radius: var(--pf-v6-c-form-control--BorderRadius, var(--pf-t--global--border--radius--small, 4px));
+      background: var(--pf-v6-c-form-control--BackgroundColor, var(--pf-t--global--background--color--floating--default, #fff));
+      cursor: pointer; position: relative;
       box-sizing: border-box;
     }
     .sg-select.pf-m-disabled {
@@ -1526,6 +1582,10 @@
     }
     .sg-select__actions button {
       border: none; background: none; padding: 2px 4px; cursor: pointer; color: inherit;
+      display: inline-flex; align-items: center;
+    }
+    .sg-select__actions button svg {
+      width: 1em; height: 1em; fill: currentColor;
     }
     .sg-select__menu {
       position: absolute; inset-block-start: calc(100% + 4px); inset-inline: 0;
@@ -2139,12 +2199,22 @@
     }
     .filter-select {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 10px; font-size: 14px; background: #fff;
-      border: 1px solid var(--vmaas-border); border-radius: 6px; cursor: pointer;
+      padding: 6px 10px; font-size: 14px;
+      background: var(--pf-v6-c-form-control--BackgroundColor, var(--pf-t--global--background--color--floating--default, #fff));
+      border: var(--pf-v6-c-form-control--BorderWidth, 1px) solid var(--pf-v6-c-form-control--BorderColor, var(--vmaas-border));
+      border-radius: var(--pf-v6-c-form-control--BorderRadius, var(--pf-t--global--border--radius--small, 4px));
+      cursor: pointer;
       color: var(--vmaas-text); min-width: 110px;
     }
     .filter-select strong { font-weight: 600; }
-    .filter-select i { margin-left: auto; font-size: 11px; color: var(--vmaas-text-subtle); }
+    .filter-select i,
+    .filter-select > svg {
+      margin-left: auto;
+      font-size: var(--pf-t--global--icon--size--font--body--default, 14px);
+      color: var(--pf-v6-c-form-control__toggle-icon--Color, var(--pf-t--global--icon--color--regular, var(--vmaas-text-subtle)));
+      fill: currentColor;
+      flex-shrink: 0;
+    }
     .filter-select.filter-select--static {
       cursor: default;
       pointer-events: none;
@@ -2990,7 +3060,9 @@
     .os-type-field .pf-v6-c-form-control { width: 100%; }
     .os-type-toggle {
       display: flex; align-items: stretch; width: 100%;
-      border: 1px solid var(--vmaas-border); border-radius: 6px; background: #f5f5f5;
+      border: var(--pf-v6-c-form-control--BorderWidth, 1px) solid var(--pf-v6-c-form-control--BorderColor, var(--vmaas-border));
+      border-radius: var(--pf-v6-c-form-control--BorderRadius, var(--pf-t--global--border--radius--small, 4px));
+      background: var(--pf-v6-c-form-control--BackgroundColor, var(--pf-t--global--background--color--floating--default, #fff));
       min-height: 36px; overflow: hidden;
     }
     .os-type-toggle:focus-within {
@@ -3005,6 +3077,10 @@
     .os-type-toggle__btn {
       border: none; background: transparent; padding: 0 10px; cursor: pointer;
       color: var(--vmaas-text-subtle);
+      display: inline-flex; align-items: center;
+    }
+    .os-type-toggle__btn svg {
+      width: 1em; height: 1em; fill: currentColor;
     }
     .os-type-menu {
       position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px);
@@ -4163,7 +4239,7 @@
               <option value="provider">Cloud provider admin</option>
             </select>
             <span class="pf-v6-c-form-control__utilities">
-              <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+              <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
         </div>
@@ -4265,7 +4341,7 @@
                   <span class="pf-v6-c-menu-toggle__text" id="projectFilterLabel">Project: All projects</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
-                      <i class="fas fa-caret-down"></i>
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                     </span>
                   </span>
                 </button>
@@ -4280,7 +4356,7 @@
                   <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="statusBadge" hidden>0</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
-                      <i class="fas fa-caret-down"></i>
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                     </span>
                   </span>
                 </button>
@@ -4295,7 +4371,7 @@
                   <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="osBadge" hidden>0</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
-                      <i class="fas fa-caret-down"></i>
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                     </span>
                   </span>
                 </button>
@@ -4310,7 +4386,7 @@
                   <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="hwBadge" hidden>0</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
-                      <i class="fas fa-caret-down"></i>
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                     </span>
                   </span>
                 </button>
@@ -4336,7 +4412,7 @@
                     <button class="pf-v6-c-menu-toggle__button" type="button" id="vm-bulk-menu-btn" aria-expanded="false" aria-haspopup="menu" aria-controls="vm-bulk-menu" aria-label="Select">
                       <span class="pf-v6-c-menu-toggle__controls">
                         <span class="pf-v6-c-menu-toggle__toggle-icon">
-                          <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                          <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                         </span>
                       </span>
                     </button>
@@ -4376,7 +4452,7 @@
                     <span class="pf-v6-c-menu-toggle__text">Actions</span>
                     <span class="pf-v6-c-menu-toggle__controls">
                       <span class="pf-v6-c-menu-toggle__toggle-icon">
-                        <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                        <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                       </span>
                     </span>
                   </button>
@@ -4452,8 +4528,8 @@
               <strong>Create Virtual machine → Network</strong>.
             </p>
             <div class="filter-bar">
-              <button type="button" class="filter-select">Type: <strong>All</strong> <i class="fa-solid fa-caret-down"></i></button>
-              <button type="button" class="filter-select">Project: <strong>All</strong> <i class="fa-solid fa-caret-down"></i></button>
+              <button type="button" class="filter-select">Type: <strong>All</strong> <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></button>
+              <button type="button" class="filter-select">Project: <strong>All</strong> <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></button>
               <div class="filter-name-search">
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                 <input type="search" id="net-search" placeholder="Search by name..." aria-label="Search networks" />
@@ -4587,17 +4663,22 @@
                 </div>
                 <div class="form-field">
                   <label for="create-di-guest-os">Guest OS family <span class="req">*</span></label>
-                  <select id="create-di-guest-os" name="guestOsFamily" required>
-                    <option value="Linux" selected>Linux</option>
-                    <option value="Windows">Windows</option>
-                  </select>
+                  <span class="pf-v6-c-form-control">
+                    <select id="create-di-guest-os" name="guestOsFamily" required>
+                      <option value="Linux" selected>Linux</option>
+                      <option value="Windows">Windows</option>
+                    </select>
+                    <span class="pf-v6-c-form-control__utilities">
+                      <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
+                    </span>
+                  </span>
                 </div>
                 <div class="form-field" id="create-di-arch-field">
                   <label id="create-di-arch-label">Architecture <span class="req">*</span></label>
                   <div class="arch-multi" id="create-di-arch">
                     <button type="button" class="arch-multi__toggle" id="create-di-arch-toggle" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="create-di-arch-label">
                       <span class="placeholder" id="create-di-arch-label-text">Select options</span>
-                      <i class="fas fa-caret-down" aria-hidden="true"></i>
+                      <span class="pf-v6-c-form-control__toggle-icon" aria-hidden="true"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
                     </button>
                     <ul class="arch-multi__menu" id="create-di-arch-menu" role="listbox" aria-labelledby="create-di-arch-label" hidden>
                       <li><label><input type="checkbox" name="architecture" value="amd64" /> amd64</label></li>
@@ -4608,12 +4689,17 @@
                 </div>
                 <div class="form-field">
                   <label for="create-di-scope">Scope</label>
-                  <select id="create-di-scope" name="scope">
-                    <option value="Global" selected>Global</option>
-                    <option value="project-a">project-a</option>
-                    <option value="yifat">yifat</option>
-                    <option value="vmaas">vmaas</option>
-                  </select>
+                  <span class="pf-v6-c-form-control">
+                    <select id="create-di-scope" name="scope">
+                      <option value="Global" selected>Global</option>
+                      <option value="project-a">project-a</option>
+                      <option value="yifat">yifat</option>
+                      <option value="vmaas">vmaas</option>
+                    </select>
+                    <span class="pf-v6-c-form-control__utilities">
+                      <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
+                    </span>
+                  </span>
                 </div>
                 <div class="create-it-actions">
                   <button type="submit" class="pf-v6-c-button pf-m-primary" id="create-di-submit">Create</button>
@@ -4728,7 +4814,7 @@
           </span>
         </span>
         <span class="pf-v6-c-wizard__toggle-icon">
-          <i class="fas fa-caret-down" aria-hidden="true"></i>
+          <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
         </span>
       </button>
       <div class="pf-v6-c-wizard__outer-wrap">
@@ -6815,7 +6901,7 @@
               aria-label="${ariaLabel || placeholder}" autocomplete="off" spellcheck="false" />
             <span class="pf-v6-c-form-control__utilities">
               <button type="button" class="create-search__toggle" tabindex="-1" aria-label="Toggle options" style="border:none;background:transparent;padding:0;cursor:pointer;color:inherit;">
-                <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+                <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
               </button>
             </span>
           </span>
@@ -8042,7 +8128,7 @@
                 <option value="Down" ${m.linkState === 'Down' ? 'selected' : ''}>Down</option>
               </select>
               <span class="pf-v6-c-form-control__utilities">
-                <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+                <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
               </span>
             </span>
           </div>
@@ -8065,7 +8151,7 @@
                 <option value="rtl8139" ${m.model === 'rtl8139' ? 'selected' : ''}>rtl8139</option>
               </select>
               <span class="pf-v6-c-form-control__utilities">
-                <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+                <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
               </span>
             </span>
           </div>
@@ -8085,7 +8171,7 @@
                 ${netOptions}
               </select>
               <span class="pf-v6-c-form-control__utilities">
-                <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+                <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
               </span>
             </span>
             ${networks.length ? '' : `
@@ -8325,7 +8411,7 @@
               ` : ''}
               <button type="button" id="net-f-sg-toggle" aria-label="Toggle security groups"
                 ${m.virtualNetwork && m.subnet ? '' : 'disabled'}>
-                <i class="fas fa-caret-down" aria-hidden="true"></i>
+                <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
               </button>
             </span>
             ${sgOpen ? `
@@ -9214,7 +9300,7 @@
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
               <span class="pf-v6-c-menu-toggle__controls">
                 <span class="pf-v6-c-menu-toggle__toggle-icon">
-                  <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                 </span>
               </span>
             </button>
@@ -9330,7 +9416,7 @@
                         <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                       </button>
                     </h3>
-                    <span class="filter-select filter-select--static">Last 5 minutes <i class="fa-solid fa-caret-down"></i></span>
+                    <span class="filter-select filter-select--static">Last 5 minutes <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
                   </div>
                   ${v.status === 'running' ? `
                   <div class="util-grid">
@@ -10717,7 +10803,7 @@
                 aria-controls="os-type-menu" aria-expanded="${menuOpen}" role="combobox" />
               <input type="hidden" id="f-os-type" value="${d.osType}" />
               <button type="button" class="os-type-toggle__btn" id="f-os-type-toggle" aria-label="Toggle options" aria-expanded="${menuOpen}">
-                <i class="fas fa-caret-down" aria-hidden="true"></i>
+                <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
               </button>
             </div>
             <div class="os-type-menu" id="os-type-menu" role="listbox" ${menuOpen ? '' : 'hidden'}>
@@ -10785,7 +10871,7 @@
                       <option value="project-name-3" ${bootProject === 'project-name-3' ? 'selected' : ''}>project-name-3</option>
                     </select>
                     <span class="pf-v6-c-form-control__utilities">
-                      <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+                      <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
                     </span>
                   </span>
                   <div class="search-group" style="max-width:200px;"><input type="search" placeholder="Search by name" /></div>
@@ -11365,7 +11451,7 @@
               <span class="pf-v6-c-form-control">
                 <select id="clone-project" aria-label="Project">${projectOpts}</select>
                 <span class="pf-v6-c-form-control__utilities">
-                  <span class="pf-v6-c-form-control__toggle-icon"><i class="fas fa-caret-down" aria-hidden="true"></i></span>
+                  <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
                 </span>
               </span>
             </div>
@@ -11792,7 +11878,7 @@
                       </button>
                     ` : ''}
                     <button type="button" id="f-sg-toggle" aria-label="Toggle security groups" ${sgEnabledLive ? '' : 'disabled'}>
-                      <i class="fas fa-caret-down" aria-hidden="true"></i>
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                     </button>
                   </span>
                   ${sgOpenLive ? `
@@ -11895,7 +11981,7 @@
                             </button>
                           ` : ''}
                           <button type="button" data-extra-sg-toggle="${netItem.id}" aria-label="Toggle security groups" ${sgEnabled ? '' : 'disabled'}>
-                            <i class="fas fa-caret-down" aria-hidden="true"></i>
+                            <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                           </button>
                         </span>
                         ${sgOpen ? `
@@ -12735,7 +12821,7 @@
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
               <span class="pf-v6-c-menu-toggle__controls">
                 <span class="pf-v6-c-menu-toggle__toggle-icon">
-                  <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                 </span>
               </span>
             </button>
@@ -13023,7 +13109,7 @@
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
               <span class="pf-v6-c-menu-toggle__controls">
                 <span class="pf-v6-c-menu-toggle__toggle-icon">
-                  <i class="fas fa-caret-down fa-fw" aria-hidden="true"></i>
+                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
                 </span>
               </span>
             </button>`
