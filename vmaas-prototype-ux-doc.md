@@ -15,14 +15,14 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 | | |
 |---|---|
 | **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, plus provider **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260906-carets) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260906-carets&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260906-carets&vm=azure-baboon-27) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create) |
+| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create&vm=azure-baboon-27) |
 | **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
 | **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
 
-**Source snapshot:** Pages build `?v=20260906-carets` (screenshots captured 2026-09-06).
+**Source snapshot:** Pages build `?v=20260907-di-create` (screenshots captured 2026-09-07).
 
 ---
 
@@ -285,7 +285,6 @@ Breadcrumb: Disk images › Create.
 | Field | Required | Notes |
 |---|---|---|
 | Name | Yes | DNS label helper |
-| Source type | — | Read-only **Registry** |
 | Source reference | Yes | Registry ref |
 | Guest OS family | Yes | Default Linux |
 | Architecture | Yes | Multi-select (amd64 / arm64 / s390x); placeholder *Select options* |
@@ -330,7 +329,7 @@ Figure: Disk image detail
 
 - Detailed Create-only write-up: `vmaas-create-vm-only-ux-doc.md`
 - Detailed Overview write-up: `vmaas-vm-details-overview-ux-doc.md`
-- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260906-carets
+- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create
 
 ---
 

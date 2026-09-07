@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, 'videos', 'vmaas-prototype-ux-doc');
 const BASE =
   process.env.VMAAS_MOCK_URL ||
-  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260906-carets';
+  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create';
 
 async function shot(page, name) {
   const file = path.join(outDir, `${name}.png`);
@@ -159,7 +159,7 @@ async function main() {
   await page.waitForTimeout(400);
 
   // —— VM Overview ——
-  await page.goto(`${BASE.split('?')[0]}?v=20260906-carets&vm=azure-baboon-27`, {
+  await page.goto(`${BASE.split('?')[0]}?v=20260907-di-create&vm=azure-baboon-27`, {
     waitUntil: 'networkidle',
   });
   await setRole(page, 'admin');
