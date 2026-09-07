@@ -15,14 +15,14 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 | | |
 |---|---|
 | **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, plus provider **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create&vm=azure-baboon-27) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels) |
+| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels&vm=azure-baboon-27) |
 | **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
 | **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
 
-**Source snapshot:** Pages build `?v=20260907-di-create` (screenshots captured 2026-09-07).
+**Source snapshot:** Pages build `?v=20260907-di-labels` (screenshots captured 2026-09-07).
 
 ---
 
@@ -50,7 +50,7 @@ Document the current OSAC VMaaS HTML prototype so engineering and stakeholders c
 | **After create** | Lands on new VM Overview + success toast |
 | **Overview Details** | Stacked label-above-value in **Overview** \| **Configuration** columns; VNC stays in the same card |
 | **Instance types** | Provider list + create form + 3-column detail (Overview / Compute / GPU); lifecycle Actions |
-| **Disk images** | Provider list + create form (Registry source type) + 2-column detail; show-obsolete; lifecycle Actions |
+| **Disk images** | Provider list + create form + 2-column detail; show-obsolete; lifecycle Actions |
 | **Shell** | PatternFly Felt + Glass; soft floating nav/content |
 
 ---
@@ -260,9 +260,9 @@ Aligned to [osac-ui PR 164](https://github.com/osac-project/osac-ui/pull/164).
 |---|---|
 | Name | Link → detail |
 | Lifecycle | Available / Deprecated / Obsolete |
-| Guest OS family | Linux / Windows |
+| Guest operating system | Linux / Microsoft Windows |
 | Architecture | e.g. amd64, arm64 |
-| Scope | Global or tenant name |
+| Visibility | Global or tenant name |
 | Created | |
 | Actions | Kebab — Deprecate / Obsolete / Reactivate; Delete when Obsolete |
 
@@ -285,10 +285,10 @@ Breadcrumb: Disk images › Create.
 | Field | Required | Notes |
 |---|---|---|
 | Name | Yes | DNS label helper |
-| Source reference | Yes | Registry ref |
-| Guest OS family | Yes | Default Linux |
-| Architecture | Yes | Multi-select (amd64 / arm64 / s390x); placeholder *Select options* |
-| Scope | No | Default Global |
+| Image | Yes | Example: `quay.io/containerdisks/fedora:latest` |
+| Guest operating system | Yes | Radio: Linux / Microsoft Windows (default Linux) |
+| Architecture | Yes | Multi-select (amd64 / arm64 / s390x); helper: you may select multiple types; placeholder *Select options* |
+| Visibility | No | Default Global |
 
 Actions: **Create** · **Cancel**. Success opens the new image’s detail page.
 
@@ -306,8 +306,8 @@ Two columns:
 
 | Column | Fields |
 |---|---|
-| **Overview** | Lifecycle · Scope · Created · Deprecation / Obsolescence timestamps (when set) |
-| **Image** | Source type · Source reference · Guest OS family · Architecture |
+| **Overview** | Lifecycle · Visibility · Created · Deprecation / Obsolescence timestamps (when set) |
+| **Image** | Source type · Image · Guest operating system · Architecture |
 
 Header: name + subtitle (`Guest OS · architecture`) · **Actions** when transitions are available.
 
@@ -329,7 +329,7 @@ Figure: Disk image detail
 
 - Detailed Create-only write-up: `vmaas-create-vm-only-ux-doc.md`
 - Detailed Overview write-up: `vmaas-vm-details-overview-ux-doc.md`
-- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-create
+- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels
 
 ---
 

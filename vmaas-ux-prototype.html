@@ -2913,6 +2913,10 @@
     .form-check {
       display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 20px 0 0;
     }
+    .di-os-radios {
+      display: flex; flex-wrap: wrap; gap: 24px; margin-top: 8px;
+    }
+    .di-os-radios .form-check { margin: 0; }
     .pf-v6-c-wizard__footer.wiz-footer {
       display: flex; flex-direction: column; align-items: stretch; gap: 12px;
     }
@@ -4609,9 +4613,9 @@
                   <tr class="pf-v6-c-table__tr">
                     <th class="pf-v6-c-table__th" scope="col">Name</th>
                     <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
-                    <th class="pf-v6-c-table__th" scope="col">Guest OS family</th>
+                    <th class="pf-v6-c-table__th" scope="col">Guest operating system</th>
                     <th class="pf-v6-c-table__th" scope="col">Architecture</th>
-                    <th class="pf-v6-c-table__th" scope="col">Scope</th>
+                    <th class="pf-v6-c-table__th" scope="col">Visibility</th>
                     <th class="pf-v6-c-table__th" scope="col">Created</th>
                     <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
                   </tr>
@@ -4654,20 +4658,28 @@
                   </div>
                 </div>
                 <div class="form-field" id="create-di-source-ref-field">
-                  <label for="create-di-source-ref">Source reference <span class="req">*</span></label>
+                  <label for="create-di-source-ref">Image <span class="req">*</span></label>
                   <input type="text" id="create-di-source-ref" name="sourceRef" autocomplete="off" required />
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">Example: quay.io/containerdisks/fedora:latest</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="form-field">
-                  <label for="create-di-guest-os">Guest OS family <span class="req">*</span></label>
-                  <span class="pf-v6-c-form-control">
-                    <select id="create-di-guest-os" name="guestOsFamily" required>
-                      <option value="Linux" selected>Linux</option>
-                      <option value="Windows">Windows</option>
-                    </select>
-                    <span class="pf-v6-c-form-control__utilities">
-                      <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-                    </span>
-                  </span>
+                <div class="form-field" id="create-di-guest-os-field">
+                  <label id="create-di-guest-os-label">Guest operating system <span class="req">*</span></label>
+                  <div class="di-os-radios" role="radiogroup" aria-labelledby="create-di-guest-os-label">
+                    <label class="form-check">
+                      <input type="radio" name="guestOsFamily" id="create-di-guest-os-linux" value="Linux" checked required />
+                      Linux
+                    </label>
+                    <label class="form-check">
+                      <input type="radio" name="guestOsFamily" id="create-di-guest-os-windows" value="Microsoft Windows" />
+                      Microsoft Windows
+                    </label>
+                  </div>
                 </div>
                 <div class="form-field" id="create-di-arch-field">
                   <label id="create-di-arch-label">Architecture <span class="req">*</span></label>
@@ -4682,9 +4694,16 @@
                       <li><label><input type="checkbox" name="architecture" value="s390x" /> s390x</label></li>
                     </ul>
                   </div>
+                  <div class="pf-v6-c-form__helper-text">
+                    <div class="pf-v6-c-helper-text">
+                      <div class="pf-v6-c-helper-text__item">
+                        <span class="pf-v6-c-helper-text__item-text">You may select multiple architecture types.</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="form-field">
-                  <label for="create-di-scope">Scope</label>
+                  <label for="create-di-scope">Visibility</label>
                   <span class="pf-v6-c-form-control">
                     <select id="create-di-scope" name="scope">
                       <option value="Global" selected>Global</option>
@@ -12903,7 +12922,7 @@
       {
         name: 'windows-2022',
         lifecycle: 'Available',
-        guestOs: 'Windows',
+        guestOs: 'Microsoft Windows',
         architecture: ['amd64'],
         scope: 'project-a',
         sourceType: 'Registry',
@@ -12937,6 +12956,11 @@
         obsolescenceTs: 'Jun 1, 2026, 12:00 AM',
       },
     ];
+
+    function formatDiskImageGuestOs(guestOs) {
+      if (guestOs === 'Windows') return 'Microsoft Windows';
+      return guestOs || '—';
+    }
 
     function normalizeDiskImageLifecycle(state) {
       const key = String(state || '').toLowerCase();
@@ -13097,7 +13121,7 @@
       }
       const safeName = String(di.name).replace(/</g, '&lt;');
       const arch = (di.architecture || []).join(', ') || '—';
-      const subtitle = `${di.guestOs} · ${arch}`;
+      const subtitle = `${formatDiskImageGuestOs(di.guestOs)} · ${arch}`;
       const actions = diskImageLifecycleActions(di.lifecycle);
       const actionsBtn = actions.length
         ? `<button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="di-detail-actions-btn"
@@ -13113,7 +13137,7 @@
 
       let overviewFields = `
         ${itField('Lifecycle', lifecycleLabelHtml(di.lifecycle))}
-        ${itField('Scope', String(di.scope || '—').replace(/</g, '&lt;'))}
+        ${itField('Visibility', String(di.scope || '—').replace(/</g, '&lt;'))}
         ${itField('Created', String(di.created || '—').replace(/</g, '&lt;'))}
       `;
       if (di.deprecationTs) {
@@ -13155,8 +13179,8 @@
             <section class="ethan-detail-col" aria-labelledby="di-image-title">
               <h3 class="ethan-detail-col__title" id="di-image-title">Image</h3>
               ${itField('Source type', String(di.sourceType || '—').replace(/</g, '&lt;'))}
-              ${itField('Source reference', `<code>${String(di.sourceRef || '—').replace(/</g, '&lt;')}</code>`)}
-              ${itField('Guest OS family', String(di.guestOs || '—').replace(/</g, '&lt;'))}
+              ${itField('Image', `<code>${String(di.sourceRef || '—').replace(/</g, '&lt;')}</code>`)}
+              ${itField('Guest operating system', String(formatDiskImageGuestOs(di.guestOs)).replace(/</g, '&lt;'))}
               ${itField('Architecture', String(arch).replace(/</g, '&lt;'))}
             </section>
           </div>
@@ -13201,7 +13225,7 @@
         <tr class="pf-v6-c-table__tr">
           <td class="pf-v6-c-table__td"><a href="#" class="pf-v6-c-button pf-m-link pf-m-inline" data-disk-image="${String(di.name).replace(/"/g, '&quot;')}">${String(di.name).replace(/</g, '&lt;')}</a></td>
           <td class="pf-v6-c-table__td">${lifecycleLabelHtml(di.lifecycle)}</td>
-          <td class="pf-v6-c-table__td">${String(di.guestOs || '—').replace(/</g, '&lt;')}</td>
+          <td class="pf-v6-c-table__td">${String(formatDiskImageGuestOs(di.guestOs)).replace(/</g, '&lt;')}</td>
           <td class="pf-v6-c-table__td">${String(arch).replace(/</g, '&lt;')}</td>
           <td class="pf-v6-c-table__td">${String(di.scope || '—').replace(/</g, '&lt;')}</td>
           <td class="pf-v6-c-table__td">${String(di.created || '—').replace(/</g, '&lt;')}</td>
@@ -13240,9 +13264,9 @@
       const form = document.getElementById('create-di-form');
       if (!form) return;
       form.reset();
-      const guestOs = document.getElementById('create-di-guest-os');
+      const guestOsLinux = document.getElementById('create-di-guest-os-linux');
       const scope = document.getElementById('create-di-scope');
-      if (guestOs) guestOs.value = 'Linux';
+      if (guestOsLinux) guestOsLinux.checked = true;
       if (scope) scope.value = 'Global';
       document.querySelectorAll('#create-di-arch-menu input[name="architecture"]').forEach(el => { el.checked = false; });
       syncArchitectureToggleLabel();
@@ -13275,7 +13299,7 @@
       const archField = document.getElementById('create-di-arch-field');
       const name = (document.getElementById('create-di-name')?.value || '').trim();
       const sourceRef = (document.getElementById('create-di-source-ref')?.value || '').trim();
-      const guestOs = document.getElementById('create-di-guest-os')?.value || 'Linux';
+      const guestOs = document.querySelector('#create-di-form input[name="guestOsFamily"]:checked')?.value || 'Linux';
       const scope = document.getElementById('create-di-scope')?.value || 'Global';
       const architecture = getSelectedArchitectures();
 
