@@ -6387,6 +6387,7 @@
         virtualNetwork: '',
         subnet: '',
         securityGroups: [],
+        autoAttachExternalIp: false,
         project: 'project-a',
         group: '',
         sshPublicKey: '',
@@ -10105,6 +10106,7 @@
       state.data.virtualNetwork = '';
       state.data.subnet = '';
       state.data.securityGroups = [];
+      state.data.autoAttachExternalIp = false;
       state.sgMenuOpen = false;
       state.vmComputeMenuOpen = false;
       state.vmComputeFilter = '';
@@ -10417,6 +10419,8 @@
       if (size) d.size = size.value;
       const start = document.getElementById('f-start');
       if (start) d.startAfter = start.checked;
+      const autoExternalIp = document.getElementById('f-auto-external-ip');
+      if (autoExternalIp) d.autoAttachExternalIp = autoExternalIp.checked;
       const project = document.getElementById('f-project') || document.getElementById('f-tpl-project');
       if (project) d.project = project.value;
       const group = document.getElementById('f-group');
@@ -12178,6 +12182,12 @@
                 ${fieldErrorHtml('securityGroups')}
                 ${pfHelperText('Firewall rules for inbound and outbound traffic. A project default is preselected.')}
               </div>
+              <div class="form-field">
+                <label class="form-check">
+                  <input type="checkbox" id="f-auto-external-ip" ${d.autoAttachExternalIp ? 'checked' : ''} />
+                  Auto attach external IP
+                </label>
+              </div>
               <h3 class="config-sets-title">Additional networks</h3>
               ${(d.extraNetworks || []).length ? `
               <div class="inline-sets" aria-label="Additional networks">
@@ -12379,6 +12389,9 @@
               });
             });
           }
+          panel.querySelector('#f-auto-external-ip')?.addEventListener('change', e => {
+            d.autoAttachExternalIp = e.target.checked;
+          });
           panel.querySelectorAll('select[id^="f-extra-vn-"]').forEach(sel => {
             sel.addEventListener('change', e => {
               const id = sel.id.replace(/^f-extra-vn-/, '');
@@ -12541,6 +12554,7 @@
         const sgs = (d.securityGroups && d.securityGroups.length)
           ? d.securityGroups.join(', ')
           : '—';
+        const autoExternalIp = d.autoAttachExternalIp ? 'Yes' : 'No';
 
         const reviewRow = (label, value, { block = false } = {}) => `
           <div class="review-nebius__row${block ? ' review-nebius__row--block' : ''}">
@@ -12611,6 +12625,7 @@
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
               ${reviewRow('Security groups', sgs)}
+              ${reviewRow('Auto attach external IP', autoExternalIp)}
               ${(d.extraNetworks || []).length
                 ? (d.extraNetworks || []).map((net, i) => {
                     const label = (net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;');
