@@ -3066,7 +3066,7 @@
       width: 16px;
       height: 16px;
       flex-shrink: 0;
-      margin-top: 1px;
+      margin-left: 6px;
       background: none;
       font-size: 15px;
       line-height: 1;
@@ -10153,7 +10153,7 @@
       if (state.wizard === 'catalog-create') {
         return [
           { key: 'ci-details', label: 'Details', navNum: 1 },
-          { key: 'ci-access', label: 'Access & Compute resources', navNum: 2 },
+          { key: 'ci-access', label: 'Compute resources & Access', navNum: 2 },
           { key: 'ci-storage', label: 'Storage', navNum: 3 },
           { key: 'ci-visibility', label: 'Visibility', navNum: 4 },
           { key: 'ci-review', label: 'Review', navNum: 5 },
@@ -13577,15 +13577,15 @@
               <div class="radio-stack__item">
                 <label class="form-check">
                   <input type="radio" name="ciGuestOs" value="Linux" ${c.guestOsFamily === 'Linux' ? 'checked' : ''} />
-                  <span class="guest-os-radio__icon guest-os-radio__icon--linux" aria-hidden="true"><i class="fa-brands fa-linux"></i></span>
                   Linux
+                  <span class="guest-os-radio__icon guest-os-radio__icon--linux" aria-hidden="true"><i class="fa-brands fa-linux"></i></span>
                 </label>
               </div>
               <div class="radio-stack__item">
                 <label class="form-check">
                   <input type="radio" name="ciGuestOs" value="Microsoft Windows" ${c.guestOsFamily === 'Microsoft Windows' ? 'checked' : ''} />
-                  <span class="guest-os-radio__icon guest-os-radio__icon--windows" aria-hidden="true"><i class="fa-brands fa-windows"></i></span>
                   Microsoft Windows
+                  <span class="guest-os-radio__icon guest-os-radio__icon--windows" aria-hidden="true"><i class="fa-brands fa-windows"></i></span>
                 </label>
               </div>
             </div>
@@ -13662,7 +13662,7 @@
           return hay.includes(q);
         });
         panel.innerHTML = `
-          <h3>Access &amp; Compute resources</h3>
+          <h3>Compute resources &amp; Access</h3>
           <p class="step-help">Choose compute resources for this catalog item, then set tenant access to the guest operating system and hardware.</p>
           <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Compute resources <span class="req">*</span></h4>
           <div class="form-field">
@@ -13940,7 +13940,7 @@
             ${reviewRow('Guest operating system', String(c.guestOsFamily || '—').replace(/</g, '&lt;'))}
             ${reviewRow('Disk image', disk ? `${disk.title} (${disk.family} · ${disk.arch})` : '—')}
           `)}
-          ${reviewSection('Access &amp; Compute resources', 'ci-access', `
+          ${reviewSection('Compute resources &amp; Access', 'ci-access', `
             ${reviewRow('Tenant access', accessLabel)}
             ${reviewRow('Compute resources', `${compute.label} — ${compute.cpu} · ${compute.memory} · ${compute.gpu} · ${compute.rate}`)}
           `)}
