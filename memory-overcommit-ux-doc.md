@@ -81,9 +81,9 @@ Level definitions are in the **?** help popover.
 
 | Level | Range | Label | Meaning |
 |---|---|---|---|
-| **Green** | **75% – 100%** | Recommended | Requests most of each VM's configured memory on the cluster. Product default **97.5%** is in this range. |
+| **Green** | **75% – 100%** | Safe level | Low overcommit. Requests most configured memory on the cluster. Product default **97.5%** is in this range. |
 | **Yellow** | **50% – 74.9%** | Use with caution | Moderate overcommit. Monitor cluster memory pressure. |
-| **Red** | **25% – 49.9%** | High overcommit risk | Aggressive overcommit. Each VM requests between 25% and 50% of its configured memory on the cluster. |
+| **Red** | **25% – 49.9%** | High risk | Aggressive overcommit. Memory pressure can rise quickly if workloads grow. |
 
 *Thresholds are proposed for the mockup — confirm with engineering and PM before implementation.*
 
@@ -142,7 +142,7 @@ Memory request ratio  [New] [?]               [accordion, expanded]
 └── Active ratio: 94.2%  [?]                [read-only; live cluster value]
     Saved ratio  [?]                           [label for editable control]
     [−] [ 97.5 ] [+] %                         [PF6 Number input with unit]
-    ● Recommended                               [traffic-light level; valid values only]
+    ● Safe level                                [traffic-light level; valid values only]
     [Save]  [Restore default]                 [visible when saved value changed]
 
 Kernel Samepage Merging (KSM)  [?]            [toggle; left-aligned with accordions]
@@ -188,7 +188,7 @@ Use **PatternFly 6 Number input with unit** (`pf-v6-c-number-input`):
 | Saved ratio **?** popover | After changes are saved, they apply cluster-wide: **New VMs:** Use the saved ratio immediately, unless they have a specific ratio set by the VM owner. **Running VMs:** Retain their current ratio until they reboot or migrate. |
 | Badge | **New** (accordion header only) |
 | **?** popover (accordion) | **Memory request ratio** — The percentage of each VM's configured memory that is requested on the cluster. **Formula:** requested ÷ configured, on a 0–100% range. At **25%**, a 4 GiB VM requests 1 GiB on the cluster. At **100%**, it requests the full configured amount of 4 GiB. This setting is the cluster-wide default for all VMs. **Ratio levels:** … |
-| Ratio level indicator | Colored dot + label below input: **Recommended** / **Use with caution** / **High overcommit risk** |
+| Ratio level indicator | Colored dot + label below input: **Safe level** / **Use with caution** / **High risk** |
 | Number input (aria) | Saved ratio |
 | Unit | **%** |
 | Save | **Save** (secondary) |

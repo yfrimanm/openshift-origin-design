@@ -100,9 +100,9 @@
       <table>
         <thead><tr><th>Level</th><th>Range</th><th>Label</th><th>Meaning</th></tr></thead>
         <tbody>
-          <tr><td><strong>Green</strong></td><td><strong>75% – 100%</strong></td><td>Recommended</td><td>Requests most of configured memory. Default <strong>97.5%</strong> is here.</td></tr>
-          <tr><td><strong>Yellow</strong></td><td><strong>50% – 74.9%</strong></td><td>Use with caution</td><td>Moderate overcommit; monitor memory pressure.</td></tr>
-          <tr><td><strong>Red</strong></td><td><strong>25% – 49.9%</strong></td><td>High overcommit risk</td><td>Aggressive overcommit. Each VM requests between 25% and 50% of its configured memory on the cluster.</td></tr>
+          <tr><td><strong>Green</strong></td><td><strong>75% – 100%</strong></td><td>Safe level</td><td>Low overcommit. Requests most configured memory on the cluster. Default <strong>97.5%</strong> is here.</td></tr>
+          <tr><td><strong>Yellow</strong></td><td><strong>50% – 74.9%</strong></td><td>Use with caution</td><td>Moderate overcommit. Monitor cluster memory pressure.</td></tr>
+          <tr><td><strong>Red</strong></td><td><strong>25% – 49.9%</strong></td><td>High risk</td><td>Aggressive overcommit. Memory pressure can rise quickly if workloads grow.</td></tr>
         </tbody>
       </table>
       <p class="doc-note">Thresholds are proposed for the mockup — confirm with engineering and PM.</p>
@@ -130,7 +130,7 @@
 └── Active ratio: 94.2%  [?]                [read-only; live cluster value]
     Saved ratio  [?]
     [−] [ 97.5 ] [+] %                         [PF6 Number input with unit]
-    ● Recommended
+    ● Safe level
     [Save]  [Restore default]
 
 Kernel Samepage Merging (KSM)  [?]</pre>
@@ -155,7 +155,7 @@ Kernel Samepage Merging (KSM)  [?]</pre>
           <tr><td>Saved ratio <strong>?</strong> popover</td><td>After changes are saved, they apply cluster-wide: <strong>New VMs:</strong> Use the saved ratio immediately, unless they have a specific ratio set by the VM owner. <strong>Running VMs:</strong> Retain their current ratio until they reboot or migrate.</td></tr>
           <tr><td>Badge</td><td><strong>New</strong> (accordion header only)</td></tr>
           <tr><td><strong>?</strong> popover (accordion)</td><td><strong>Memory request ratio</strong> — The percentage of each VM's configured memory that is requested on the cluster. <strong>Formula:</strong> requested ÷ configured, on a 0–100% range. At <strong>25%</strong>, a 4 GiB VM requests 1 GiB on the cluster. At <strong>100%</strong>, it requests the full configured amount of 4 GiB. This setting is the cluster-wide default for all VMs. <strong>Ratio levels:</strong> …</td></tr>
-          <tr><td>Ratio level indicator</td><td>Colored dot + label: <strong>Recommended</strong> / <strong>Use with caution</strong> / <strong>High overcommit risk</strong></td></tr>
+          <tr><td>Ratio level indicator</td><td>Colored dot + label: <strong>Safe level</strong> / <strong>Use with caution</strong> / <strong>High risk</strong></td></tr>
           <tr><td>Save</td><td><strong>Save</strong> (secondary)</td></tr>
           <tr><td>Restore default</td><td><strong>Restore default</strong> (link)</td></tr>
           <tr><td>Validation error</td><td>Enter a value from 0 to 100.</td></tr>

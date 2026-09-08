@@ -762,7 +762,7 @@
                     </p>
                     <p class="ratio-level-indicator ratio-level-indicator--green hidden" id="ratio-level-indicator" aria-live="polite">
                       <span class="ratio-level-indicator__dot" aria-hidden="true"></span>
-                      <span id="ratio-level-label">Recommended</span>
+                      <span id="ratio-level-label">Safe level</span>
                     </p>
                     <div class="reservation-ratio-actions hidden" id="ratio-form-actions">
                       <button type="button" class="pf-v6-c-button pf-m-secondary" id="save-ratio-btn" disabled>Save</button>
@@ -874,8 +874,8 @@
                   <div class="help-popover__level">
                     <span class="help-popover__level-dot help-popover__level-dot--green" aria-hidden="true"></span>
                     <div>
-                      <div class="help-popover__level-title">Recommended <span class="help-popover__level-range">(75% and above)</span></div>
-                      <p class="help-popover__level-desc">Requests most of each VM's configured memory on the cluster.</p>
+                      <div class="help-popover__level-title">Safe level <span class="help-popover__level-range">(75% and above)</span></div>
+                      <p class="help-popover__level-desc">Low overcommit. Requests most configured memory on the cluster.</p>
                     </div>
                   </div>
                   <div class="help-popover__level">
@@ -888,8 +888,8 @@
                   <div class="help-popover__level">
                     <span class="help-popover__level-dot help-popover__level-dot--red" aria-hidden="true"></span>
                     <div>
-                      <div class="help-popover__level-title">High overcommit risk <span class="help-popover__level-range">(25% to 49.9%)</span></div>
-                      <p class="help-popover__level-desc">Aggressive overcommit. Each VM requests between 25% and 50% of its configured memory on the cluster.</p>
+                      <div class="help-popover__level-title">High risk <span class="help-popover__level-range">(25% to 49.9%)</span></div>
+                      <p class="help-popover__level-desc">Aggressive overcommit. Memory pressure can rise quickly if workloads grow.</p>
                     </div>
                   </div>
                 </div>
@@ -935,9 +935,9 @@
     const DEFAULT_RATIO = 97.5;
     const ACTIVE_RATIO = 94.2;
     const RATIO_LEVELS = {
-      green: { min: 75, label: 'Recommended' },
+      green: { min: 75, label: 'Safe level' },
       yellow: { min: 50, label: 'Use with caution' },
-      red: { label: 'High overcommit risk' },
+      red: { label: 'High risk' },
     };
     let targetRatio = DEFAULT_RATIO;
     let ratioFieldTouched = false;
