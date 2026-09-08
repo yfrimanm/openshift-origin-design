@@ -11713,8 +11713,8 @@
                   ${noTemplatesInProject ? 'disabled' : ''} />
               </div>
               <div class="tpl-view-toggle" role="group" aria-label="Template view">
-                <button type="button" data-tpl-view="list" class="${view === 'list' ? 'pf-m-selected' : ''}" aria-label="List view" title="List view" ${noTemplatesInProject ? 'disabled' : ''}><i class="fa-solid fa-list"></i></button>
-                <button type="button" data-tpl-view="cards" class="${view === 'cards' ? 'pf-m-selected' : ''}" aria-label="Card view" title="Card view" ${noTemplatesInProject ? 'disabled' : ''}><i class="fa-solid fa-table-cells-large"></i></button>
+                <button type="button" data-tpl-view="cards" class="${view === 'cards' ? 'pf-m-selected' : ''}" aria-pressed="${view === 'cards'}" aria-label="Card view" title="Card view" ${noTemplatesInProject ? 'disabled' : ''}><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+                <button type="button" data-tpl-view="list" class="${view === 'list' ? 'pf-m-selected' : ''}" aria-pressed="${view === 'list'}" aria-label="List view" title="List view" ${noTemplatesInProject ? 'disabled' : ''}><i class="fa-solid fa-list" aria-hidden="true"></i></button>
               </div>
             </div>
             <div class="tpl-body tpl-body--no-filters">
