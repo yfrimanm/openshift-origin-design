@@ -2955,6 +2955,31 @@
     @media (max-width: 900px) {
       .method-grid { grid-template-columns: 1fr; max-width: 420px; }
     }
+    .method-grid--pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 720px;
+    }
+    @media (max-width: 700px) {
+      .method-grid--pair { grid-template-columns: 1fr; max-width: 420px; }
+    }
+    .radio-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+      max-width: 560px;
+    }
+    .radio-stack__item .form-check {
+      margin: 0;
+      font-weight: 600;
+      align-items: flex-start;
+    }
+    .radio-stack__item .form-check input[type="radio"] {
+      margin-top: 3px;
+    }
+    .radio-stack__item .form-helper {
+      margin: 4px 0 0 calc(1rem + 10px);
+    }
     .clone-source-toolbar {
       display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 12px 0 16px;
     }
@@ -3095,35 +3120,6 @@
     .form-section-divider {
       border: none; border-top: 1px solid var(--vmaas-border-light);
       margin: 24px 0; max-width: 560px;
-    }
-    .access-card-grid {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 720px;
-    }
-    @media (max-width: 700px) { .access-card-grid { grid-template-columns: 1fr; } }
-    .access-card {
-      position: relative; display: flex; flex-direction: column; gap: 8px;
-      padding: 16px; text-align: left; cursor: pointer;
-      border: 1px solid var(--vmaas-border); border-radius: 8px; background: #fff;
-      min-height: 140px; box-sizing: border-box;
-    }
-    .access-card:hover { border-color: var(--vmaas-blue); }
-    .access-card.pf-m-selected {
-      border-color: var(--vmaas-blue); box-shadow: 0 0 0 1px var(--vmaas-blue);
-    }
-    .access-card__badge {
-      position: absolute; top: 12px; right: 12px;
-      padding: 2px 8px; border-radius: 999px; background: #f0f0f0;
-      font-size: 11px; font-weight: 600; color: var(--vmaas-text-subtle);
-    }
-    .access-card__icon {
-      font-size: 22px; color: var(--vmaas-blue); line-height: 1;
-    }
-    .access-card__icon--editable { color: #0066cc; }
-    .access-card__title { margin: 0; font-size: 16px; font-weight: 700; color: var(--vmaas-text); }
-    .access-card__desc { margin: 0; font-size: 14px; color: var(--vmaas-text-subtle); line-height: 1.45; }
-    .compute-rich-option__meta {
-      display: block; margin-top: 2px; font-size: 13px; line-height: 1.4;
-      color: var(--vmaas-text-subtle);
     }
     .wiz-breadcrumb {
       font-size: 13px; color: var(--vmaas-text-subtle); margin: 0 0 4px;
@@ -13300,20 +13296,6 @@
       renderWizard();
     }
 
-    function accessCard(value, title, description, kind, selected) {
-      const icon = kind === 'editable'
-        ? '<i class="fa-solid fa-pen"></i>'
-        : '<i class="fa-solid fa-lock"></i>';
-      const iconClass = kind === 'editable' ? 'access-card__icon--editable' : '';
-      return `
-        <button type="button" class="access-card ${selected ? 'pf-m-selected' : ''}" data-access="${value}">
-          ${selected ? '<span class="access-card__badge">Selected</span>' : ''}
-          <span class="access-card__icon ${iconClass}" aria-hidden="true">${icon}</span>
-          <p class="access-card__title">${title}</p>
-          <p class="access-card__desc">${description}</p>
-        </button>`;
-    }
-
     function bindRichSelect(root, {
       toggleSel, menuSel, optionSel, onOpen, onClose, onSelect,
     }) {
@@ -13464,17 +13446,20 @@
           <h3>Access &amp; Compute resources</h3>
           <p class="step-help">Set tenant access to the guest operating system and choose compute resources for this catalog item.</p>
           <h4 class="config-section-title">Tenant access to hardware and OS</h4>
-          <div class="access-card-grid">
-            ${accessCard('locked', 'Locked', 'Tenants cannot change the guest operating system or hardware.', 'locked', c.tenantAccess === 'locked')}
-            ${accessCard('editable', 'Editable', 'Tenants can change the guest operating system or hardware at provisioning.', 'editable', c.tenantAccess === 'editable')}
+          <div class="method-grid method-grid--pair">
+            ${methodCard('locked', 'Locked',
+              'Tenants cannot change the guest operating system or hardware.',
+              'fa-lock', c.tenantAccess === 'locked')}
+            ${methodCard('editable', 'Editable',
+              'Tenants can change the guest operating system or hardware at provisioning.',
+              'fa-pen', c.tenantAccess === 'editable')}
           </div>
           <div class="form-field" style="margin-top:24px;">
             <label id="ci-compute-label">Compute resources <span class="req">*</span></label>
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               <button type="button" class="pf-v6-c-menu-toggle" id="ci-compute-toggle" aria-expanded="${c.computeMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-compute-label">
-                <span class="rich-select__toggle-main rich-select__toggle-main--stacked">
+                <span class="rich-select__toggle-main">
                   <span class="rich-select__toggle-label">${compute.label}</span>
-                  <span class="rich-select__toggle-desc">${compute.cpu} · ${compute.memory} · ${compute.gpu}</span>
                 </span>
                 <span class="pf-v6-c-menu-toggle__controls">
                   <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
@@ -13494,8 +13479,7 @@
                       <span class="pf-v6-c-menu__item-main">
                         <span class="rich-select__option-body">
                           <span class="rich-select__option-title">${cr.label}</span>
-                          <span class="rich-select__option-desc">${cr.cpu} · ${cr.memory} · ${cr.gpu}</span>
-                          <span class="compute-rich-option__meta">${cr.rate}</span>
+                          <span class="rich-select__option-desc">${cr.cpu} · ${cr.memory} · ${cr.gpu} · ${cr.rate}</span>
                         </span>
                       </span>
                     </button>
@@ -13505,9 +13489,9 @@
             </div>
           </div>
         `;
-        panel.querySelectorAll('[data-access]').forEach(btn => {
+        panel.querySelectorAll('[data-method]').forEach(btn => {
           btn.addEventListener('click', () => {
-            c.tenantAccess = btn.dataset.access;
+            c.tenantAccess = btn.dataset.method;
             renderWizard();
           });
         });
@@ -13615,15 +13599,21 @@
           <h3>Visibility</h3>
           <p class="step-help">Control which tenants can discover and order this catalog item.</p>
           <div class="form-field">
-            <div class="di-os-radios" role="radiogroup" aria-label="Catalog item visibility">
-              <label class="form-check">
-                <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
-                Global public
-              </label>
-              <label class="form-check">
-                <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
-                Tenant scoped
-              </label>
+            <div class="radio-stack" role="radiogroup" aria-label="Catalog item visibility">
+              <div class="radio-stack__item">
+                <label class="form-check">
+                  <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
+                  Global public
+                </label>
+                <p class="form-helper">Visible to all tenants</p>
+              </div>
+              <div class="radio-stack__item">
+                <label class="form-check">
+                  <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
+                  Tenant scoped
+                </label>
+                <p class="form-helper">Visible only to selected tenants</p>
+              </div>
             </div>
           </div>
           ${c.visibility === 'tenant' ? `
@@ -13846,21 +13836,34 @@
       }
       if (view === 'list') {
         root.innerHTML = `
-          <div class="tpl-list">
-            <table>
-              <thead><tr>
-                <th>Name</th><th>Compute</th><th>Disk image</th><th>Rate</th><th>Visibility</th>
-              </tr></thead>
-              <tbody>
-                ${items.map(item => `
-                  <tr>
-                    <td><span class="tpl-list__name-link">${String(item.name).replace(/</g, '&lt;')}</span></td>
-                    <td>${item.cpu} · ${item.memory}${item.gpu ? ` · ${item.gpu}` : ''}</td>
-                    <td>${String(item.diskImage).replace(/</g, '&lt;')}${item.diskLocked ? ' · Locked' : ''}</td>
-                    <td>${item.rateHour}</td>
-                    <td>${String(item.visibilityLabel).replace(/</g, '&lt;')}</td>
-                  </tr>
-                `).join('')}
+          <div style="overflow-x:auto;">
+            <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+              <thead class="pf-v6-c-table__thead">
+                <tr class="pf-v6-c-table__tr">
+                  <th class="pf-v6-c-table__th" scope="col">Name</th>
+                  <th class="pf-v6-c-table__th" scope="col">Compute</th>
+                  <th class="pf-v6-c-table__th" scope="col">Disk image</th>
+                  <th class="pf-v6-c-table__th" scope="col">Rate</th>
+                  <th class="pf-v6-c-table__th" scope="col">Visibility</th>
+                </tr>
+              </thead>
+              <tbody class="pf-v6-c-table__tbody">
+                ${items.map(item => {
+                  const name = String(item.diskImage || item.name).replace(/</g, '&lt;');
+                  const diskImage = String(item.diskImage).replace(/</g, '&lt;');
+                  const visibility = String(item.visibilityLabel).replace(/</g, '&lt;');
+                  const compute = `${item.cpu} · ${item.memory}${item.gpu ? ` · ${item.gpu}` : ''}`;
+                  const rate = `${item.rateHour} ${item.rateMonth}`;
+                  const lockSuffix = item.diskLocked ? ' · Locked' : '';
+                  return `
+                  <tr class="pf-v6-c-table__tr">
+                    <td class="pf-v6-c-table__td">${name}</td>
+                    <td class="pf-v6-c-table__td">${compute}</td>
+                    <td class="pf-v6-c-table__td">${diskImage}${lockSuffix}</td>
+                    <td class="pf-v6-c-table__td">${rate}</td>
+                    <td class="pf-v6-c-table__td">${visibility}</td>
+                  </tr>`;
+                }).join('')}
               </tbody>
             </table>
           </div>`;
