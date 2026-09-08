@@ -3093,9 +3093,37 @@
     }
     .wiz-breadcrumb a { color: var(--vmaas-blue); text-decoration: none; }
     .wiz-breadcrumb a:hover { text-decoration: underline; }
+    #catalog-tenant-toggle.filter-dd-btn--project {
+      border-radius: 999px;
+    }
+    .filter-dd-btn--project.pf-m-expanded,
     #catalog-tenant-toggle.filter-dd-btn--project.pf-m-expanded {
       border-color: var(--vmaas-blue);
       box-shadow: 0 0 0 1px var(--vmaas-blue);
+    }
+    .catalog-tenant-dd { flex: 0 0 auto; }
+    #catalog-tenant-menu.catalog-tenant-menu {
+      min-width: 100%;
+      width: max-content;
+      border: 1px solid #d2d2d2;
+      border-radius: 4px;
+      box-shadow: none;
+      max-height: 152px;
+      overflow-y: auto;
+    }
+    #catalog-tenant-menu .pf-v6-c-menu__content,
+    #catalog-tenant-menu .pf-v6-c-menu__list {
+      padding: 0;
+    }
+    #catalog-tenant-menu .catalog-tenant-item {
+      width: 100%;
+      justify-content: flex-start;
+      padding: 8px 16px;
+      font-weight: 400;
+      color: var(--vmaas-text);
+    }
+    #catalog-tenant-menu .catalog-tenant-item .pf-v6-c-menu__item-text {
+      font-weight: 400;
     }
     .location-summary {
       display: flex; align-items: center; gap: 8px;
@@ -4649,8 +4677,8 @@
               <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-catalog-item" hidden>Create catalog item</button>
             </div>
             <div class="tpl-toolbar" id="catalog-toolbar">
-              <div class="tpl-project-dd" id="catalog-tenant-dd">
-                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn filter-dd-btn--project" id="catalog-tenant-toggle" aria-expanded="false" aria-haspopup="listbox">
+              <div class="filter-dd-wrap catalog-tenant-dd" id="catalog-tenant-dd">
+                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn filter-dd-btn--project" id="catalog-tenant-toggle" aria-expanded="false" aria-haspopup="listbox" aria-label="Filter by tenant">
                   <span class="pf-v6-c-menu-toggle__text" id="catalog-tenant-label">All tenants</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
@@ -4658,9 +4686,7 @@
                     </span>
                   </span>
                 </button>
-                <div class="tpl-project-dd__menu" id="catalog-tenant-menu" hidden>
-                  <ul class="tpl-project-dd__list" id="catalog-tenant-list" role="listbox"></ul>
-                </div>
+                <div class="pf-v6-c-menu filter-dd-menu catalog-tenant-menu" id="catalog-tenant-menu" role="listbox" aria-label="Tenant filter"></div>
               </div>
               <div class="filter-name-search">
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -13131,7 +13157,7 @@
       { id: 'large', label: 'Large', cpu: '64 vCPU', memory: '512 GB', gpu: 'NVIDIA A100 80 GB', rate: '$15.12/hr' },
     ];
 
-    const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'tenant-c', 'project-a', 'yifat', 'vmaas', 'acme-corp', 'globex'];
+    const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'tenant-c'];
 
     let PROVIDER_CATALOG_ITEMS = [
       {
@@ -13160,7 +13186,7 @@
         rateMonth: '$5,200/mo per instance',
         visibility: 'tenant',
         visibilityLabel: 'Tenant scoped',
-        tenants: ['tenant-a', 'project-a'],
+        tenants: ['tenant-a', 'tenant-b'],
       },
     ];
 
@@ -13846,29 +13872,49 @@
         </div>`;
     }
 
-    function renderCatalogTenantFilter() {
-      const list = document.getElementById('catalog-tenant-list');
-      if (!list) return;
+    function setCatalogTenantMenuOpen(open) {
+      const menu = document.getElementById('catalog-tenant-menu');
+      const toggle = document.getElementById('catalog-tenant-toggle');
+      if (!menu || !toggle) return;
+      menu.classList.toggle('pf-m-open', open);
+      toggle.classList.toggle('pf-m-expanded', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    }
+
+    function buildCatalogTenantMenu() {
+      const menu = document.getElementById('catalog-tenant-menu');
+      if (!menu) return;
+      const current = state.catalogTenantFilter || 'all';
       const options = [{ id: 'all', label: 'All tenants' }, ...PLATFORM_TENANTS.map(t => ({ id: t, label: t }))];
-      list.innerHTML = options.map(o => `
-        <li>
-          <button type="button" class="tpl-project-dd__option" data-catalog-tenant="${o.id}" role="option">
-            <span class="tpl-project-dd__option-label">${o.label}</span>
+      const items = options.map(o => `
+        <li class="pf-v6-c-menu__list-item" role="none">
+          <button type="button" class="pf-v6-c-menu__item catalog-tenant-item" role="option"
+            data-catalog-tenant="${o.id}" ${current === o.id ? 'aria-selected="true"' : ''}>
+            <span class="pf-v6-c-menu__item-main">
+              <span class="pf-v6-c-menu__item-text">${o.label}</span>
+            </span>
           </button>
         </li>
       `).join('');
-      list.querySelectorAll('[data-catalog-tenant]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.catalogTenantFilter = btn.dataset.catalogTenant;
-          const label = document.getElementById('catalog-tenant-label');
-          if (label) label.textContent = btn.dataset.catalogTenant === 'all' ? 'All tenants' : btn.dataset.catalogTenant;
-          document.getElementById('catalog-tenant-menu')?.setAttribute('hidden', '');
-          const toggle = document.getElementById('catalog-tenant-toggle');
-          toggle?.setAttribute('aria-expanded', 'false');
-          toggle?.classList.remove('pf-m-expanded');
-          renderCatalog();
-        });
+      menu.innerHTML = `<div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list" role="none">${items}</ul></div>`;
+      if (menu.dataset.wired) return;
+      menu.dataset.wired = '1';
+      menu.addEventListener('click', e => {
+        e.stopPropagation();
+        const btn = e.target.closest('[data-catalog-tenant]');
+        if (!btn) return;
+        state.catalogTenantFilter = btn.dataset.catalogTenant;
+        const label = document.getElementById('catalog-tenant-label');
+        if (label) {
+          label.textContent = btn.dataset.catalogTenant === 'all' ? 'All tenants' : btn.dataset.catalogTenant;
+        }
+        setCatalogTenantMenuOpen(false);
+        renderCatalog();
       });
+    }
+
+    function renderCatalogTenantFilter() {
+      buildCatalogTenantMenu();
     }
 
     function formatDiskImageGuestOs(guestOs) {
@@ -14643,26 +14689,15 @@
     document.getElementById('catalog-tenant-toggle')?.addEventListener('click', e => {
       e.stopPropagation();
       const menu = document.getElementById('catalog-tenant-menu');
-      const toggle = document.getElementById('catalog-tenant-toggle');
-      const open = menu?.hasAttribute('hidden');
-      if (open) {
-        renderCatalogTenantFilter();
-        menu?.removeAttribute('hidden');
-        toggle?.setAttribute('aria-expanded', 'true');
-        toggle?.classList.add('pf-m-expanded');
-      } else {
-        menu?.setAttribute('hidden', '');
-        toggle?.setAttribute('aria-expanded', 'false');
-        toggle?.classList.remove('pf-m-expanded');
-      }
+      const open = !menu?.classList.contains('pf-m-open');
+      if (open) buildCatalogTenantMenu();
+      setCatalogTenantMenuOpen(open);
     });
+    document.getElementById('catalog-tenant-menu')?.addEventListener('click', e => e.stopPropagation());
     document.addEventListener('click', e => {
       const dd = document.getElementById('catalog-tenant-dd');
       if (!dd || dd.contains(e.target)) return;
-      document.getElementById('catalog-tenant-menu')?.setAttribute('hidden', '');
-      const toggle = document.getElementById('catalog-tenant-toggle');
-      toggle?.setAttribute('aria-expanded', 'false');
-      toggle?.classList.remove('pf-m-expanded');
+      setCatalogTenantMenuOpen(false);
     });
     document.getElementById('btn-create-instance-type')?.addEventListener('click', () => {
       openCreateInstanceType();
