@@ -3196,10 +3196,13 @@
     }
     .tpl-card__scope-badge i { font-size: 11px; }
     .tpl-card--catalog .tpl-card__title-row {
-      margin-bottom: 18px;
+      margin-bottom: 0;
     }
     .tpl-card--catalog .tpl-card__title-row .tpl-card__title {
       margin: 0;
+    }
+    .tpl-card--catalog .tpl-card__desc {
+      margin: 4px 0 16px;
     }
     .tpl-card--catalog .tpl-card__specs {
       margin-bottom: 16px;
@@ -13403,7 +13406,7 @@
     let PROVIDER_CATALOG_ITEMS = [
       {
         id: 'pci-1',
-        name: 'RHEL 9.4',
+        name: 'catalog item-1',
         cpu: '64 vCPU',
         memory: '512 GB',
         gpu: 'NVIDIA A100 80 GB',
@@ -13417,7 +13420,7 @@
       },
       {
         id: 'pci-2',
-        name: 'Catalog-item-name-2',
+        name: 'catalog item-2',
         cpu: '32 vCPU',
         memory: '256 GB',
         gpu: 'NVIDIA A100 40 GB',
@@ -14086,7 +14089,7 @@
               </thead>
               <tbody class="pf-v6-c-table__tbody">
                 ${items.map(item => {
-                  const name = String(item.diskImage || item.name).replace(/</g, '&lt;');
+                  const name = String(item.name).replace(/</g, '&lt;');
                   const diskImage = String(item.diskImage).replace(/</g, '&lt;');
                   const visibility = String(item.visibilityLabel).replace(/</g, '&lt;');
                   const compute = `${item.cpu} · ${item.memory}${item.gpu ? ` · ${item.gpu}` : ''}`;
@@ -14109,7 +14112,8 @@
       root.innerHTML = `
         <div class="tpl-cards">
           ${items.map(item => {
-            const title = String(item.diskImage || item.name).replace(/</g, '&lt;');
+            const title = String(item.name).replace(/</g, '&lt;');
+            const osLine = String(item.diskImage || '—').replace(/</g, '&lt;');
             const scopeIcon = item.visibility === 'global' ? 'globe' : 'building';
             const scopeLabel = String(item.visibilityLabel || '—').replace(/</g, '&lt;');
             return `
@@ -14127,6 +14131,7 @@
                 <span class="tpl-card__title">${title}</span>
                 ${item.diskLocked ? fieldGovLabel('locked') : fieldGovLabel('editable')}
               </div>
+              <p class="tpl-card__desc">${osLine}</p>
               <div class="tpl-card__specs">
                 <div>
                   <span class="tpl-card__spec-label">CPU</span>
