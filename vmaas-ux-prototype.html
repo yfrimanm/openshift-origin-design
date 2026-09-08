@@ -1976,6 +1976,14 @@
       flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
       text-align: start;
     }
+    .rich-select__toggle-main--stacked {
+      flex-direction: column; align-items: flex-start; gap: 2px;
+    }
+    .rich-select__toggle-desc {
+      display: block; font-size: 13px; line-height: 1.35;
+      color: var(--vmaas-text-subtle);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+    }
     .rich-select__toggle-label {
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400;
     }
@@ -3023,52 +3031,33 @@
       flex: 1;
     }
 
-    /* Provider catalog list */
-    .provider-catalog-card {
-      text-align: left; cursor: default;
-      background: #fff; border: 1px solid var(--vmaas-border-light);
-      border-radius: 16px; padding: 18px 16px 14px;
-      display: flex; flex-direction: column; gap: 12px;
-      min-height: 100%;
-      box-sizing: border-box;
+    /* Provider catalog list — reuse tpl-card; static cards on Catalog page */
+    .tpl-card--catalog {
+      cursor: default;
     }
-    .provider-catalog-card__title {
-      margin: 0; font-size: 16px; font-weight: 700; line-height: 1.35; color: var(--vmaas-text);
+    .tpl-card--catalog:hover { border-color: var(--vmaas-border-light); }
+    .tpl-card--catalog .tpl-card__title {
+      color: var(--vmaas-text);
+      cursor: default;
     }
-    .provider-catalog-card__specs {
-      display: grid; gap: 6px; font-size: 14px; color: var(--vmaas-text);
+    .tpl-card--catalog .tpl-card__title:hover { text-decoration: none; }
+    .tpl-card__footer--catalog {
+      align-items: center;
     }
-    .provider-catalog-card__spec-row {
-      display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center;
+    .tpl-card__visibility {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; line-height: 1.3; color: var(--vmaas-text-subtle);
     }
-    .provider-catalog-card__spec-label { color: var(--vmaas-text-subtle); min-width: 2.5rem; }
-    .provider-catalog-card__image-row {
-      display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    .tpl-card__visibility i { font-size: 12px; }
+    .tpl-card__rate {
+      display: inline-flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+      justify-content: flex-end; text-align: end;
     }
-    .provider-catalog-card__os-icon {
-      width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
-      color: #ee0000; font-size: 14px;
-    }
-    .provider-catalog-card__locked {
-      display: inline-flex; align-items: center; padding: 0 8px; min-height: 20px;
-      border-radius: 999px; background: #f0f0f0; font-size: 12px; font-weight: 600; color: var(--vmaas-text-subtle);
-    }
-    .provider-catalog-card__rates {
-      font-size: 14px; color: var(--vmaas-text); line-height: 1.4;
-    }
-    .provider-catalog-card__footer {
-      margin-top: auto; padding-top: 8px; border-top: 1px solid var(--vmaas-border-light);
-      display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--vmaas-text-subtle);
-    }
-    .provider-catalog-grid {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
-    }
-    @media (max-width: 900px) { .provider-catalog-grid { grid-template-columns: 1fr; } }
 
     /* Catalog create wizard */
     .form-section-divider {
       border: none; border-top: 1px solid var(--vmaas-border-light);
-      margin: 24px 0;
+      margin: 24px 0; max-width: 560px;
     }
     .access-card-grid {
       display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 720px;
@@ -3092,31 +3081,21 @@
     .access-card__icon {
       font-size: 22px; color: var(--vmaas-blue); line-height: 1;
     }
-    .access-card__icon--open { color: var(--vmaas-text); }
+    .access-card__icon--editable { color: #0066cc; }
     .access-card__title { margin: 0; font-size: 16px; font-weight: 700; color: var(--vmaas-text); }
     .access-card__desc { margin: 0; font-size: 14px; color: var(--vmaas-text-subtle); line-height: 1.45; }
-    .compute-rich-option__gpu { color: #6754ac; font-size: 14px; }
-    .compute-rich-option__rate { margin-top: 4px; font-size: 14px; color: var(--vmaas-text); }
-    .visibility-radios { display: flex; flex-direction: column; gap: 12px; max-width: 640px; }
-    .visibility-radio {
-      display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
-      border: 1px solid var(--vmaas-border); border-radius: 8px; cursor: pointer;
+    .compute-rich-option__meta {
+      display: block; margin-top: 2px; font-size: 13px; line-height: 1.4;
+      color: var(--vmaas-text-subtle);
     }
-    .visibility-radio:hover { border-color: var(--vmaas-blue); }
-    .visibility-radio.pf-m-selected {
-      border-color: var(--vmaas-blue); box-shadow: 0 0 0 1px var(--vmaas-blue);
-    }
-    .visibility-radio input { margin-top: 3px; flex-shrink: 0; }
-    .visibility-radio__body { flex: 1; min-width: 0; }
-    .visibility-radio__title { font-size: 14px; font-weight: 600; color: var(--vmaas-text); }
-    .visibility-radio__desc { font-size: 13px; color: var(--vmaas-text-subtle); margin-top: 2px; }
     .wiz-breadcrumb {
       font-size: 13px; color: var(--vmaas-text-subtle); margin: 0 0 4px;
     }
     .wiz-breadcrumb a { color: var(--vmaas-blue); text-decoration: none; }
     .wiz-breadcrumb a:hover { text-decoration: underline; }
-
-      margin: 0 0 14px; font-size: 14px; color: var(--vmaas-text); max-width: 640px; line-height: 1.45;
+    #catalog-tenant-toggle.filter-dd-btn--project.pf-m-expanded {
+      border-color: var(--vmaas-blue);
+      box-shadow: 0 0 0 1px var(--vmaas-blue);
     }
     .location-summary {
       display: flex; align-items: center; gap: 8px;
@@ -4671,7 +4650,7 @@
             </div>
             <div class="tpl-toolbar" id="catalog-toolbar">
               <div class="tpl-project-dd" id="catalog-tenant-dd">
-                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn" id="catalog-tenant-toggle" aria-expanded="false" aria-haspopup="listbox">
+                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn filter-dd-btn--project" id="catalog-tenant-toggle" aria-expanded="false" aria-haspopup="listbox">
                   <span class="pf-v6-c-menu-toggle__text" id="catalog-tenant-label">All tenants</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
@@ -4680,24 +4659,16 @@
                   </span>
                 </button>
                 <div class="tpl-project-dd__menu" id="catalog-tenant-menu" hidden>
-                  <div class="tpl-project-dd__search">
-                    <i class="fa-solid fa-search" aria-hidden="true"></i>
-                    <input type="search" id="catalog-tenant-search" placeholder="Filter tenants" aria-label="Filter tenants" />
-                  </div>
                   <ul class="tpl-project-dd__list" id="catalog-tenant-list" role="listbox"></ul>
                 </div>
               </div>
               <div class="filter-name-search">
-                <span class="pf-v6-c-form-control pf-m-search">
-                  <span class="pf-v6-c-form-control__utilities pf-m-search">
-                    <span class="pf-v6-c-form-control__icon"><i class="fas fa-search" aria-hidden="true"></i></span>
-                  </span>
-                  <input type="search" id="catalog-search" placeholder="Search catalog items" aria-label="Search catalog items" />
-                </span>
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" id="catalog-search" placeholder="Search catalog items" aria-label="Search catalog items" />
               </div>
               <div class="tpl-view-toggle" role="group" aria-label="Catalog view">
-                <button type="button" id="catalog-view-cards" class="pf-m-selected" aria-pressed="true" title="Grid view"><i class="fa-solid fa-grid-2" aria-hidden="true"></i></button>
-                <button type="button" id="catalog-view-list" aria-pressed="false" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
+                <button type="button" id="catalog-view-cards" class="pf-m-selected" aria-pressed="true" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+                <button type="button" id="catalog-view-list" aria-pressed="false" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
               </div>
             </div>
             <div id="catalog-content"></div>
@@ -13160,19 +13131,19 @@
       { id: 'large', label: 'Large', cpu: '64 vCPU', memory: '512 GB', gpu: 'NVIDIA A100 80 GB', rate: '$15.12/hr' },
     ];
 
-    const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'project-a', 'yifat', 'vmaas', 'acme-corp', 'globex'];
+    const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'tenant-c', 'project-a', 'yifat', 'vmaas', 'acme-corp', 'globex'];
 
     let PROVIDER_CATALOG_ITEMS = [
       {
         id: 'pci-1',
-        name: 'Catalog-item-name-1',
+        name: 'rhel 9.4',
         cpu: '64 vCPU',
         memory: '512 GB',
         gpu: 'NVIDIA A100 80 GB',
-        diskImage: 'RHEL 9.4',
+        diskImage: 'rhel 9.4',
         diskLocked: true,
-        rateHour: '$4.25/hr',
-        rateMonth: '$2,850/mo per instance',
+        rateHour: '$4.25/hour',
+        rateMonth: '$2,850/month per instance',
         visibility: 'global',
         visibilityLabel: 'Global public',
         tenants: [],
@@ -13266,13 +13237,15 @@
       renderWizard();
     }
 
-    function accessCard(value, title, description, iconClass, selected) {
+    function accessCard(value, title, description, kind, selected) {
+      const icon = kind === 'editable'
+        ? '<i class="fa-solid fa-pen"></i>'
+        : '<i class="fa-solid fa-lock"></i>';
+      const iconClass = kind === 'editable' ? 'access-card__icon--editable' : '';
       return `
         <button type="button" class="access-card ${selected ? 'pf-m-selected' : ''}" data-access="${value}">
           ${selected ? '<span class="access-card__badge">Selected</span>' : ''}
-          <span class="access-card__icon ${iconClass === 'open' ? 'access-card__icon--open' : ''}" aria-hidden="true">
-            <i class="fa-solid fa-${iconClass === 'open' ? 'lock-open' : 'lock'}"></i>
-          </span>
+          <span class="access-card__icon ${iconClass}" aria-hidden="true">${icon}</span>
           <p class="access-card__title">${title}</p>
           <p class="access-card__desc">${description}</p>
         </button>`;
@@ -13322,6 +13295,7 @@
         const selectedDisk = getCatalogDiskImage(c.diskImageId);
         panel.innerHTML = `
           <h3>Details</h3>
+          <p class="step-help">Name the catalog item and select a guest operating system and disk image.</p>
           <div class="form-field ${state.fieldErrors.ciName ? 'pf-m-error' : ''}">
             <label for="ci-name">Name <span class="req">*</span></label>
             <div class="name-row">
@@ -13425,18 +13399,19 @@
         });
         panel.innerHTML = `
           <h3>Access &amp; Compute resources</h3>
-          <p class="step-help">Choose tenant access and compute resources.</p>
+          <p class="step-help">Set tenant access to the guest operating system and choose compute resources for this catalog item.</p>
           <h4 class="config-section-title">Tenant access to hardware and OS</h4>
           <div class="access-card-grid">
-            ${accessCard('locked', 'Locked', 'Tenants cannot change it.', 'lock', c.tenantAccess === 'locked')}
-            ${accessCard('editable', 'Editable at provisioning', 'Tenants can change at launch.', 'open', c.tenantAccess === 'editable')}
+            ${accessCard('locked', 'Locked', 'Tenants cannot change the guest operating system or hardware.', 'locked', c.tenantAccess === 'locked')}
+            ${accessCard('editable', 'Editable', 'Tenants can change the guest operating system or hardware at provisioning.', 'editable', c.tenantAccess === 'editable')}
           </div>
           <div class="form-field" style="margin-top:24px;">
             <label id="ci-compute-label">Compute resources <span class="req">*</span></label>
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               <button type="button" class="pf-v6-c-menu-toggle" id="ci-compute-toggle" aria-expanded="${c.computeMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-compute-label">
-                <span class="rich-select__toggle-main">
+                <span class="rich-select__toggle-main rich-select__toggle-main--stacked">
                   <span class="rich-select__toggle-label">${compute.label}</span>
+                  <span class="rich-select__toggle-desc">${compute.cpu} · ${compute.memory} · ${compute.gpu}</span>
                 </span>
                 <span class="pf-v6-c-menu-toggle__controls">
                   <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
@@ -13456,9 +13431,8 @@
                       <span class="pf-v6-c-menu__item-main">
                         <span class="rich-select__option-body">
                           <span class="rich-select__option-title">${cr.label}</span>
-                          <span class="rich-select__option-desc">${cr.cpu} · ${cr.memory}</span>
-                          <span class="compute-rich-option__gpu">${cr.gpu}</span>
-                          <span class="compute-rich-option__rate">${cr.rate}</span>
+                          <span class="rich-select__option-desc">${cr.cpu} · ${cr.memory} · ${cr.gpu}</span>
+                          <span class="compute-rich-option__meta">${cr.rate}</span>
                         </span>
                       </span>
                     </button>
@@ -13576,21 +13550,18 @@
         const selectedTenants = new Set(c.tenants || []);
         panel.innerHTML = `
           <h3>Visibility</h3>
-          <div class="visibility-radios" role="radiogroup" aria-label="Catalog item visibility">
-            <label class="visibility-radio ${c.visibility === 'global' ? 'pf-m-selected' : ''}">
-              <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
-              <span class="visibility-radio__body">
-                <span class="visibility-radio__title">Global public</span>
-                <span class="visibility-radio__desc">Visible to all tenants</span>
-              </span>
-            </label>
-            <label class="visibility-radio ${c.visibility === 'tenant' ? 'pf-m-selected' : ''}">
-              <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
-              <span class="visibility-radio__body">
-                <span class="visibility-radio__title">Tenant scoped</span>
-                <span class="visibility-radio__desc">Visible only to selected tenants</span>
-              </span>
-            </label>
+          <p class="step-help">Control which tenants can discover and order this catalog item.</p>
+          <div class="form-field">
+            <div class="di-os-radios" role="radiogroup" aria-label="Catalog item visibility">
+              <label class="form-check">
+                <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
+                Global public
+              </label>
+              <label class="form-check">
+                <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
+                Tenant scoped
+              </label>
+            </div>
           </div>
           ${c.visibility === 'tenant' ? `
           <div class="form-field ${state.fieldErrors.ciTenants ? 'pf-m-error' : ''}" style="margin-top:20px;">
@@ -13644,45 +13615,67 @@
 
       const disk = getCatalogDiskImage(c.diskImageId);
       const compute = getCatalogComputeResource(c.computeResourceId);
-      const accessLabel = c.tenantAccess === 'editable' ? 'Editable at provisioning' : 'Locked';
-      const visibilityLabel = c.visibility === 'global' ? 'Global public' : `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`;
-      panel.innerHTML = `
-        <h3>Review</h3>
-        <p class="step-help">Confirm your settings before creating the catalog item.</p>
-        <div class="review-block">
-          <details class="review-section" open>
-            <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Details</summary>
-            <dl class="review-dl">
-              <dt>Name</dt><dd>${String(c.name || '—').replace(/</g, '&lt;')}</dd>
-              <dt>Description</dt><dd>${c.description ? String(c.description).replace(/</g, '&lt;') : '—'}</dd>
-              <dt>Guest operating system</dt><dd>${String(c.guestOsFamily || '—').replace(/</g, '&lt;')}</dd>
-              <dt>Disk image</dt><dd>${disk ? `${disk.title} (${disk.family} · ${disk.arch})` : '—'}</dd>
-            </dl>
-          </details>
-          <details class="review-section" open>
-            <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Access &amp; Compute resources</summary>
-            <dl class="review-dl">
-              <dt>Tenant access</dt><dd>${accessLabel}</dd>
-              <dt>Compute resources</dt><dd>${compute.label} — ${compute.cpu} · ${compute.memory} · ${compute.gpu} · ${compute.rate}</dd>
-            </dl>
-          </details>
-          <details class="review-section" open>
-            <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Storage</summary>
-            <dl class="review-dl">
-              <dt>Boot disk</dt><dd>${c.bootDiskGiB || 30} GiB</dd>
-              <dt>Additional disks</dt><dd>${c.extraDisks?.length
-                ? c.extraDisks.map((d, i) => `Disk set ${i + 1}: ${d.size} GiB`).join('; ')
-                : 'None'}</dd>
-            </dl>
-          </details>
-          <details class="review-section" open>
-            <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Visibility</summary>
-            <dl class="review-dl">
-              <dt>Visibility</dt><dd>${visibilityLabel.replace(/</g, '&lt;')}</dd>
-            </dl>
-          </details>
+      const accessLabel = c.tenantAccess === 'editable' ? 'Editable' : 'Locked';
+      const visibilityLabel = c.visibility === 'global'
+        ? 'Global public'
+        : `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`;
+      const reviewRow = (label, value, { block = false } = {}) => `
+        <div class="review-nebius__row${block ? ' review-nebius__row--block' : ''}">
+          <span class="review-nebius__label">${label}</span>
+          <span class="review-nebius__value">${value}</span>
         </div>
       `;
+      const reviewSection = (title, stepKey, rowsHtml) => `
+        <section class="review-nebius__section" aria-labelledby="ci-review-${stepKey}">
+          <div class="review-nebius__head">
+            <h4 class="review-nebius__title" id="ci-review-${stepKey}">${title}</h4>
+            <button type="button" class="review-nebius__edit" data-review-goto="${stepKey}"
+              aria-label="Edit ${title}">
+              <i class="fas fa-pencil" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="review-nebius__card">
+            ${rowsHtml}
+          </div>
+        </section>
+      `;
+      panel.innerHTML = `
+        <h3>Review and create</h3>
+        <p class="step-help">Confirm your settings before creating the catalog item.</p>
+        <div class="review-nebius">
+          ${reviewSection('Details', 'ci-details', `
+            ${reviewRow('Name', String(c.name || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('Description', c.description ? String(c.description).replace(/</g, '&lt;') : '—')}
+            ${reviewRow('Guest operating system', String(c.guestOsFamily || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('Disk image', disk ? `${disk.title} (${disk.family} · ${disk.arch})` : '—')}
+          `)}
+          ${reviewSection('Access &amp; Compute resources', 'ci-access', `
+            ${reviewRow('Tenant access', accessLabel)}
+            ${reviewRow('Compute resources', `${compute.label} — ${compute.cpu} · ${compute.memory} · ${compute.gpu} · ${compute.rate}`)}
+          `)}
+          ${reviewSection('Storage', 'ci-storage', `
+            ${reviewRow('Boot disk', `${c.bootDiskGiB || 30} GiB`)}
+            ${reviewRow('Additional disks', c.extraDisks?.length
+              ? c.extraDisks.map((d, i) => `Disk set ${i + 1}: ${d.size} GiB`).join('; ')
+              : 'None')}
+          `)}
+          ${reviewSection('Visibility', 'ci-visibility', `
+            ${reviewRow('Visibility', visibilityLabel.replace(/</g, '&lt;'))}
+          `)}
+        </div>
+      `;
+      panel.querySelectorAll('[data-review-goto]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetKey = btn.dataset.reviewGoto;
+          const steps = stepsForType();
+          const idx = steps.findIndex(s => s.key === targetKey);
+          if (idx < 0) return;
+          readCatalogCreateFields();
+          state.step = idx;
+          state.maxVisited = Math.max(state.maxVisited, idx);
+          renderWizard();
+        });
+      });
     }
 
     function readCatalogCreateFields() {
@@ -13811,24 +13804,42 @@
         return;
       }
       root.innerHTML = `
-        <div class="provider-catalog-grid">
+        <div class="tpl-cards">
           ${items.map(item => `
-            <article class="provider-catalog-card">
-              <h3 class="provider-catalog-card__title">${String(item.name).replace(/</g, '&lt;')}</h3>
-              <div class="provider-catalog-card__specs">
-                <div class="provider-catalog-card__spec-row"><span class="provider-catalog-card__spec-label">CPU</span><span>${item.cpu}</span></div>
-                <div class="provider-catalog-card__spec-row"><span class="provider-catalog-card__spec-label">RAM</span><span>${item.memory}</span></div>
-                ${item.gpu ? `<div class="provider-catalog-card__spec-row"><span class="provider-catalog-card__spec-label">GPU</span><span>${item.gpu}</span></div>` : ''}
-                <div class="provider-catalog-card__image-row">
-                  <span class="provider-catalog-card__os-icon"><i class="fa-brands fa-redhat" aria-hidden="true"></i></span>
-                  <span>${String(item.diskImage).replace(/</g, '&lt;')}</span>
-                  ${item.diskLocked ? '<span class="provider-catalog-card__locked">Locked</span>' : ''}
+            <article class="tpl-card tpl-card--catalog">
+              <span class="tpl-card__icon tpl-card__icon--rhel" aria-hidden="true">
+                <i class="fa-brands fa-redhat"></i>
+              </span>
+              <div class="tpl-card__title-row">
+                <span class="tpl-card__title">${String(item.diskImage || item.name).replace(/</g, '&lt;')}</span>
+                ${item.diskLocked ? fieldGovLabel('locked') : fieldGovLabel('editable')}
+              </div>
+              <div class="tpl-card__specs">
+                <div>
+                  <span class="tpl-card__spec-label">CPU</span>
+                  <span class="tpl-card__spec-value">${item.cpu}</span>
+                </div>
+                <div>
+                  <span class="tpl-card__spec-label">RAM</span>
+                  <span class="tpl-card__spec-value">${item.memory}</span>
+                </div>
+                <div>
+                  <span class="tpl-card__spec-label">GPU</span>
+                  <span class="tpl-card__spec-value">${item.gpu || '—'}</span>
                 </div>
               </div>
-              <div class="provider-catalog-card__rates">${item.rateHour} · ${item.rateMonth}</div>
-              <div class="provider-catalog-card__footer">
-                <i class="fa-solid fa-${item.visibility === 'global' ? 'globe' : 'building'}" aria-hidden="true"></i>
-                <span>${String(item.visibilityLabel).replace(/</g, '&lt;')}</span>
+              <div class="tpl-card__footer tpl-card__footer--catalog">
+                <span class="tpl-card__visibility">
+                  <i class="fa-solid fa-${item.visibility === 'global' ? 'globe' : 'building'}" aria-hidden="true"></i>
+                  ${String(item.visibilityLabel).replace(/</g, '&lt;')}
+                </span>
+                <span class="tpl-card__rate">
+                  <span class="tpl-card__cost-label">Rate</span>
+                  <span class="tpl-card__cost-values">
+                    ${item.rateHour}
+                    <span class="tpl-card__cost-month">${item.rateMonth}</span>
+                  </span>
+                </span>
               </div>
             </article>
           `).join('')}
@@ -13838,9 +13849,7 @@
     function renderCatalogTenantFilter() {
       const list = document.getElementById('catalog-tenant-list');
       if (!list) return;
-      const q = (document.getElementById('catalog-tenant-search')?.value || '').toLowerCase();
-      const options = [{ id: 'all', label: 'All tenants' }, ...PLATFORM_TENANTS.map(t => ({ id: t, label: t }))]
-        .filter(o => !q || o.label.toLowerCase().includes(q));
+      const options = [{ id: 'all', label: 'All tenants' }, ...PLATFORM_TENANTS.map(t => ({ id: t, label: t }))];
       list.innerHTML = options.map(o => `
         <li>
           <button type="button" class="tpl-project-dd__option" data-catalog-tenant="${o.id}" role="option">
@@ -13854,7 +13863,9 @@
           const label = document.getElementById('catalog-tenant-label');
           if (label) label.textContent = btn.dataset.catalogTenant === 'all' ? 'All tenants' : btn.dataset.catalogTenant;
           document.getElementById('catalog-tenant-menu')?.setAttribute('hidden', '');
-          document.getElementById('catalog-tenant-toggle')?.setAttribute('aria-expanded', 'false');
+          const toggle = document.getElementById('catalog-tenant-toggle');
+          toggle?.setAttribute('aria-expanded', 'false');
+          toggle?.classList.remove('pf-m-expanded');
           renderCatalog();
         });
       });
@@ -14632,22 +14643,26 @@
     document.getElementById('catalog-tenant-toggle')?.addEventListener('click', e => {
       e.stopPropagation();
       const menu = document.getElementById('catalog-tenant-menu');
+      const toggle = document.getElementById('catalog-tenant-toggle');
       const open = menu?.hasAttribute('hidden');
       if (open) {
         renderCatalogTenantFilter();
         menu?.removeAttribute('hidden');
-        document.getElementById('catalog-tenant-toggle')?.setAttribute('aria-expanded', 'true');
+        toggle?.setAttribute('aria-expanded', 'true');
+        toggle?.classList.add('pf-m-expanded');
       } else {
         menu?.setAttribute('hidden', '');
-        document.getElementById('catalog-tenant-toggle')?.setAttribute('aria-expanded', 'false');
+        toggle?.setAttribute('aria-expanded', 'false');
+        toggle?.classList.remove('pf-m-expanded');
       }
     });
-    document.getElementById('catalog-tenant-search')?.addEventListener('input', () => renderCatalogTenantFilter());
     document.addEventListener('click', e => {
       const dd = document.getElementById('catalog-tenant-dd');
       if (!dd || dd.contains(e.target)) return;
       document.getElementById('catalog-tenant-menu')?.setAttribute('hidden', '');
-      document.getElementById('catalog-tenant-toggle')?.setAttribute('aria-expanded', 'false');
+      const toggle = document.getElementById('catalog-tenant-toggle');
+      toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.classList.remove('pf-m-expanded');
     });
     document.getElementById('btn-create-instance-type')?.addEventListener('click', () => {
       openCreateInstanceType();
