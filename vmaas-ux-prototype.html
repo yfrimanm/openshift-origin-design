@@ -5586,6 +5586,27 @@
       return COMPUTE_RESOURCES.find(c => c.id === id)?.label || id || '—';
     }
 
+    function computeResourceParts(id) {
+      const c = COMPUTE_RESOURCES.find(x => x.id === id);
+      const label = c?.label || id || '—';
+      const m = String(label).match(/^([^:]+):\s*(.+)$/);
+      if (m) return { title: m[1].trim(), desc: m[2].trim(), hourly: c?.hourly };
+      return { title: label, desc: '', hourly: c?.hourly };
+    }
+
+    function filteredVmComputeResources(filter = '') {
+      const q = (filter || '').toLowerCase();
+      return COMPUTE_RESOURCES.filter(c => {
+        if (!q) return true;
+        return `${c.id} ${c.label}`.toLowerCase().includes(q);
+      });
+    }
+
+    function formatComputeHourlyRate(hourly) {
+      if (hourly == null || Number.isNaN(hourly)) return '';
+      return `$${hourly.toFixed(2)}/hr`;
+    }
+
     /** Derive card CPU/Mem from compute resource so Catalog stays aligned with Compute. */
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
@@ -6332,6 +6353,8 @@
       catalogTenantFilter: 'all',
       catalogView: 'cards',
       catalogCreate: null,
+      vmComputeMenuOpen: false,
+      vmComputeFilter: '',
       data: {
         name: '',
         description: '',
@@ -10083,6 +10106,8 @@
       state.data.subnet = '';
       state.data.securityGroups = [];
       state.sgMenuOpen = false;
+      state.vmComputeMenuOpen = false;
+      state.vmComputeFilter = '';
       state.data.osFamily = 'rhel';
       state.data.osType = 'rhel.10';
       state.data.osTypeFilter = null;
@@ -10411,9 +10436,9 @@
         d.bootStorageTierLabel = tier?.name || bootTier.value;
       }
       // OS image is always locked by the template — never overwrite from Configure.
-      const compute = document.getElementById('f-compute-resource');
-      if (compute && compute.tagName === 'SELECT') {
-        d.computeResource = compute.value;
+      if (!d.computeResource) {
+        const compute = document.getElementById('f-compute-resource');
+        if (compute && compute.tagName === 'SELECT') d.computeResource = compute.value;
       }
     }
 
@@ -11758,20 +11783,50 @@
           const fieldBeh = getTemplateFields(selectedTpl || d.catalogPreset);
           const computeEditable = fieldBeh.compute === 'editable';
           const computeLabel = computeResourceLabel(d.computeResource);
+          const selectedCompute = computeResourceParts(d.computeResource);
+          const vmComputeOptions = filteredVmComputeResources(state.vmComputeFilter);
           const computeFieldHtml = computeEditable ? `
               <div class="form-field">
-                <label for="f-compute-resource" class="label-with-optional">
+                <label id="f-compute-resource-label" class="label-with-optional">
                   <span>Compute resource <span class="req">*</span></span>
                   ${fieldGovLabel('editable')}
                 </label>
-                ${pfSelect({
-                  id: 'f-compute-resource',
-                  ariaLabel: 'Compute resource',
-                  required: true,
-                  optionsHtml: COMPUTE_RESOURCES.map(c =>
-                    `<option value="${c.id}" ${d.computeResource === c.id ? 'selected' : ''}>${c.label}</option>`
-                  ).join(''),
-                })}
+                <div class="rich-select rich-select--typeahead ${state.vmComputeMenuOpen ? 'pf-m-expanded' : ''}" id="vm-compute-select">
+                  <button type="button" class="pf-v6-c-menu-toggle" id="f-compute-resource-toggle" aria-expanded="${state.vmComputeMenuOpen}" aria-haspopup="listbox" aria-labelledby="f-compute-resource-label">
+                    <span class="rich-select__toggle-main">
+                      <span class="rich-select__toggle-label" id="f-compute-resource">${selectedCompute.title}</span>
+                    </span>
+                    <span class="pf-v6-c-menu-toggle__controls">
+                      <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
+                        <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                      </span>
+                    </span>
+                  </button>
+                  <div class="pf-v6-c-menu rich-select__menu" id="vm-compute-menu" role="listbox" ${state.vmComputeMenuOpen ? '' : 'hidden'}>
+                    <div class="rich-select__search">
+                      <i class="fa-solid fa-search" aria-hidden="true"></i>
+                      <input type="search" id="vm-compute-search" placeholder="Search compute resources" value="${String(state.vmComputeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search compute resources" />
+                    </div>
+                    <hr class="rich-select__menu-divider" />
+                    <div class="rich-select__menu-list">
+                      ${vmComputeOptions.map(c => {
+                        const parts = computeResourceParts(c.id);
+                        const rate = formatComputeHourlyRate(c.hourly);
+                        const desc = [parts.desc, rate].filter(Boolean).join(' · ');
+                        return `
+                        <button type="button" class="pf-v6-c-menu__item rich-select__option ${d.computeResource === c.id ? 'pf-m-selected' : ''}" data-vm-compute="${c.id}" role="option">
+                          <span class="pf-v6-c-menu__item-main">
+                            <span class="rich-select__option-body">
+                              <span class="rich-select__option-title">${parts.title}</span>
+                              <span class="rich-select__option-desc">${desc}</span>
+                            </span>
+                          </span>
+                        </button>
+                      `;
+                      }).join('') || '<p class="muted" style="padding:12px;">No compute resources match your search.</p>'}
+                    </div>
+                  </div>
+                </div>
                 <p class="form-helper">Starting default from the template. Change if this Virtual machine needs a different size.</p>
               </div>
           ` : `
@@ -11800,9 +11855,23 @@
           `;
 
           if (computeEditable) {
-            panel.querySelector('#f-compute-resource')?.addEventListener('change', e => {
-              d.computeResource = e.target.value;
-              updateCostEstimate(key);
+            const computeRoot = panel.querySelector('#vm-compute-select');
+            bindRichSelect(computeRoot, {
+              toggleSel: '#f-compute-resource-toggle',
+              menuSel: '#vm-compute-menu',
+              optionSel: '[data-vm-compute]',
+              onOpen: () => { state.vmComputeMenuOpen = true; },
+              onClose: () => { state.vmComputeMenuOpen = false; },
+              onSelect: opt => {
+                d.computeResource = opt.dataset.vmCompute;
+                updateCostEstimate(key);
+                renderWizard();
+              },
+            });
+            panel.querySelector('#vm-compute-search')?.addEventListener('input', e => {
+              state.vmComputeFilter = e.target.value;
+              renderWizard();
+              panel.querySelector('#vm-compute-search')?.focus();
             });
           }
         } else if (stepKey === 'config-storage') {
@@ -13458,10 +13527,11 @@
               </div>
             </div>
           </div>
+          <hr class="form-section-divider" />
+          <h4 class="config-section-title" id="ci-compute-section-label">Compute resources <span class="req">*</span></h4>
           <div class="form-field">
-            <label id="ci-compute-label">Compute resources <span class="req">*</span></label>
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
-              <button type="button" class="pf-v6-c-menu-toggle" id="ci-compute-toggle" aria-expanded="${c.computeMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-compute-label">
+              <button type="button" class="pf-v6-c-menu-toggle" id="ci-compute-toggle" aria-expanded="${c.computeMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-compute-section-label">
                 <span class="rich-select__toggle-main">
                   <span class="rich-select__toggle-label">${compute.label}</span>
                 </span>
