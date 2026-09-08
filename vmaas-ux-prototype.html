@@ -2955,13 +2955,6 @@
     @media (max-width: 900px) {
       .method-grid { grid-template-columns: 1fr; max-width: 420px; }
     }
-    .method-grid--pair {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      max-width: 720px;
-    }
-    @media (max-width: 700px) {
-      .method-grid--pair { grid-template-columns: 1fr; max-width: 420px; }
-    }
     .radio-stack {
       display: flex;
       flex-direction: column;
@@ -13446,15 +13439,26 @@
           <h3>Access &amp; Compute resources</h3>
           <p class="step-help">Set tenant access to the guest operating system and choose compute resources for this catalog item.</p>
           <h4 class="config-section-title">Tenant access to hardware and OS</h4>
-          <div class="method-grid method-grid--pair">
-            ${methodCard('locked', 'Locked',
-              'Tenants cannot change the guest operating system or hardware.',
-              'fa-lock', c.tenantAccess === 'locked')}
-            ${methodCard('editable', 'Editable',
-              'Tenants can change the guest operating system or hardware at provisioning.',
-              'fa-pen', c.tenantAccess === 'editable')}
+          <div class="form-field">
+            <div class="radio-stack" role="radiogroup" aria-labelledby="ci-tenant-access-label">
+              <span class="pf-v6-screen-reader" id="ci-tenant-access-label">Tenant access to hardware and OS</span>
+              <div class="radio-stack__item">
+                <label class="form-check">
+                  <input type="radio" name="ciTenantAccess" value="locked" ${c.tenantAccess === 'locked' ? 'checked' : ''} />
+                  Locked
+                </label>
+                <p class="form-helper">Tenants cannot change the guest operating system or hardware.</p>
+              </div>
+              <div class="radio-stack__item">
+                <label class="form-check">
+                  <input type="radio" name="ciTenantAccess" value="editable" ${c.tenantAccess === 'editable' ? 'checked' : ''} />
+                  Editable
+                </label>
+                <p class="form-helper">Tenants can change the guest operating system or hardware at provisioning.</p>
+              </div>
+            </div>
           </div>
-          <div class="form-field" style="margin-top:24px;">
+          <div class="form-field">
             <label id="ci-compute-label">Compute resources <span class="req">*</span></label>
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               <button type="button" class="pf-v6-c-menu-toggle" id="ci-compute-toggle" aria-expanded="${c.computeMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-compute-label">
@@ -13489,9 +13493,9 @@
             </div>
           </div>
         `;
-        panel.querySelectorAll('[data-method]').forEach(btn => {
-          btn.addEventListener('click', () => {
-            c.tenantAccess = btn.dataset.method;
+        panel.querySelectorAll('input[name="ciTenantAccess"]').forEach(r => {
+          r.addEventListener('change', () => {
+            c.tenantAccess = r.value;
             renderWizard();
           });
         });
@@ -13740,6 +13744,8 @@
       if (desc) c.description = desc.value.trim();
       const guestOs = document.querySelector('input[name="ciGuestOs"]:checked');
       if (guestOs) c.guestOsFamily = guestOs.value;
+      const tenantAccess = document.querySelector('input[name="ciTenantAccess"]:checked');
+      if (tenantAccess) c.tenantAccess = tenantAccess.value;
       const boot = document.getElementById('ci-boot-disk');
       if (boot) c.bootDiskGiB = Number(boot.value) || c.bootDiskGiB;
       const vis = document.querySelector('input[name="ciVisibility"]:checked');
