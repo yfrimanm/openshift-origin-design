@@ -3282,9 +3282,9 @@
       align-items: center;
       gap: 8px;
       margin-top: auto;
-      padding: 10px 16px;
+      padding: 10px 16px 14px;
       border-top: 1px solid var(--vmaas-border-light);
-      background: #f0f0f0;
+      background: transparent;
       font-size: 13px;
       font-weight: 600;
       color: var(--vmaas-text-subtle);
@@ -6654,6 +6654,7 @@
       ciActionsOpen: false,
       ciActionsId: null,
       catalogCreate: null,
+      catalogEditId: null,
       vmComputeMenuOpen: false,
       vmComputeFilter: '',
       data: {
@@ -10559,6 +10560,7 @@
       if (state.wizard === 'catalog-create') {
         state.wizard = 'vm';
         state.catalogCreate = null;
+        state.catalogEditId = null;
         const wizDesc = document.getElementById('wiz-desc');
         if (wizDesc) { wizDesc.hidden = true; wizDesc.textContent = ''; }
         const wizTitle = document.getElementById('wiz-title');
@@ -10908,7 +10910,9 @@
       document.getElementById('wiz-back').disabled = state.step === 0;
       const next = document.getElementById('wiz-next');
       if (state.wizard === 'catalog-create') {
-        next.textContent = key === 'ci-review' ? 'Create catalog item' : 'Next';
+        next.textContent = key === 'ci-review'
+          ? (state.catalogEditId ? 'Save changes' : 'Create catalog item')
+          : 'Next';
         next.disabled = false;
       } else if (state.wizard === 'network') {
         next.textContent = key === 'net-review' ? 'Create network' : 'Next';
@@ -13633,7 +13637,7 @@
         rateHour: '$4.25/hr',
         rateMonth: '$2,850/mo per instance',
         visibility: 'global',
-        visibilityLabel: 'Global public',
+        visibilityLabel: 'Global publish',
         tenants: [],
         created: 'Sep 7, 2026, 11:16 AM',
       },
@@ -13648,9 +13652,9 @@
         diskLocked: true,
         rateHour: '$8.50/hr',
         rateMonth: '$5,200/mo per instance',
-        visibility: null,
-        visibilityLabel: 'Not published',
-        tenants: [],
+        visibility: 'tenant',
+        visibilityLabel: 'Tenant scoped',
+        tenants: ['tenant-a', 'tenant-b'],
         created: 'Aug 22, 2026, 3:42 PM',
       },
       {
@@ -13664,9 +13668,9 @@
         diskLocked: true,
         rateHour: '$5.68/hr',
         rateMonth: '$3,400/mo per instance',
-        visibility: null,
-        visibilityLabel: 'Not published',
-        tenants: [],
+        visibility: 'tenant',
+        visibilityLabel: 'Tenant scoped',
+        tenants: ['tenant-c'],
         created: 'Jul 14, 2026, 9:05 AM',
       },
     ];
@@ -13688,6 +13692,8 @@
         diskImageId: 'rhel-10',
         tenantAccess: 'locked',
         instanceTypeId: 'medium',
+        visibility: 'global',
+        tenants: [],
         bootDiskGiB: 30,
         extraDisks: [],
         diskImageMenuOpen: false,
@@ -13737,7 +13743,26 @@
 
     function catalogItemSearchText(item) {
       const compute = resolveCatalogItemCompute(item);
-      return `${item.name} ${compute.summary} ${compute.gpu} ${item.diskImage || ''} ${item.visibilityLabel || ''}`;
+      return `${item.name} ${compute.summary} ${compute.gpu} ${item.diskImage || ''} ${catalogPublishScopeLabel(item)} ${item.publishState || ''}`;
+    }
+
+    function catalogPublishScopeLabel(item) {
+      if (item.visibility === 'tenant') return 'Tenant scoped';
+      return 'Global publish';
+    }
+
+    function catalogPublishScopeFields(c) {
+      const visibility = c.visibility === 'tenant' ? 'tenant' : 'global';
+      return {
+        visibility,
+        visibilityLabel: visibility === 'tenant' ? 'Tenant scoped' : 'Global publish',
+        tenants: visibility === 'tenant' ? [...(c.tenants || [])] : [],
+      };
+    }
+
+    function findCatalogDiskImageIdByTitle(title) {
+      const match = CATALOG_DISK_IMAGE_OPTIONS.find(d => d.title === title);
+      return match?.id || CATALOG_DISK_IMAGE_OPTIONS[0]?.id || 'rhel-10';
     }
 
     function catalogComputeToggleSummary(id) {
@@ -13765,6 +13790,7 @@
     function openCatalogItemWizard() {
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
+      state.catalogEditId = null;
       state.wizard = 'catalog-create';
       state.step = 0;
       state.maxVisited = 0;
@@ -13776,6 +13802,52 @@
       if (wizDesc) {
         wizDesc.hidden = false;
         wizDesc.innerHTML = '<nav class="wiz-breadcrumb" aria-label="Breadcrumb"><a href="#" id="ci-wiz-crumb-catalog">Catalog</a> › Create catalog item</nav>';
+        wizDesc.querySelector('#ci-wiz-crumb-catalog')?.addEventListener('click', e => {
+          e.preventDefault();
+          requestCloseWizard();
+        });
+      }
+      document.getElementById('cost-estimate')?.setAttribute('hidden', '');
+      document.getElementById('overlay').classList.add('pf-m-open');
+      document.body.style.overflow = 'hidden';
+      renderWizard();
+    }
+
+    function openCatalogItemEdit(id) {
+      const item = findCatalogItemById(id);
+      if (!item) return;
+      closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
+      closeCatalogItemActionsMenu();
+      state.catalogEditId = id;
+      state.wizard = 'catalog-create';
+      state.step = 0;
+      state.maxVisited = 0;
+      state.fieldErrors = {};
+      state.catalogCreate = {
+        name: item.name,
+        description: item.description || '',
+        guestOsFamily: item.guestOsFamily || 'Linux',
+        diskImageId: findCatalogDiskImageIdByTitle(item.diskImage),
+        tenantAccess: item.tenantAccess || 'locked',
+        instanceTypeId: item.instanceTypeId || 'medium',
+        visibility: item.visibility || 'global',
+        tenants: [...(item.tenants || [])],
+        bootDiskGiB: item.bootDiskGiB || 30,
+        extraDisks: (item.extraDisks || []).map(d => ({ ...d })),
+        diskImageMenuOpen: false,
+        diskImageFilter: '',
+        computeMenuOpen: false,
+        computeFilter: '',
+        tenantMenuOpen: false,
+        tenantFilter: '',
+      };
+      const wizTitle = document.getElementById('wiz-title');
+      const wizDesc = document.getElementById('wiz-desc');
+      if (wizTitle) wizTitle.textContent = 'Edit catalog item';
+      if (wizDesc) {
+        wizDesc.hidden = false;
+        wizDesc.innerHTML = '<nav class="wiz-breadcrumb" aria-label="Breadcrumb"><a href="#" id="ci-wiz-crumb-catalog">Catalog</a> › Edit catalog item</nav>';
         wizDesc.querySelector('#ci-wiz-crumb-catalog')?.addEventListener('click', e => {
           e.preventDefault();
           requestCloseWizard();
@@ -13938,6 +14010,61 @@
           const hay = `${it.label} ${it.cpu} ${it.memoryGiB} ${it.gpuResource} ${opt.rateHour}`.toLowerCase();
           return hay.includes(q);
         });
+        const tenantOptions = PLATFORM_TENANTS.filter(t => {
+          const q = (c.tenantFilter || '').toLowerCase();
+          if (!q) return true;
+          return t.toLowerCase().includes(q);
+        });
+        const selectedTenants = new Set(c.tenants || []);
+        const publishScopeHtml = isProviderCatalogRole() ? `
+          <hr class="form-section-divider" />
+          <h4 class="config-section-title">Publish scope</h4>
+          <p class="step-help" style="margin-top:-8px;margin-bottom:12px;">Choose who can order this item when it is published. Creating the item does not publish it.</p>
+          <div class="form-field">
+            <div class="radio-stack" role="radiogroup" aria-label="Publish scope">
+              <div class="radio-stack__item">
+                <label class="form-check">
+                  <input type="radio" name="ciVisibility" value="global" ${(c.visibility || 'global') !== 'tenant' ? 'checked' : ''} />
+                  Global publish
+                </label>
+                <p class="form-helper">Available to all tenants when published</p>
+              </div>
+              <div class="radio-stack__item">
+                <label class="form-check">
+                  <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
+                  Tenant scoped
+                </label>
+                <p class="form-helper">Available only to selected tenants when published</p>
+              </div>
+            </div>
+          </div>
+          ${c.visibility === 'tenant' ? `
+          <div class="form-field ${state.fieldErrors.ciTenants ? 'pf-m-error' : ''}" style="margin-top:20px;">
+            <label id="ci-tenants-label">Tenants <span class="req">*</span></label>
+            <div class="arch-multi" id="ci-tenants-multi">
+              <button type="button" class="arch-multi__toggle" id="ci-tenants-toggle" aria-expanded="${c.tenantMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-tenants-label">
+                <span class="placeholder" id="ci-tenants-label-text">${c.tenants?.length ? c.tenants.join(', ') : 'Select tenants'}</span>
+                <span class="pf-v6-c-form-control__toggle-icon" aria-hidden="true"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
+              </button>
+              <ul class="arch-multi__menu" id="ci-tenants-menu" role="listbox" aria-labelledby="ci-tenants-label" ${c.tenantMenuOpen ? '' : 'hidden'}>
+                <li class="arch-multi__search-rich">
+                  <div class="rich-select__search">
+                    <i class="fa-solid fa-search" aria-hidden="true"></i>
+                    <input type="search" id="ci-tenant-search" placeholder="Search tenants" value="${String(c.tenantFilter || '').replace(/"/g, '&quot;')}" aria-label="Search tenants" />
+                  </div>
+                </li>
+                <li class="arch-multi__menu-divider" aria-hidden="true"><hr class="rich-select__menu-divider" /></li>
+                <li class="arch-multi__menu-list">
+                  <ul>
+                ${tenantOptions.map(t => `
+                  <li><label><input type="checkbox" name="ciTenant" value="${t}" ${selectedTenants.has(t) ? 'checked' : ''} /> ${t}</label></li>
+                `).join('')}
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>` : ''}
+        ` : '';
         panel.innerHTML = `
           <h3>Instance type &amp; Access</h3>
           <p class="step-help">Choose an instance type for this catalog item. GPU configuration is defined on the instance type. Publishing is a separate step after creation.</p>
@@ -13998,11 +14125,38 @@
               </div>
             </div>
           </div>
+          ${publishScopeHtml}
         `;
         panel.querySelectorAll('input[name="ciTenantAccess"]').forEach(r => {
           r.addEventListener('change', () => {
             c.tenantAccess = r.value;
             renderWizard();
+          });
+        });
+        panel.querySelectorAll('input[name="ciVisibility"]').forEach(r => {
+          r.addEventListener('change', () => {
+            c.visibility = r.value;
+            if (c.visibility === 'global') c.tenants = [];
+            renderWizard();
+          });
+        });
+        panel.querySelector('#ci-tenants-toggle')?.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          c.tenantMenuOpen = !c.tenantMenuOpen;
+          renderWizard();
+        });
+        panel.querySelector('#ci-tenant-search')?.addEventListener('input', e => {
+          c.tenantFilter = e.target.value;
+          c.tenantMenuOpen = true;
+          renderWizard();
+          panel.querySelector('#ci-tenant-search')?.focus();
+        });
+        panel.querySelectorAll('input[name="ciTenant"]').forEach(cb => {
+          cb.addEventListener('change', () => {
+            c.tenants = [...panel.querySelectorAll('input[name="ciTenant"]:checked')].map(el => el.value);
+            const label = panel.querySelector('#ci-tenants-label-text');
+            if (label) label.textContent = c.tenants.length ? c.tenants.join(', ') : 'Select tenants';
           });
         });
         bindRichSelect(panel.querySelector('#ci-compute-select'), {
@@ -14113,9 +14267,9 @@
               <div class="radio-stack__item">
                 <label class="form-check">
                   <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
-                  Global public
+                  Global publish
                 </label>
-                <p class="form-helper">Visible to all tenants</p>
+                <p class="form-helper">Available to all tenants when published</p>
               </div>
               <div class="radio-stack__item">
                 <label class="form-check">
@@ -14220,6 +14374,9 @@
           ${reviewSection('Instance type &amp; Access', 'ci-access', `
             ${reviewRow('Instance type', compute.summary.replace(/</g, '&lt;'))}
             ${reviewRow('Tenant access', accessLabel)}
+            ${isProviderCatalogRole() ? reviewRow('Publish scope', c.visibility === 'tenant'
+              ? `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`
+              : 'Global publish') : ''}
           `)}
           ${reviewSection('Storage', 'ci-storage', `
             ${reviewRow('Boot disk', `${c.bootDiskGiB || 30} GiB`)}
@@ -14256,6 +14413,11 @@
       if (tenantAccess) c.tenantAccess = tenantAccess.value;
       const boot = document.getElementById('ci-boot-disk');
       if (boot) c.bootDiskGiB = Number(boot.value) || c.bootDiskGiB;
+      const vis = document.querySelector('input[name="ciVisibility"]:checked');
+      if (vis) c.visibility = vis.value;
+      if (document.querySelectorAll('input[name="ciTenant"]').length) {
+        c.tenants = [...document.querySelectorAll('input[name="ciTenant"]:checked')].map(el => el.value);
+      }
     }
 
     function validateCatalogCreateStep(key) {
@@ -14274,6 +14436,12 @@
           toast('Select a disk image to continue.');
           return false;
         }
+      }
+      if (key === 'ci-access' && isProviderCatalogRole() && c.visibility === 'tenant' && !(c.tenants || []).length) {
+        state.fieldErrors = { ciTenants: 'Select at least one tenant.' };
+        renderWizard();
+        toast('Select at least one tenant for tenant-scoped publish.');
+        return false;
       }
       state.fieldErrors = {};
       return true;
@@ -14298,16 +14466,36 @@
         bootDiskGiB: c.bootDiskGiB,
         extraDisks: (c.extraDisks || []).map(d => ({ ...d })),
       };
+      const scope = isProviderCatalogRole() ? catalogPublishScopeFields(c) : null;
+      if (state.catalogEditId) {
+        const item = findCatalogItemById(state.catalogEditId);
+        if (item) {
+          Object.assign(item, baseItem, scope || {});
+        }
+        closeWizard();
+        document.getElementById('wiz-desc').hidden = true;
+        document.getElementById('wiz-desc').textContent = '';
+        document.getElementById('wiz-title').textContent = 'Create Virtual machine';
+        state.wizard = 'vm';
+        state.catalogCreate = null;
+        state.catalogEditId = null;
+        if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
+          renderCatalogItemDetail();
+        } else {
+          setView('templates');
+        }
+        renderCatalog();
+        toast(`Updated catalog item ${c.name}.`, 'success');
+        return;
+      }
       if (isProviderCatalogRole()) {
         PROVIDER_CATALOG_ITEMS.unshift({
           id: `pci-${Date.now()}`,
           scope: 'provider',
           ...baseItem,
+          ...scope,
           publishState: 'unpublished',
           created: formatInstanceTypeCreated(),
-          visibility: null,
-          visibilityLabel: 'Not published',
-          tenants: [],
         });
       } else {
         TENANT_CATALOG_ITEMS.unshift({
@@ -14324,6 +14512,7 @@
       document.getElementById('wiz-title').textContent = 'Create Virtual machine';
       state.wizard = 'vm';
       state.catalogCreate = null;
+      state.catalogEditId = null;
       setView('templates');
       renderCatalog();
       toast(`Created catalog item ${c.name}. It is unpublished until you publish it.`, 'success');
@@ -14451,7 +14640,7 @@
         return;
       }
       if (actionId === 'edit') {
-        toast(`Edit ${item.name} (prototype).`);
+        openCatalogItemEdit(id);
         return;
       }
       if (actionId === 'duplicate') {
@@ -14461,9 +14650,6 @@
           id: `${item.id}-copy-${Date.now()}`,
           name: `${item.name}-copy`,
           publishState: 'unpublished',
-          visibility: null,
-          visibilityLabel: 'Not published',
-          tenants: [],
         };
         src.unshift(copy);
         toast(`Duplicated ${item.name}.`, 'success');
@@ -14473,9 +14659,7 @@
       if (actionId === 'publish') {
         item.publishState = 'live';
         if (!item.visibility) {
-          item.visibility = 'global';
-          item.visibilityLabel = 'Global public';
-          item.tenants = [];
+          Object.assign(item, catalogPublishScopeFields({ visibility: 'global', tenants: [] }));
         }
         toast(`${item.name} published.`, 'success');
         if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
@@ -14486,9 +14670,6 @@
       }
       if (actionId === 'unpublish') {
         item.publishState = 'unpublished';
-        item.visibility = null;
-        item.visibilityLabel = 'Not published';
-        item.tenants = [];
         toast(`${item.name} unpublished.`);
         if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
           renderCatalogItemDetail();
@@ -14529,10 +14710,8 @@
       const safeDesc = String(item.description || '—').replace(/</g, '&lt;');
       const isProvider = item.scope === 'provider';
       const compute = resolveCatalogItemCompute(item);
-      const visibilityIcon = item.visibility === 'global' ? 'globe' : 'building';
-      const visibilityText = item.publishState === 'live'
-        ? String(item.visibilityLabel || '—').replace(/</g, '&lt;')
-        : 'Not published';
+      const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
+      const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
       const diskImage = String(item.diskImage || '—').replace(/</g, '&lt;');
       const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
       const sizeGov = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
@@ -14584,15 +14763,14 @@
               <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
                 <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
                 ${itField('Service', 'Virtual machines')}
-                ${isProvider ? itField('Status', publishLabelHtml(item.publishState)) : ''}
+                ${isProvider ? '' : ''}
                 ${itField('Rate', catalogRateLine(item))}
               </section>
               ${isProvider ? `
               <section class="ethan-detail-col" aria-labelledby="ci-publishing-title">
                 <h3 class="ethan-detail-col__title" id="ci-publishing-title">Publishing</h3>
-                ${itField('Visibility', item.publishState === 'live'
-                  ? `<i class="fa-solid fa-${visibilityIcon}" aria-hidden="true"></i> ${visibilityText}`
-                  : visibilityText)}
+                ${itField('Publish state', publishLabelHtml(item.publishState))}
+                ${itField('Publish scope', `<i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i> ${scopeLabel}`)}
                 ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
               </section>
               ` : `
@@ -14796,15 +14974,8 @@
       const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
       const unpublishedClass = item.publishState === 'unpublished' ? ' tpl-m-unpublished' : '';
       const visibilityFooter = showVisibility ? (() => {
-        if (item.publishState !== 'live') {
-          return `
-            <div class="tpl-card__visibility-footer">
-              <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
-              Not published
-            </div>`;
-        }
-        const scopeIcon = item.visibility === 'global' ? 'globe' : 'cubes';
-        const scopeLabel = String(item.visibilityLabel || '—').replace(/</g, '&lt;');
+        const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
+        const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
         return `
           <div class="tpl-card__visibility-footer">
             <i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i>
@@ -14955,7 +15126,7 @@
                   <th class="pf-v6-c-table__th" scope="col">Instance type</th>
                   <th class="pf-v6-c-table__th" scope="col">Disk image</th>
                   <th class="pf-v6-c-table__th" scope="col">Rate</th>
-                  ${isProvider ? '<th class="pf-v6-c-table__th" scope="col">Publish state</th><th class="pf-v6-c-table__th" scope="col">Visibility</th>' : ''}
+                  ${isProvider ? '<th class="pf-v6-c-table__th" scope="col">Publish state</th><th class="pf-v6-c-table__th" scope="col">Publish scope</th>' : ''}
                   <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
                 </tr>
               </thead>
@@ -14963,9 +15134,7 @@
                 ${noSearchMatches ? searchRow : items.map(item => {
                   const name = String(item.name).replace(/</g, '&lt;');
                   const diskImage = String(item.diskImage).replace(/</g, '&lt;');
-                  const visibility = item.publishState === 'live'
-                    ? String(item.visibilityLabel || '—').replace(/</g, '&lt;')
-                    : 'Not published';
+                  const visibility = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
                   const compute = resolveCatalogItemCompute(item).summary.replace(/</g, '&lt;');
                   const rate = catalogRateLine(item);
                   const lockSuffix = item.diskLocked ? ' · Locked' : '';
