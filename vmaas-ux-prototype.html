@@ -3165,19 +3165,7 @@
     }
 
     /* Provider catalog list — Ethan BMaaS card layout (VMaaS) */
-    .tpl-cards--catalog {
-      --catalog-card-width: 20.875rem;
-      display: grid;
-      grid-template-columns: repeat(
-        auto-fill,
-        minmax(min(100%, var(--catalog-card-width)), var(--catalog-card-width))
-      );
-      gap: var(--pf-t--global--spacer--lg, 24px);
-      justify-content: start;
-      align-items: start;
-      overflow: visible;
-    }
-    .tpl-cards--catalog .tpl-card--catalog {
+    .tpl-cards.tpl-cards--catalog .tpl-card--catalog {
       width: 100%;
       max-width: var(--catalog-card-width);
       border-radius: var(--pf-t--global--border--radius--medium, 6px);
@@ -3205,21 +3193,26 @@
       align-items: center;
       justify-content: space-between;
       gap: var(--pf-t--global--spacer--sm, 8px);
-      margin-bottom: var(--pf-t--global--spacer--sm, 8px);
+      margin-bottom: var(--pf-t--global--spacer--xs, 4px);
     }
     .tpl-card--catalog .tpl-card__icon--catalog-vm {
       width: 2.75rem;
       height: 2.75rem;
-      margin-bottom: 0;
+      margin: 0;
+      padding: 0.625rem;
+      box-sizing: border-box;
       border-radius: var(--pf-t--global--border--radius--medium, 6px);
       background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
       color: var(--pf-t--color--red--50, #a30000);
       flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .tpl-card--catalog .tpl-card__icon--catalog-vm .pf-v6-pficon-virtual-machine {
-      width: 24px;
-      height: 24px;
-      font-size: 24px;
+      width: 1.5rem;
+      height: 1.5rem;
+      font-size: 1.5rem;
       line-height: 1;
     }
     .tpl-card__catalog-head-actions {
@@ -3232,13 +3225,13 @@
     }
     .tpl-card--catalog .publish-label { font-weight: 400; }
     .tpl-card--catalog .tpl-card__title-link {
-      display: inline;
+      display: block;
       margin: 0 0 var(--pf-t--global--spacer--sm, 8px);
       padding: 0;
       border: none;
       background: none;
       font-size: var(--pf-t--global--font--size--body--default, 14px);
-      font-weight: 400;
+      font-weight: 700;
       line-height: 1.35;
       color: var(--vmaas-blue);
       text-align: left;
@@ -3255,7 +3248,7 @@
     }
     .catalog-card-specs__row {
       display: grid;
-      grid-template-columns: 6.5rem minmax(0, 1fr);
+      grid-template-columns: 5.5rem minmax(0, 1fr);
       gap: var(--pf-t--global--spacer--sm, 8px);
       align-items: baseline;
       font-size: var(--pf-t--global--font--size--body--sm, 14px);
@@ -3456,8 +3449,9 @@
     .catalog-tenant-dd { flex: 0 0 auto; }
     #catalog-publish-menu.catalog-filter-menu,
     #catalog-tenant-menu.catalog-filter-menu {
-      min-width: 100%;
-      width: max-content;
+      min-width: 14rem;
+      width: 14rem;
+      max-width: 14rem;
       border: 1px solid #d2d2d2;
       border-radius: var(--pf-t--global--border--radius--small, 4px);
       box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
@@ -3472,21 +3466,40 @@
     }
     #catalog-publish-menu .catalog-filter-item,
     #catalog-tenant-menu .catalog-filter-item {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 12px;
       width: 100%;
-      justify-content: space-between;
       padding: 8px 16px;
       font-weight: 400;
       color: var(--vmaas-text);
+      text-align: left;
+    }
+    #catalog-publish-menu .catalog-filter-item .pf-v6-c-menu__item-main,
+    #catalog-tenant-menu .catalog-filter-item .pf-v6-c-menu__item-main {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      grid-column: 1;
     }
     #catalog-publish-menu .catalog-filter-item .pf-v6-c-menu__item-text,
     #catalog-tenant-menu .catalog-filter-item .pf-v6-c-menu__item-text {
       font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .catalog-filter-check {
-      margin-left: 16px;
+      grid-column: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
       color: var(--vmaas-blue);
       font-size: 12px;
       flex-shrink: 0;
+      line-height: 1;
     }
     .location-summary {
       display: flex; align-items: center; gap: 8px;
@@ -4073,6 +4086,22 @@
     @media (max-width: 1200px) { .tpl-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 900px) { .tpl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 560px) { .tpl-cards { grid-template-columns: 1fr; } }
+    /* Catalog grid — must follow .tpl-cards so Ethan spacing wins (24px gap, fixed card width). */
+    .tpl-cards.tpl-cards--catalog {
+      --catalog-card-width: 20.875rem;
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--catalog-card-width)), var(--catalog-card-width))
+      );
+      gap: var(--pf-t--global--spacer--lg, 24px);
+      justify-content: start;
+      align-items: start;
+      align-content: start;
+      overflow: visible;
+      padding: 0;
+      min-height: 0;
+    }
     .tpl-list {
       border: 1px solid var(--vmaas-border-light); border-radius: 4px; overflow: auto;
       background: #fff;
@@ -14631,6 +14660,38 @@
       return '<span class="catalog-gov-badge">Locked</span>';
     }
 
+    function catalogDiskImageIconHtml(diskImage) {
+      if (!/rhel|red hat/i.test(String(diskImage || ''))) return '';
+      return '<i class="fa-brands fa-redhat catalog-disk-image-value__icon" aria-hidden="true"></i>';
+    }
+
+    function catalogCardSpecsRowsHtml(item) {
+      const compute = resolveCatalogItemCompute(item);
+      const diskImage = String(item.diskImage || '—').replace(/</g, '&lt;');
+      const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
+      const diskIcon = catalogDiskImageIconHtml(item.diskImage);
+      const rows = [
+        { label: 'CPU', value: compute.cpu },
+        { label: 'RAM', value: compute.memory },
+        { label: 'GPU', value: compute.gpu },
+      ];
+      return `${rows.map(row => `
+        <div class="catalog-card-specs__row">
+          <dt class="catalog-card-specs__label">${row.label}</dt>
+          <dd class="catalog-card-specs__value">${String(row.value).replace(/</g, '&lt;')}</dd>
+        </div>`).join('')}
+        <div class="catalog-card-specs__row">
+          <dt class="catalog-card-specs__label">Disk image</dt>
+          <dd class="catalog-card-specs__value">
+            <span class="catalog-disk-image-value">
+              ${diskIcon}
+              ${diskImage}
+              ${govBadge}
+            </span>
+          </dd>
+        </div>`;
+    }
+
     function catalogRateLine(item) {
       const hour = String(item.rateHour || '—').replace(/</g, '&lt;');
       const month = String(item.rateMonth || '').replace(/</g, '&lt;');
@@ -14891,7 +14952,7 @@
                 </div>
                 <div class="tpl-fixed-panel__row">
                   <dt>Disk image</dt>
-                  <dd><span class="catalog-disk-image-value"><i class="fa-brands fa-redhat catalog-disk-image-value__icon" aria-hidden="true"></i> ${diskImage} ${govBadge}</span></dd>
+                  <dd><span class="catalog-disk-image-value">${catalogDiskImageIconHtml(item.diskImage)} ${diskImage} ${govBadge}</span></dd>
                 </div>
               </dl>
             </section>
@@ -15070,9 +15131,6 @@
 
     function renderCatalogCard(item, { showVisibility, showPublishState }) {
       const title = String(item.name).replace(/</g, '&lt;');
-      const compute = resolveCatalogItemCompute(item);
-      const diskImage = String(item.diskImage || '—').replace(/</g, '&lt;');
-      const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
       const unpublishedClass = item.publishState === 'unpublished' ? ' tpl-m-unpublished' : '';
       const visibilityFooter = showVisibility ? (() => {
         const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
@@ -15105,20 +15163,7 @@
             </div>
             <button type="button" class="tpl-card__title-link" data-catalog-open="${item.id}">${title}</button>
             <dl class="catalog-card-specs">
-              <div class="catalog-card-specs__row">
-                <dt class="catalog-card-specs__label">Instance type</dt>
-                <dd class="catalog-card-specs__value">${compute.summary.replace(/</g, '&lt;')}</dd>
-              </div>
-              <div class="catalog-card-specs__row">
-                <dt class="catalog-card-specs__label">Disk image</dt>
-                <dd class="catalog-card-specs__value">
-                  <span class="catalog-disk-image-value">
-                    <i class="fa-brands fa-redhat catalog-disk-image-value__icon" aria-hidden="true"></i>
-                    ${diskImage}
-                    ${govBadge}
-                  </span>
-                </dd>
-              </div>
+              ${catalogCardSpecsRowsHtml(item)}
             </dl>
           </div>
           <dl class="catalog-card-rate">
