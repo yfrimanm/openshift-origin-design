@@ -3290,6 +3290,12 @@
       color: #4d4d4d;
     }
     .catalog-gov-badge--editable { background: #e7f1fa; color: #004080; }
+    .catalog-detail-spec-badges {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
     .catalog-card-rate {
       display: grid;
       gap: var(--pf-t--global--spacer--xs, 4px);
@@ -3703,6 +3709,20 @@
     .tpl-empty__title { margin: 0; font-size: 16px; font-weight: 600; color: var(--vmaas-text); }
     .tpl-empty__body {
       margin: 0; font-size: 14px; color: var(--vmaas-text-subtle); line-height: 1.45; max-width: 28rem;
+    }
+    .tpl-empty--compact {
+      min-height: auto; padding: 20px 16px; gap: 6px;
+      border: none; border-radius: 0; background: transparent;
+    }
+    .tpl-empty--compact .tpl-empty__icon { font-size: 20px; margin-bottom: 0; }
+    .tpl-empty--compact .tpl-empty__title { font-size: 14px; }
+    .tpl-empty--compact .tpl-empty__body { font-size: 12px; max-width: 16rem; }
+    .tpl-empty--panel {
+      min-height: 140px; padding: 32px 20px;
+    }
+    .rich-select__menu-list > .tpl-empty--compact,
+    .arch-multi__menu-list > .tpl-empty--compact {
+      margin: 4px 0;
     }
     .nic-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
 
@@ -5032,13 +5052,15 @@
               </div>
             </div>
 
-            <div style="overflow-x:auto;">
-              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr" id="vm-thead-row"></tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
-              </table>
+            <div id="vm-table-area">
+              <div style="overflow-x:auto;" id="vm-table-scroll">
+                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr" id="vm-thead-row"></tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
+                </table>
+              </div>
             </div>
           </section>
 
@@ -5063,21 +5085,23 @@
                 <input type="search" id="net-search" placeholder="Search by name..." aria-label="Search networks" />
               </div>
             </div>
-            <div style="overflow-x:auto;">
-              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr">
-                    <th class="pf-v6-c-table__th" scope="col">Name</th>
-                    <th class="pf-v6-c-table__th" scope="col">Type</th>
-                    <th class="pf-v6-c-table__th" scope="col">Project</th>
-                    <th class="pf-v6-c-table__th" scope="col">CIDR</th>
-                    <th class="pf-v6-c-table__th" scope="col">Status</th>
-                    <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
-                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                  </tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
-              </table>
+            <div id="net-table-area">
+              <div style="overflow-x:auto;" id="net-table-scroll">
+                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr">
+                      <th class="pf-v6-c-table__th" scope="col">Name</th>
+                      <th class="pf-v6-c-table__th" scope="col">Type</th>
+                      <th class="pf-v6-c-table__th" scope="col">Project</th>
+                      <th class="pf-v6-c-table__th" scope="col">CIDR</th>
+                      <th class="pf-v6-c-table__th" scope="col">Status</th>
+                      <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
+                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
+                </table>
+              </div>
             </div>
           </section>
           <section class="view" id="view-templates">
@@ -5179,21 +5203,23 @@
                 Show obsolete
               </label>
             </div>
-            <div style="overflow-x:auto;">
-              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr">
-                    <th class="pf-v6-c-table__th" scope="col">Name</th>
-                    <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
-                    <th class="pf-v6-c-table__th" scope="col">Guest operating system</th>
-                    <th class="pf-v6-c-table__th" scope="col">Architecture</th>
-                    <th class="pf-v6-c-table__th" scope="col">Visibility</th>
-                    <th class="pf-v6-c-table__th" scope="col">Created</th>
-                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                  </tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
-              </table>
+            <div id="disk-images-table-area">
+              <div style="overflow-x:auto;" id="disk-images-table-scroll">
+                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr">
+                      <th class="pf-v6-c-table__th" scope="col">Name</th>
+                      <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
+                      <th class="pf-v6-c-table__th" scope="col">Guest operating system</th>
+                      <th class="pf-v6-c-table__th" scope="col">Architecture</th>
+                      <th class="pf-v6-c-table__th" scope="col">Visibility</th>
+                      <th class="pf-v6-c-table__th" scope="col">Created</th>
+                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
+                </table>
+              </div>
             </div>
           </section>
 
@@ -7874,6 +7900,78 @@
       return String(q || '').trim();
     }
 
+    function emptyStateHtml({ title, body, icon = 'fa-cube', compact = false, panel = false }) {
+      const safeTitle = String(title || '').replace(/</g, '&lt;');
+      const safeBody = String(body || '').replace(/</g, '&lt;');
+      const mods = `${compact ? ' tpl-empty--compact' : ''}${panel ? ' tpl-empty--panel' : ''}`;
+      return `
+        <div class="tpl-empty${mods}" role="status">
+          <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid ${icon}"></i></div>
+          <p class="tpl-empty__title">${safeTitle}</p>
+          <p class="tpl-empty__body">${safeBody}</p>
+        </div>`;
+    }
+
+    function emptyStateSearchHtml(resourceLabel, { compact = false, panel = false } = {}) {
+      return emptyStateHtml({
+        title: `No ${resourceLabel} match your search`,
+        body: 'Try a different search term.',
+        compact,
+        panel,
+      });
+    }
+
+    function emptyStateFiltersHtml(resourceLabel, { compact = false, panel = false } = {}) {
+      return emptyStateHtml({
+        title: `No ${resourceLabel} match the current filters`,
+        body: 'Clear all filters or adjust your search.',
+        compact,
+        panel,
+      });
+    }
+
+    function emptyStateProjectHtml(resourceLabel, resourceSingular, { compact = false, panel = false, body } = {}) {
+      return emptyStateHtml({
+        title: `No ${resourceLabel} found in this project`,
+        body: body || `Select a different project, or create a ${resourceSingular}.`,
+        compact,
+        panel,
+      });
+    }
+
+    function emptyStateMenuSearchHtml(resourceLabel) {
+      return emptyStateSearchHtml(resourceLabel, { compact: true });
+    }
+
+    function vmFiltersActive(q = state.vmFilter) {
+      const { project, status, os, hardware } = state.filters;
+      const search = stripFilterAttributes(q);
+      return !!(search || project.length || status.length || os.length || hardware.length);
+    }
+
+    function showListEmptyState(areaId, scrollId, emptyId, html) {
+      const area = document.getElementById(areaId);
+      const scroll = scrollId ? document.getElementById(scrollId) : null;
+      if (scroll) scroll.hidden = true;
+      let slot = document.getElementById(emptyId);
+      if (!slot && area) {
+        slot = document.createElement('div');
+        slot.id = emptyId;
+        area.appendChild(slot);
+      }
+      if (slot) {
+        slot.innerHTML = html;
+        slot.hidden = false;
+      }
+    }
+
+    function clearListEmptyState(scrollId, emptyId) {
+      const scroll = scrollId ? document.getElementById(scrollId) : null;
+      if (scroll) scroll.hidden = false;
+      const slot = document.getElementById(emptyId);
+      if (slot) slot.hidden = true;
+    }
+
     function vmMatchesSearch(v, q) {
       const needle = String(q || '').trim().toLowerCase();
       if (!needle) return true;
@@ -8244,7 +8342,33 @@
       document.getElementById('vm-page-count').textContent = n ? `1–${n} of ${n}` : '0–0 of 0';
       renderVmTableHeader();
       const cols = visibleVmColumns();
-      document.getElementById('vm-tbody').innerHTML = rows.map(v => `
+      const tbody = document.getElementById('vm-tbody');
+      if (!tbody) return;
+      if (!n) {
+        const { project, status, os, hardware } = state.filters;
+        const search = stripFilterAttributes(q);
+        const projectOnly = project.length === 1 && !status.length && !os.length && !hardware.length && !search;
+        const noVmsInProject = projectOnly && !VMS.some(v => v.ns === project[0]);
+        let emptyHtml;
+        if (noVmsInProject) {
+          emptyHtml = emptyStateProjectHtml('virtual machines', 'virtual machine');
+        } else if (search && !status.length && !os.length && !hardware.length && !project.length) {
+          emptyHtml = emptyStateSearchHtml('virtual machines');
+        } else if (vmFiltersActive(q)) {
+          emptyHtml = emptyStateFiltersHtml('virtual machines');
+        } else {
+          emptyHtml = emptyStateHtml({
+            title: 'No virtual machines yet',
+            body: 'Create a virtual machine to get started.',
+          });
+        }
+        tbody.innerHTML = '';
+        showListEmptyState('vm-table-area', 'vm-table-scroll', 'vm-empty-state', emptyHtml);
+        syncVmBulkSelect();
+        return;
+      }
+      clearListEmptyState('vm-table-scroll', 'vm-empty-state');
+      tbody.innerHTML = rows.map(v => `
         <tr class="pf-v6-c-table__tr${state.selectedVms.has(v.name) ? ' pf-m-selected' : ''}">
           <td class="pf-v6-c-table__td">
             <label class="pf-v6-c-check pf-m-standalone">
@@ -9467,7 +9591,7 @@
                     </span>
                   </button>
                 </li>
-              `).join('') || `<li class="pf-v6-c-menu__list-item" role="none"><p class="muted" style="margin:8px 16px;font-size:13px;">No storage tier matches.</p></li>`}
+              `).join('') || `<li class="pf-v6-c-menu__list-item" role="none">${emptyStateMenuSearchHtml('storage tiers')}</li>`}
             </ul>
           </div>
         </div>
@@ -10589,8 +10713,25 @@
     }
 
     function renderNetworks(q = '') {
-      const rows = NETWORKS.filter(n => !q || n.name.toLowerCase().includes(q.toLowerCase()));
-      document.getElementById('net-tbody').innerHTML = rows.map(n => `
+      const search = String(q || '').trim();
+      const rows = NETWORKS.filter(n => !search || n.name.toLowerCase().includes(search.toLowerCase()));
+      const tbody = document.getElementById('net-tbody');
+      if (!tbody) return;
+      if (!rows.length) {
+        tbody.innerHTML = '';
+        const emptyHtml = !NETWORKS.length
+          ? emptyStateHtml({
+            title: 'No networks yet',
+            body: 'Create a network to attach virtual machines.',
+          })
+          : (search
+            ? emptyStateSearchHtml('networks')
+            : emptyStateFiltersHtml('networks'));
+        showListEmptyState('net-table-area', 'net-table-scroll', 'net-empty-state', emptyHtml);
+        return;
+      }
+      clearListEmptyState('net-table-scroll', 'net-empty-state');
+      tbody.innerHTML = rows.map(n => `
         <tr class="pf-v6-c-table__tr">
           <td class="pf-v6-c-table__td"><button type="button" class="name-link">${n.name}</button></td>
           <td class="pf-v6-c-table__td"><span class="cond-pill">${n.type}</span></td>
@@ -10600,7 +10741,7 @@
           <td class="pf-v6-c-table__td">${n.vms}</td>
           <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${n.name}"><i class="fa-solid fa-ellipsis-v"></i></button></td>
         </tr>
-      `).join('') || `<tr class="pf-v6-c-table__tr"><td class="pf-v6-c-table__td muted" colspan="7">No networks match.</td></tr>`;
+      `).join('');
     }
 
     function typeLabel(t) {
@@ -11563,6 +11704,7 @@
                   <div class="search-group" style="max-width:200px;"><input type="search" placeholder="Search by name" /></div>
                   <button type="button" class="pf-v6-c-button pf-m-secondary">Add boot source</button>
                 </div>
+                ${bootVolumes.length ? `
                 <table class="pf-v6-c-table pf-m-compact">
                   <thead>
                     <tr><th>Volume name</th><th>Architecture</th><th>Project</th><th>Size</th></tr>
@@ -11580,9 +11722,13 @@
                         <td>${v.project}</td>
                         <td>${v.size}</td>
                       </tr>
-                    `).join('') || '<tr><td colspan="4" class="muted">No volumes in this project.</td></tr>'}
+                    `).join('')}
                   </tbody>
                 </table>
+                ` : emptyStateProjectHtml('volumes', 'volume', {
+                  panel: true,
+                  body: 'Select a different project, or add a boot source.',
+                })}
               </div>
             ` : ''}
           </div>
@@ -11958,21 +12104,20 @@
             </aside>
           `;
         }
-        const tplEmptyHtml = noTemplatesInProject ? `
-          <div class="tpl-empty" role="status">
-            <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
-            <p class="tpl-empty__title">No Templates found in this project</p>
-            <p class="tpl-empty__body">Select a different project, or ask an administrator to add templates.</p>
-          </div>
-        ` : '';
-        const tplSearchEmpty = noSearchMatches
-          ? (view === 'cards'
-            ? '<p class="muted">No templates match your search.</p>'
-            : '<tr><td colspan="5" class="muted">No templates match your search.</td></tr>')
+        const tplEmptyHtml = noTemplatesInProject
+          ? emptyStateHtml({
+            title: 'No templates found in this project',
+            body: 'Select a different project, or ask an administrator to add templates.',
+          })
           : '';
-        const tplCatalogHtml = noTemplatesInProject ? tplEmptyHtml : (view === 'cards' ? `
+        const tplSearchEmptyHtml = noSearchMatches ? emptyStateSearchHtml('templates') : '';
+        const tplCatalogHtml = noTemplatesInProject
+          ? tplEmptyHtml
+          : (noSearchMatches
+            ? tplSearchEmptyHtml
+            : (view === 'cards' ? `
                 <div class="tpl-cards" role="listbox" aria-label="Templates">
-                  ${cards || tplSearchEmpty}
+                  ${cards}
                 </div>
               ` : `
                 <div class="tpl-list">
@@ -11987,11 +12132,11 @@
                       </tr>
                     </thead>
                     <tbody>
-                      ${listRows || tplSearchEmpty}
+                      ${listRows}
                     </tbody>
                   </table>
                 </div>
-              `);
+              `));
         panel.innerHTML = `
           <div class="tpl-step">
             <div>
@@ -12149,19 +12294,35 @@
               <input type="search" id="clone-filter" placeholder="Search by name" aria-label="Search by name" value="${state.cloneFilter || ''}" />
             </div>
           </div>
-          <table class="pf-v6-c-table pf-m-grid-md vm-table clone-source-table" role="grid">
-            <thead class="pf-v6-c-table__thead">
-              <tr class="pf-v6-c-table__tr">
-                <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Select</span></th>
-                <th class="pf-v6-c-table__th" scope="col">Name</th>
-                <th class="pf-v6-c-table__th" scope="col">Status</th>
-                <th class="pf-v6-c-table__th" scope="col">Created</th>
-              </tr>
-            </thead>
-            <tbody class="pf-v6-c-table__tbody">
-              ${rows || '<tr class="pf-v6-c-table__tr"><td class="pf-v6-c-table__td" colspan="4"><span class="muted">No virtual machines match your filter.</span></td></tr>'}
-            </tbody>
-          </table>
+          <div id="clone-source-area">
+            <div id="clone-source-scroll" ${list.length ? '' : 'hidden'}>
+              <table class="pf-v6-c-table pf-m-grid-md vm-table clone-source-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr">
+                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Select</span></th>
+                    <th class="pf-v6-c-table__th" scope="col">Name</th>
+                    <th class="pf-v6-c-table__th" scope="col">Status</th>
+                    <th class="pf-v6-c-table__th" scope="col">Created</th>
+                  </tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody">
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+            ${list.length ? '' : (() => {
+              const searchOnly = q && project === 'all';
+              const projectOnly = project !== 'all' && !q;
+              const noVmsInProject = projectOnly && !VMS.some(v => v.ns === project);
+              if (noVmsInProject) {
+                return emptyStateProjectHtml('virtual machines', 'virtual machine');
+              }
+              if (searchOnly) {
+                return emptyStateSearchHtml('virtual machines');
+              }
+              return emptyStateFiltersHtml('virtual machines');
+            })()}
+          </div>
         `;
         const selectSource = (name) => {
           d.cloneSourceName = name;
@@ -12274,7 +12435,7 @@
                           </span>
                         </button>
                       `;
-                      }).join('') || '<p class="muted" style="padding:12px;">No compute resources match your search.</p>'}
+                      }).join('') || emptyStateMenuSearchHtml('compute resources')}
                     </div>
                   </div>
                 </div>
@@ -13385,12 +13546,14 @@
     }
 
     function catalogStepsForRole() {
-      return [
-        { key: 'ci-details', label: 'Details', navNum: 1 },
-        { key: 'ci-access', label: 'Instance type & Access', navNum: 2 },
-        { key: 'ci-storage', label: 'Storage', navNum: 3 },
-        { key: 'ci-review', label: 'Review', navNum: 4 },
+      const steps = [
+        { key: 'ci-details', label: 'Details' },
+        { key: 'ci-access', label: 'Instance type & Access' },
+        { key: 'ci-visibility', label: 'Visibility' },
+        { key: 'ci-storage', label: 'Storage' },
+        { key: 'ci-review', label: 'Review' },
       ];
+      return steps.map((step, index) => ({ ...step, navNum: index + 1 }));
     }
 
     const INSTANCE_TYPES = [
@@ -13756,7 +13919,7 @@
         rateHour: '$4.25/hr',
         rateMonth: '$2,850/mo per instance',
         visibility: 'global',
-        visibilityLabel: 'Global publish',
+        visibilityLabel: 'Global public',
         tenants: [],
         created: 'Sep 7, 2026, 11:16 AM',
       },
@@ -13867,14 +14030,14 @@
 
     function catalogPublishScopeLabel(item) {
       if (item.visibility === 'tenant') return 'Tenant scoped';
-      return 'Global publish';
+      return 'Global public';
     }
 
     function catalogPublishScopeFields(c) {
       const visibility = c.visibility === 'tenant' ? 'tenant' : 'global';
       return {
         visibility,
-        visibilityLabel: visibility === 'tenant' ? 'Tenant scoped' : 'Global publish',
+        visibilityLabel: visibility === 'tenant' ? 'Tenant scoped' : 'Global public',
         tenants: visibility === 'tenant' ? [...(c.tenants || [])] : [],
       };
     }
@@ -14082,7 +14245,7 @@
                         </span>
                       </span>
                     </button>
-                  `).join('') || '<p class="muted" style="padding:12px;">No disk images match your search.</p>'}
+                  `).join('') || emptyStateMenuSearchHtml('disk images')}
                 </div>
               </div>
             </div>
@@ -14129,64 +14292,9 @@
           const hay = `${it.label} ${it.cpu} ${it.memoryGiB} ${it.gpuResource} ${opt.rateHour}`.toLowerCase();
           return hay.includes(q);
         });
-        const tenantOptions = PLATFORM_TENANTS.filter(t => {
-          const q = (c.tenantFilter || '').toLowerCase();
-          if (!q) return true;
-          return t.toLowerCase().includes(q);
-        });
-        const selectedTenants = new Set(c.tenants || []);
-        const publishScopeHtml = isProviderCatalogRole() ? `
-          <hr class="form-section-divider" />
-          <h4 class="config-section-title">Publish scope</h4>
-          <p class="step-help" style="margin-top:-8px;margin-bottom:12px;">Choose who can order this item when it is published. Creating the item does not publish it.</p>
-          <div class="form-field">
-            <div class="radio-stack" role="radiogroup" aria-label="Publish scope">
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciVisibility" value="global" ${(c.visibility || 'global') !== 'tenant' ? 'checked' : ''} />
-                  Global publish
-                </label>
-                <p class="form-helper">Available to all tenants when published</p>
-              </div>
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
-                  Tenant scoped
-                </label>
-                <p class="form-helper">Available only to selected tenants when published</p>
-              </div>
-            </div>
-          </div>
-          ${c.visibility === 'tenant' ? `
-          <div class="form-field ${state.fieldErrors.ciTenants ? 'pf-m-error' : ''}" style="margin-top:20px;">
-            <label id="ci-tenants-label">Tenants <span class="req">*</span></label>
-            <div class="arch-multi" id="ci-tenants-multi">
-              <button type="button" class="arch-multi__toggle" id="ci-tenants-toggle" aria-expanded="${c.tenantMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-tenants-label">
-                <span class="placeholder" id="ci-tenants-label-text">${c.tenants?.length ? c.tenants.join(', ') : 'Select tenants'}</span>
-                <span class="pf-v6-c-form-control__toggle-icon" aria-hidden="true"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-              </button>
-              <ul class="arch-multi__menu" id="ci-tenants-menu" role="listbox" aria-labelledby="ci-tenants-label" ${c.tenantMenuOpen ? '' : 'hidden'}>
-                <li class="arch-multi__search-rich">
-                  <div class="rich-select__search">
-                    <i class="fa-solid fa-search" aria-hidden="true"></i>
-                    <input type="search" id="ci-tenant-search" placeholder="Search tenants" value="${String(c.tenantFilter || '').replace(/"/g, '&quot;')}" aria-label="Search tenants" />
-                  </div>
-                </li>
-                <li class="arch-multi__menu-divider" aria-hidden="true"><hr class="rich-select__menu-divider" /></li>
-                <li class="arch-multi__menu-list">
-                  <ul>
-                ${tenantOptions.map(t => `
-                  <li><label><input type="checkbox" name="ciTenant" value="${t}" ${selectedTenants.has(t) ? 'checked' : ''} /> ${t}</label></li>
-                `).join('')}
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>` : ''}
-        ` : '';
         panel.innerHTML = `
           <h3>Instance type &amp; Access</h3>
-          <p class="step-help">Choose an instance type for this catalog item. GPU configuration is defined on the instance type. Publishing is a separate step after creation.</p>
+          <p class="step-help">Choose an instance type for this catalog item. GPU configuration is defined on the instance type.</p>
           <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Instance type <span class="req">*</span></h4>
           <div class="form-field">
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
@@ -14207,7 +14315,7 @@
                 </div>
                 <hr class="rich-select__menu-divider" />
                 <div class="rich-select__menu-list">
-                  ${computeOptions.map(opt => {
+                  ${computeOptions.length ? computeOptions.map(opt => {
                     const it = getCatalogInstanceType(opt.id);
                     return `
                     <button type="button" class="pf-v6-c-menu__item rich-select__option ${opt.id === instanceTypeId ? 'pf-m-selected' : ''}" data-compute="${opt.id}" role="option">
@@ -14218,7 +14326,7 @@
                         </span>
                       </span>
                     </button>`;
-                  }).join('')}
+                  }).join('') : emptyStateMenuSearchHtml('instance types')}
                 </div>
               </div>
             </div>
@@ -14244,38 +14352,11 @@
               </div>
             </div>
           </div>
-          ${publishScopeHtml}
         `;
         panel.querySelectorAll('input[name="ciTenantAccess"]').forEach(r => {
           r.addEventListener('change', () => {
             c.tenantAccess = r.value;
             renderWizard();
-          });
-        });
-        panel.querySelectorAll('input[name="ciVisibility"]').forEach(r => {
-          r.addEventListener('change', () => {
-            c.visibility = r.value;
-            if (c.visibility === 'global') c.tenants = [];
-            renderWizard();
-          });
-        });
-        panel.querySelector('#ci-tenants-toggle')?.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          c.tenantMenuOpen = !c.tenantMenuOpen;
-          renderWizard();
-        });
-        panel.querySelector('#ci-tenant-search')?.addEventListener('input', e => {
-          c.tenantFilter = e.target.value;
-          c.tenantMenuOpen = true;
-          renderWizard();
-          panel.querySelector('#ci-tenant-search')?.focus();
-        });
-        panel.querySelectorAll('input[name="ciTenant"]').forEach(cb => {
-          cb.addEventListener('change', () => {
-            c.tenants = [...panel.querySelectorAll('input[name="ciTenant"]:checked')].map(el => el.value);
-            const label = panel.querySelector('#ci-tenants-label-text');
-            if (label) label.textContent = c.tenants.length ? c.tenants.join(', ') : 'Select tenants';
           });
         });
         bindRichSelect(panel.querySelector('#ci-compute-select'), {
@@ -14385,8 +14466,8 @@
             <div class="radio-stack" role="radiogroup" aria-label="Catalog item visibility">
               <div class="radio-stack__item">
                 <label class="form-check">
-                  <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
-                  Global publish
+                  <input type="radio" name="ciVisibility" value="global" ${(c.visibility || 'global') !== 'tenant' ? 'checked' : ''} />
+                  Global public
                 </label>
                 <p class="form-helper">Available to all tenants when published</p>
               </div>
@@ -14416,11 +14497,11 @@
                 </li>
                 <li class="arch-multi__menu-divider" aria-hidden="true"><hr class="rich-select__menu-divider" /></li>
                 <li class="arch-multi__menu-list">
-                  <ul>
+                  ${tenantOptions.length ? `<ul>
                 ${tenantOptions.map(t => `
                   <li><label><input type="checkbox" name="ciTenant" value="${t}" ${selectedTenants.has(t) ? 'checked' : ''} /> ${t}</label></li>
                 `).join('')}
-                  </ul>
+                  </ul>` : emptyStateMenuSearchHtml('tenants')}
                 </li>
               </ul>
             </div>
@@ -14488,14 +14569,16 @@
             ${reviewRow('Description', c.description ? String(c.description).replace(/</g, '&lt;') : '—')}
             ${reviewRow('Guest operating system', String(c.guestOsFamily || '—').replace(/</g, '&lt;'))}
             ${reviewRow('Disk image', disk ? `${disk.title} (${disk.family} · ${disk.arch})` : '—')}
-            ${reviewRow('Publish state', 'Unpublished')}
+            ${reviewRow('Status', 'Unpublished')}
           `)}
           ${reviewSection('Instance type &amp; Access', 'ci-access', `
             ${reviewRow('Instance type', compute.summary.replace(/</g, '&lt;'))}
             ${reviewRow('Tenant access', accessLabel)}
-            ${isProviderCatalogRole() ? reviewRow('Publish scope', c.visibility === 'tenant'
+          `)}
+          ${reviewSection('Visibility', 'ci-visibility', `
+            ${reviewRow('Visibility', c.visibility === 'tenant'
               ? `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`
-              : 'Global publish') : ''}
+              : 'Global public')}
           `)}
           ${reviewSection('Storage', 'ci-storage', `
             ${reviewRow('Boot disk', `${c.bootDiskGiB || 30} GiB`)}
@@ -14556,10 +14639,10 @@
           return false;
         }
       }
-      if (key === 'ci-access' && isProviderCatalogRole() && c.visibility === 'tenant' && !(c.tenants || []).length) {
+      if (key === 'ci-visibility' && c.visibility === 'tenant' && !(c.tenants || []).length) {
         state.fieldErrors = { ciTenants: 'Select at least one tenant.' };
         renderWizard();
-        toast('Select at least one tenant for tenant-scoped publish.');
+        toast('Select at least one tenant for tenant-scoped visibility.');
         return false;
       }
       state.fieldErrors = {};
@@ -14663,6 +14746,45 @@
     function catalogDiskImageIconHtml(diskImage) {
       if (!/rhel|red hat/i.test(String(diskImage || ''))) return '';
       return '<i class="fa-brands fa-redhat catalog-disk-image-value__icon" aria-hidden="true"></i>';
+    }
+
+    function catalogDetailHardwareSpecsHtml(item) {
+      const compute = resolveCatalogItemCompute(item);
+      const esc = value => String(value || '—').replace(/</g, '&lt;');
+      const diskImage = esc(item.diskImage);
+      const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
+      const sizeLabel = esc(compute.label);
+      const sizeGov = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
+      const diskIcon = catalogDiskImageIconHtml(item.diskImage);
+      return `
+        <div class="tpl-fixed-panel__row">
+          <dt>Size</dt>
+          <dd><span class="catalog-detail-spec-badges"><span class="catalog-gov-badge">${sizeLabel}</span>${sizeGov}</span></dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>CPU</dt>
+          <dd>${esc(compute.cpu)}</dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>RAM</dt>
+          <dd>${esc(compute.memory)}</dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>GPU</dt>
+          <dd>${esc(compute.gpu)}</dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>Disk image</dt>
+          <dd>
+            <span class="catalog-disk-image-value">
+              ${diskIcon}
+              <span class="catalog-detail-spec-badges">
+                <span class="catalog-gov-badge">${diskImage}</span>
+                ${govBadge}
+              </span>
+            </span>
+          </dd>
+        </div>`;
     }
 
     function catalogCardSpecsRowsHtml(item) {
@@ -14860,12 +14982,8 @@
       const safeName = String(item.name).replace(/</g, '&lt;');
       const safeDesc = String(item.description || '—').replace(/</g, '&lt;');
       const isProvider = item.scope === 'provider';
-      const compute = resolveCatalogItemCompute(item);
       const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
       const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
-      const diskImage = String(item.diskImage || '—').replace(/</g, '&lt;');
-      const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
-      const sizeGov = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
       const launchDisabled = isProvider && item.publishState !== 'live';
 
       root.innerHTML = `
@@ -14914,13 +15032,13 @@
               <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
                 <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
                 ${itField('Service', 'Virtual machines')}
+                ${isProvider ? itField('Status', publishLabelHtml(item.publishState)) : ''}
                 ${itField('Rate', catalogRateLine(item))}
               </section>
               ${isProvider ? `
               <section class="ethan-detail-col" aria-labelledby="ci-publishing-title">
                 <h3 class="ethan-detail-col__title" id="ci-publishing-title">Publishing</h3>
-                ${itField('Publish state', publishLabelHtml(item.publishState))}
-                ${itField('Publish scope', `<i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i> ${scopeLabel}`)}
+                ${itField('Visibility', `<i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i> ${scopeLabel}`)}
                 ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
               </section>
               ` : `
@@ -14934,26 +15052,7 @@
             <section class="tpl-fixed-panel" aria-labelledby="ci-hardware-title">
               <h3 class="tpl-fixed-panel__title" id="ci-hardware-title">Hardware specifications</h3>
               <dl class="tpl-fixed-panel__dl">
-                <div class="tpl-fixed-panel__row">
-                  <dt>Instance type</dt>
-                  <dd>${compute.label.replace(/</g, '&lt;')} ${sizeGov}</dd>
-                </div>
-                <div class="tpl-fixed-panel__row">
-                  <dt>CPU</dt>
-                  <dd>${compute.cpu.replace(/</g, '&lt;')}</dd>
-                </div>
-                <div class="tpl-fixed-panel__row">
-                  <dt>RAM</dt>
-                  <dd>${compute.memory.replace(/</g, '&lt;')}</dd>
-                </div>
-                <div class="tpl-fixed-panel__row">
-                  <dt>GPU</dt>
-                  <dd>${compute.gpu.replace(/</g, '&lt;')}</dd>
-                </div>
-                <div class="tpl-fixed-panel__row">
-                  <dt>Disk image</dt>
-                  <dd><span class="catalog-disk-image-value">${catalogDiskImageIconHtml(item.diskImage)} ${diskImage} ${govBadge}</span></dd>
-                </div>
+                ${catalogDetailHardwareSpecsHtml(item)}
               </dl>
             </section>
           </div>
@@ -15091,19 +15190,12 @@
 
     function catalogEmptyStateHtml({ isProvider }) {
       if (isProvider) {
-        return `
-          <div class="tpl-empty" role="status">
-            <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
-            <p class="tpl-empty__title">No catalog items yet</p>
-            <p class="tpl-empty__body">Create a catalog item from a master template, then attach it to tenants.</p>
-          </div>`;
+        return emptyStateHtml({
+          title: 'No catalog items yet',
+          body: 'Create a catalog item from a master template, then attach it to tenants.',
+        });
       }
-      return `
-        <div class="tpl-empty" role="status">
-          <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
-          <p class="tpl-empty__title">No catalog items found in this project</p>
-          <p class="tpl-empty__body">Create a catalog item, or select a different project.</p>
-        </div>`;
+      return emptyStateProjectHtml('catalog items', 'catalog item');
     }
 
     function renderCatalogProjectFilter() {
@@ -15255,14 +15347,16 @@
         return;
       }
       if (noFilterMatches) {
-        root.innerHTML = '<p class="muted" style="padding:24px 0;">No catalog items match the current filters.</p>';
+        root.innerHTML = isProvider
+          ? emptyStateFiltersHtml('catalog items')
+          : emptyStateProjectHtml('catalog items', 'catalog item');
+        return;
+      }
+      if (noSearchMatches) {
+        root.innerHTML = emptyStateSearchHtml('catalog items');
         return;
       }
       if (view === 'list') {
-        const colCount = isProvider ? 7 : 5;
-        const searchRow = noSearchMatches
-          ? `<tr><td colspan="${colCount}" class="muted">No catalog items match your search.</td></tr>`
-          : '';
         root.innerHTML = `
           <div style="overflow-x:auto;">
             <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
@@ -15272,12 +15366,12 @@
                   <th class="pf-v6-c-table__th" scope="col">Instance type</th>
                   <th class="pf-v6-c-table__th" scope="col">Disk image</th>
                   <th class="pf-v6-c-table__th" scope="col">Rate</th>
-                  ${isProvider ? '<th class="pf-v6-c-table__th" scope="col">Publish state</th><th class="pf-v6-c-table__th" scope="col">Publish scope</th>' : ''}
+                  ${isProvider ? '<th class="pf-v6-c-table__th" scope="col">Status</th><th class="pf-v6-c-table__th" scope="col">Visibility</th>' : ''}
                   <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
                 </tr>
               </thead>
               <tbody class="pf-v6-c-table__tbody">
-                ${noSearchMatches ? searchRow : items.map(item => {
+                ${items.map(item => {
                   const name = String(item.name).replace(/</g, '&lt;');
                   const diskImage = String(item.diskImage).replace(/</g, '&lt;');
                   const visibility = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
@@ -15301,9 +15395,7 @@
         wireCatalogCards(root);
         return;
       }
-      const cards = noSearchMatches
-        ? '<p class="muted">No catalog items match your search.</p>'
-        : items.map(item => renderCatalogCard(item, {
+      const cards = items.map(item => renderCatalogCard(item, {
           showVisibility: isProvider,
           showPublishState: isProvider,
         })).join('');
@@ -15602,15 +15694,17 @@
       const showObsolete = !!state.diShowObsolete;
       const rows = DISK_IMAGES.filter(di => showObsolete || normalizeDiskImageLifecycle(di.lifecycle) !== 'Obsolete');
       if (!rows.length) {
-        tbody.innerHTML = `<tr class="pf-v6-c-table__tr">
-          <td class="pf-v6-c-table__td" colspan="7">
-            <div class="muted" style="padding:24px;text-align:center;">
-              ${DISK_IMAGES.length ? 'No disk images match the current filters.' : 'No disk images yet. Create a disk image to make it available for provisioning.'}
-            </div>
-          </td>
-        </tr>`;
+        tbody.innerHTML = '';
+        const emptyHtml = !DISK_IMAGES.length
+          ? emptyStateHtml({
+            title: 'No disk images yet',
+            body: 'Create a disk image to make it available for provisioning.',
+          })
+          : emptyStateFiltersHtml('disk images');
+        showListEmptyState('disk-images-table-area', 'disk-images-table-scroll', 'disk-images-empty-state', emptyHtml);
         return;
       }
+      clearListEmptyState('disk-images-table-scroll', 'disk-images-empty-state');
       tbody.innerHTML = rows.map(di => {
         const arch = (di.architecture || []).join(', ') || '—';
         const hasActions = diskImageLifecycleActions(di.lifecycle).length > 0;
@@ -15798,6 +15892,12 @@
       if (onCatalog) {
         renderCatalog();
         if (role.canManageProviderCatalog) renderCatalogTenantFilter();
+      }
+      if (state.wizard === 'catalog-create') {
+        const steps = catalogStepsForRole();
+        if (state.step >= steps.length) state.step = steps.length - 1;
+        state.maxVisited = Math.min(state.maxVisited, steps.length - 1);
+        renderWizard();
       }
     }
 
