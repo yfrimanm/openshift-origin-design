@@ -15,14 +15,14 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 | | |
 |---|---|
 | **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, provider **Catalog**, plus **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1351) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1351&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1351&vm=azure-baboon-27) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1351&role=provider) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533) |
+| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533&vm=azure-baboon-27) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533&role=provider) |
 | **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
 | **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
 
-**Source snapshot:** Pages build `?v=20260910-1351` (screenshots captured 2026-09-10).
+**Source snapshot:** Pages build `?v=20260910-1533` (screenshots captured 2026-09-10).
 
 ---
 
@@ -233,9 +233,44 @@ Figure: Create catalog item — Visibility step
 | **Publishing** | Visibility (Global public) · Created |
 | **Hardware specifications** | Size (+ Locked) · CPU · RAM · GPU · Disk image (+ Locked) |
 
+Header actions: **Launch instance** · **Actions** (Edit / Duplicate / Publish or Unpublish / Delete).
+
 ![Figure: Catalog item detail](videos/vmaas-prototype-ux-doc/19-catalog-item-detail.png)
 
 Figure: Catalog item detail
+
+![Figure: Hardware specifications](videos/vmaas-prototype-ux-doc/19b-catalog-hardware-specs.png)
+
+Figure: Hardware specifications card (Ethan stacked fields + Locked badges)
+
+---
+
+## Edit catalog item — Review
+
+Same wizard as create (Details → Instance type & Access → Visibility → Storage → Review), opened from **Actions → Edit**.
+
+| Review state | Behavior |
+|---|---|
+| **No changes** | Helper: “No changes yet…” · **Save changes** disabled · info alert that changes apply immediately |
+| **With changes** | Before → after rows for each edited field · **Save changes** enabled |
+
+![Figure: Edit catalog — Review empty](videos/vmaas-prototype-ux-doc/20-catalog-edit-review-empty.png)
+
+Figure: Edit catalog item — Review with no changes
+
+![Figure: Edit catalog — Review with changes](videos/vmaas-prototype-ux-doc/21-catalog-edit-review-changes.png)
+
+Figure: Edit catalog item — Review with before/after summary
+
+---
+
+## Delete catalog item
+
+**Actions → Delete** opens a danger confirmation modal naming the catalog item. Confirm permanently removes it from the catalog.
+
+![Figure: Delete catalog item](videos/vmaas-prototype-ux-doc/22-catalog-delete-modal.png)
+
+Figure: Delete catalog item confirmation
 
 ---
 
@@ -379,7 +414,7 @@ Figure: Disk image detail
 
 - Detailed Create-only write-up: `vmaas-create-vm-only-ux-doc.md`
 - Detailed Overview write-up: `vmaas-vm-details-overview-ux-doc.md`
-- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1351
+- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533
 
 ---
 
@@ -410,3 +445,7 @@ Figure: Disk image detail
 | `17-catalog-list.png` | Catalog list (provider) |
 | `18-catalog-create-visibility.png` | Create catalog item — Visibility |
 | `19-catalog-item-detail.png` | Catalog item detail |
+| `19b-catalog-hardware-specs.png` | Hardware specifications card |
+| `20-catalog-edit-review-empty.png` | Edit catalog — Review (no changes) |
+| `21-catalog-edit-review-changes.png` | Edit catalog — Review (with changes) |
+| `22-catalog-delete-modal.png` | Delete catalog item confirmation |

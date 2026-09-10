@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, 'videos', 'vmaas-prototype-ux-doc');
 const BASE =
   process.env.VMAAS_MOCK_URL ||
-  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1351';
+  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533';
 
 async function shot(page, name) {
   const file = path.join(outDir, `${name}.png`);
@@ -216,6 +216,77 @@ async function main() {
   await page.locator('[data-catalog-card]').first().click();
   await page.waitForTimeout(600);
   await shot(page, '19-catalog-item-detail');
+
+  // Hardware specifications card (catalog detail)
+  const hwSpecs = page.locator('.catalog-hw-specs').first();
+  if (await hwSpecs.count()) {
+    await hwSpecs.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+    const hwFile = path.join(outDir, '19b-catalog-hardware-specs.png');
+    await hwSpecs.screenshot({ path: hwFile });
+    console.log('wrote', path.relative(root, hwFile));
+  }
+
+  // Edit catalog item — Review (no changes)
+  await page.locator('#ci-detail-actions-btn').click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-ci-action="edit"]').click();
+  await page.waitForSelector('#overlay.pf-m-open', { timeout: 8000 });
+  await page.waitForTimeout(400);
+  for (const title of ['Instance type & Access', 'Visibility', 'Storage', 'Review']) {
+    await clickNext(page);
+    if (title === 'Review') {
+      await page.locator('#wiz-panel h3').filter({ hasText: /Review/ }).first().waitFor({ timeout: 10000 });
+    } else {
+      await waitStep(page, title);
+    }
+  }
+  await shot(page, '20-catalog-edit-review-empty');
+
+  // Back to Details via wizard nav, change description, return to Review with changes
+  await page.locator('#wiz-nav-list [data-step="0"]').click();
+  await waitStep(page, 'Details');
+  await page.waitForTimeout(300);
+  const desc = page.locator('#ci-description');
+  await desc.waitFor({ state: 'visible', timeout: 8000 });
+  const prev = await desc.inputValue();
+  await desc.fill(`${prev || 'Catalog item'} (updated for review)`);
+  await page.waitForTimeout(200);
+  for (const title of ['Instance type & Access', 'Visibility', 'Storage', 'Review']) {
+    await clickNext(page);
+    if (title === 'Review') {
+      await page.locator('#wiz-panel h3').filter({ hasText: /Review/ }).first().waitFor({ timeout: 10000 });
+    } else {
+      await waitStep(page, title);
+    }
+  }
+  await shot(page, '21-catalog-edit-review-changes');
+
+  // Exit edit wizard
+  await page.locator('#wiz-close').click();
+  await page.waitForTimeout(400);
+  if (await page.locator('#cancel-confirm').isVisible().catch(() => false)) {
+    await page.locator('#cancel-confirm').click();
+  }
+  await page.waitForTimeout(400);
+
+  // Delete catalog item confirmation modal
+  // Ensure we are on catalog detail (re-open first card if needed)
+  if (!(await page.locator('#ci-detail-actions-btn').isVisible().catch(() => false))) {
+    await page.goto(BASE, { waitUntil: 'networkidle' });
+    await setRole(page, 'provider');
+    await page.waitForTimeout(500);
+    await page.locator('[data-catalog-card]').first().click();
+    await page.waitForTimeout(500);
+  }
+  await page.locator('#ci-detail-actions-btn').click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-ci-action="delete"]').click();
+  await page.waitForSelector('#delete-catalog-overlay.pf-m-open', { timeout: 5000 });
+  await page.waitForTimeout(300);
+  await shot(page, '22-catalog-delete-modal');
+  await page.locator('#delete-catalog-cancel').click();
+  await page.waitForTimeout(300);
 
   // —— Provider: Instance types ——
   await page.locator('[data-nav="instance-types"]').click();
