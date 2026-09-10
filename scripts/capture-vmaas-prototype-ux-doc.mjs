@@ -20,6 +20,14 @@ async function shot(page, name) {
   console.log('wrote', path.relative(root, file));
 }
 
+async function shotPanel(page, name) {
+  const file = path.join(outDir, `${name}.png`);
+  const panel = page.locator('.console__body').first();
+  await panel.waitFor({ state: 'visible' });
+  await panel.screenshot({ path: file });
+  console.log('wrote', path.relative(root, file));
+}
+
 async function clickNext(page) {
   await page.locator('#wiz-next').click();
   await page.waitForTimeout(500);
@@ -230,20 +238,22 @@ async function main() {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
 
-  // —— Disk images ——
+  // —— Disk images (panel shots — better aspect ratio for Google Doc embeds) ——
+  await page.setViewportSize({ width: 1680, height: 1000 });
   await page.locator('[data-nav="disk-images"]').click();
-  await page.waitForTimeout(500);
-  await shot(page, '14-disk-images-list');
+  await page.waitForTimeout(600);
+  await shotPanel(page, '14-disk-images-list');
 
   await page.locator('#btn-create-disk-image').click();
-  await page.waitForTimeout(500);
-  await shot(page, '15-create-disk-image');
+  await page.waitForTimeout(600);
+  await shotPanel(page, '15-create-disk-image');
   await page.locator('#create-di-cancel').click();
   await page.waitForTimeout(400);
 
   await page.locator('[data-disk-image="rhel-9-5"]').click();
-  await page.waitForTimeout(500);
-  await shot(page, '16-disk-image-detail');
+  await page.waitForTimeout(600);
+  await shotPanel(page, '16-disk-image-detail');
+  await page.setViewportSize({ width: 1440, height: 900 });
 
   await browser.close();
   console.log('done →', path.relative(root, outDir));
