@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>VMaaS UX prototype — list, create, overview, infrastructure</title>
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.6.1/patternfly-addons.css" />
@@ -80,6 +83,15 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+    }
+    .prototype-build {
+      font-size: 11px;
+      color: var(--vmaas-text-subtle);
+      white-space: nowrap;
+      padding-inline: 8px;
+      border: 1px solid var(--vmaas-border-light);
+      border-radius: 999px;
+      line-height: 22px;
     }
     .console__masthead-role .pf-v6-c-form-control {
       min-width: 220px;
@@ -430,6 +442,18 @@
     .lifecycle-label.pf-m-active { color: #0f2808; background: #bde5b8; }
     .lifecycle-label.pf-m-obsolete { color: #1f1f1f; background: #f0f0f0; }
     .lifecycle-label.pf-m-deprecated { color: #795600; background: #f9e0a2; }
+    .publish-label {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .publish-label.pf-m-live { color: #1e4f18; background: #c7f0c0; }
+    .publish-label.pf-m-unpublished { color: #4d4d4d; background: #e0e0e0; }
     .create-it-page {
       max-width: 560px;
     }
@@ -3152,67 +3176,282 @@
       flex: 1;
     }
 
-    /* Provider catalog list — card layout per design spec */
+    /* Provider catalog list — Ethan BMaaS card layout (VMaaS) */
+    .tpl-cards.tpl-cards--catalog .tpl-card--catalog {
+      width: 100%;
+      max-width: var(--catalog-card-width);
+      border-radius: var(--pf-t--global--border--radius--medium, 6px);
+      align-self: start;
+    }
     .tpl-card--catalog {
-      cursor: default;
-      padding: 16px 16px 14px;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    .tpl-card--catalog:hover { border-color: var(--vmaas-border-light); }
-    .tpl-card--catalog .tpl-card__title {
-      color: var(--vmaas-text);
-      cursor: default;
-      font-size: 16px;
-      font-weight: 700;
+    .tpl-card--catalog:hover { border-color: #8a8d90; box-shadow: 0 4px 8px rgba(0, 0, 0, .08); }
+    .tpl-card--catalog.tpl-m-unpublished {
+      background: var(--pf-t--global--background--color--secondary--default, #f5f5f5);
     }
-    .tpl-card--catalog .tpl-card__title:hover { text-decoration: none; }
+    .tpl-card--catalog .tpl-card__body {
+      padding: var(--pf-t--global--spacer--md, 16px) var(--pf-t--global--spacer--md, 16px) 0;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+    }
     .tpl-card__catalog-head {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin-bottom: var(--pf-t--global--spacer--xs, 4px);
     }
-    .tpl-card--catalog .tpl-card__icon {
-      width: 32px;
-      height: 32px;
-      margin-bottom: 0;
-      font-size: 16px;
-      border-radius: 6px;
-    }
-    .tpl-card__scope-badge {
+    .tpl-card--catalog .tpl-card__icon--catalog-vm {
+      width: 2.75rem;
+      height: 2.75rem;
+      margin: 0;
+      padding: 0.625rem;
+      box-sizing: border-box;
+      border-radius: var(--pf-t--global--border--radius--medium, 6px);
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      color: var(--pf-t--color--red--50, #a30000);
+      flex-shrink: 0;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+    }
+    .tpl-card--catalog .tpl-card__icon--catalog-vm .pf-v6-pficon-virtual-machine {
+      width: 1.5rem;
+      height: 1.5rem;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .tpl-card__catalog-head-actions {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: var(--pf-t--global--spacer--sm, 8px);
       flex-shrink: 0;
-      max-width: 58%;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #f0f0f0;
-      font-size: 12px;
+      margin-inline-start: auto;
+    }
+    .tpl-card--catalog .publish-label { font-weight: 400; }
+    .tpl-card--catalog .tpl-card__title-link {
+      display: block;
+      margin: 0 0 var(--pf-t--global--spacer--sm, 8px);
+      padding: 0;
+      border: none;
+      background: none;
+      font-size: var(--pf-t--global--font--size--body--default, 14px);
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--vmaas-blue);
+      text-align: left;
+      cursor: pointer;
+    }
+    .tpl-card--catalog .tpl-card__title-link:hover { text-decoration: underline; }
+    .catalog-card-specs {
+      display: flex;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: var(--pf-t--global--spacer--md, 16px) 0 0;
+      padding-bottom: var(--pf-t--global--spacer--md, 16px);
+      border-bottom: 1px solid var(--vmaas-border-light);
+    }
+    .catalog-card-specs__row {
+      display: grid;
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      align-items: baseline;
+      font-size: var(--pf-t--global--font--size--body--sm, 14px);
+      line-height: 1.35;
+    }
+    .catalog-card-specs__label {
+      margin: 0;
       font-weight: 600;
-      line-height: 1.3;
       color: var(--vmaas-text-subtle);
       white-space: nowrap;
     }
-    .tpl-card__scope-badge i { font-size: 11px; }
-    .tpl-card--catalog .tpl-card__title-row {
-      margin-bottom: 0;
-    }
-    .tpl-card--catalog .tpl-card__title-row .tpl-card__title {
+    .catalog-card-specs__value {
       margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text);
+      min-width: 0;
     }
-    .tpl-card--catalog .tpl-card__desc {
-      margin: 4px 0 16px;
+    .catalog-disk-image-value {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--pf-t--global--spacer--sm, 8px);
     }
-    .tpl-card--catalog .tpl-card__specs {
-      margin-bottom: 16px;
+    .catalog-disk-image-value__icon {
+      flex: 0 0 auto;
+      color: var(--pf-t--global--icon--color--regular, #6a6e73);
+      font-size: 14px;
+      line-height: 1;
     }
-    .tpl-card__footer--catalog {
-      align-items: baseline;
-      margin-top: 0;
+    .catalog-gov-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: #e8e8e8;
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: #4d4d4d;
+    }
+    .catalog-gov-badge--editable { background: #e7f1fa; color: #004080; }
+    .catalog-detail-spec-badges {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .catalog-card-rate {
+      display: grid;
+      gap: var(--pf-t--global--spacer--xs, 4px);
+      margin: var(--pf-t--global--spacer--md, 16px) 0 0;
+      padding: 0;
+    }
+    .catalog-card-rate__label {
+      margin: 0;
+      color: var(--vmaas-text-subtle);
+      font-size: var(--pf-t--global--font--size--body--sm, 14px);
+      font-weight: 400;
+    }
+    .catalog-card-rate__value {
+      margin: 0;
+      font-size: var(--pf-t--global--font--size--body--sm, 14px);
+      font-weight: 400;
+      color: var(--vmaas-text);
+      line-height: 1.35;
+    }
+    .tpl-card__visibility-footer {
+      display: flex;
+      align-items: center;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      box-sizing: border-box;
+      width: calc(100% + 32px);
+      margin: var(--pf-t--global--spacer--md, 16px) -16px 0;
+      padding: var(--pf-t--global--spacer--md, 16px);
+      border-top: 1px solid var(--vmaas-border-light);
+      background: transparent;
+      font-size: var(--pf-t--global--font--size--body--sm, 14px);
+      font-weight: 400;
+      color: var(--vmaas-text-subtle);
+      line-height: 1.25;
+    }
+    .tpl-card__visibility-footer i {
+      font-size: 1rem;
+      color: var(--pf-t--global--icon--color--regular, #6a6e73);
+    }
+    .catalog-summary {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle);
+    }
+    .catalog-summary strong { color: var(--vmaas-text); font-weight: 600; }
+    .catalog-summary__clear {
+      margin-left: 4px;
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--vmaas-blue);
+      font-size: inherit;
+      cursor: pointer;
+    }
+    .catalog-summary__clear:hover { text-decoration: underline; }
+    .catalog-detail-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px 32px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .catalog-detail-grid { grid-template-columns: 1fr; }
+    }
+    .catalog-detail-grid__meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 32px;
+    }
+    @media (max-width: 700px) {
+      .catalog-detail-grid__meta { grid-template-columns: 1fr; }
+    }
+    .catalog-detail-header__icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--pf-t--global--border--radius--medium, 6px);
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      color: var(--pf-t--color--red--50, #a30000);
+      flex-shrink: 0;
+    }
+    .catalog-detail-header__icon .pf-v6-pficon-virtual-machine {
+      width: 24px;
+      height: 24px;
+      font-size: 24px;
+      line-height: 1;
+    }
+    .ethan-detail-header__title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
     }
     #catalog-toolbar {
-      margin-bottom: 20px;
+      margin-bottom: 12px;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      align-items: center;
+    }
+    #catalog-toolbar .catalog-filter-toggle.filter-dd-btn {
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      min-width: 14rem;
+      justify-content: space-between;
+    }
+    #catalog-toolbar .catalog-filter-toggle.filter-dd-btn.pf-m-expanded,
+    #catalog-toolbar .catalog-filter-toggle.filter-dd-btn.pf-m-expanded {
+      border-color: var(--vmaas-blue);
+      box-shadow: 0 0 0 1px var(--vmaas-blue);
+    }
+    #catalog-toolbar .filter-name-search {
+      flex: 0 0 15rem;
+      width: 15rem;
+      max-width: 15rem;
+      min-width: 15rem;
+      align-self: center;
+    }
+    #catalog-toolbar .tpl-view-toggle {
+      align-self: center;
+      margin-left: auto;
+    }
+    #catalog-toolbar .tpl-toolbar__project[hidden] {
+      display: none !important;
+    }
+    #catalog-toolbar .tpl-toolbar__project {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      min-width: 0;
+      max-width: none;
+    }
+    #catalog-toolbar .tpl-toolbar__project > label {
+      margin: 0;
+      white-space: nowrap;
+    }
+    #catalog-publish-dd { flex: 0 0 auto; }
+    #ci-actions-menu:not(.pf-m-open),
+    #ci-actions-menu.pf-m-open {
+      position: fixed;
+      z-index: 500;
+      min-width: 220px;
+    }
+    #ci-actions-menu .pf-v6-c-divider { margin: 4px 0; }
+    #ci-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text {
+      color: #c9190b;
     }
 
     /* Catalog create wizard */
@@ -3225,37 +3464,60 @@
     }
     .wiz-breadcrumb a { color: var(--vmaas-blue); text-decoration: none; }
     .wiz-breadcrumb a:hover { text-decoration: underline; }
-    #catalog-tenant-toggle.filter-dd-btn--project {
-      border-radius: 999px;
-    }
-    .filter-dd-btn--project.pf-m-expanded,
-    #catalog-tenant-toggle.filter-dd-btn--project.pf-m-expanded {
-      border-color: var(--vmaas-blue);
-      box-shadow: 0 0 0 1px var(--vmaas-blue);
-    }
     .catalog-tenant-dd { flex: 0 0 auto; }
-    #catalog-tenant-menu.catalog-tenant-menu {
-      min-width: 100%;
-      width: max-content;
+    #catalog-publish-menu.catalog-filter-menu,
+    #catalog-tenant-menu.catalog-filter-menu {
+      min-width: 14rem;
+      width: 14rem;
+      max-width: 14rem;
       border: 1px solid #d2d2d2;
-      border-radius: 4px;
-      box-shadow: none;
-      max-height: 152px;
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+      max-height: 18rem;
       overflow-y: auto;
     }
+    #catalog-publish-menu .pf-v6-c-menu__content,
+    #catalog-publish-menu .pf-v6-c-menu__list,
     #catalog-tenant-menu .pf-v6-c-menu__content,
     #catalog-tenant-menu .pf-v6-c-menu__list {
       padding: 0;
     }
-    #catalog-tenant-menu .catalog-tenant-item {
+    #catalog-publish-menu .catalog-filter-item,
+    #catalog-tenant-menu .catalog-filter-item {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 12px;
       width: 100%;
-      justify-content: flex-start;
       padding: 8px 16px;
       font-weight: 400;
       color: var(--vmaas-text);
+      text-align: left;
     }
-    #catalog-tenant-menu .catalog-tenant-item .pf-v6-c-menu__item-text {
+    #catalog-publish-menu .catalog-filter-item .pf-v6-c-menu__item-main,
+    #catalog-tenant-menu .catalog-filter-item .pf-v6-c-menu__item-main {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      grid-column: 1;
+    }
+    #catalog-publish-menu .catalog-filter-item .pf-v6-c-menu__item-text,
+    #catalog-tenant-menu .catalog-filter-item .pf-v6-c-menu__item-text {
       font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .catalog-filter-check {
+      grid-column: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
+      color: var(--vmaas-blue);
+      font-size: 12px;
+      flex-shrink: 0;
+      line-height: 1;
     }
     .location-summary {
       display: flex; align-items: center; gap: 8px;
@@ -3459,6 +3721,20 @@
     .tpl-empty__title { margin: 0; font-size: 16px; font-weight: 600; color: var(--vmaas-text); }
     .tpl-empty__body {
       margin: 0; font-size: 14px; color: var(--vmaas-text-subtle); line-height: 1.45; max-width: 28rem;
+    }
+    .tpl-empty--compact {
+      min-height: auto; padding: 20px 16px; gap: 6px;
+      border: none; border-radius: 0; background: transparent;
+    }
+    .tpl-empty--compact .tpl-empty__icon { font-size: 20px; margin-bottom: 0; }
+    .tpl-empty--compact .tpl-empty__title { font-size: 14px; }
+    .tpl-empty--compact .tpl-empty__body { font-size: 12px; max-width: 16rem; }
+    .tpl-empty--panel {
+      min-height: 140px; padding: 32px 20px;
+    }
+    .rich-select__menu-list > .tpl-empty--compact,
+    .arch-multi__menu-list > .tpl-empty--compact {
+      margin: 4px 0;
     }
     .nic-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
 
@@ -3842,6 +4118,22 @@
     @media (max-width: 1200px) { .tpl-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 900px) { .tpl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 560px) { .tpl-cards { grid-template-columns: 1fr; } }
+    /* Catalog grid — must follow .tpl-cards so Ethan spacing wins (24px gap, fixed card width). */
+    .tpl-cards.tpl-cards--catalog {
+      --catalog-card-width: 20.875rem;
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--catalog-card-width)), var(--catalog-card-width))
+      );
+      gap: var(--pf-t--global--spacer--lg, 24px);
+      justify-content: start;
+      align-items: start;
+      align-content: start;
+      overflow: visible;
+      padding: 0;
+      min-height: 0;
+    }
     .tpl-list {
       border: 1px solid var(--vmaas-border-light); border-radius: 4px; overflow: auto;
       background: #fff;
@@ -4479,6 +4771,7 @@
       <div class="console__masthead">
         <span class="muted" id="role-badge">Tenant Admin</span>
         <div class="console__masthead-role">
+          <span class="prototype-build" id="prototype-build" title="Prototype build stamp">Build 2026-09-10</span>
           <span class="demo-bar__label">Role</span>
           <span class="pf-v6-c-form-control" style="width:auto;min-width:260px;">
             <select id="role-select" aria-label="OSAC persona">
@@ -4563,6 +4856,26 @@
                   </li>
                   <li class="pf-v6-c-nav__item">
                     <button type="button" class="pf-v6-c-nav__link" data-nav="disk-images">Disk images</button>
+                  </li>
+                </ul>
+              </section>
+            </li>
+            <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded" id="nav-platform" hidden>
+              <button type="button" class="pf-v6-c-nav__link" id="nav-platform-toggle" aria-expanded="true" aria-controls="nav-platform-sub">
+                Platform
+                <span class="pf-v6-c-nav__toggle">
+                  <span class="pf-v6-c-nav__toggle-icon">
+                    <i class="fas fa-angle-right" aria-hidden="true"></i>
+                  </span>
+                </span>
+              </button>
+              <section class="pf-v6-c-nav__subnav" id="nav-platform-sub" aria-label="Platform">
+                <ul class="pf-v6-c-nav__list">
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="tenants">Tenants</button>
+                  </li>
+                  <li class="pf-v6-c-nav__item">
+                    <button type="button" class="pf-v6-c-nav__link pf-m-disabled" disabled data-nav="quotas">Quotas</button>
                   </li>
                 </ul>
               </section>
@@ -4752,13 +5065,15 @@
               </div>
             </div>
 
-            <div style="overflow-x:auto;">
-              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr" id="vm-thead-row"></tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
-              </table>
+            <div id="vm-table-area">
+              <div style="overflow-x:auto;" id="vm-table-scroll">
+                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr" id="vm-thead-row"></tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
+                </table>
+              </div>
             </div>
           </section>
 
@@ -4783,34 +5098,50 @@
                 <input type="search" id="net-search" placeholder="Search by name..." aria-label="Search networks" />
               </div>
             </div>
-            <div style="overflow-x:auto;">
-              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr">
-                    <th class="pf-v6-c-table__th" scope="col">Name</th>
-                    <th class="pf-v6-c-table__th" scope="col">Type</th>
-                    <th class="pf-v6-c-table__th" scope="col">Project</th>
-                    <th class="pf-v6-c-table__th" scope="col">CIDR</th>
-                    <th class="pf-v6-c-table__th" scope="col">Status</th>
-                    <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
-                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                  </tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
-              </table>
+            <div id="net-table-area">
+              <div style="overflow-x:auto;" id="net-table-scroll">
+                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr">
+                      <th class="pf-v6-c-table__th" scope="col">Name</th>
+                      <th class="pf-v6-c-table__th" scope="col">Type</th>
+                      <th class="pf-v6-c-table__th" scope="col">Project</th>
+                      <th class="pf-v6-c-table__th" scope="col">CIDR</th>
+                      <th class="pf-v6-c-table__th" scope="col">Status</th>
+                      <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
+                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
+                </table>
+              </div>
             </div>
           </section>
           <section class="view" id="view-templates">
             <div class="page-header page-header--with-desc">
               <div class="page-header__text">
                 <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Catalog</h2>
-                <p class="page-desc">Create catalog items from master templates, and then attach them to tenants.</p>
+                <p class="page-desc" id="catalog-page-desc">Create catalog items from master templates, and then attach them to tenants.</p>
               </div>
-              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-catalog-item" hidden>Create catalog item</button>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-catalog-item" hidden>
+                <span class="pf-v6-c-button__icon"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+                <span class="pf-v6-c-button__text">Create catalog item</span>
+              </button>
             </div>
             <div class="tpl-toolbar" id="catalog-toolbar">
+              <div class="filter-dd-wrap catalog-tenant-dd" id="catalog-publish-dd" hidden>
+                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn catalog-filter-toggle" id="catalog-publish-toggle" aria-expanded="false" aria-haspopup="listbox" aria-label="Filter by publish state">
+                  <span class="pf-v6-c-menu-toggle__text" id="catalog-publish-label">All publish states</span>
+                  <span class="pf-v6-c-menu-toggle__controls">
+                    <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                    </span>
+                  </span>
+                </button>
+                <div class="pf-v6-c-menu filter-dd-menu catalog-filter-menu" id="catalog-publish-menu" role="listbox" aria-label="Publish state filter"></div>
+              </div>
               <div class="filter-dd-wrap catalog-tenant-dd" id="catalog-tenant-dd">
-                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn filter-dd-btn--project" id="catalog-tenant-toggle" aria-expanded="false" aria-haspopup="listbox" aria-label="Filter by tenant">
+                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn catalog-filter-toggle" id="catalog-tenant-toggle" aria-expanded="false" aria-haspopup="listbox" aria-label="Filter by tenant">
                   <span class="pf-v6-c-menu-toggle__text" id="catalog-tenant-label">All tenants</span>
                   <span class="pf-v6-c-menu-toggle__controls">
                     <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
@@ -4818,7 +5149,11 @@
                     </span>
                   </span>
                 </button>
-                <div class="pf-v6-c-menu filter-dd-menu catalog-tenant-menu" id="catalog-tenant-menu" role="listbox" aria-label="Tenant filter"></div>
+                <div class="pf-v6-c-menu filter-dd-menu catalog-filter-menu" id="catalog-tenant-menu" role="listbox" aria-label="Tenant filter"></div>
+              </div>
+              <div class="tpl-toolbar__project" id="catalog-project-field" hidden>
+                <label for="catalog-project-filter">Project</label>
+                <span id="catalog-project-select-wrap"></span>
               </div>
               <div class="filter-name-search">
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -4829,7 +5164,12 @@
                 <button type="button" id="catalog-view-list" aria-pressed="false" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
               </div>
             </div>
+            <p class="catalog-summary" id="catalog-summary" hidden></p>
             <div id="catalog-content"></div>
+          </section>
+
+          <section class="view" id="view-catalog-item">
+            <div id="catalog-item-detail-root"></div>
           </section>
 
           <section class="view" id="view-instance-types">
@@ -4876,21 +5216,23 @@
                 Show obsolete
               </label>
             </div>
-            <div style="overflow-x:auto;">
-              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr">
-                    <th class="pf-v6-c-table__th" scope="col">Name</th>
-                    <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
-                    <th class="pf-v6-c-table__th" scope="col">Guest operating system</th>
-                    <th class="pf-v6-c-table__th" scope="col">Architecture</th>
-                    <th class="pf-v6-c-table__th" scope="col">Visibility</th>
-                    <th class="pf-v6-c-table__th" scope="col">Created</th>
-                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                  </tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
-              </table>
+            <div id="disk-images-table-area">
+              <div style="overflow-x:auto;" id="disk-images-table-scroll">
+                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                  <thead class="pf-v6-c-table__thead">
+                    <tr class="pf-v6-c-table__tr">
+                      <th class="pf-v6-c-table__th" scope="col">Name</th>
+                      <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
+                      <th class="pf-v6-c-table__th" scope="col">Guest operating system</th>
+                      <th class="pf-v6-c-table__th" scope="col">Architecture</th>
+                      <th class="pf-v6-c-table__th" scope="col">Visibility</th>
+                      <th class="pf-v6-c-table__th" scope="col">Created</th>
+                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
+                </table>
+              </div>
             </div>
           </section>
 
@@ -5278,6 +5620,12 @@
   <div class="pf-v6-c-menu" id="di-actions-menu" hidden role="menu" aria-label="Disk image actions">
     <div class="pf-v6-c-menu__content">
       <ul class="pf-v6-c-menu__list" role="menu" id="di-actions-menu-list"></ul>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-menu" id="ci-actions-menu" hidden role="menu" aria-label="Catalog item actions">
+    <div class="pf-v6-c-menu__content">
+      <ul class="pf-v6-c-menu__list" role="menu" id="ci-actions-menu-list"></ul>
     </div>
   </div>
 
@@ -6457,8 +6805,14 @@
       cloneProject: 'all',
       catalogFilter: '',
       catalogTenantFilter: 'all',
+      catalogPublishFilter: 'all',
+      catalogProjectFilter: 'project-a',
       catalogView: 'cards',
+      selectedCatalogItemId: null,
+      ciActionsOpen: false,
+      ciActionsId: null,
       catalogCreate: null,
+      catalogEditId: null,
       vmComputeMenuOpen: false,
       vmComputeFilter: '',
       data: {
@@ -7559,6 +7913,78 @@
       return String(q || '').trim();
     }
 
+    function emptyStateHtml({ title, body, icon = 'fa-cube', compact = false, panel = false }) {
+      const safeTitle = String(title || '').replace(/</g, '&lt;');
+      const safeBody = String(body || '').replace(/</g, '&lt;');
+      const mods = `${compact ? ' tpl-empty--compact' : ''}${panel ? ' tpl-empty--panel' : ''}`;
+      return `
+        <div class="tpl-empty${mods}" role="status">
+          <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid ${icon}"></i></div>
+          <p class="tpl-empty__title">${safeTitle}</p>
+          <p class="tpl-empty__body">${safeBody}</p>
+        </div>`;
+    }
+
+    function emptyStateSearchHtml(resourceLabel, { compact = false, panel = false } = {}) {
+      return emptyStateHtml({
+        title: `No ${resourceLabel} match your search`,
+        body: 'Try a different search term.',
+        compact,
+        panel,
+      });
+    }
+
+    function emptyStateFiltersHtml(resourceLabel, { compact = false, panel = false } = {}) {
+      return emptyStateHtml({
+        title: `No ${resourceLabel} match the current filters`,
+        body: 'Clear all filters or adjust your search.',
+        compact,
+        panel,
+      });
+    }
+
+    function emptyStateProjectHtml(resourceLabel, resourceSingular, { compact = false, panel = false, body } = {}) {
+      return emptyStateHtml({
+        title: `No ${resourceLabel} found in this project`,
+        body: body || `Select a different project, or create a ${resourceSingular}.`,
+        compact,
+        panel,
+      });
+    }
+
+    function emptyStateMenuSearchHtml(resourceLabel) {
+      return emptyStateSearchHtml(resourceLabel, { compact: true });
+    }
+
+    function vmFiltersActive(q = state.vmFilter) {
+      const { project, status, os, hardware } = state.filters;
+      const search = stripFilterAttributes(q);
+      return !!(search || project.length || status.length || os.length || hardware.length);
+    }
+
+    function showListEmptyState(areaId, scrollId, emptyId, html) {
+      const area = document.getElementById(areaId);
+      const scroll = scrollId ? document.getElementById(scrollId) : null;
+      if (scroll) scroll.hidden = true;
+      let slot = document.getElementById(emptyId);
+      if (!slot && area) {
+        slot = document.createElement('div');
+        slot.id = emptyId;
+        area.appendChild(slot);
+      }
+      if (slot) {
+        slot.innerHTML = html;
+        slot.hidden = false;
+      }
+    }
+
+    function clearListEmptyState(scrollId, emptyId) {
+      const scroll = scrollId ? document.getElementById(scrollId) : null;
+      if (scroll) scroll.hidden = false;
+      const slot = document.getElementById(emptyId);
+      if (slot) slot.hidden = true;
+    }
+
     function vmMatchesSearch(v, q) {
       const needle = String(q || '').trim().toLowerCase();
       if (!needle) return true;
@@ -7929,7 +8355,33 @@
       document.getElementById('vm-page-count').textContent = n ? `1–${n} of ${n}` : '0–0 of 0';
       renderVmTableHeader();
       const cols = visibleVmColumns();
-      document.getElementById('vm-tbody').innerHTML = rows.map(v => `
+      const tbody = document.getElementById('vm-tbody');
+      if (!tbody) return;
+      if (!n) {
+        const { project, status, os, hardware } = state.filters;
+        const search = stripFilterAttributes(q);
+        const projectOnly = project.length === 1 && !status.length && !os.length && !hardware.length && !search;
+        const noVmsInProject = projectOnly && !VMS.some(v => v.ns === project[0]);
+        let emptyHtml;
+        if (noVmsInProject) {
+          emptyHtml = emptyStateProjectHtml('virtual machines', 'virtual machine');
+        } else if (search && !status.length && !os.length && !hardware.length && !project.length) {
+          emptyHtml = emptyStateSearchHtml('virtual machines');
+        } else if (vmFiltersActive(q)) {
+          emptyHtml = emptyStateFiltersHtml('virtual machines');
+        } else {
+          emptyHtml = emptyStateHtml({
+            title: 'No virtual machines yet',
+            body: 'Create a virtual machine to get started.',
+          });
+        }
+        tbody.innerHTML = '';
+        showListEmptyState('vm-table-area', 'vm-table-scroll', 'vm-empty-state', emptyHtml);
+        syncVmBulkSelect();
+        return;
+      }
+      clearListEmptyState('vm-table-scroll', 'vm-empty-state');
+      tbody.innerHTML = rows.map(v => `
         <tr class="pf-v6-c-table__tr${state.selectedVms.has(v.name) ? ' pf-m-selected' : ''}">
           <td class="pf-v6-c-table__td">
             <label class="pf-v6-c-check pf-m-standalone">
@@ -7948,6 +8400,7 @@
       const navId = id === 'vm' ? 'vms'
         : (id === 'create-instance-type' || id === 'instance-type') ? 'instance-types'
         : (id === 'create-disk-image' || id === 'disk-image') ? 'disk-images'
+        : (id === 'catalog-item') ? 'templates'
         : id;
       document.querySelectorAll('.console__nav [data-nav]').forEach(n => {
         n.classList.toggle('pf-m-current', n.dataset.nav === navId);
@@ -9151,7 +9604,7 @@
                     </span>
                   </button>
                 </li>
-              `).join('') || `<li class="pf-v6-c-menu__list-item" role="none"><p class="muted" style="margin:8px 16px;font-size:13px;">No storage tier matches.</p></li>`}
+              `).join('') || `<li class="pf-v6-c-menu__list-item" role="none">${emptyStateMenuSearchHtml('storage tiers')}</li>`}
             </ul>
           </div>
         </div>
@@ -10151,13 +10604,7 @@
 
     function stepsForType() {
       if (state.wizard === 'catalog-create') {
-        return [
-          { key: 'ci-details', label: 'Details', navNum: 1 },
-          { key: 'ci-access', label: 'Compute resources & Access', navNum: 2 },
-          { key: 'ci-storage', label: 'Storage', navNum: 3 },
-          { key: 'ci-visibility', label: 'Visibility', navNum: 4 },
-          { key: 'ci-review', label: 'Review', navNum: 5 },
-        ];
+        return catalogStepsForRole();
       }
       if (state.wizard === 'network') {
         return [
@@ -10279,8 +10726,25 @@
     }
 
     function renderNetworks(q = '') {
-      const rows = NETWORKS.filter(n => !q || n.name.toLowerCase().includes(q.toLowerCase()));
-      document.getElementById('net-tbody').innerHTML = rows.map(n => `
+      const search = String(q || '').trim();
+      const rows = NETWORKS.filter(n => !search || n.name.toLowerCase().includes(search.toLowerCase()));
+      const tbody = document.getElementById('net-tbody');
+      if (!tbody) return;
+      if (!rows.length) {
+        tbody.innerHTML = '';
+        const emptyHtml = !NETWORKS.length
+          ? emptyStateHtml({
+            title: 'No networks yet',
+            body: 'Create a network to attach virtual machines.',
+          })
+          : (search
+            ? emptyStateSearchHtml('networks')
+            : emptyStateFiltersHtml('networks'));
+        showListEmptyState('net-table-area', 'net-table-scroll', 'net-empty-state', emptyHtml);
+        return;
+      }
+      clearListEmptyState('net-table-scroll', 'net-empty-state');
+      tbody.innerHTML = rows.map(n => `
         <tr class="pf-v6-c-table__tr">
           <td class="pf-v6-c-table__td"><button type="button" class="name-link">${n.name}</button></td>
           <td class="pf-v6-c-table__td"><span class="cond-pill">${n.type}</span></td>
@@ -10290,7 +10754,7 @@
           <td class="pf-v6-c-table__td">${n.vms}</td>
           <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${n.name}"><i class="fa-solid fa-ellipsis-v"></i></button></td>
         </tr>
-      `).join('') || `<tr class="pf-v6-c-table__tr"><td class="pf-v6-c-table__td muted" colspan="7">No networks match.</td></tr>`;
+      `).join('');
     }
 
     function typeLabel(t) {
@@ -10369,6 +10833,7 @@
       if (state.wizard === 'catalog-create') {
         state.wizard = 'vm';
         state.catalogCreate = null;
+        state.catalogEditId = null;
         const wizDesc = document.getElementById('wiz-desc');
         if (wizDesc) { wizDesc.hidden = true; wizDesc.textContent = ''; }
         const wizTitle = document.getElementById('wiz-title');
@@ -10718,7 +11183,9 @@
       document.getElementById('wiz-back').disabled = state.step === 0;
       const next = document.getElementById('wiz-next');
       if (state.wizard === 'catalog-create') {
-        next.textContent = key === 'ci-review' ? 'Create catalog item' : 'Next';
+        next.textContent = key === 'ci-review'
+          ? (state.catalogEditId ? 'Save changes' : 'Create catalog item')
+          : 'Next';
         next.disabled = false;
       } else if (state.wizard === 'network') {
         next.textContent = key === 'net-review' ? 'Create network' : 'Next';
@@ -11250,6 +11717,7 @@
                   <div class="search-group" style="max-width:200px;"><input type="search" placeholder="Search by name" /></div>
                   <button type="button" class="pf-v6-c-button pf-m-secondary">Add boot source</button>
                 </div>
+                ${bootVolumes.length ? `
                 <table class="pf-v6-c-table pf-m-compact">
                   <thead>
                     <tr><th>Volume name</th><th>Architecture</th><th>Project</th><th>Size</th></tr>
@@ -11267,9 +11735,13 @@
                         <td>${v.project}</td>
                         <td>${v.size}</td>
                       </tr>
-                    `).join('') || '<tr><td colspan="4" class="muted">No volumes in this project.</td></tr>'}
+                    `).join('')}
                   </tbody>
                 </table>
+                ` : emptyStateProjectHtml('volumes', 'volume', {
+                  panel: true,
+                  body: 'Select a different project, or add a boot source.',
+                })}
               </div>
             ` : ''}
           </div>
@@ -11645,21 +12117,20 @@
             </aside>
           `;
         }
-        const tplEmptyHtml = noTemplatesInProject ? `
-          <div class="tpl-empty" role="status">
-            <div class="tpl-empty__icon" aria-hidden="true"><i class="fa-solid fa-cube"></i></div>
-            <p class="tpl-empty__title">No Templates found in this project</p>
-            <p class="tpl-empty__body">Select a different project, or ask an administrator to add templates.</p>
-          </div>
-        ` : '';
-        const tplSearchEmpty = noSearchMatches
-          ? (view === 'cards'
-            ? '<p class="muted">No templates match your search.</p>'
-            : '<tr><td colspan="5" class="muted">No templates match your search.</td></tr>')
+        const tplEmptyHtml = noTemplatesInProject
+          ? emptyStateHtml({
+            title: 'No templates found in this project',
+            body: 'Select a different project, or ask an administrator to add templates.',
+          })
           : '';
-        const tplCatalogHtml = noTemplatesInProject ? tplEmptyHtml : (view === 'cards' ? `
+        const tplSearchEmptyHtml = noSearchMatches ? emptyStateSearchHtml('templates') : '';
+        const tplCatalogHtml = noTemplatesInProject
+          ? tplEmptyHtml
+          : (noSearchMatches
+            ? tplSearchEmptyHtml
+            : (view === 'cards' ? `
                 <div class="tpl-cards" role="listbox" aria-label="Templates">
-                  ${cards || tplSearchEmpty}
+                  ${cards}
                 </div>
               ` : `
                 <div class="tpl-list">
@@ -11674,11 +12145,11 @@
                       </tr>
                     </thead>
                     <tbody>
-                      ${listRows || tplSearchEmpty}
+                      ${listRows}
                     </tbody>
                   </table>
                 </div>
-              `);
+              `));
         panel.innerHTML = `
           <div class="tpl-step">
             <div>
@@ -11836,19 +12307,35 @@
               <input type="search" id="clone-filter" placeholder="Search by name" aria-label="Search by name" value="${state.cloneFilter || ''}" />
             </div>
           </div>
-          <table class="pf-v6-c-table pf-m-grid-md vm-table clone-source-table" role="grid">
-            <thead class="pf-v6-c-table__thead">
-              <tr class="pf-v6-c-table__tr">
-                <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Select</span></th>
-                <th class="pf-v6-c-table__th" scope="col">Name</th>
-                <th class="pf-v6-c-table__th" scope="col">Status</th>
-                <th class="pf-v6-c-table__th" scope="col">Created</th>
-              </tr>
-            </thead>
-            <tbody class="pf-v6-c-table__tbody">
-              ${rows || '<tr class="pf-v6-c-table__tr"><td class="pf-v6-c-table__td" colspan="4"><span class="muted">No virtual machines match your filter.</span></td></tr>'}
-            </tbody>
-          </table>
+          <div id="clone-source-area">
+            <div id="clone-source-scroll" ${list.length ? '' : 'hidden'}>
+              <table class="pf-v6-c-table pf-m-grid-md vm-table clone-source-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr">
+                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Select</span></th>
+                    <th class="pf-v6-c-table__th" scope="col">Name</th>
+                    <th class="pf-v6-c-table__th" scope="col">Status</th>
+                    <th class="pf-v6-c-table__th" scope="col">Created</th>
+                  </tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody">
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+            ${list.length ? '' : (() => {
+              const searchOnly = q && project === 'all';
+              const projectOnly = project !== 'all' && !q;
+              const noVmsInProject = projectOnly && !VMS.some(v => v.ns === project);
+              if (noVmsInProject) {
+                return emptyStateProjectHtml('virtual machines', 'virtual machine');
+              }
+              if (searchOnly) {
+                return emptyStateSearchHtml('virtual machines');
+              }
+              return emptyStateFiltersHtml('virtual machines');
+            })()}
+          </div>
         `;
         const selectSource = (name) => {
           d.cloneSourceName = name;
@@ -11961,7 +12448,7 @@
                           </span>
                         </button>
                       `;
-                      }).join('') || '<p class="muted" style="padding:12px;">No compute resources match your search.</p>'}
+                      }).join('') || emptyStateMenuSearchHtml('compute resources')}
                     </div>
                   </div>
                 </div>
@@ -13032,6 +13519,8 @@
         canViewNetworks: true,
         canManageInfrastructure: false,
         canManageCatalog: false,
+        canManageProviderCatalog: false,
+        canManageTenantCatalog: true,
       },
       user: {
         label: 'Tenant User',
@@ -13043,6 +13532,8 @@
         canViewNetworks: true,
         canManageInfrastructure: false,
         canManageCatalog: false,
+        canManageProviderCatalog: false,
+        canManageTenantCatalog: false,
       },
       provider: {
         label: 'Cloud provider admin',
@@ -13054,10 +13545,34 @@
         canViewNetworks: false,
         canManageInfrastructure: true,
         canManageCatalog: true,
+        canManageProviderCatalog: true,
+        canManageTenantCatalog: false,
       },
     };
 
+    function getActiveRole() {
+      return ROLES[document.getElementById('role-select')?.value] || ROLES.admin;
+    }
+
+    function isProviderCatalogRole() {
+      return !!getActiveRole().canManageProviderCatalog;
+    }
+
+    function catalogStepsForRole() {
+      const steps = [
+        { key: 'ci-details', label: 'Details' },
+        { key: 'ci-access', label: 'Instance type & Access' },
+        { key: 'ci-visibility', label: 'Visibility' },
+        { key: 'ci-storage', label: 'Storage' },
+        { key: 'ci-review', label: 'Review' },
+      ];
+      return steps.map((step, index) => ({ ...step, navNum: index + 1 }));
+    }
+
     const INSTANCE_TYPES = [
+      { name: 'catalog-small', lifecycle: 'Active', label: 'Small', cpu: 16, memoryGiB: 128, gpus: 1, gpuPci: null, gpuResource: 'NVIDIA A100 40 GB', created: '7/14/2026, 9:05 AM' },
+      { name: 'catalog-medium', lifecycle: 'Active', label: 'Medium', cpu: 32, memoryGiB: 256, gpus: 1, gpuPci: null, gpuResource: 'NVIDIA A100 40 GB', created: '8/22/2026, 3:42 PM' },
+      { name: 'catalog-large', lifecycle: 'Active', label: 'Large', cpu: 64, memoryGiB: 512, gpus: 1, gpuPci: null, gpuResource: 'NVIDIA A100 80 GB', created: '9/7/2026, 11:16 AM' },
       { name: 'aaa', lifecycle: 'Active', cpu: 10, memoryGiB: 100, gpus: null, gpuPci: null, gpuResource: null, created: '8/13/2024, 16:13' },
       { name: 'bbb', lifecycle: 'Obsolete', cpu: 1, memoryGiB: 2, gpus: 2, gpuPci: '20B0', gpuResource: 'nvidia.com/A100', created: '8/12/2024, 22:52' },
       { name: 'ddd', lifecycle: 'Active', cpu: 4, memoryGiB: 16, gpus: null, gpuPci: null, gpuResource: null, created: '8/11/2024, 09:40' },
@@ -13395,10 +13910,11 @@
       { id: 'windows-2022', title: 'Windows Server 2022', family: 'Microsoft Windows', arch: 'x86_64', guestOs: 'Microsoft Windows' },
     ];
 
-    const CATALOG_COMPUTE_RESOURCES = [
-      { id: 'small', label: 'Small', cpu: '16 vCPU', memory: '128 GB', gpu: 'NVIDIA A100 40 GB', rate: '$5.68/hr' },
-      { id: 'medium', label: 'Medium', cpu: '32 vCPU', memory: '256 GB', gpu: 'NVIDIA A100 40 GB', rate: '$8.56/hr' },
-      { id: 'large', label: 'Large', cpu: '64 vCPU', memory: '512 GB', gpu: 'NVIDIA A100 80 GB', rate: '$15.12/hr' },
+    /** Catalog wizard options — each maps to an InstanceType (GPU is defined on the instance type). */
+    const CATALOG_INSTANCE_TYPE_OPTIONS = [
+      { id: 'small', instanceTypeName: 'catalog-small', rateHour: '$5.68/hr', rateMonth: '$3,400/mo per instance' },
+      { id: 'medium', instanceTypeName: 'catalog-medium', rateHour: '$8.50/hr', rateMonth: '$5,200/mo per instance' },
+      { id: 'large', instanceTypeName: 'catalog-large', rateHour: '$4.25/hr', rateMonth: '$2,850/mo per instance' },
     ];
 
     const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'tenant-c'];
@@ -13406,24 +13922,27 @@
     let PROVIDER_CATALOG_ITEMS = [
       {
         id: 'pci-1',
-        name: 'catalog item-1',
-        cpu: '64 vCPU',
-        memory: '512 GB',
-        gpu: 'NVIDIA A100 80 GB',
+        name: 'vm-gpu-training-server',
+        scope: 'provider',
+        description: 'Use this catalog item when you need dedicated GPU compute for training or batch jobs.',
+        publishState: 'live',
+        instanceTypeId: 'large',
         diskImage: 'RHEL 9.4',
         diskLocked: true,
-        rateHour: '$4.25/hour',
-        rateMonth: '$2,850/month per instance',
+        rateHour: '$4.25/hr',
+        rateMonth: '$2,850/mo per instance',
         visibility: 'global',
         visibilityLabel: 'Global public',
         tenants: [],
+        created: 'Sep 7, 2026, 11:16 AM',
       },
       {
         id: 'pci-2',
-        name: 'catalog item-2',
-        cpu: '32 vCPU',
-        memory: '256 GB',
-        gpu: 'NVIDIA A100 40 GB',
+        name: 'vm-inference-standard',
+        scope: 'provider',
+        description: 'Balanced compute for inference workloads with tenant-scoped access.',
+        publishState: 'unpublished',
+        instanceTypeId: 'medium',
         diskImage: 'RHEL 9.4',
         diskLocked: true,
         rateHour: '$8.50/hr',
@@ -13431,8 +13950,28 @@
         visibility: 'tenant',
         visibilityLabel: 'Tenant scoped',
         tenants: ['tenant-a', 'tenant-b'],
+        created: 'Aug 22, 2026, 3:42 PM',
+      },
+      {
+        id: 'pci-3',
+        name: 'vm-dev-workstation',
+        scope: 'provider',
+        description: 'Development workstation profile for tenant teams.',
+        publishState: 'unpublished',
+        instanceTypeId: 'small',
+        diskImage: 'Ubuntu 22.04 LTS',
+        diskLocked: true,
+        rateHour: '$5.68/hr',
+        rateMonth: '$3,400/mo per instance',
+        visibility: 'tenant',
+        visibilityLabel: 'Tenant scoped',
+        tenants: ['tenant-c'],
+        created: 'Jul 14, 2026, 9:05 AM',
       },
     ];
+
+    /** Tenant-owned catalog items — editable by tenant admin only. */
+    let TENANT_CATALOG_ITEMS = [];
 
     function generateCatalogItemName() {
       const nouns = ['narwhal', 'mink', 'baboon', 'eider', 'gull'];
@@ -13447,11 +13986,11 @@
         guestOsFamily: 'Linux',
         diskImageId: 'rhel-10',
         tenantAccess: 'locked',
-        computeResourceId: 'medium',
-        bootDiskGiB: 30,
-        extraDisks: [],
+        instanceTypeId: 'medium',
         visibility: 'global',
         tenants: [],
+        bootDiskGiB: 30,
+        extraDisks: [],
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
@@ -13465,13 +14004,69 @@
       return CATALOG_DISK_IMAGE_OPTIONS.find(d => d.id === id) || CATALOG_DISK_IMAGE_OPTIONS[0];
     }
 
-    function getCatalogComputeResource(id) {
-      return CATALOG_COMPUTE_RESOURCES.find(c => c.id === id) || CATALOG_COMPUTE_RESOURCES[1];
+    function getCatalogInstanceTypeOption(id) {
+      return CATALOG_INSTANCE_TYPE_OPTIONS.find(o => o.id === id) || CATALOG_INSTANCE_TYPE_OPTIONS[1];
     }
 
-    function catalogComputeToggleSummary(cr) {
-      if (!cr) return { title: '—', desc: '' };
-      return { title: cr.label, desc: `${cr.cpu} · ${cr.memory}` };
+    function getCatalogInstanceType(id) {
+      const opt = getCatalogInstanceTypeOption(id);
+      const it = INSTANCE_TYPES.find(x => x.name === opt.instanceTypeName);
+      if (!it) return { ...opt, label: opt.id, cpu: 0, memoryGiB: 0, gpus: null, gpuResource: null };
+      return { ...opt, ...it, label: it.label || it.name };
+    }
+
+    function formatCatalogInstanceTypeGpu(it) {
+      if (!it?.gpus) return '—';
+      return String(it.gpuResource || 'GPU').replace(/</g, '&lt;');
+    }
+
+    function resolveCatalogItemCompute(item) {
+      const id = item.instanceTypeId || item.computeResourceId;
+      const it = getCatalogInstanceType(id);
+      return {
+        id,
+        label: it.label || it.name,
+        instanceTypeName: it.instanceTypeName || it.name,
+        cpu: `${it.cpu} vCPU`,
+        memory: `${it.memoryGiB} GB`,
+        gpu: formatCatalogInstanceTypeGpu(it),
+        rateHour: item.rateHour || it.rateHour,
+        rateMonth: item.rateMonth || it.rateMonth,
+        summary: `${it.label || it.name} · ${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
+      };
+    }
+
+    function catalogItemSearchText(item) {
+      const compute = resolveCatalogItemCompute(item);
+      return `${item.name} ${compute.summary} ${compute.gpu} ${item.diskImage || ''} ${catalogPublishScopeLabel(item)} ${item.publishState || ''}`;
+    }
+
+    function catalogPublishScopeLabel(item) {
+      if (item.visibility === 'tenant') return 'Tenant scoped';
+      return 'Global public';
+    }
+
+    function catalogPublishScopeFields(c) {
+      const visibility = c.visibility === 'tenant' ? 'tenant' : 'global';
+      return {
+        visibility,
+        visibilityLabel: visibility === 'tenant' ? 'Tenant scoped' : 'Global public',
+        tenants: visibility === 'tenant' ? [...(c.tenants || [])] : [],
+      };
+    }
+
+    function findCatalogDiskImageIdByTitle(title) {
+      const match = CATALOG_DISK_IMAGE_OPTIONS.find(d => d.title === title);
+      return match?.id || CATALOG_DISK_IMAGE_OPTIONS[0]?.id || 'rhel-10';
+    }
+
+    function catalogComputeToggleSummary(id) {
+      const it = getCatalogInstanceType(id);
+      if (!it) return { title: '—', desc: '' };
+      return {
+        title: it.label || it.name,
+        desc: `${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
+      };
     }
 
     function filteredCatalogDiskImages(guestOsFamily, filter = '') {
@@ -13490,6 +14085,7 @@
     function openCatalogItemWizard() {
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
+      state.catalogEditId = null;
       state.wizard = 'catalog-create';
       state.step = 0;
       state.maxVisited = 0;
@@ -13501,6 +14097,52 @@
       if (wizDesc) {
         wizDesc.hidden = false;
         wizDesc.innerHTML = '<nav class="wiz-breadcrumb" aria-label="Breadcrumb"><a href="#" id="ci-wiz-crumb-catalog">Catalog</a> › Create catalog item</nav>';
+        wizDesc.querySelector('#ci-wiz-crumb-catalog')?.addEventListener('click', e => {
+          e.preventDefault();
+          requestCloseWizard();
+        });
+      }
+      document.getElementById('cost-estimate')?.setAttribute('hidden', '');
+      document.getElementById('overlay').classList.add('pf-m-open');
+      document.body.style.overflow = 'hidden';
+      renderWizard();
+    }
+
+    function openCatalogItemEdit(id) {
+      const item = findCatalogItemById(id);
+      if (!item) return;
+      closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
+      closeCatalogItemActionsMenu();
+      state.catalogEditId = id;
+      state.wizard = 'catalog-create';
+      state.step = 0;
+      state.maxVisited = 0;
+      state.fieldErrors = {};
+      state.catalogCreate = {
+        name: item.name,
+        description: item.description || '',
+        guestOsFamily: item.guestOsFamily || 'Linux',
+        diskImageId: findCatalogDiskImageIdByTitle(item.diskImage),
+        tenantAccess: item.tenantAccess || 'locked',
+        instanceTypeId: item.instanceTypeId || 'medium',
+        visibility: item.visibility || 'global',
+        tenants: [...(item.tenants || [])],
+        bootDiskGiB: item.bootDiskGiB || 30,
+        extraDisks: (item.extraDisks || []).map(d => ({ ...d })),
+        diskImageMenuOpen: false,
+        diskImageFilter: '',
+        computeMenuOpen: false,
+        computeFilter: '',
+        tenantMenuOpen: false,
+        tenantFilter: '',
+      };
+      const wizTitle = document.getElementById('wiz-title');
+      const wizDesc = document.getElementById('wiz-desc');
+      if (wizTitle) wizTitle.textContent = 'Edit catalog item';
+      if (wizDesc) {
+        wizDesc.hidden = false;
+        wizDesc.innerHTML = '<nav class="wiz-breadcrumb" aria-label="Breadcrumb"><a href="#" id="ci-wiz-crumb-catalog">Catalog</a> › Edit catalog item</nav>';
         wizDesc.querySelector('#ci-wiz-crumb-catalog')?.addEventListener('click', e => {
           e.preventDefault();
           requestCloseWizard();
@@ -13616,7 +14258,7 @@
                         </span>
                       </span>
                     </button>
-                  `).join('') || '<p class="muted" style="padding:12px;">No disk images match your search.</p>'}
+                  `).join('') || emptyStateMenuSearchHtml('disk images')}
                 </div>
               </div>
             </div>
@@ -13653,18 +14295,20 @@
       }
 
       if (key === 'ci-access') {
-        const compute = getCatalogComputeResource(c.computeResourceId);
-        const computeToggle = catalogComputeToggleSummary(compute);
-        const computeOptions = CATALOG_COMPUTE_RESOURCES.filter(cr => {
+        const instanceTypeId = c.instanceTypeId || c.computeResourceId || 'medium';
+        c.instanceTypeId = instanceTypeId;
+        const computeToggle = catalogComputeToggleSummary(instanceTypeId);
+        const computeOptions = CATALOG_INSTANCE_TYPE_OPTIONS.filter(opt => {
+          const it = getCatalogInstanceType(opt.id);
           const q = (c.computeFilter || '').toLowerCase();
           if (!q) return true;
-          const hay = `${cr.label} ${cr.cpu} ${cr.memory} ${cr.gpu} ${cr.rate}`.toLowerCase();
+          const hay = `${it.label} ${it.cpu} ${it.memoryGiB} ${it.gpuResource} ${opt.rateHour}`.toLowerCase();
           return hay.includes(q);
         });
         panel.innerHTML = `
-          <h3>Compute resources &amp; Access</h3>
-          <p class="step-help">Choose compute resources for this catalog item, then set tenant access to the guest operating system and hardware.</p>
-          <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Compute resources <span class="req">*</span></h4>
+          <h3>Instance type &amp; Access</h3>
+          <p class="step-help">Choose an instance type for this catalog item. GPU configuration is defined on the instance type.</p>
+          <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Instance type <span class="req">*</span></h4>
           <div class="form-field">
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               ${pfRichSelectToggle({
@@ -13680,20 +14324,22 @@
               <div class="pf-v6-c-menu rich-select__menu" id="ci-compute-menu" role="listbox" ${c.computeMenuOpen ? '' : 'hidden'}>
                 <div class="rich-select__search">
                   <i class="fa-solid fa-search" aria-hidden="true"></i>
-                  <input type="search" id="ci-compute-search" placeholder="Search compute resources" value="${String(c.computeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search compute resources" />
+                  <input type="search" id="ci-compute-search" placeholder="Search instance types" value="${String(c.computeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search instance types" />
                 </div>
                 <hr class="rich-select__menu-divider" />
                 <div class="rich-select__menu-list">
-                  ${computeOptions.map(cr => `
-                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${cr.id === c.computeResourceId ? 'pf-m-selected' : ''}" data-compute="${cr.id}" role="option">
+                  ${computeOptions.length ? computeOptions.map(opt => {
+                    const it = getCatalogInstanceType(opt.id);
+                    return `
+                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${opt.id === instanceTypeId ? 'pf-m-selected' : ''}" data-compute="${opt.id}" role="option">
                       <span class="pf-v6-c-menu__item-main">
                         <span class="rich-select__option-body">
-                          <span class="rich-select__option-title">${cr.label}</span>
-                          <span class="rich-select__option-desc">${cr.cpu} · ${cr.memory} · ${cr.gpu} · ${cr.rate}</span>
+                          <span class="rich-select__option-title">${it.label}</span>
+                          <span class="rich-select__option-desc">${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)} · ${opt.rateHour}</span>
                         </span>
                       </span>
-                    </button>
-                  `).join('')}
+                    </button>`;
+                  }).join('') : emptyStateMenuSearchHtml('instance types')}
                 </div>
               </div>
             </div>
@@ -13732,7 +14378,7 @@
           optionSel: '[data-compute]',
           onOpen: () => { c.computeMenuOpen = true; },
           onClose: () => { c.computeMenuOpen = false; },
-          onSelect: opt => { c.computeResourceId = opt.dataset.compute; renderWizard(); },
+          onSelect: opt => { c.instanceTypeId = opt.dataset.compute; renderWizard(); },
         });
         panel.querySelector('#ci-compute-search')?.addEventListener('input', e => {
           c.computeFilter = e.target.value;
@@ -13833,10 +14479,10 @@
             <div class="radio-stack" role="radiogroup" aria-label="Catalog item visibility">
               <div class="radio-stack__item">
                 <label class="form-check">
-                  <input type="radio" name="ciVisibility" value="global" ${c.visibility === 'global' ? 'checked' : ''} />
+                  <input type="radio" name="ciVisibility" value="global" ${(c.visibility || 'global') !== 'tenant' ? 'checked' : ''} />
                   Global public
                 </label>
-                <p class="form-helper">Visible to all tenants</p>
+                <p class="form-helper">Available to all tenants when published</p>
               </div>
               <div class="radio-stack__item">
                 <label class="form-check">
@@ -13864,11 +14510,11 @@
                 </li>
                 <li class="arch-multi__menu-divider" aria-hidden="true"><hr class="rich-select__menu-divider" /></li>
                 <li class="arch-multi__menu-list">
-                  <ul>
+                  ${tenantOptions.length ? `<ul>
                 ${tenantOptions.map(t => `
                   <li><label><input type="checkbox" name="ciTenant" value="${t}" ${selectedTenants.has(t) ? 'checked' : ''} /> ${t}</label></li>
                 `).join('')}
-                  </ul>
+                  </ul>` : emptyStateMenuSearchHtml('tenants')}
                 </li>
               </ul>
             </div>
@@ -13905,11 +14551,8 @@
       }
 
       const disk = getCatalogDiskImage(c.diskImageId);
-      const compute = getCatalogComputeResource(c.computeResourceId);
+      const compute = resolveCatalogItemCompute({ instanceTypeId: c.instanceTypeId || c.computeResourceId });
       const accessLabel = c.tenantAccess === 'editable' ? 'Editable' : 'Locked';
-      const visibilityLabel = c.visibility === 'global'
-        ? 'Global public'
-        : `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`;
       const reviewRow = (label, value, { block = false } = {}) => `
         <div class="review-nebius__row${block ? ' review-nebius__row--block' : ''}">
           <span class="review-nebius__label">${label}</span>
@@ -13932,26 +14575,29 @@
       `;
       panel.innerHTML = `
         <h3>Review and create</h3>
-        <p class="step-help">Confirm your settings before creating the catalog item.</p>
+        <p class="step-help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it.</p>
         <div class="review-nebius">
           ${reviewSection('Details', 'ci-details', `
             ${reviewRow('Name', String(c.name || '—').replace(/</g, '&lt;'))}
             ${reviewRow('Description', c.description ? String(c.description).replace(/</g, '&lt;') : '—')}
             ${reviewRow('Guest operating system', String(c.guestOsFamily || '—').replace(/</g, '&lt;'))}
             ${reviewRow('Disk image', disk ? `${disk.title} (${disk.family} · ${disk.arch})` : '—')}
+            ${reviewRow('Status', 'Unpublished')}
           `)}
-          ${reviewSection('Compute resources &amp; Access', 'ci-access', `
+          ${reviewSection('Instance type &amp; Access', 'ci-access', `
+            ${reviewRow('Instance type', compute.summary.replace(/</g, '&lt;'))}
             ${reviewRow('Tenant access', accessLabel)}
-            ${reviewRow('Compute resources', `${compute.label} — ${compute.cpu} · ${compute.memory} · ${compute.gpu} · ${compute.rate}`)}
+          `)}
+          ${reviewSection('Visibility', 'ci-visibility', `
+            ${reviewRow('Visibility', c.visibility === 'tenant'
+              ? `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`
+              : 'Global public')}
           `)}
           ${reviewSection('Storage', 'ci-storage', `
             ${reviewRow('Boot disk', `${c.bootDiskGiB || 30} GiB`)}
             ${reviewRow('Additional disks', c.extraDisks?.length
               ? c.extraDisks.map((d, i) => `Disk set ${i + 1}: ${d.size} GiB`).join('; ')
               : 'None')}
-          `)}
-          ${reviewSection('Visibility', 'ci-visibility', `
-            ${reviewRow('Visibility', visibilityLabel.replace(/</g, '&lt;'))}
           `)}
         </div>
       `;
@@ -14019,59 +14665,708 @@
     function finishCatalogCreate() {
       const c = state.catalogCreate;
       if (!c) return;
-      const compute = getCatalogComputeResource(c.computeResourceId);
+      const instanceTypeId = c.instanceTypeId || c.computeResourceId || 'medium';
+      const inst = getCatalogInstanceType(instanceTypeId);
       const disk = getCatalogDiskImage(c.diskImageId);
-      const id = `pci-${Date.now()}`;
-      PROVIDER_CATALOG_ITEMS.unshift({
-        id,
+      const baseItem = {
         name: c.name.trim(),
         description: c.description || '',
-        cpu: compute.cpu,
-        memory: compute.memory,
-        gpu: compute.gpu,
+        instanceTypeId,
         diskImage: disk.title,
         diskLocked: c.tenantAccess === 'locked',
-        rateHour: compute.rate,
-        rateMonth: '—',
-        visibility: c.visibility,
-        visibilityLabel: c.visibility === 'global' ? 'Global public' : 'Tenant scoped',
-        tenants: [...(c.tenants || [])],
+        rateHour: inst.rateHour,
+        rateMonth: inst.rateMonth || '—',
         guestOsFamily: c.guestOsFamily,
         tenantAccess: c.tenantAccess,
         bootDiskGiB: c.bootDiskGiB,
         extraDisks: (c.extraDisks || []).map(d => ({ ...d })),
-      });
+      };
+      const scope = isProviderCatalogRole() ? catalogPublishScopeFields(c) : null;
+      if (state.catalogEditId) {
+        const item = findCatalogItemById(state.catalogEditId);
+        if (item) {
+          Object.assign(item, baseItem, scope || {});
+        }
+        closeWizard();
+        document.getElementById('wiz-desc').hidden = true;
+        document.getElementById('wiz-desc').textContent = '';
+        document.getElementById('wiz-title').textContent = 'Create Virtual machine';
+        state.wizard = 'vm';
+        state.catalogCreate = null;
+        state.catalogEditId = null;
+        if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
+          renderCatalogItemDetail();
+        } else {
+          setView('templates');
+        }
+        renderCatalog();
+        toast(`Updated catalog item ${c.name}.`, 'success');
+        return;
+      }
+      if (isProviderCatalogRole()) {
+        PROVIDER_CATALOG_ITEMS.unshift({
+          id: `pci-${Date.now()}`,
+          scope: 'provider',
+          ...baseItem,
+          ...scope,
+          publishState: 'unpublished',
+          created: formatInstanceTypeCreated(),
+        });
+      } else {
+        TENANT_CATALOG_ITEMS.unshift({
+          id: `tci-${Date.now()}`,
+          scope: 'tenant',
+          project: state.catalogProjectFilter || 'project-a',
+          ...baseItem,
+          created: formatInstanceTypeCreated(),
+        });
+      }
       closeWizard();
       document.getElementById('wiz-desc').hidden = true;
       document.getElementById('wiz-desc').textContent = '';
       document.getElementById('wiz-title').textContent = 'Create Virtual machine';
       state.wizard = 'vm';
       state.catalogCreate = null;
+      state.catalogEditId = null;
       setView('templates');
       renderCatalog();
-      toast(`Created catalog item ${c.name}.`, 'success');
+      toast(`Created catalog item ${c.name}. It is unpublished until you publish it.`, 'success');
+    }
+
+    function catalogItemsSource() {
+      return isProviderCatalogRole() ? PROVIDER_CATALOG_ITEMS : TENANT_CATALOG_ITEMS;
+    }
+
+    function findCatalogItemById(id) {
+      return PROVIDER_CATALOG_ITEMS.find(x => x.id === id)
+        || TENANT_CATALOG_ITEMS.find(x => x.id === id);
+    }
+
+    function publishLabelHtml(state) {
+      const key = String(state || 'unpublished').toLowerCase();
+      const mod = key === 'live' ? 'pf-m-live' : 'pf-m-unpublished';
+      const label = key === 'live' ? 'Live' : 'Unpublished';
+      return `<span class="publish-label ${mod}">${label}</span>`;
+    }
+
+    function catalogGovBadge(kind) {
+      if (kind === 'editable') {
+        return '<span class="catalog-gov-badge catalog-gov-badge--editable">Editable</span>';
+      }
+      return '<span class="catalog-gov-badge">Locked</span>';
+    }
+
+    function catalogDiskImageIconHtml(diskImage) {
+      if (!/rhel|red hat/i.test(String(diskImage || ''))) return '';
+      return '<i class="fa-brands fa-redhat catalog-disk-image-value__icon" aria-hidden="true"></i>';
+    }
+
+    function catalogDetailHardwareSpecsHtml(item) {
+      const compute = resolveCatalogItemCompute(item);
+      const esc = value => String(value || '—').replace(/</g, '&lt;');
+      const diskImage = esc(item.diskImage);
+      const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
+      const sizeLabel = esc(compute.label);
+      const sizeGov = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
+      const diskIcon = catalogDiskImageIconHtml(item.diskImage);
+      return `
+        <div class="tpl-fixed-panel__row">
+          <dt>Size</dt>
+          <dd><span class="catalog-detail-spec-badges"><span class="catalog-gov-badge">${sizeLabel}</span>${sizeGov}</span></dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>CPU</dt>
+          <dd>${esc(compute.cpu)}</dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>RAM</dt>
+          <dd>${esc(compute.memory)}</dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>GPU</dt>
+          <dd>${esc(compute.gpu)}</dd>
+        </div>
+        <div class="tpl-fixed-panel__row">
+          <dt>Disk image</dt>
+          <dd>
+            <span class="catalog-disk-image-value">
+              ${diskIcon}
+              <span class="catalog-detail-spec-badges">
+                <span class="catalog-gov-badge">${diskImage}</span>
+                ${govBadge}
+              </span>
+            </span>
+          </dd>
+        </div>`;
+    }
+
+    function catalogCardSpecsRowsHtml(item) {
+      const compute = resolveCatalogItemCompute(item);
+      const diskImage = String(item.diskImage || '—').replace(/</g, '&lt;');
+      const govBadge = item.diskLocked ? catalogGovBadge('locked') : catalogGovBadge('editable');
+      const diskIcon = catalogDiskImageIconHtml(item.diskImage);
+      const rows = [
+        { label: 'CPU', value: compute.cpu },
+        { label: 'RAM', value: compute.memory },
+        { label: 'GPU', value: compute.gpu },
+      ];
+      return `${rows.map(row => `
+        <div class="catalog-card-specs__row">
+          <dt class="catalog-card-specs__label">${row.label}</dt>
+          <dd class="catalog-card-specs__value">${String(row.value).replace(/</g, '&lt;')}</dd>
+        </div>`).join('')}
+        <div class="catalog-card-specs__row">
+          <dt class="catalog-card-specs__label">Disk image</dt>
+          <dd class="catalog-card-specs__value">
+            <span class="catalog-disk-image-value">
+              ${diskIcon}
+              ${diskImage}
+              ${govBadge}
+            </span>
+          </dd>
+        </div>`;
+    }
+
+    function catalogRateLine(item) {
+      const hour = String(item.rateHour || '—').replace(/</g, '&lt;');
+      const month = String(item.rateMonth || '').replace(/</g, '&lt;');
+      return month ? `${hour} · ${month}` : hour;
+    }
+
+    function catalogItemActions() {
+      return [
+        { id: 'view-details', label: 'View details' },
+        { id: 'launch', label: 'Launch instance' },
+        { id: 'edit', label: 'Edit' },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'publish', label: 'Publish' },
+        { id: 'unpublish', label: 'Unpublish' },
+        { id: 'delete', label: 'Delete', danger: true },
+      ];
+    }
+
+    function closeCatalogItemActionsMenu() {
+      const menu = document.getElementById('ci-actions-menu');
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('pf-m-open');
+      }
+      document.querySelectorAll('[data-ci-kebab]').forEach(btn => {
+        btn.classList.remove('pf-m-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      document.getElementById('ci-detail-actions-btn')?.classList.remove('pf-m-expanded');
+      document.getElementById('ci-detail-actions-btn')?.setAttribute('aria-expanded', 'false');
+      state.ciActionsOpen = false;
+      state.ciActionsId = null;
+    }
+
+    function openCatalogItemActionsMenu(btn, itemId) {
+      const menu = document.getElementById('ci-actions-menu');
+      const list = document.getElementById('ci-actions-menu-list');
+      const item = findCatalogItemById(itemId);
+      if (!menu || !list || !item || !btn) return;
+      const alreadyOpen = state.ciActionsOpen && state.ciActionsId === itemId;
+      closeCatalogItemActionsMenu();
+      closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
+      if (alreadyOpen) return;
+
+      const actions = catalogItemActions().filter(a => {
+        if (a.id === 'publish') return item.scope === 'provider' && item.publishState !== 'live';
+        if (a.id === 'unpublish') return item.scope === 'provider' && item.publishState === 'live';
+        if (a.id === 'launch') return item.publishState === 'live';
+        return true;
+      });
+      list.innerHTML = actions.map((a, i) => {
+        const sep = a.danger && i > 0 ? '<li class="pf-v6-c-divider" role="separator"></li>' : '';
+        const dangerClass = a.danger ? ' pf-m-danger' : '';
+        return `${sep}<li class="pf-v6-c-menu__list-item" role="none">
+          <button class="pf-v6-c-menu__item${dangerClass}" type="button" role="menuitem" data-ci-action="${a.id}">
+            <span class="pf-v6-c-menu__item-main">
+              <span class="pf-v6-c-menu__item-text">${a.label}</span>
+            </span>
+          </button>
+        </li>`;
+      }).join('');
+
+      menu.hidden = false;
+      menu.classList.add('pf-m-open');
+      btn.classList.add('pf-m-expanded');
+      btn.setAttribute('aria-expanded', 'true');
+      state.ciActionsOpen = true;
+      state.ciActionsId = itemId;
+
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = Math.max(menu.offsetWidth || 220, 220);
+      const left = Math.min(window.innerWidth - menuWidth - 8, Math.max(8, rect.right - menuWidth));
+      let top = rect.bottom + 4;
+      menu.style.left = `${left}px`;
+      menu.style.top = `${top}px`;
+      requestAnimationFrame(() => {
+        const h = menu.offsetHeight || 0;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 4);
+          menu.style.top = `${top}px`;
+        }
+      });
+    }
+
+    function applyCatalogItemAction(actionId) {
+      const id = state.ciActionsId || state.selectedCatalogItemId;
+      const item = findCatalogItemById(id);
+      if (!item) return;
+      closeCatalogItemActionsMenu();
+      if (actionId === 'view-details') {
+        openCatalogItemDetail(id);
+        return;
+      }
+      if (actionId === 'launch') {
+        toast(`Launch instance from ${item.name} (prototype).`, 'success');
+        return;
+      }
+      if (actionId === 'edit') {
+        openCatalogItemEdit(id);
+        return;
+      }
+      if (actionId === 'duplicate') {
+        const src = catalogItemsSource();
+        const copy = {
+          ...item,
+          id: `${item.id}-copy-${Date.now()}`,
+          name: `${item.name}-copy`,
+          publishState: 'unpublished',
+        };
+        src.unshift(copy);
+        toast(`Duplicated ${item.name}.`, 'success');
+        renderCatalog();
+        return;
+      }
+      if (actionId === 'publish') {
+        item.publishState = 'live';
+        if (!item.visibility) {
+          Object.assign(item, catalogPublishScopeFields({ visibility: 'global', tenants: [] }));
+        }
+        toast(`${item.name} published.`, 'success');
+        if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
+          renderCatalogItemDetail();
+        }
+        renderCatalog();
+        return;
+      }
+      if (actionId === 'unpublish') {
+        item.publishState = 'unpublished';
+        toast(`${item.name} unpublished.`);
+        if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
+          renderCatalogItemDetail();
+        }
+        renderCatalog();
+        return;
+      }
+      if (actionId === 'delete') {
+        const providerIdx = PROVIDER_CATALOG_ITEMS.findIndex(x => x.id === id);
+        const tenantIdx = TENANT_CATALOG_ITEMS.findIndex(x => x.id === id);
+        if (providerIdx >= 0) PROVIDER_CATALOG_ITEMS.splice(providerIdx, 1);
+        if (tenantIdx >= 0) TENANT_CATALOG_ITEMS.splice(tenantIdx, 1);
+        if (state.selectedCatalogItemId === id) state.selectedCatalogItemId = null;
+        toast(`Deleted catalog item ${item.name}.`);
+        setView('templates');
+        renderCatalog();
+      }
+    }
+
+    function openCatalogItemDetail(id) {
+      const item = findCatalogItemById(id);
+      if (!item) return;
+      closeCatalogItemActionsMenu();
+      state.selectedCatalogItemId = id;
+      setView('catalog-item');
+      renderCatalogItemDetail();
+    }
+
+    function renderCatalogItemDetail() {
+      const root = document.getElementById('catalog-item-detail-root');
+      const item = findCatalogItemById(state.selectedCatalogItemId);
+      if (!root) return;
+      if (!item) {
+        root.innerHTML = '<p class="muted">Catalog item not found.</p>';
+        return;
+      }
+      const safeName = String(item.name).replace(/</g, '&lt;');
+      const safeDesc = String(item.description || '—').replace(/</g, '&lt;');
+      const isProvider = item.scope === 'provider';
+      const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
+      const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
+      const launchDisabled = isProvider && item.publishState !== 'live';
+
+      root.innerHTML = `
+        <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol class="pf-v6-c-breadcrumb__list">
+            <li class="pf-v6-c-breadcrumb__item">
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-catalog>Catalog</a>
+            </li>
+            <li class="pf-v6-c-breadcrumb__item">
+              <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeName}</span>
+            </li>
+          </ol>
+        </nav>
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <div class="ethan-detail-header__title-row">
+              <span class="catalog-detail-header__icon" aria-hidden="true"><i class="pf-v6-pficon-virtual-machine"></i></span>
+              <div>
+                <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safeName}</h2>
+                <p class="ethan-detail-header__subtitle">${safeDesc}</p>
+              </div>
+            </div>
+          </div>
+          <div class="ethan-detail-header__actions" role="group" aria-label="Catalog item actions">
+            <button type="button" class="pf-v6-c-button pf-m-primary" id="ci-launch-btn" ${launchDisabled ? 'disabled title="Publish this catalog item before launching"' : ''}>
+              <span class="pf-v6-c-button__icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></span>
+              <span class="pf-v6-c-button__text">Launch instance</span>
+            </button>
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="ci-detail-actions-btn"
+              aria-expanded="false" aria-haspopup="menu" aria-controls="ci-actions-menu">
+              <span class="pf-v6-c-menu-toggle__text">Actions</span>
+              <span class="pf-v6-c-menu-toggle__controls">
+                <span class="pf-v6-c-menu-toggle__toggle-icon">
+                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="ethan-detail-panel">
+          <div class="catalog-detail-grid">
+            <div class="catalog-detail-grid__meta">
+              <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
+                <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
+                ${itField('Service', 'Virtual machines')}
+                ${isProvider ? itField('Status', publishLabelHtml(item.publishState)) : ''}
+                ${itField('Rate', catalogRateLine(item))}
+              </section>
+              ${isProvider ? `
+              <section class="ethan-detail-col" aria-labelledby="ci-publishing-title">
+                <h3 class="ethan-detail-col__title" id="ci-publishing-title">Publishing</h3>
+                ${itField('Visibility', `<i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i> ${scopeLabel}`)}
+                ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
+              </section>
+              ` : `
+              <section class="ethan-detail-col" aria-labelledby="ci-project-title">
+                <h3 class="ethan-detail-col__title" id="ci-project-title">Project</h3>
+                ${itField('Project', String(item.project || '—').replace(/</g, '&lt;'))}
+                ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
+              </section>
+              `}
+            </div>
+            <section class="tpl-fixed-panel" aria-labelledby="ci-hardware-title">
+              <h3 class="tpl-fixed-panel__title" id="ci-hardware-title">Hardware specifications</h3>
+              <dl class="tpl-fixed-panel__dl">
+                ${catalogDetailHardwareSpecsHtml(item)}
+              </dl>
+            </section>
+          </div>
+        </div>
+      `;
+
+      root.querySelector('[data-breadcrumb-catalog]')?.addEventListener('click', e => {
+        e.preventDefault();
+        closeCatalogItemActionsMenu();
+        state.selectedCatalogItemId = null;
+        setView('templates');
+        renderCatalog();
+      });
+      root.querySelector('#ci-launch-btn')?.addEventListener('click', () => {
+        applyCatalogItemAction('launch');
+      });
+      root.querySelector('#ci-detail-actions-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        openCatalogItemActionsMenu(e.currentTarget, item.id);
+      });
+    }
+
+    function updateCatalogPageChrome() {
+      const role = getActiveRole();
+      const isProvider = role.canManageProviderCatalog;
+      const desc = document.getElementById('catalog-page-desc');
+      const createBtn = document.getElementById('btn-create-catalog-item');
+      const tenantDd = document.getElementById('catalog-tenant-dd');
+      const publishDd = document.getElementById('catalog-publish-dd');
+      const projectField = document.getElementById('catalog-project-field');
+      const canCreate = role.canManageProviderCatalog || role.canManageTenantCatalog;
+      if (desc) {
+        desc.textContent = isProvider
+          ? 'Create catalog items from master templates, and then attach them to tenants.'
+          : 'Create and manage catalog items for your projects.';
+      }
+      if (createBtn) createBtn.hidden = !canCreate;
+      if (tenantDd) tenantDd.hidden = !isProvider;
+      if (publishDd) publishDd.hidden = !isProvider;
+      if (projectField) projectField.hidden = isProvider;
+      if (!isProvider) renderCatalogProjectFilter();
+      if (isProvider) buildCatalogPublishMenu();
+    }
+
+    function setCatalogPublishMenuOpen(open) {
+      const menu = document.getElementById('catalog-publish-menu');
+      const toggle = document.getElementById('catalog-publish-toggle');
+      if (!menu || !toggle) return;
+      menu.classList.toggle('pf-m-open', open);
+      toggle.classList.toggle('pf-m-expanded', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    }
+
+    function catalogFilterMenuItem({ value, label, selected, dataAttr, dataValue }) {
+      return `
+        <li class="pf-v6-c-menu__list-item" role="none">
+          <button type="button" class="pf-v6-c-menu__item catalog-filter-item" role="option"
+            ${dataAttr}="${dataValue}" ${selected ? 'aria-selected="true"' : ''}>
+            <span class="pf-v6-c-menu__item-main">
+              <span class="pf-v6-c-menu__item-text">${label}</span>
+            </span>
+            ${selected ? '<span class="catalog-filter-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>' : ''}
+          </button>
+        </li>`;
+    }
+
+    function buildCatalogPublishMenu() {
+      const menu = document.getElementById('catalog-publish-menu');
+      if (!menu) return;
+      const current = state.catalogPublishFilter || 'all';
+      const options = [
+        { id: 'all', label: 'All publish states' },
+        { id: 'live', label: 'Published' },
+        { id: 'unpublished', label: 'Unpublished' },
+      ];
+      menu.innerHTML = `<div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list" role="none">${options.map(o =>
+        catalogFilterMenuItem({
+          value: o.id,
+          label: o.label,
+          selected: current === o.id,
+          dataAttr: 'data-catalog-publish',
+          dataValue: o.id,
+        })
+      ).join('')}</ul></div>`;
+      if (menu.dataset.wired) return;
+      menu.dataset.wired = '1';
+      menu.addEventListener('click', e => {
+        e.stopPropagation();
+        const btn = e.target.closest('[data-catalog-publish]');
+        if (!btn) return;
+        state.catalogPublishFilter = btn.dataset.catalogPublish;
+        const label = document.getElementById('catalog-publish-label');
+        const opt = options.find(o => o.id === btn.dataset.catalogPublish);
+        if (label && opt) label.textContent = opt.label;
+        setCatalogPublishMenuOpen(false);
+        renderCatalog();
+      });
+    }
+
+    function updateCatalogSummary({ shown, total, hasFilters }) {
+      const el = document.getElementById('catalog-summary');
+      if (!el) return;
+      if (total === 0) {
+        el.hidden = true;
+        el.innerHTML = '';
+        return;
+      }
+      el.hidden = false;
+      const filterNote = hasFilters
+        ? ' <button type="button" class="catalog-summary__clear" id="catalog-clear-filters">Clear all filters</button>'
+        : '';
+      el.innerHTML = `<strong>${shown} of ${total}</strong> catalog items${filterNote}`;
+      el.querySelector('#catalog-clear-filters')?.addEventListener('click', () => {
+        state.catalogFilter = '';
+        state.catalogTenantFilter = 'all';
+        state.catalogPublishFilter = 'all';
+        const search = document.getElementById('catalog-search');
+        if (search) search.value = '';
+        const tenantLabel = document.getElementById('catalog-tenant-label');
+        if (tenantLabel) tenantLabel.textContent = 'All tenants';
+        const publishLabel = document.getElementById('catalog-publish-label');
+        if (publishLabel) publishLabel.textContent = 'All publish states';
+        renderCatalog();
+      });
+    }
+
+    function syncCatalogToolbarDisabled(disabled) {
+      const search = document.getElementById('catalog-search');
+      const cardsBtn = document.getElementById('catalog-view-cards');
+      const listBtn = document.getElementById('catalog-view-list');
+      if (search) search.disabled = disabled;
+      if (cardsBtn) cardsBtn.disabled = disabled;
+      if (listBtn) listBtn.disabled = disabled;
+    }
+
+    function catalogEmptyStateHtml({ isProvider }) {
+      if (isProvider) {
+        return emptyStateHtml({
+          title: 'No catalog items yet',
+          body: 'Create a catalog item from a master template, then attach it to tenants.',
+        });
+      }
+      return emptyStateProjectHtml('catalog items', 'catalog item');
+    }
+
+    function renderCatalogProjectFilter() {
+      const wrap = document.getElementById('catalog-project-select-wrap');
+      if (!wrap) return;
+      const current = state.catalogProjectFilter || 'project-a';
+      wrap.innerHTML = pfSelect({
+        id: 'catalog-project-filter',
+        ariaLabel: 'Project',
+        optionsHtml: PROJECTS.map(p =>
+          `<option value="${p}" ${current === p ? 'selected' : ''}>${p}</option>`
+        ).join(''),
+      });
+      const sel = document.getElementById('catalog-project-filter');
+      if (!sel || sel.dataset.wired) return;
+      sel.dataset.wired = '1';
+      sel.addEventListener('change', e => {
+        state.catalogProjectFilter = e.target.value || 'project-a';
+        state.catalogFilter = '';
+        const search = document.getElementById('catalog-search');
+        if (search) search.value = '';
+        renderCatalog();
+      });
+    }
+
+    function renderCatalogCard(item, { showVisibility, showPublishState }) {
+      const title = String(item.name).replace(/</g, '&lt;');
+      const unpublishedClass = item.publishState === 'unpublished' ? ' tpl-m-unpublished' : '';
+      const visibilityFooter = showVisibility ? (() => {
+        const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
+        const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
+        return `
+          <div class="tpl-card__visibility-footer">
+            <i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i>
+            ${scopeLabel}
+          </div>`;
+      })() : (item.project ? `
+          <div class="tpl-card__visibility-footer">
+            <i class="fa-solid fa-folder" aria-hidden="true"></i>
+            ${String(item.project).replace(/</g, '&lt;')}
+          </div>` : '');
+      const publishBadge = showPublishState ? publishLabelHtml(item.publishState) : '';
+      return `
+        <article class="tpl-card tpl-card--catalog${unpublishedClass}" data-catalog-card="${item.id}" tabindex="0" role="link" aria-label="Open ${title}">
+          <div class="tpl-card__body">
+            <div class="tpl-card__catalog-head">
+              <span class="tpl-card__icon tpl-card__icon--catalog-vm" aria-hidden="true">
+                <i class="pf-v6-pficon-virtual-machine"></i>
+              </span>
+              <div class="tpl-card__catalog-head-actions">
+                ${publishBadge}
+                <button type="button" class="kebab" data-ci-kebab="${item.id}"
+                  aria-label="Actions for ${title}" aria-haspopup="menu" aria-expanded="false" aria-controls="ci-actions-menu">
+                  <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <button type="button" class="tpl-card__title-link" data-catalog-open="${item.id}">${title}</button>
+            <dl class="catalog-card-specs">
+              ${catalogCardSpecsRowsHtml(item)}
+            </dl>
+          </div>
+          <dl class="catalog-card-rate">
+            <dt class="catalog-card-rate__label">Rate</dt>
+            <dd class="catalog-card-rate__value">${catalogRateLine(item)}</dd>
+          </dl>
+          ${visibilityFooter}
+        </article>`;
+    }
+
+    function wireCatalogCards(root) {
+      root.querySelectorAll('[data-catalog-card]').forEach(card => {
+        card.addEventListener('click', e => {
+          if (e.target.closest('[data-ci-kebab]') || e.target.closest('.kebab')) return;
+          openCatalogItemDetail(card.dataset.catalogCard);
+        });
+        card.addEventListener('keydown', e => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          if (e.target.closest('[data-ci-kebab]')) return;
+          e.preventDefault();
+          openCatalogItemDetail(card.dataset.catalogCard);
+        });
+      });
+      root.querySelectorAll('[data-catalog-open]').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          openCatalogItemDetail(link.dataset.catalogOpen);
+        });
+      });
+      root.querySelectorAll('[data-ci-kebab]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          openCatalogItemActionsMenu(e.currentTarget, e.currentTarget.dataset.ciKebab);
+        });
+      });
+      root.querySelectorAll('[data-catalog-row]').forEach(row => {
+        row.addEventListener('click', e => {
+          if (e.target.closest('[data-ci-kebab]') || e.target.closest('[data-catalog-open]')) return;
+          openCatalogItemDetail(row.dataset.catalogRow);
+        });
+      });
     }
 
     function renderCatalog() {
       const root = document.getElementById('catalog-content');
       if (!root) return;
+      updateCatalogPageChrome();
+      const isProvider = isProviderCatalogRole();
       const q = (state.catalogFilter || '').toLowerCase();
-      const tenantFilter = state.catalogTenantFilter || 'all';
-      let items = PROVIDER_CATALOG_ITEMS.slice();
-      if (tenantFilter !== 'all') {
-        items = items.filter(item =>
-          item.visibility === 'global' || (item.tenants || []).includes(tenantFilter)
-        );
+      let scopedItems = catalogItemsSource().slice();
+      if (isProvider) {
+        const tenantFilter = state.catalogTenantFilter || 'all';
+        const publishFilter = state.catalogPublishFilter || 'all';
+        if (tenantFilter !== 'all') {
+          scopedItems = scopedItems.filter(item =>
+            item.publishState === 'live'
+            && (item.visibility === 'global' || (item.tenants || []).includes(tenantFilter))
+          );
+        }
+        if (publishFilter !== 'all') {
+          scopedItems = scopedItems.filter(item => item.publishState === publishFilter);
+        }
+      } else {
+        const project = state.catalogProjectFilter || 'project-a';
+        scopedItems = scopedItems.filter(item => (item.project || 'project-a') === project);
       }
+      const catalogIsEmpty = catalogItemsSource().length === 0;
+      const noItemsInScope = scopedItems.length === 0;
+      let items = scopedItems;
       if (q) {
-        items = items.filter(item => {
-          const hay = `${item.name} ${item.cpu} ${item.memory} ${item.gpu} ${item.diskImage} ${item.visibilityLabel}`.toLowerCase();
-          return hay.includes(q);
-        });
+        items = scopedItems.filter(item => catalogItemSearchText(item).toLowerCase().includes(q));
       }
+      const noFilterMatches = !catalogIsEmpty && noItemsInScope;
+      const noSearchMatches = !noItemsInScope && q && items.length === 0;
       const view = state.catalogView || 'cards';
-      if (!items.length) {
-        root.innerHTML = '<p class="muted" style="padding:24px 0;">No catalog items match the current filters.</p>';
+      const hasFilters = !!(q || (isProvider && (
+        (state.catalogTenantFilter && state.catalogTenantFilter !== 'all')
+        || (state.catalogPublishFilter && state.catalogPublishFilter !== 'all')
+      )));
+      syncCatalogToolbarDisabled(catalogIsEmpty);
+      updateCatalogSummary({
+        shown: items.length,
+        total: catalogItemsSource().length,
+        hasFilters,
+      });
+      if (catalogIsEmpty) {
+        root.innerHTML = catalogEmptyStateHtml({ isProvider });
+        return;
+      }
+      if (noFilterMatches) {
+        root.innerHTML = isProvider
+          ? emptyStateFiltersHtml('catalog items')
+          : emptyStateProjectHtml('catalog items', 'catalog item');
+        return;
+      }
+      if (noSearchMatches) {
+        root.innerHTML = emptyStateSearchHtml('catalog items');
         return;
       }
       if (view === 'list') {
@@ -14081,81 +15376,44 @@
               <thead class="pf-v6-c-table__thead">
                 <tr class="pf-v6-c-table__tr">
                   <th class="pf-v6-c-table__th" scope="col">Name</th>
-                  <th class="pf-v6-c-table__th" scope="col">Compute</th>
+                  <th class="pf-v6-c-table__th" scope="col">Instance type</th>
                   <th class="pf-v6-c-table__th" scope="col">Disk image</th>
                   <th class="pf-v6-c-table__th" scope="col">Rate</th>
-                  <th class="pf-v6-c-table__th" scope="col">Visibility</th>
+                  ${isProvider ? '<th class="pf-v6-c-table__th" scope="col">Status</th><th class="pf-v6-c-table__th" scope="col">Visibility</th>' : ''}
+                  <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
                 </tr>
               </thead>
               <tbody class="pf-v6-c-table__tbody">
                 ${items.map(item => {
                   const name = String(item.name).replace(/</g, '&lt;');
                   const diskImage = String(item.diskImage).replace(/</g, '&lt;');
-                  const visibility = String(item.visibilityLabel).replace(/</g, '&lt;');
-                  const compute = `${item.cpu} · ${item.memory}${item.gpu ? ` · ${item.gpu}` : ''}`;
-                  const rate = `${item.rateHour} ${item.rateMonth}`;
+                  const visibility = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
+                  const compute = resolveCatalogItemCompute(item).summary.replace(/</g, '&lt;');
+                  const rate = catalogRateLine(item);
                   const lockSuffix = item.diskLocked ? ' · Locked' : '';
+                  const publish = isProvider ? publishLabelHtml(item.publishState) : '';
                   return `
-                  <tr class="pf-v6-c-table__tr">
-                    <td class="pf-v6-c-table__td">${name}</td>
+                  <tr class="pf-v6-c-table__tr" data-catalog-row="${item.id}" style="cursor:pointer;">
+                    <td class="pf-v6-c-table__td"><a href="#" class="pf-v6-c-button pf-m-link pf-m-inline" data-catalog-open="${item.id}">${name}</a></td>
                     <td class="pf-v6-c-table__td">${compute}</td>
                     <td class="pf-v6-c-table__td">${diskImage}${lockSuffix}</td>
                     <td class="pf-v6-c-table__td">${rate}</td>
-                    <td class="pf-v6-c-table__td">${visibility}</td>
+                    ${isProvider ? `<td class="pf-v6-c-table__td">${publish}</td><td class="pf-v6-c-table__td">${visibility}</td>` : ''}
+                    <td class="pf-v6-c-table__td"><button type="button" class="kebab" data-ci-kebab="${item.id}" aria-label="Actions for ${name}" aria-haspopup="menu" aria-expanded="false" aria-controls="ci-actions-menu"><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td>
                   </tr>`;
                 }).join('')}
               </tbody>
             </table>
           </div>`;
+        wireCatalogCards(root);
         return;
       }
-      root.innerHTML = `
-        <div class="tpl-cards">
-          ${items.map(item => {
-            const title = String(item.name).replace(/</g, '&lt;');
-            const osLine = String(item.diskImage || '—').replace(/</g, '&lt;');
-            const scopeIcon = item.visibility === 'global' ? 'globe' : 'building';
-            const scopeLabel = String(item.visibilityLabel || '—').replace(/</g, '&lt;');
-            return `
-            <article class="tpl-card tpl-card--catalog">
-              <div class="tpl-card__catalog-head">
-                <span class="tpl-card__icon tpl-card__icon--rhel" aria-hidden="true">
-                  <i class="fa-brands fa-redhat"></i>
-                </span>
-                <span class="tpl-card__scope-badge">
-                  <i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i>
-                  ${scopeLabel}
-                </span>
-              </div>
-              <div class="tpl-card__title-row">
-                <span class="tpl-card__title">${title}</span>
-                ${item.diskLocked ? fieldGovLabel('locked') : fieldGovLabel('editable')}
-              </div>
-              <p class="tpl-card__desc">${osLine}</p>
-              <div class="tpl-card__specs">
-                <div>
-                  <span class="tpl-card__spec-label">CPU</span>
-                  <span class="tpl-card__spec-value">${item.cpu}</span>
-                </div>
-                <div>
-                  <span class="tpl-card__spec-label">RAM</span>
-                  <span class="tpl-card__spec-value">${item.memory}</span>
-                </div>
-                <div>
-                  <span class="tpl-card__spec-label">GPU</span>
-                  <span class="tpl-card__spec-value">${item.gpu || '—'}</span>
-                </div>
-              </div>
-              <div class="tpl-card__footer tpl-card__footer--catalog">
-                <span class="tpl-card__cost-label">Rate</span>
-                <span class="tpl-card__cost-values">
-                  ${item.rateHour}
-                  <span class="tpl-card__cost-month">${item.rateMonth}</span>
-                </span>
-              </div>
-            </article>`;
-          }).join('')}
-        </div>`;
+      const cards = items.map(item => renderCatalogCard(item, {
+          showVisibility: isProvider,
+          showPublishState: isProvider,
+        })).join('');
+      root.innerHTML = `<div class="tpl-cards tpl-cards--catalog">${cards}</div>`;
+      wireCatalogCards(root);
     }
 
     function setCatalogTenantMenuOpen(open) {
@@ -14172,16 +15430,13 @@
       if (!menu) return;
       const current = state.catalogTenantFilter || 'all';
       const options = [{ id: 'all', label: 'All tenants' }, ...PLATFORM_TENANTS.map(t => ({ id: t, label: t }))];
-      const items = options.map(o => `
-        <li class="pf-v6-c-menu__list-item" role="none">
-          <button type="button" class="pf-v6-c-menu__item catalog-tenant-item" role="option"
-            data-catalog-tenant="${o.id}" ${current === o.id ? 'aria-selected="true"' : ''}>
-            <span class="pf-v6-c-menu__item-main">
-              <span class="pf-v6-c-menu__item-text">${o.label}</span>
-            </span>
-          </button>
-        </li>
-      `).join('');
+      const items = options.map(o => catalogFilterMenuItem({
+        value: o.id,
+        label: o.label,
+        selected: current === o.id,
+        dataAttr: 'data-catalog-tenant',
+        dataValue: o.id,
+      })).join('');
       menu.innerHTML = `<div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list" role="none">${items}</ul></div>`;
       if (menu.dataset.wired) return;
       menu.dataset.wired = '1';
@@ -14452,15 +15707,17 @@
       const showObsolete = !!state.diShowObsolete;
       const rows = DISK_IMAGES.filter(di => showObsolete || normalizeDiskImageLifecycle(di.lifecycle) !== 'Obsolete');
       if (!rows.length) {
-        tbody.innerHTML = `<tr class="pf-v6-c-table__tr">
-          <td class="pf-v6-c-table__td" colspan="7">
-            <div class="muted" style="padding:24px;text-align:center;">
-              ${DISK_IMAGES.length ? 'No disk images match the current filters.' : 'No disk images yet. Create a disk image to make it available for provisioning.'}
-            </div>
-          </td>
-        </tr>`;
+        tbody.innerHTML = '';
+        const emptyHtml = !DISK_IMAGES.length
+          ? emptyStateHtml({
+            title: 'No disk images yet',
+            body: 'Create a disk image to make it available for provisioning.',
+          })
+          : emptyStateFiltersHtml('disk images');
+        showListEmptyState('disk-images-table-area', 'disk-images-table-scroll', 'disk-images-empty-state', emptyHtml);
         return;
       }
+      clearListEmptyState('disk-images-table-scroll', 'disk-images-empty-state');
       tbody.innerHTML = rows.map(di => {
         const arch = (di.architecture || []).join(', ') || '—';
         const hasActions = diskImageLifecycleActions(di.lifecycle).length > 0;
@@ -14605,10 +15862,11 @@
       const createNet = document.getElementById('btn-create-network');
       const navNetworks = document.querySelector('[data-nav="networks"]');
       const navInfrastructure = document.getElementById('nav-infrastructure');
-      const catalogToolbar = document.getElementById('catalog-toolbar');
+      const navPlatform = document.getElementById('nav-platform');
+      const canCreateCatalog = role.canManageProviderCatalog || role.canManageTenantCatalog;
       createBtn.hidden = !role.canCreate;
-      if (createCatalog) createCatalog.hidden = !role.canManageCatalog;
-      if (catalogToolbar) catalogToolbar.hidden = !role.canManageCatalog;
+      if (createCatalog) createCatalog.hidden = !canCreateCatalog;
+      if (navPlatform) navPlatform.hidden = !role.canManageProviderCatalog;
       if (createNet) createNet.hidden = !role.canCreateNetwork;
       if (navNetworks) navNetworks.hidden = !role.canViewNetworks;
       if (navInfrastructure) navInfrastructure.hidden = !role.canManageInfrastructure;
@@ -14629,7 +15887,8 @@
         || document.getElementById('view-disk-image')?.classList.contains('pf-m-active')
         || document.getElementById('view-create-instance-type')?.classList.contains('pf-m-active')
         || document.getElementById('view-create-disk-image')?.classList.contains('pf-m-active');
-      const onCatalog = document.getElementById('view-templates')?.classList.contains('pf-m-active');
+      const onCatalog = document.getElementById('view-templates')?.classList.contains('pf-m-active')
+        || document.getElementById('view-catalog-item')?.classList.contains('pf-m-active');
       if (role.canManageInfrastructure) {
         if (!onInfra && !onCatalog) {
           setView('templates');
@@ -14642,6 +15901,16 @@
         closeInstanceTypeActionsMenu();
         closeDiskImageActionsMenu();
         setView('vms');
+      }
+      if (onCatalog) {
+        renderCatalog();
+        if (role.canManageProviderCatalog) renderCatalogTenantFilter();
+      }
+      if (state.wizard === 'catalog-create') {
+        const steps = catalogStepsForRole();
+        if (state.step >= steps.length) state.step = steps.length - 1;
+        state.maxVisited = Math.min(state.maxVisited, steps.length - 1);
+        renderWizard();
       }
     }
 
@@ -14946,7 +16215,7 @@
       setView(nav);
       if (nav === 'templates') {
         renderCatalog();
-        renderCatalogTenantFilter();
+        if (getActiveRole().canManageProviderCatalog) renderCatalogTenantFilter();
       }
       if (nav === 'instance-types') renderInstanceTypes();
       if (nav === 'disk-images') renderDiskImages();
@@ -14972,6 +16241,14 @@
       document.getElementById('catalog-view-cards')?.setAttribute('aria-pressed', 'false');
       renderCatalog();
     });
+    document.getElementById('catalog-publish-toggle')?.addEventListener('click', e => {
+      e.stopPropagation();
+      const menu = document.getElementById('catalog-publish-menu');
+      const open = !menu?.classList.contains('pf-m-open');
+      if (open) buildCatalogPublishMenu();
+      setCatalogPublishMenuOpen(open);
+    });
+    document.getElementById('catalog-publish-menu')?.addEventListener('click', e => e.stopPropagation());
     document.getElementById('catalog-tenant-toggle')?.addEventListener('click', e => {
       e.stopPropagation();
       const menu = document.getElementById('catalog-tenant-menu');
@@ -14981,9 +16258,17 @@
     });
     document.getElementById('catalog-tenant-menu')?.addEventListener('click', e => e.stopPropagation());
     document.addEventListener('click', e => {
+      const publishDd = document.getElementById('catalog-publish-dd');
+      if (publishDd && !publishDd.contains(e.target)) setCatalogPublishMenuOpen(false);
       const dd = document.getElementById('catalog-tenant-dd');
       if (!dd || dd.contains(e.target)) return;
       setCatalogTenantMenuOpen(false);
+    });
+    document.getElementById('ci-actions-menu')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-ci-action]');
+      if (!btn) return;
+      e.preventDefault();
+      applyCatalogItemAction(btn.dataset.ciAction);
     });
     document.getElementById('btn-create-instance-type')?.addEventListener('click', () => {
       openCreateInstanceType();
@@ -15087,6 +16372,12 @@
         && !e.target.closest('[data-di-kebab]')) {
         closeDiskImageActionsMenu();
       }
+      if (state.ciActionsOpen
+        && !e.target.closest('#ci-actions-menu')
+        && !e.target.closest('#ci-detail-actions-btn')
+        && !e.target.closest('[data-ci-kebab]')) {
+        closeCatalogItemActionsMenu();
+      }
       if (!e.target.closest('#create-di-arch')) {
         setArchitectureMenuOpen(false);
       }
@@ -15109,9 +16400,10 @@
     bindNavExpandable('nav-services-toggle', 'nav-services');
     bindNavExpandable('nav-networking-toggle', 'nav-networking');
     bindNavExpandable('nav-infrastructure-toggle', 'nav-infrastructure');
+    bindNavExpandable('nav-platform-toggle', 'nav-platform');
 
     applyRole();
-    renderCatalogTenantFilter();
+    if (getActiveRole().canManageProviderCatalog) renderCatalogTenantFilter();
     if (document.getElementById('view-templates')?.classList.contains('pf-m-active')) renderCatalog();
     initVmFilterDropdowns();
     renderVms();

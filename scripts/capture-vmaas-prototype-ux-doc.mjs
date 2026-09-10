@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, 'videos', 'vmaas-prototype-ux-doc');
 const BASE =
   process.env.VMAAS_MOCK_URL ||
-  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels';
+  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-visibility';
 
 async function shot(page, name) {
   const file = path.join(outDir, `${name}.png`);
@@ -159,7 +159,8 @@ async function main() {
   await page.waitForTimeout(400);
 
   // —— VM Overview ——
-  await page.goto(`${BASE.split('?')[0]}?v=20260907-di-labels&vm=azure-baboon-27`, {
+  const vmUrl = BASE.includes('?') ? `${BASE}&vm=azure-baboon-27` : `${BASE}?vm=azure-baboon-27`;
+  await page.goto(vmUrl, {
     waitUntil: 'networkidle',
   });
   await setRole(page, 'admin');
@@ -183,9 +184,33 @@ async function main() {
     await page.keyboard.press('Escape');
   }
 
-  // —— Provider: Instance types ——
+  // —— Provider: Catalog (default landing) ——
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await setRole(page, 'provider');
+  await page.waitForTimeout(600);
+  await shot(page, '17-catalog-list');
+
+  await page.locator('#btn-create-catalog-item').click();
+  await page.waitForSelector('#overlay.pf-m-open', { timeout: 8000 });
+  await page.waitForTimeout(500);
+  await clickNext(page);
+  await waitStep(page, 'Instance type & Access');
+  await clickNext(page);
+  await waitStep(page, 'Visibility');
+  await shot(page, '18-catalog-create-visibility');
+  await page.locator('#wiz-close').click();
+  await page.waitForTimeout(400);
+  if (await page.locator('#cancel-confirm').isVisible().catch(() => false)) {
+    await page.locator('#cancel-confirm').click();
+  }
+  await page.waitForTimeout(400);
+
+  await page.locator('[data-catalog-card]').first().click();
+  await page.waitForTimeout(600);
+  await shot(page, '19-catalog-item-detail');
+
+  // —— Provider: Instance types ——
+  await page.locator('[data-nav="instance-types"]').click();
   await page.waitForTimeout(600);
   await shot(page, '11-instance-types-list');
 

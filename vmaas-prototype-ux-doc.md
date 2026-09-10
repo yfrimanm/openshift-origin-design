@@ -14,15 +14,15 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 
 | | |
 |---|---|
-| **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, plus provider **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels&vm=azure-baboon-27) |
+| **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, provider **Catalog**, plus **Instance types** and **Disk images** |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-visibility) |
+| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-visibility&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-visibility&vm=azure-baboon-27) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-visibility&role=provider) |
 | **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
 | **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
 
-**Source snapshot:** Pages build `?v=20260907-di-labels` (screenshots captured 2026-09-07).
+**Source snapshot:** Pages build `?v=20260910-visibility` (screenshots captured 2026-09-10).
 
 ---
 
@@ -38,7 +38,7 @@ Document the current OSAC VMaaS HTML prototype so engineering and stakeholders c
 |---|---|---|
 | **Tenant Admin** | Services → Virtual machines, Networking | List, Create wizard, VM Overview (editable config) |
 | **Tenant User** | Same nav; Create hidden | Power / console; Overview config read-only |
-| **Cloud provider admin** | Infrastructure → Instance types, Disk images | List / create / details for provider resources |
+| **Cloud provider admin** | Catalog, Infrastructure → Instance types, Disk images | Catalog create / detail; provider resource list / create / details |
 
 ---
 
@@ -189,9 +189,59 @@ Figure: Status popover (Ask AI placeholder + Learn more)
 
 ---
 
-# Part B — Infrastructure (Cloud provider admin)
+# Part B — Catalog (Cloud provider admin)
 
-Switch role to **Cloud provider admin**. Default landing: Instance types.
+Switch role to **Cloud provider admin**. Default landing: **Catalog**.
+
+## Catalog — list
+
+| Column | Notes |
+|---|---|
+| Name | Link → detail |
+| Status | Live / Unpublished |
+| Visibility | Global public / Tenant scoped |
+| Instance type · Disk image · Rate | Card view also shows specs + rate |
+
+Primary CTA: **Create catalog item**.
+
+![Figure: Catalog list](videos/vmaas-prototype-ux-doc/17-catalog-list.png)
+
+Figure: Catalog list (provider)
+
+---
+
+## Create catalog item — Visibility step
+
+Wizard steps: Details → Instance type & Access → **Visibility** → Storage → Review.
+
+| Option | Meaning |
+|---|---|
+| **Global public** | Available to all tenants when published |
+| **Tenant scoped** | Visible only to selected tenants |
+
+![Figure: Create catalog item — Visibility](videos/vmaas-prototype-ux-doc/18-catalog-create-visibility.png)
+
+Figure: Create catalog item — Visibility step
+
+---
+
+## Catalog item — details
+
+| Section | Fields |
+|---|---|
+| **Overview** | Service · Status (Live / Unpublished) · Rate |
+| **Publishing** | Visibility (Global public) · Created |
+| **Hardware specifications** | Size (+ Locked) · CPU · RAM · GPU · Disk image (+ Locked) |
+
+![Figure: Catalog item detail](videos/vmaas-prototype-ux-doc/19-catalog-item-detail.png)
+
+Figure: Catalog item detail
+
+---
+
+# Part C — Infrastructure (Cloud provider admin)
+
+From **Infrastructure** in the left nav: Instance types, Disk images.
 
 ## Instance types — list
 
@@ -329,7 +379,7 @@ Figure: Disk image detail
 
 - Detailed Create-only write-up: `vmaas-create-vm-only-ux-doc.md`
 - Detailed Overview write-up: `vmaas-vm-details-overview-ux-doc.md`
-- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260907-di-labels
+- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-visibility
 
 ---
 
@@ -357,3 +407,6 @@ Figure: Disk image detail
 | `14-disk-images-list.png` | Disk images list |
 | `15-create-disk-image.png` | Create disk image |
 | `16-disk-image-detail.png` | Disk image detail |
+| `17-catalog-list.png` | Catalog list (provider) |
+| `18-catalog-create-visibility.png` | Create catalog item — Visibility |
+| `19-catalog-item-detail.png` | Catalog item detail |
