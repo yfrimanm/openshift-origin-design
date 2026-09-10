@@ -14832,12 +14832,9 @@
         readCatalogCreateFields();
         const changes = getCatalogEditChanges();
         panel.innerHTML = `
-          <h3>Review your changes before saving.</h3>
-          <p class="step-help">${changes.length
-            ? 'The following fields were updated in earlier steps.'
-            : 'No changes yet. Update a step to see a before-and-after summary here.'}</p>
-          ${changes.length ? `
-          <div class="catalog-edit-review__changes" role="list" aria-label="Changed fields">
+          <h3>Review your changes before saving</h3>
+          ${changes.length
+            ? `<div class="catalog-edit-review__changes" role="list" aria-label="Changed fields">
             ${changes.map(change => `
               <div class="catalog-edit-review__change" role="listitem">
                 <div class="catalog-edit-review__change-label">${change.label}</div>
@@ -14848,7 +14845,8 @@
                 </div>
               </div>
             `).join('')}
-          </div>` : ''}
+          </div>`
+            : `<p class="step-help">No changes yet. Update a step to see a before-and-after summary here.</p>`}
           <div class="pf-v6-c-alert pf-m-inline pf-m-info catalog-edit-review__alert" role="status">
             <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
             <div class="pf-v6-c-alert__title">Changes apply immediately</div>
