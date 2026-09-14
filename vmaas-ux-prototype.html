@@ -7445,6 +7445,15 @@
       catalogEditOriginal: null,
       vmComputeMenuOpen: false,
       vmComputeFilter: '',
+      vmBootTierMenuOpen: false,
+      vmBootTierFilter: '',
+      vmVnMenuOpen: false,
+      vmVnFilter: '',
+      vmSubnetMenuOpen: false,
+      vmSubnetFilter: '',
+      vmTplProjectMenuOpen: false,
+      vmTplProjectFilter: '',
+      focusRichSearchId: null,
       data: {
         name: '',
         description: '',
@@ -8154,6 +8163,133 @@
           </span>
         </span>
       `;
+    }
+
+    /** Escape for attribute / text nodes in rich-select markup. */
+    function richSelectEsc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Typeahead rich-select matching Compute resource (FormControl toggle + search menu).
+     * options: [{ id, title, desc? }]
+     */
+    function renderTypeaheadRichSelectHtml({
+      rootId,
+      toggleId,
+      menuId,
+      searchId,
+      labelId = '',
+      open = false,
+      filter = '',
+      searchPlaceholder = 'Search',
+      selectedId = '',
+      placeholder = 'Select…',
+      options = [],
+      optionAttr = 'data-option',
+      stacked = false,
+      disabled = false,
+      invalid = false,
+      describedBy = '',
+      hiddenInputId = '',
+      emptyNoun = 'options',
+    }) {
+      const selected = options.find(o => o.id === selectedId);
+      const valueId = hiddenInputId || `${rootId}-value`;
+      const hidden = `<input type="hidden" id="${valueId}" value="${richSelectEsc(selectedId)}" />`;
+      if (disabled) {
+        return `
+          ${hidden}
+          <input type="text" class="unit-size-input" value="${richSelectEsc(selected?.title || placeholder)}"
+            disabled aria-disabled="true" aria-label="${richSelectEsc(placeholder)}"
+            ${describedBy ? `aria-describedby="${describedBy}"` : ''} />
+        `;
+      }
+      const q = (filter || '').toLowerCase();
+      const filtered = options.filter(o => {
+        if (!q) return true;
+        return `${o.title} ${o.desc || ''} ${o.id}`.toLowerCase().includes(q);
+      });
+      const useStacked = !!(stacked && selected?.desc);
+      const toggleMain = selected
+        ? (useStacked
+          ? `<span class="rich-select__toggle-label">${richSelectEsc(selected.title)}</span><span class="rich-select__toggle-desc">${richSelectEsc(selected.desc)}</span>`
+          : `<span class="rich-select__toggle-label">${richSelectEsc(selected.title)}</span>`)
+        : `<span class="rich-select__toggle-label">${richSelectEsc(placeholder)}</span>`;
+      const controlExtra = [
+        selected ? '' : 'pf-m-placeholder',
+        invalid ? 'pf-m-error' : '',
+      ].filter(Boolean).join(' ');
+      return `
+        ${hidden}
+        <div class="rich-select rich-select--typeahead ${open ? 'pf-m-expanded' : ''}" id="${rootId}">
+          ${pfRichSelectToggle({
+            id: toggleId,
+            ariaLabelledby: labelId,
+            ariaExpanded: !!open,
+            ariaControls: menuId,
+            stacked: useStacked,
+            extraClass: controlExtra,
+            mainHtml: toggleMain,
+          })}
+          <div class="pf-v6-c-menu rich-select__menu" id="${menuId}" role="listbox" ${open ? '' : 'hidden'}>
+            <div class="rich-select__search">
+              <i class="fa-solid fa-search" aria-hidden="true"></i>
+              <input type="search" id="${searchId}" placeholder="${richSelectEsc(searchPlaceholder)}"
+                value="${richSelectEsc(filter)}" aria-label="${richSelectEsc(searchPlaceholder)}" />
+            </div>
+            <hr class="rich-select__menu-divider" />
+            <div class="rich-select__menu-list">
+              ${filtered.map(o => `
+                <button type="button" class="pf-v6-c-menu__item rich-select__option ${o.id === selectedId ? 'pf-m-selected' : ''}"
+                  ${optionAttr}="${richSelectEsc(o.id)}" role="option">
+                  <span class="pf-v6-c-menu__item-main">
+                    <span class="rich-select__option-body">
+                      <span class="rich-select__option-title">${richSelectEsc(o.title)}</span>
+                      ${o.desc ? `<span class="rich-select__option-desc">${richSelectEsc(o.desc)}</span>` : ''}
+                    </span>
+                  </span>
+                </button>
+              `).join('') || emptyStateMenuSearchHtml(emptyNoun)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function wireTypeaheadRichSelect(panel, {
+      rootId, toggleId, menuId, searchId, optionSel, getOptionId,
+      setOpen, setFilter, onSelectId,
+    }) {
+      const root = panel.querySelector(`#${rootId}`);
+      if (!root) return;
+      bindRichSelect(root, {
+        toggleSel: `#${toggleId}`,
+        menuSel: `#${menuId}`,
+        optionSel,
+        onOpen: () => { setOpen(true); },
+        onClose: () => { setOpen(false); },
+        onSelect: (opt) => { onSelectId(getOptionId(opt)); },
+      });
+      panel.querySelector(`#${searchId}`)?.addEventListener('input', e => {
+        setFilter(e.target.value);
+        state.focusRichSearchId = searchId;
+        renderWizard();
+      });
+    }
+
+    function restoreRichSearchFocus(panel) {
+      const id = state.focusRichSearchId;
+      if (!id || !panel) return;
+      state.focusRichSearchId = null;
+      const el = panel.querySelector(`#${id}`);
+      if (!el) return;
+      el.focus();
+      const len = el.value?.length || 0;
+      try { el.setSelectionRange(len, len); } catch (_) { /* ignore */ }
     }
 
     /** PatternFly PlusCircleIcon / MinusCircleIcon (same SVGs Ethan uses). */
@@ -12116,6 +12252,15 @@
       state.sgMenuOpen = false;
       state.vmComputeMenuOpen = false;
       state.vmComputeFilter = '';
+      state.vmBootTierMenuOpen = false;
+      state.vmBootTierFilter = '';
+      state.vmVnMenuOpen = false;
+      state.vmVnFilter = '';
+      state.vmSubnetMenuOpen = false;
+      state.vmSubnetFilter = '';
+      state.vmTplProjectMenuOpen = false;
+      state.vmTplProjectFilter = '';
+      state.focusRichSearchId = null;
       state.data.osFamily = 'rhel';
       state.data.osType = 'rhel.10';
       state.data.osTypeFilter = null;
@@ -13598,17 +13743,26 @@
             </div>
             <div class="tpl-toolbar">
               <div class="tpl-toolbar__project">
-                <label for="f-tpl-project">Project</label>
+                <label id="f-tpl-project-label">Project</label>
                 ${(() => {
                   const projectOpts = PROJECTS.includes(currentProject)
                     ? PROJECTS
                     : [currentProject, ...PROJECTS];
-                  return pfSelect({
-                    id: 'f-tpl-project',
-                    ariaLabel: 'Project',
-                    optionsHtml: projectOpts.map(p =>
-                      `<option value="${p}" ${currentProject === p ? 'selected' : ''}>${p}</option>`
-                    ).join(''),
+                  return renderTypeaheadRichSelectHtml({
+                    rootId: 'vm-tpl-project-select',
+                    toggleId: 'f-tpl-project-toggle',
+                    menuId: 'vm-tpl-project-menu',
+                    searchId: 'vm-tpl-project-search',
+                    labelId: 'f-tpl-project-label',
+                    open: !!state.vmTplProjectMenuOpen,
+                    filter: state.vmTplProjectFilter || '',
+                    searchPlaceholder: 'Search projects',
+                    selectedId: currentProject,
+                    placeholder: 'Select a project',
+                    optionAttr: 'data-tpl-project',
+                    hiddenInputId: 'f-tpl-project',
+                    emptyNoun: 'projects',
+                    options: projectOpts.map(p => ({ id: p, title: p })),
                   });
                 })()}
               </div>
@@ -13673,15 +13827,28 @@
           clearTplDrawerEsc();
           state.tplRestoreCardFocus = false;
         }
-        panel.querySelector('#f-tpl-project')?.addEventListener('change', e => {
-          d.project = e.target.value || 'project-a';
-          d.templateId = null;
-          d.catalogPreset = null;
-          state.tplDrawerOpen = false;
-          state.tplFilter = '';
-          clearFieldError('catalog');
-          renderWizard();
+        wireTypeaheadRichSelect(panel, {
+          rootId: 'vm-tpl-project-select',
+          toggleId: 'f-tpl-project-toggle',
+          menuId: 'vm-tpl-project-menu',
+          searchId: 'vm-tpl-project-search',
+          optionSel: '[data-tpl-project]',
+          getOptionId: opt => opt.dataset.tplProject,
+          setOpen: (open) => { state.vmTplProjectMenuOpen = open; },
+          setFilter: (v) => { state.vmTplProjectFilter = v; },
+          onSelectId: (value) => {
+            d.project = value || 'project-a';
+            d.templateId = null;
+            d.catalogPreset = null;
+            state.tplDrawerOpen = false;
+            state.tplFilter = '';
+            state.vmTplProjectMenuOpen = false;
+            state.vmTplProjectFilter = '';
+            clearFieldError('catalog');
+            renderWizard();
+          },
         });
+        restoreRichSearchFocus(panel);
         panel.querySelectorAll('[data-tpl-view]').forEach(b => {
           b.onclick = () => { state.tplView = b.dataset.tplView; renderWizard(); };
         });
@@ -13970,14 +14137,27 @@
                     ${pfHelperText(`Disk name will be <code>${String(disk.name || '').replace(/</g, '&lt;')}</code>.`)}
                   </div>
                   <div class="form-field">
-                    <label for="f-disk-tier-${disk.id}">Storage tier <span class="req">*</span></label>
-                    ${pfSelect({
-                      id: `f-disk-tier-${disk.id}`,
-                      ariaLabel: `Disk set ${idx + 1} storage tier`,
-                      required: true,
-                      optionsHtml: tiers.map(t =>
-                        `<option value="${t.id}" ${disk.storageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
-                      ).join('') || '<option value="">No storage tiers available</option>',
+                    <label id="f-disk-tier-label-${disk.id}" for="f-disk-tier-toggle-${disk.id}">Storage tier <span class="req">*</span></label>
+                    ${renderTypeaheadRichSelectHtml({
+                      rootId: `vm-disk-tier-select-${disk.id}`,
+                      toggleId: `f-disk-tier-toggle-${disk.id}`,
+                      menuId: `vm-disk-tier-menu-${disk.id}`,
+                      searchId: `vm-disk-tier-search-${disk.id}`,
+                      labelId: `f-disk-tier-label-${disk.id}`,
+                      open: !!disk.tierMenuOpen,
+                      filter: disk.tierFilter || '',
+                      searchPlaceholder: 'Search storage tiers',
+                      selectedId: disk.storageTierId || '',
+                      placeholder: 'Select storage tier',
+                      stacked: true,
+                      optionAttr: 'data-disk-tier',
+                      hiddenInputId: `f-disk-tier-${disk.id}`,
+                      emptyNoun: 'storage tiers',
+                      options: tiers.map(t => ({
+                        id: t.id,
+                        title: t.name,
+                        desc: t.description || '',
+                      })),
                     })}
                     ${pfHelperText('Storage tiers are defined by your cloud provider administrator.')}
                   </div>
@@ -14018,34 +14198,56 @@
           `;
           const bootTierFieldHtml = bootEditable ? `
               <div class="form-field">
-                <label for="f-boot-tier" class="label-with-optional">
+                <label id="f-boot-tier-label" class="label-with-optional">
                   <span>Storage tier <span class="req">*</span></span>
                   ${fieldGovLabel('editable')}
                 </label>
-                ${pfSelect({
-                  id: 'f-boot-tier',
-                  ariaLabel: 'Boot disk storage tier',
-                  required: true,
-                  optionsHtml: tiers.map(t =>
-                    `<option value="${t.id}" ${d.bootStorageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
-                  ).join('') || '<option value="">No storage tiers available</option>',
+                ${renderTypeaheadRichSelectHtml({
+                  rootId: 'vm-boot-tier-select',
+                  toggleId: 'f-boot-tier-toggle',
+                  menuId: 'vm-boot-tier-menu',
+                  searchId: 'vm-boot-tier-search',
+                  labelId: 'f-boot-tier-label',
+                  open: !!state.vmBootTierMenuOpen,
+                  filter: state.vmBootTierFilter || '',
+                  searchPlaceholder: 'Search storage tiers',
+                  selectedId: d.bootStorageTierId || '',
+                  placeholder: 'Select storage tier',
+                  stacked: true,
+                  optionAttr: 'data-boot-tier',
+                  hiddenInputId: 'f-boot-tier',
+                  emptyNoun: 'storage tiers',
+                  options: tiers.map(t => ({
+                    id: t.id,
+                    title: t.name,
+                    desc: t.description || '',
+                  })),
                 })}
                 ${pfHelperText('Storage tiers are defined by your cloud provider administrator.')}
               </div>
           ` : `
               <div class="form-field">
-                <label for="f-boot-tier" class="label-with-optional">
+                <label id="f-boot-tier-label" class="label-with-optional">
                   <span>Storage tier</span>
                   ${fieldGovLabel('locked')}
                 </label>
-                ${pfSelect({
-                  id: 'f-boot-tier',
-                  ariaLabel: 'Boot disk storage tier',
+                ${renderTypeaheadRichSelectHtml({
+                  rootId: 'vm-boot-tier-select',
+                  toggleId: 'f-boot-tier-toggle',
+                  menuId: 'vm-boot-tier-menu',
+                  searchId: 'vm-boot-tier-search',
+                  labelId: 'f-boot-tier-label',
+                  selectedId: d.bootStorageTierId || '',
+                  placeholder: 'Storage tier',
+                  stacked: true,
                   disabled: true,
                   describedBy: 'f-boot-tier-locked-help',
-                  optionsHtml: tiers.map(t =>
-                    `<option value="${t.id}" ${d.bootStorageTierId === t.id ? 'selected' : ''}>${t.name}</option>`
-                  ).join('') || '<option value="">No storage tiers available</option>',
+                  hiddenInputId: 'f-boot-tier',
+                  options: tiers.map(t => ({
+                    id: t.id,
+                    title: t.name,
+                    desc: t.description || '',
+                  })),
                 })}
                 ${pfHelperText('Storage tier is set by the template and can’t be changed during create.', 'f-boot-tier-locked-help')}
               </div>
@@ -14106,7 +14308,22 @@
           if (bootEditable) {
             panel.querySelector('#f-boot-disk')?.addEventListener('input', e => syncBootDisk(e.target.value));
             panel.querySelector('#f-boot-disk')?.addEventListener('change', e => syncBootDisk(e.target.value));
-            panel.querySelector('#f-boot-tier')?.addEventListener('change', e => syncBootTier(e.target.value));
+            wireTypeaheadRichSelect(panel, {
+              rootId: 'vm-boot-tier-select',
+              toggleId: 'f-boot-tier-toggle',
+              menuId: 'vm-boot-tier-menu',
+              searchId: 'vm-boot-tier-search',
+              optionSel: '[data-boot-tier]',
+              getOptionId: opt => opt.dataset.bootTier,
+              setOpen: (open) => { state.vmBootTierMenuOpen = open; },
+              setFilter: (v) => { state.vmBootTierFilter = v; },
+              onSelectId: (tierId) => {
+                syncBootTier(tierId);
+                state.vmBootTierMenuOpen = false;
+                state.vmBootTierFilter = '';
+                renderWizard();
+              },
+            });
           }
           panel.querySelector('#f-add-disk')?.addEventListener('click', addWizardExtraDisk);
           panel.querySelectorAll('[data-disk-size]').forEach(input => {
@@ -14124,14 +14341,24 @@
             input.addEventListener('input', e => syncExtra(e.target.value));
             input.addEventListener('change', e => syncExtra(e.target.value));
           });
-          panel.querySelectorAll('select[id^="f-disk-tier-"]').forEach(sel => {
-            sel.addEventListener('change', e => {
-              const id = sel.id.replace(/^f-disk-tier-/, '');
-              const disk = (d.extraDisks || []).find(x => x.id === id);
-              if (!disk) return;
-              disk.storageTierId = e.target.value;
-              disk.storageTierLabel = tiers.find(t => t.id === e.target.value)?.name || e.target.value;
-              updateCostEstimate(key);
+          (d.extraDisks || []).forEach(disk => {
+            wireTypeaheadRichSelect(panel, {
+              rootId: `vm-disk-tier-select-${disk.id}`,
+              toggleId: `f-disk-tier-toggle-${disk.id}`,
+              menuId: `vm-disk-tier-menu-${disk.id}`,
+              searchId: `vm-disk-tier-search-${disk.id}`,
+              optionSel: '[data-disk-tier]',
+              getOptionId: opt => opt.dataset.diskTier,
+              setOpen: (open) => { disk.tierMenuOpen = open; },
+              setFilter: (v) => { disk.tierFilter = v; },
+              onSelectId: (tierId) => {
+                disk.storageTierId = tierId;
+                disk.storageTierLabel = tiers.find(t => t.id === tierId)?.name || tierId;
+                disk.tierMenuOpen = false;
+                disk.tierFilter = '';
+                updateCostEstimate(key);
+                renderWizard();
+              },
             });
           });
           panel.querySelectorAll('[data-remove-disk]').forEach(btn => {
@@ -14141,6 +14368,7 @@
               renderWizard();
             });
           });
+          restoreRichSearchFocus(panel);
         } else if (stepKey === 'config-network') {
           ensureNetworkingDefaults(d);
           const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork);
@@ -14167,39 +14395,53 @@
             <p class="step-help">Defaults are preselected. Change them if this Virtual machine needs different network settings.</p>
             <div class="vm-config__fields">
               <div class="form-field ${state.fieldErrors.virtualNetwork ? 'pf-m-error' : ''}" data-field="virtualNetwork">
-                <label for="f-virtual-network">Virtual network <span class="req">*</span></label>
-                ${pfSelect({
-                  id: 'f-virtual-network',
-                  ariaLabel: 'Virtual network',
-                  required: true,
+                <label id="f-virtual-network-label">Virtual network <span class="req">*</span></label>
+                ${renderTypeaheadRichSelectHtml({
+                  rootId: 'vm-vn-select',
+                  toggleId: 'f-virtual-network-toggle',
+                  menuId: 'vm-vn-menu',
+                  searchId: 'vm-vn-search',
+                  labelId: 'f-virtual-network-label',
+                  open: !!state.vmVnMenuOpen,
+                  filter: state.vmVnFilter || '',
+                  searchPlaceholder: 'Search virtual networks',
+                  selectedId: d.virtualNetwork || '',
+                  placeholder: 'Select a virtual network',
+                  optionAttr: 'data-vn',
+                  hiddenInputId: 'f-virtual-network',
                   invalid: !!state.fieldErrors.virtualNetwork,
                   describedBy: state.fieldErrors.virtualNetwork ? 'err-virtualNetwork' : '',
-                  extraClass: d.virtualNetwork ? '' : 'pf-m-placeholder',
-                  optionsHtml: `
-                    <option value="" ${!d.virtualNetwork ? 'selected' : ''} disabled hidden>Select a virtual network</option>
-                    ${CONFIG_VIRTUAL_NETWORKS.map(n =>
-                      `<option value="${n.id}" ${d.virtualNetwork === n.id ? 'selected' : ''}>${n.label}</option>`
-                    ).join('')}
-                  `,
+                  emptyNoun: 'virtual networks',
+                  options: CONFIG_VIRTUAL_NETWORKS.map(n => ({
+                    id: n.id,
+                    title: n.label,
+                  })),
                 })}
                 ${fieldErrorHtml('virtualNetwork')}
               </div>
               <div class="form-field ${state.fieldErrors.subnet ? 'pf-m-error' : ''}" data-field="subnet">
-                <label for="f-subnet">Subnet <span class="req">*</span></label>
-                ${pfSelect({
-                  id: 'f-subnet',
-                  ariaLabel: 'Subnet',
-                  required: true,
+                <label id="f-subnet-label">Subnet <span class="req">*</span></label>
+                ${renderTypeaheadRichSelectHtml({
+                  rootId: 'vm-subnet-select',
+                  toggleId: 'f-subnet-toggle',
+                  menuId: 'vm-subnet-menu',
+                  searchId: 'vm-subnet-search',
+                  labelId: 'f-subnet-label',
+                  open: !!state.vmSubnetMenuOpen && subnetEnabledLive,
+                  filter: state.vmSubnetFilter || '',
+                  searchPlaceholder: 'Search subnets',
+                  selectedId: d.subnet || '',
+                  placeholder: 'Select a subnet',
+                  optionAttr: 'data-subnet',
+                  hiddenInputId: 'f-subnet',
                   disabled: !subnetEnabledLive,
                   invalid: !!state.fieldErrors.subnet,
                   describedBy: state.fieldErrors.subnet ? 'err-subnet' : '',
-                  extraClass: d.subnet ? '' : 'pf-m-placeholder',
-                  optionsHtml: `
-                    <option value="" ${!d.subnet ? 'selected' : ''} disabled hidden>Select a subnet</option>
-                    ${subnetOptsLive.map(s =>
-                      `<option value="${s}" ${d.subnet === s ? 'selected' : ''}>${s}</option>`
-                    ).join('')}
-                  `,
+                  emptyNoun: 'subnets',
+                  options: subnetOptsLive.map(s => ({
+                    id: s,
+                    title: s,
+                  })),
                 })}
                 ${fieldErrorHtml('subnet')}
               </div>
@@ -14280,35 +14522,49 @@
                       })}
                     </div>
                     <div class="form-field">
-                      <label for="f-extra-vn-${netItem.id}">Virtual network <span class="req">*</span></label>
-                      ${pfSelect({
-                        id: `f-extra-vn-${netItem.id}`,
-                        ariaLabel: `Network set ${idx + 1} virtual network`,
-                        required: true,
-                        extraClass: netItem.virtualNetwork ? '' : 'pf-m-placeholder',
-                        optionsHtml: `
-                          <option value="" ${!netItem.virtualNetwork ? 'selected' : ''} disabled hidden>Select a virtual network</option>
-                          ${CONFIG_VIRTUAL_NETWORKS.map(n =>
-                            `<option value="${n.id}" ${netItem.virtualNetwork === n.id ? 'selected' : ''}>${n.label}</option>`
-                          ).join('')}
-                        `,
+                      <label id="f-extra-vn-label-${netItem.id}">Virtual network <span class="req">*</span></label>
+                      ${renderTypeaheadRichSelectHtml({
+                        rootId: `vm-extra-vn-select-${netItem.id}`,
+                        toggleId: `f-extra-vn-toggle-${netItem.id}`,
+                        menuId: `vm-extra-vn-menu-${netItem.id}`,
+                        searchId: `vm-extra-vn-search-${netItem.id}`,
+                        labelId: `f-extra-vn-label-${netItem.id}`,
+                        open: !!netItem.vnMenuOpen,
+                        filter: netItem.vnFilter || '',
+                        searchPlaceholder: 'Search virtual networks',
+                        selectedId: netItem.virtualNetwork || '',
+                        placeholder: 'Select a virtual network',
+                        optionAttr: 'data-extra-vn',
+                        hiddenInputId: `f-extra-vn-${netItem.id}`,
+                        emptyNoun: 'virtual networks',
+                        options: CONFIG_VIRTUAL_NETWORKS.map(n => ({
+                          id: n.id,
+                          title: n.label,
+                        })),
                       })}
                       ${pfHelperText(`Network name will be <code>${String(netItem.name || '—').replace(/</g, '&lt;')}</code>.`)}
                     </div>
                     <div class="form-field">
-                      <label for="f-extra-subnet-${netItem.id}">Subnet <span class="req">*</span></label>
-                      ${pfSelect({
-                        id: `f-extra-subnet-${netItem.id}`,
-                        ariaLabel: `Network set ${idx + 1} subnet`,
-                        required: true,
+                      <label id="f-extra-subnet-label-${netItem.id}">Subnet <span class="req">*</span></label>
+                      ${renderTypeaheadRichSelectHtml({
+                        rootId: `vm-extra-subnet-select-${netItem.id}`,
+                        toggleId: `f-extra-subnet-toggle-${netItem.id}`,
+                        menuId: `vm-extra-subnet-menu-${netItem.id}`,
+                        searchId: `vm-extra-subnet-search-${netItem.id}`,
+                        labelId: `f-extra-subnet-label-${netItem.id}`,
+                        open: !!netItem.subnetMenuOpen && !!netItem.virtualNetwork,
+                        filter: netItem.subnetFilter || '',
+                        searchPlaceholder: 'Search subnets',
+                        selectedId: netItem.subnet || '',
+                        placeholder: 'Select a subnet',
+                        optionAttr: 'data-extra-subnet',
+                        hiddenInputId: `f-extra-subnet-${netItem.id}`,
                         disabled: !netItem.virtualNetwork,
-                        extraClass: netItem.subnet ? '' : 'pf-m-placeholder',
-                        optionsHtml: `
-                          <option value="" ${!netItem.subnet ? 'selected' : ''} disabled hidden>Select a subnet</option>
-                          ${subnetOpts.map(s =>
-                            `<option value="${s}" ${netItem.subnet === s ? 'selected' : ''}>${s}</option>`
-                          ).join('')}
-                        `,
+                        emptyNoun: 'subnets',
+                        options: subnetOpts.map(s => ({
+                          id: s,
+                          title: s,
+                        })),
                       })}
                     </div>
                     <div class="form-field">
@@ -14362,32 +14618,56 @@
           `;
           const vn = panel.querySelector('#f-virtual-network');
           const sn = panel.querySelector('#f-subnet');
-          if (vn) {
-            vn.addEventListener('change', e => {
-              d.virtualNetwork = e.target.value;
+          wireTypeaheadRichSelect(panel, {
+            rootId: 'vm-vn-select',
+            toggleId: 'f-virtual-network-toggle',
+            menuId: 'vm-vn-menu',
+            searchId: 'vm-vn-search',
+            optionSel: '[data-vn]',
+            getOptionId: opt => opt.dataset.vn,
+            setOpen: (open) => { state.vmVnMenuOpen = open; },
+            setFilter: (v) => { state.vmVnFilter = v; },
+            onSelectId: (value) => {
+              d.virtualNetwork = value;
               applyNetworkingSmartDefaults(d, { networkChanged: true });
               state.sgMenuOpen = false;
               state.extraSgMenuOpen = null;
+              state.vmVnMenuOpen = false;
+              state.vmVnFilter = '';
+              state.vmSubnetMenuOpen = false;
+              state.vmSubnetFilter = '';
               if (d.virtualNetwork) clearFieldError('virtualNetwork');
               if (d.subnet) clearFieldError('subnet');
               if (d.securityGroups?.length) clearFieldError('securityGroups');
               renderWizard();
+            },
+          });
+          if (subnetEnabledLive) {
+            wireTypeaheadRichSelect(panel, {
+              rootId: 'vm-subnet-select',
+              toggleId: 'f-subnet-toggle',
+              menuId: 'vm-subnet-menu',
+              searchId: 'vm-subnet-search',
+              optionSel: '[data-subnet]',
+              getOptionId: opt => opt.dataset.subnet,
+              setOpen: (open) => { state.vmSubnetMenuOpen = open; },
+              setFilter: (v) => { state.vmSubnetFilter = v; },
+              onSelectId: (value) => {
+                d.subnet = value;
+                d.securityGroups = [];
+                applyNetworkingSmartDefaults(d, { subnetChanged: true });
+                state.sgMenuOpen = false;
+                state.extraSgMenuOpen = null;
+                state.vmSubnetMenuOpen = false;
+                state.vmSubnetFilter = '';
+                if (d.subnet) clearFieldError('subnet');
+                if (d.securityGroups?.length) clearFieldError('securityGroups');
+                renderWizard();
+              },
             });
           }
-          if (sn) {
-            sn.disabled = !subnetEnabledLive;
-            if (!subnetEnabledLive) sn.setAttribute('disabled', 'disabled');
-            sn.addEventListener('change', e => {
-              d.subnet = e.target.value;
-              d.securityGroups = [];
-              applyNetworkingSmartDefaults(d, { subnetChanged: true });
-              state.sgMenuOpen = false;
-              state.extraSgMenuOpen = null;
-              if (d.subnet) clearFieldError('subnet');
-              if (d.securityGroups?.length) clearFieldError('securityGroups');
-              renderWizard();
-            });
-          }
+          // Keep refs for any legacy callers that expect these nodes
+          void vn; void sn;
           const sgRoot = panel.querySelector('#f-security-groups');
           if (panel._sgAbort) panel._sgAbort.abort();
           const ac = new AbortController();
@@ -14447,31 +14727,51 @@
           panel.querySelector('#f-auto-external-ip')?.addEventListener('change', e => {
             d.autoAttachExternalIp = e.target.checked;
           });
-          panel.querySelectorAll('select[id^="f-extra-vn-"]').forEach(sel => {
-            sel.addEventListener('change', e => {
-              const id = sel.id.replace(/^f-extra-vn-/, '');
-              const item = (d.extraNetworks || []).find(n => n.id === id);
-              if (!item) return;
-              item.virtualNetwork = e.target.value;
-              const cfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === item.virtualNetwork);
-              item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
-              item.subnet = cfg?.subnets?.[0] || '';
-              item.securityGroups = item.subnet ? [DEFAULT_SECURITY_GROUP] : [];
-              item.name = networkAttachmentName(item.virtualNetwork, (d.extraNetworks || []).filter(n => n.id !== id));
-              state.extraSgMenuOpen = null;
-              renderWizard();
+          (d.extraNetworks || []).forEach(item => {
+            wireTypeaheadRichSelect(panel, {
+              rootId: `vm-extra-vn-select-${item.id}`,
+              toggleId: `f-extra-vn-toggle-${item.id}`,
+              menuId: `vm-extra-vn-menu-${item.id}`,
+              searchId: `vm-extra-vn-search-${item.id}`,
+              optionSel: '[data-extra-vn]',
+              getOptionId: opt => opt.dataset.extraVn,
+              setOpen: (open) => { item.vnMenuOpen = open; },
+              setFilter: (v) => { item.vnFilter = v; },
+              onSelectId: (value) => {
+                item.virtualNetwork = value;
+                const cfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === item.virtualNetwork);
+                item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
+                item.subnet = cfg?.subnets?.[0] || '';
+                item.securityGroups = item.subnet ? [DEFAULT_SECURITY_GROUP] : [];
+                item.name = networkAttachmentName(item.virtualNetwork, (d.extraNetworks || []).filter(n => n.id !== item.id));
+                item.vnMenuOpen = false;
+                item.vnFilter = '';
+                item.subnetMenuOpen = false;
+                item.subnetFilter = '';
+                state.extraSgMenuOpen = null;
+                renderWizard();
+              },
             });
-          });
-          panel.querySelectorAll('select[id^="f-extra-subnet-"]').forEach(sel => {
-            sel.addEventListener('change', e => {
-              const id = sel.id.replace(/^f-extra-subnet-/, '');
-              const item = (d.extraNetworks || []).find(n => n.id === id);
-              if (!item) return;
-              item.subnet = e.target.value;
-              if (!item.securityGroups?.length) item.securityGroups = [DEFAULT_SECURITY_GROUP];
-              state.extraSgMenuOpen = null;
-              renderWizard();
-            });
+            if (item.virtualNetwork) {
+              wireTypeaheadRichSelect(panel, {
+                rootId: `vm-extra-subnet-select-${item.id}`,
+                toggleId: `f-extra-subnet-toggle-${item.id}`,
+                menuId: `vm-extra-subnet-menu-${item.id}`,
+                searchId: `vm-extra-subnet-search-${item.id}`,
+                optionSel: '[data-extra-subnet]',
+                getOptionId: opt => opt.dataset.extraSubnet,
+                setOpen: (open) => { item.subnetMenuOpen = open; },
+                setFilter: (v) => { item.subnetFilter = v; },
+                onSelectId: (value) => {
+                  item.subnet = value;
+                  if (!item.securityGroups?.length) item.securityGroups = [DEFAULT_SECURITY_GROUP];
+                  item.subnetMenuOpen = false;
+                  item.subnetFilter = '';
+                  state.extraSgMenuOpen = null;
+                  renderWizard();
+                },
+              });
+            }
           });
           panel.querySelectorAll('[data-extra-sg-toggle]').forEach(btn => {
             btn.addEventListener('click', e => {
