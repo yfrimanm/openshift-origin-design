@@ -9048,7 +9048,7 @@
         tenantId: '',
         tenantFilter: '',
         tenantMenuOpen: false,
-        name: '',
+        name: generateProviderResourceName('disk-image'),
         description: '',
         labels: [],
         labelDraft: '',
@@ -9067,7 +9067,7 @@
         tenantId: '',
         tenantFilter: '',
         tenantMenuOpen: false,
-        name: '',
+        name: generateProviderResourceName('instance-type'),
         description: '',
         labels: [],
         labelDraft: '',
@@ -9092,6 +9092,15 @@
 
     function isValidDnsLabel(name) {
       return /^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/.test(name);
+    }
+
+    /** Ethan / catalog-style suggested DNS names for provider resources. */
+    function generateProviderResourceName(kind) {
+      const nouns = ['narwhal', 'mink', 'baboon', 'eider', 'gull', 'otter', 'heron', 'lynx'];
+      const noun = nouns[Math.floor(Math.random() * nouns.length)];
+      const n = Math.floor(Math.random() * 90 + 10);
+      const prefix = kind === 'instance-type' ? 'instance-type' : 'disk-image';
+      return `${prefix}-${noun}-${n}`;
     }
 
     function renderProviderCreateNav(navId, draft, rerender) {
@@ -9331,11 +9340,17 @@
         <p class="create-resource-wiz__help">${help}</p>
         <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="${prefix}-name-field">
           <label for="${prefix}-name">Name <span class="req">*</span></label>
-          <input type="text" id="${prefix}-name" value="${escAttr(draft.name)}" autocomplete="off" required />
+          <div class="name-row">
+            <input type="text" id="${prefix}-name" value="${escAttr(draft.name)}" autocomplete="off" required
+              aria-describedby="${prefix}-name-help" />
+            <button type="button" class="icon-btn" id="${prefix}-regen-name" title="Generate name" aria-label="Generate name">
+              <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+            </button>
+          </div>
           <div class="pf-v6-c-form__helper-text">
             <div class="pf-v6-c-helper-text">
               <div class="pf-v6-c-helper-text__item">
-                <span class="pf-v6-c-helper-text__item-text">${escAttr(nameErr || 'Name must be a valid DNS label (RFC 1035).')}</span>
+                <span class="pf-v6-c-helper-text__item-text" id="${prefix}-name-help">${escAttr(nameErr || 'Enter a valid DNS label (RFC 1035), or click Generate to create one.')}</span>
               </div>
             </div>
           </div>
@@ -9347,6 +9362,25 @@
         ${renderTenantEditor(prefix, draft)}
         ${renderLabelsEditor(prefix, draft)}
       `;
+    }
+
+
+    function bindProviderNameRegen(prefix, draft, kind) {
+      document.getElementById(`${prefix}-regen-name`)?.addEventListener('click', () => {
+        draft.name = generateProviderResourceName(kind);
+        if (draft.fieldErrors) delete draft.fieldErrors.name;
+        const input = document.getElementById(`${prefix}-name`);
+        if (input) {
+          input.value = draft.name;
+          input.focus();
+          input.select();
+        }
+        const help = document.getElementById(`${prefix}-name-help`);
+        if (help && !draft.fieldErrors?.name) {
+          help.textContent = 'Enter a valid DNS label (RFC 1035), or click Generate to create one.';
+        }
+        document.getElementById(`${prefix}-name-field`)?.classList.remove('pf-m-error');
+      });
     }
 
     function syncGeneralFields(prefix, draft) {
@@ -9517,6 +9551,7 @@
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-it', draft,
           'Name the instance type, assign it to a tenant (or make it global), and add an optional description.');
+        bindProviderNameRegen('create-it', draft, 'instance-type');
         bindTenantEditor('create-it', draft, renderCreateInstanceTypeWizard);
         bindLabelsEditor('create-it', draft, renderCreateInstanceTypeWizard);
       } else if (draft.step === 1) {
@@ -9695,6 +9730,7 @@
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-di', draft,
           'Name the disk image, assign it to a tenant (or make it global), and add an optional description.');
+        bindProviderNameRegen('create-di', draft, 'disk-image');
         bindTenantEditor('create-di', draft, renderCreateDiskImageWizard);
         bindLabelsEditor('create-di', draft, renderCreateDiskImageWizard);
       } else if (draft.step === 1) {
