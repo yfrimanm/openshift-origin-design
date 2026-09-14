@@ -4568,19 +4568,19 @@
     .review-dl dd { margin: 0; font-weight: 400; color: var(--vmaas-text); min-width: 0; word-break: break-word; }
     .review-dl--summary { margin-top: 8px; }
 
-    /* Review sections — PF spacers: sm 8 / md 16 / lg 24 */
+    /* Review sections — flat stacked rows (align with Create disk image Review) */
     .review-nebius {
       display: flex;
       flex-direction: column;
-      gap: var(--pf-t--global--spacer--lg, 24px); /* between section groups */
-      max-width: 440px;
+      gap: var(--pf-t--global--spacer--lg, 24px);
+      max-width: 36rem;
       margin-top: var(--pf-t--global--spacer--sm, 8px);
     }
     .review-nebius__head {
       display: flex;
       align-items: center;
       gap: var(--pf-t--global--spacer--sm, 8px);
-      margin: 0 0 var(--pf-t--global--spacer--sm, 8px);
+      margin: 0 0 var(--pf-t--global--spacer--md, 16px);
     }
     .review-nebius__title {
       margin: 0; font-size: 16px; font-weight: 700; color: var(--vmaas-text);
@@ -4595,27 +4595,34 @@
       background: #e7f1fa; color: var(--vmaas-blue);
     }
     .review-nebius__card {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       border: none;
       border-radius: 0;
       background: transparent;
-      padding-block: 0;
-      padding-inline: 0;
+      padding: 0;
+      box-shadow: none;
     }
     .review-nebius__row {
-      display: grid;
-      grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
-      column-gap: var(--pf-t--global--spacer--lg, 24px);
-      align-items: baseline;
-      /* PF: sm between list items */
-      padding-block: var(--pf-t--global--spacer--sm, 8px);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: stretch;
+      padding: 0;
       font-size: 14px;
       line-height: 1.4;
     }
     .review-nebius__label {
-      color: var(--vmaas-text-subtle); white-space: nowrap;
+      color: var(--vmaas-text, #151515);
+      font-weight: 600;
+      white-space: normal;
     }
     .review-nebius__value {
-      color: var(--vmaas-text); word-break: break-word; min-width: 0;
+      color: var(--vmaas-text, #151515);
+      font-weight: 400;
+      word-break: break-word;
+      min-width: 0;
     }
     .review-nebius__pre {
       display: block;
@@ -4627,10 +4634,6 @@
       word-break: break-word;
       max-height: 7.5em;
       overflow: hidden;
-    }
-    .review-nebius__row--block {
-      grid-template-columns: 1fr;
-      gap: 6px;
     }
     .review-nebius__row--block .review-nebius__label { white-space: normal; }
 
