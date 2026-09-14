@@ -568,17 +568,18 @@
       cursor: default;
     }
     /* Ethan: only the current step is a filled circle; other steps are plain numbers */
+    /* PF6 wizard ::before number badge — filled chip, not a hollow ring */
     .create-resource-wiz__nav-num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 1.5rem;
-      height: 1.5rem;
+      width: 1.75rem;
+      height: 1.75rem;
       border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: var(--vmaas-text-subtle, #6a6e73);
-      font-size: 14px;
+      border-radius: var(--pf-t--global--border--radius--large, 999px);
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      color: var(--pf-t--global--text--color--regular, #151515);
+      font-size: var(--pf-t--global--font--size--body--default, 14px);
       font-weight: 400;
       flex: 0 0 auto;
       line-height: 1;
@@ -586,33 +587,28 @@
     .create-resource-wiz__nav-label {
       display: inline-flex;
       align-items: center;
-      min-height: 1.5rem;
-      padding: 4px 12px;
-      border-radius: 16px;
+      min-height: 1.75rem;
+      padding: 6px 8px;
+      border-radius: var(--pf-t--global--border--radius--action--plain--default, 6px);
       background: transparent;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-label {
-      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+      background: var(--pf-t--global--background--color--action--plain--clicked, rgba(199, 199, 199, 0.25));
+      font-weight: 600;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
-      border-radius: 50%;
-      background: var(--vmaas-blue, #0066cc);
-      color: #fff;
-      font-size: 12px;
+      background: var(--pf-t--global--color--brand--default, #0066cc);
+      color: var(--pf-t--global--text--color--on-brand--default, #fff);
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn.pf-m-visited:not([aria-current="step"]) .create-resource-wiz__nav-num {
-      border-radius: 50%;
       background: var(--pf-t--global--color--nonstatus--green--default, #3e8635);
       color: #fff;
-      font-size: 12px;
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn:disabled .create-resource-wiz__nav-num {
-      border: 0;
       background: transparent;
-      color: var(--vmaas-text-subtle, #6a6e73);
-      font-weight: 400;
+      color: var(--pf-t--global--text--color--disabled, #6a6e73);
     }
     .create-resource-wiz__main {
       display: flex;
