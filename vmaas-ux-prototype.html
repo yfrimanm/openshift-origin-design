@@ -704,22 +704,29 @@
     }
     /* Defeat .form-field input[type=text] so Labels / Tenant don’t get a nested border */
     .form-field .label-chip-input input[type="text"],
-    .form-field .label-chip-input__field,
-    .form-field .tenant-typeahead__input,
-    .form-field .tenant-typeahead input[type="text"] {
+    .form-field .label-chip-input__field {
       width: auto;
       min-height: 0;
-      padding: 4px 12px;
+      padding: 4px;
       border: none;
       border-radius: 0;
       box-shadow: none;
       background: transparent;
     }
-    .form-field .label-chip-input input[type="text"],
-    .form-field .label-chip-input__field {
-      padding: 4px;
+    .form-field .tenant-typeahead__input,
+    .form-field .tenant-typeahead input[type="text"] {
+      width: 100%;
+      min-width: 0;
+      min-height: 0;
+      padding: 6px 12px;
+      border: none !important;
+      border-radius: 0;
+      box-shadow: none !important;
+      background: transparent;
     }
-    .tenant-typeahead { position: relative; max-width: 28rem; }
+    .tenant-typeahead { position: relative; max-width: 28rem; overflow: visible; }
+    .create-resource-wiz__panel,
+    .create-resource-wiz__main { overflow: visible; }
     .tenant-typeahead__control {
       display: flex;
       align-items: stretch;
@@ -3166,9 +3173,7 @@
     }
     /* Nested chip / typeahead inputs — single outer chrome only (no double border) */
     .form-field .label-chip-input input[type="text"],
-    .form-field .label-chip-input__field,
-    .form-field .tenant-typeahead__input,
-    .form-field .tenant-typeahead input[type="text"] {
+    .form-field .label-chip-input__field {
       width: auto !important;
       min-height: 0 !important;
       padding: 4px !important;
@@ -3178,10 +3183,18 @@
       background: transparent !important;
       outline: none;
     }
-    .form-field .tenant-typeahead__input {
-      padding: 6px 12px !important;
+    .form-field .tenant-typeahead__input,
+    .form-field .tenant-typeahead input[type="text"] {
+      width: 100% !important;
       flex: 1 1 auto;
-      min-width: 0;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      padding: 6px 12px !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      outline: none;
     }
     /* Nested PF form-control inputs use PF chrome — don’t double-style them as plain inputs */
     .form-field .pf-v6-c-form-control > input[type="text"],
@@ -8998,16 +9011,32 @@
         if (draft.fieldErrors) delete draft.fieldErrors.tenant;
         rerender();
       });
-      const input = document.getElementById(`${prefix}-tenant-input`);
-      input?.addEventListener('focus', () => {
+
+      const openMenu = (clearFilter = false) => {
         if (draft.isGlobal) return;
         draft.tenantMenuOpen = true;
-        draft.tenantFilter = draft.tenantFilter || '';
+        if (clearFilter) draft.tenantFilter = '';
         rerender();
-        requestAnimationFrame(() => document.getElementById(`${prefix}-tenant-input`)?.focus());
+        requestAnimationFrame(() => {
+          const el = document.getElementById(`${prefix}-tenant-input`);
+          if (!el) return;
+          el.focus();
+          const len = el.value.length;
+          try { el.setSelectionRange(len, len); } catch (_) {}
+        });
+      };
+
+      const input = document.getElementById(`${prefix}-tenant-input`);
+      input?.addEventListener('focus', () => {
+        if (draft.isGlobal || draft.tenantMenuOpen) return;
+        openMenu(false);
       });
-      input?.addEventListener('input', () => {
-        draft.tenantFilter = input.value;
+      input?.addEventListener('click', () => {
+        if (draft.isGlobal) return;
+        if (!draft.tenantMenuOpen) openMenu(false);
+      });
+      input?.addEventListener('input', e => {
+        draft.tenantFilter = e.target.value;
         draft.tenantMenuOpen = true;
         rerender();
         requestAnimationFrame(() => {
@@ -9015,21 +9044,35 @@
           if (!el) return;
           el.focus();
           const len = el.value.length;
-          el.setSelectionRange(len, len);
+          try { el.setSelectionRange(len, len); } catch (_) {}
         });
       });
-      document.getElementById(`${prefix}-tenant-toggle`)?.addEventListener('click', e => {
-        e.preventDefault();
-        if (draft.isGlobal) return;
-        draft.tenantMenuOpen = !draft.tenantMenuOpen;
-        if (draft.tenantMenuOpen) draft.tenantFilter = '';
-        rerender();
-        if (draft.tenantMenuOpen) {
-          requestAnimationFrame(() => document.getElementById(`${prefix}-tenant-input`)?.focus());
+      input?.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          draft.tenantMenuOpen = false;
+          rerender();
+        } else if (e.key === 'ArrowDown' && !draft.tenantMenuOpen) {
+          e.preventDefault();
+          openMenu(false);
         }
       });
+
+      document.getElementById(`${prefix}-tenant-toggle`)?.addEventListener('mousedown', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (draft.isGlobal) return;
+        if (draft.tenantMenuOpen) {
+          draft.tenantMenuOpen = false;
+          rerender();
+        } else {
+          openMenu(true);
+        }
+      });
+
       document.querySelectorAll(`#${prefix}-tenant-list [data-tenant-id]`).forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('mousedown', e => {
+          e.preventDefault();
+          e.stopPropagation();
           draft.tenantId = btn.dataset.tenantId;
           draft.tenantFilter = '';
           draft.tenantMenuOpen = false;
@@ -9037,8 +9080,19 @@
           rerender();
         });
       });
-    }
 
+      if (draft.tenantMenuOpen) {
+        const onDoc = (e) => {
+          const root = document.querySelector(`#${prefix}-tenant-field .tenant-typeahead`);
+          if (root && !root.contains(e.target)) {
+            draft.tenantMenuOpen = false;
+            document.removeEventListener('mousedown', onDoc, true);
+            rerender();
+          }
+        };
+        setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
+      }
+    }
     function renderGeneralStep(prefix, draft, help) {
       const nameErr = draft.fieldErrors?.name;
       return `
