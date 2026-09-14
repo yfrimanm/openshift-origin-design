@@ -3488,6 +3488,111 @@
     .form-check {
       display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 20px 0 0;
     }
+
+    /* PF6 Felt selectable boxes (cards-as-tiles) — Guest OS, etc. */
+    .felt-select-boxes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+      max-width: 40rem;
+    }
+    @media (max-width: 640px) {
+      .felt-select-boxes { grid-template-columns: 1fr; }
+    }
+    .felt-select-box {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 0;
+      padding: 16px 18px;
+      min-height: 72px;
+      border: 1px solid var(--pf-t--global--border--color--default, #c7c7c7);
+      border-radius: var(--pf-t--global--border--radius--pill, 16px);
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: border-color .12s ease, box-shadow .12s ease, background-color .12s ease;
+    }
+    .felt-select-box:hover {
+      border-color: var(--pf-t--global--border--color--hover, #a3a3a3);
+    }
+    .felt-select-box:focus-within {
+      outline: 2px solid var(--pf-t--global--border--color--clicked, #0066cc);
+      outline-offset: 2px;
+    }
+    /* Selected state must follow the checked radio only (not a stale pf-m-selected class). */
+    .felt-select-box:has(.felt-select-box__input:checked) {
+      border-color: var(--pf-t--global--border--color--clicked, #0066cc);
+      border-width: 2px;
+      padding: 15px 17px; /* keep size with thicker border */
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--pf-t--global--border--color--clicked, #0066cc) 18%, transparent);
+    }
+    .felt-select-box__input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .felt-select-box__badge {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      display: none;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--pf-t--global--color--nonstatus--gray--default, #f0f0f0);
+      color: var(--pf-t--global--text--color--subtle, #6a6e73);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.3;
+      pointer-events: none;
+    }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__badge { display: inline-flex; }
+    .felt-select-box__icon {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-top: 2px;
+      font-size: 1.125rem;
+      line-height: 1;
+      color: var(--pf-t--global--icon--color--regular, #151515);
+    }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon {
+      color: var(--pf-t--global--border--color--clicked, #0066cc);
+    }
+    .felt-select-box__icon--windows { color: #0078d4; }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--windows {
+      color: var(--pf-t--global--border--color--clicked, #0066cc);
+    }
+    .felt-select-box__text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      padding-inline-end: 4.5rem; /* room for Selected badge */
+    }
+    .felt-select-box__title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--pf-t--global--text--color--regular, #151515);
+      line-height: 1.4;
+    }
+    .felt-select-box__desc {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--pf-t--global--text--color--subtle, #6a6e73);
+      line-height: 1.4;
+    }
+    /* Architecture checkboxes still use di-os-radios row */
     .di-os-radios {
       display: flex; flex-wrap: wrap; gap: 24px; margin-top: 8px;
     }
@@ -3496,6 +3601,7 @@
       display: flex;
       font-weight: 400;
     }
+
     .pf-v6-c-wizard__footer.wiz-footer {
       display: flex; flex-direction: column; align-items: stretch; gap: 12px;
     }
@@ -9266,6 +9372,46 @@
     }
 
 
+
+    function renderGuestOsSelectBoxes({ name, selected, labelledBy }) {
+      const options = [
+        {
+          value: 'Linux',
+          title: 'Linux',
+          desc: 'Linux-based guest operating systems',
+          iconClass: 'fa-brands fa-linux',
+          iconMod: 'linux',
+        },
+        {
+          value: 'Microsoft Windows',
+          title: 'Microsoft Windows',
+          desc: 'Windows-based guest operating systems',
+          iconClass: 'fa-brands fa-windows',
+          iconMod: 'windows',
+        },
+      ];
+      const current = selected || 'Linux';
+      return `
+        <div class="felt-select-boxes" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
+          ${options.map(opt => {
+            const isSelected = current === opt.value;
+            return `
+            <label class="felt-select-box">
+              <input class="felt-select-box__input" type="radio" name="${name}" value="${opt.value}"
+                ${isSelected ? 'checked' : ''} />
+              <span class="felt-select-box__badge">Selected</span>
+              <span class="felt-select-box__icon felt-select-box__icon--${opt.iconMod}" aria-hidden="true">
+                <i class="${opt.iconClass}"></i>
+              </span>
+              <span class="felt-select-box__text">
+                <span class="felt-select-box__title">${opt.title}</span>
+                <span class="felt-select-box__desc">${opt.desc}</span>
+              </span>
+            </label>`;
+          }).join('')}
+        </div>`;
+    }
+
     function renderReviewRows(rows) {
       return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
         <div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>`;
@@ -9537,16 +9683,11 @@
           </div>
           <div class="form-field">
             <label id="create-di-guest-os-label">Guest operating system <span class="req">*</span></label>
-            <div class="di-os-radios" role="radiogroup" aria-labelledby="create-di-guest-os-label">
-              <label class="form-check">
-                <input type="radio" name="createDiGuestOs" value="Linux" ${draft.guestOsFamily === 'Linux' ? 'checked' : ''} />
-                Linux
-              </label>
-              <label class="form-check">
-                <input type="radio" name="createDiGuestOs" value="Microsoft Windows" ${draft.guestOsFamily === 'Microsoft Windows' ? 'checked' : ''} />
-                Microsoft Windows
-              </label>
-            </div>
+            ${renderGuestOsSelectBoxes({
+              name: 'createDiGuestOs',
+              selected: draft.guestOsFamily || 'Linux',
+              labelledBy: 'create-di-guest-os-label',
+            })}
           </div>
           <div class="form-field${archErr ? ' pf-m-error' : ''}" id="create-di-arch-field">
             <label id="create-di-arch-label">Architecture <span class="req">*</span></label>
@@ -15526,22 +15667,11 @@
           <hr class="form-section-divider" />
           <div class="form-field" id="ci-guest-os-field">
             <label id="ci-guest-os-label">Guest operating system <span class="req">*</span></label>
-            <div class="radio-stack" role="radiogroup" aria-labelledby="ci-guest-os-label">
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciGuestOs" value="Linux" ${c.guestOsFamily === 'Linux' ? 'checked' : ''} />
-                  Linux
-                  <span class="guest-os-radio__icon guest-os-radio__icon--linux" aria-hidden="true"><i class="fa-brands fa-linux"></i></span>
-                </label>
-              </div>
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciGuestOs" value="Microsoft Windows" ${c.guestOsFamily === 'Microsoft Windows' ? 'checked' : ''} />
-                  Microsoft Windows
-                  <span class="guest-os-radio__icon guest-os-radio__icon--windows" aria-hidden="true"><i class="fa-brands fa-windows"></i></span>
-                </label>
-              </div>
-            </div>
+            ${renderGuestOsSelectBoxes({
+              name: 'ciGuestOs',
+              selected: c.guestOsFamily || 'Linux',
+              labelledBy: 'ci-guest-os-label',
+            })}
           </div>
           <hr class="form-section-divider" />
           <div class="form-field ${state.fieldErrors.ciDiskImage ? 'pf-m-error' : ''}">
