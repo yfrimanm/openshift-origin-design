@@ -541,7 +541,12 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      /* Ethan External IP pool: ~1.9× badge height between step circles (~52px at 28px badges) */
+      gap: 52px;
+    }
+    .create-resource-wiz__nav-list > li {
+      margin: 0;
+      padding: 0;
     }
     /* Ethan / PF wizard nav: number circle stays outside the current-step pill */
     /* Ethan/PF: equal-height num + label, vertically centered on one axis */
