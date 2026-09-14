@@ -492,23 +492,23 @@
     }
     .create-resource-wiz__layout {
       display: grid;
-      grid-template-columns: 15.625rem minmax(0, 1fr);
-      gap: 0;
+      grid-template-columns: 15.625rem minmax(0, 40rem);
+      gap: 0 32px;
       margin-top: 8px;
       min-height: 28rem;
-      border: 1px solid var(--vmaas-border-light, #d2d2d2);
-      border-radius: 8px;
-      background: #fff;
-      overflow: hidden;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      overflow: visible;
     }
     @media (max-width: 768px) {
       .create-resource-wiz__layout { grid-template-columns: 1fr; }
     }
     .create-resource-wiz__nav {
       margin: 0;
-      padding: 16px 0;
-      background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
-      border-inline-end: 1px solid var(--vmaas-border-light, #d2d2d2);
+      padding: 8px 0;
+      background: transparent;
+      border-inline-end: none;
     }
     .create-resource-wiz__nav-list {
       list-style: none;
@@ -520,8 +520,9 @@
       align-items: center;
       gap: 12px;
       width: 100%;
-      padding: 10px 16px;
+      padding: 10px 12px;
       border: 0;
+      border-radius: 4px;
       background: transparent;
       color: var(--vmaas-text, #151515);
       font: inherit;
@@ -529,10 +530,12 @@
       text-align: left;
       cursor: pointer;
     }
+    .create-resource-wiz__nav-btn[aria-current="step"] {
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
+    }
     .create-resource-wiz__nav-btn:hover { background: rgba(0,0,0,.04); }
     .create-resource-wiz__nav-btn[aria-current="step"] {
-      background: #fff;
-      box-shadow: inset 3px 0 0 var(--vmaas-blue, #0066cc);
+      background: var(--pf-t--global--background--color--primary--default, #fff);
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn:disabled {
@@ -569,7 +572,7 @@
     }
     .create-resource-wiz__panel {
       flex: 1 1 auto;
-      padding: 24px 28px;
+      padding: 0;
       max-width: 40rem;
     }
     .create-resource-wiz__panel h3 {
@@ -579,19 +582,19 @@
     }
     .create-resource-wiz__help {
       margin: 0 0 24px;
-      color: var(--vmaas-text-subtle, #6a6e73);
+      color: var(--vmaas-text, #151515);
       font-size: 14px;
-      line-height: 1.45;
+      line-height: 1.5;
     }
     .create-resource-wiz__footer {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 12px;
-      margin-top: auto;
-      padding: 16px 28px;
-      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
-      background: #fff;
+      margin-top: 24px;
+      padding: 16px 0 0;
+      border-top: none;
+      background: transparent;
     }
     .create-resource-wiz .form-field { margin-bottom: 24px; }
     .create-resource-wiz .form-field label {
@@ -642,6 +645,70 @@
       padding: 4px;
     }
     .tenant-typeahead { position: relative; max-width: 28rem; }
+    .tenant-typeahead__control {
+      display: flex;
+      align-items: stretch;
+      min-height: 36px;
+      border: 1px solid var(--vmaas-border, #c7c7c7);
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      background: #fff;
+      overflow: hidden;
+    }
+    .tenant-typeahead__control:focus-within {
+      border-color: var(--vmaas-blue, #0066cc);
+      box-shadow: 0 0 0 1px var(--vmaas-blue, #0066cc);
+    }
+    .tenant-typeahead.pf-m-expanded .tenant-typeahead__control {
+      border-color: var(--vmaas-blue, #0066cc);
+      box-shadow: 0 0 0 1px var(--vmaas-blue, #0066cc);
+    }
+    .tenant-typeahead__input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      outline: none;
+      background: transparent;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 14px;
+      min-height: 34px;
+      color: var(--vmaas-text);
+    }
+    .tenant-typeahead__input:disabled {
+      color: var(--vmaas-text-subtle, #6a6e73);
+      cursor: not-allowed;
+    }
+    .tenant-typeahead__toggle {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      border: 0;
+      border-left: 1px solid var(--vmaas-border, #c7c7c7);
+      background: transparent;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      cursor: pointer;
+      padding: 0;
+    }
+    .tenant-typeahead__toggle:hover:not(:disabled) {
+      background: #f0f0f0;
+      color: var(--vmaas-text);
+    }
+    .tenant-typeahead__toggle:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .tenant-typeahead.pf-m-expanded .tenant-typeahead__toggle i {
+      transform: rotate(180deg);
+    }
+    .tenant-typeahead__toggle i {
+      transition: transform 0.15s ease;
+      font-size: 12px;
+    }
     .tenant-typeahead__list {
       position: absolute;
       z-index: 20;
@@ -674,6 +741,10 @@
       display: block;
       color: var(--vmaas-text-subtle, #6a6e73);
       font-size: 12px;
+    }
+    .tenant-typeahead__option--empty {
+      color: var(--vmaas-text-subtle, #6a6e73);
+      cursor: default;
     }
     .review-summary-dl {
       display: grid;
@@ -5541,7 +5612,7 @@
                     <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
                       <i class="fas fa-angle-right" aria-hidden="true"></i>
                     </span>
-                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create</span>
+                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create disk image</span>
                   </li>
                 </ol>
               </nav>
@@ -5573,7 +5644,7 @@
                     <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
                       <i class="fas fa-angle-right" aria-hidden="true"></i>
                     </span>
-                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create</span>
+                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">Create instance type</span>
                   </li>
                 </ol>
               </nav>
@@ -8643,7 +8714,7 @@
       return {
         step: 0,
         maxVisited: 0,
-        isGlobal: true,
+        isGlobal: false,
         tenantId: '',
         tenantFilter: '',
         tenantMenuOpen: false,
@@ -8662,7 +8733,7 @@
       return {
         step: 0,
         maxVisited: 0,
-        isGlobal: true,
+        isGlobal: false,
         tenantId: '',
         tenantFilter: '',
         tenantMenuOpen: false,
@@ -8772,16 +8843,19 @@
       const selected = providerTenantById(draft.tenantId);
       const filter = (draft.tenantFilter || '').trim().toLowerCase();
       const options = tenants.filter(t => !filter || `${t.name} ${t.domain}`.toLowerCase().includes(filter));
+      const displayValue = draft.tenantMenuOpen
+        ? (draft.tenantFilter || '')
+        : (selected ? `${selected.name}` : '');
       const list = (!draft.isGlobal && draft.tenantMenuOpen) ? `
         <ul class="tenant-typeahead__list" role="listbox" id="${prefix}-tenant-list">
           ${options.length ? options.map(t => `
             <li role="none">
               <button type="button" class="tenant-typeahead__option" role="option"
                 data-tenant-id="${escAttr(t.id)}" ${draft.tenantId === t.id ? 'aria-selected="true"' : ''}>
-                ${escAttr(t.name)}
+                <span class="tenant-typeahead__option-title">${escAttr(t.name)}</span>
                 <span class="tenant-typeahead__option-sub">${escAttr(t.domain)}</span>
               </button>
-            </li>`).join('') : '<li><span class="tenant-typeahead__option">No tenants found</span></li>'}
+            </li>`).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No tenants found</span></li>'}
         </ul>` : '';
       return `
         <div class="form-field">
@@ -8792,19 +8866,27 @@
           <div class="pf-v6-c-form__helper-text">
             <div class="pf-v6-c-helper-text">
               <div class="pf-v6-c-helper-text__item">
-                <span class="pf-v6-c-helper-text__item-text">Global resources are available to all tenants.</span>
+                <span class="pf-v6-c-helper-text__item-text">When unchecked, assign this resource to a tenant. Global resources are available to all tenants.</span>
               </div>
             </div>
           </div>
         </div>
         <div class="form-field" id="${prefix}-tenant-field" ${draft.isGlobal ? 'hidden' : ''}>
           <label for="${prefix}-tenant-input">Tenant <span class="req">*</span></label>
-          <div class="tenant-typeahead">
-            <input type="text" id="${prefix}-tenant-input"
-              value="${escAttr(draft.tenantMenuOpen ? (draft.tenantFilter || '') : (selected?.name || ''))}"
-              placeholder="Search tenants" autocomplete="off"
-              aria-autocomplete="list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
-              ${draft.isGlobal ? 'disabled' : ''} />
+          <div class="tenant-typeahead${draft.tenantMenuOpen ? ' pf-m-expanded' : ''}">
+            <div class="tenant-typeahead__control">
+              <input type="text" id="${prefix}-tenant-input" class="tenant-typeahead__input"
+                value="${escAttr(displayValue)}"
+                placeholder="Search and select a tenant" autocomplete="off"
+                aria-autocomplete="list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
+                aria-controls="${prefix}-tenant-list"
+                ${draft.isGlobal ? 'disabled' : ''} />
+              <button type="button" class="tenant-typeahead__toggle" id="${prefix}-tenant-toggle"
+                aria-label="Toggle tenant list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
+                ${draft.isGlobal ? 'disabled' : ''}>
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </button>
+            </div>
             ${list}
           </div>
           ${draft.fieldErrors?.tenant ? `<div class="pf-v6-c-form__helper-text"><span class="pf-v6-c-helper-text__item-text" style="color:#b1380b">${escAttr(draft.fieldErrors.tenant)}</span></div>` : ''}
@@ -8842,6 +8924,16 @@
           el.setSelectionRange(len, len);
         });
       });
+      document.getElementById(`${prefix}-tenant-toggle`)?.addEventListener('click', e => {
+        e.preventDefault();
+        if (draft.isGlobal) return;
+        draft.tenantMenuOpen = !draft.tenantMenuOpen;
+        if (draft.tenantMenuOpen) draft.tenantFilter = '';
+        rerender();
+        if (draft.tenantMenuOpen) {
+          requestAnimationFrame(() => document.getElementById(`${prefix}-tenant-input`)?.focus());
+        }
+      });
       document.querySelectorAll(`#${prefix}-tenant-list [data-tenant-id]`).forEach(btn => {
         btn.addEventListener('click', () => {
           draft.tenantId = btn.dataset.tenantId;
@@ -8856,9 +8948,7 @@
     function renderGeneralStep(prefix, draft, help) {
       const nameErr = draft.fieldErrors?.name;
       return `
-        <h3>General</h3>
         <p class="create-resource-wiz__help">${help}</p>
-        ${renderTenantEditor(prefix, draft)}
         <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="${prefix}-name-field">
           <label for="${prefix}-name">Name <span class="req">*</span></label>
           <input type="text" id="${prefix}-name" value="${escAttr(draft.name)}" autocomplete="off" required />
@@ -8874,6 +8964,7 @@
           <label for="${prefix}-description">Description</label>
           <textarea id="${prefix}-description" rows="3">${escAttr(draft.description)}</textarea>
         </div>
+        ${renderTenantEditor(prefix, draft)}
         ${renderLabelsEditor(prefix, draft)}
       `;
     }
@@ -8899,6 +8990,7 @@
       draft.fieldErrors = errors;
       return Object.keys(errors).length === 0;
     }
+
 
     function renderReviewRows(rows) {
       return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
@@ -8972,7 +9064,7 @@
 
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-it', draft,
-          'Name the instance type, add an optional description, and choose tenant scope.');
+          'Name the instance type, assign it to a tenant (or make it global), and add an optional description.');
         bindTenantEditor('create-it', draft, renderCreateInstanceTypeWizard);
         bindLabelsEditor('create-it', draft, renderCreateInstanceTypeWizard);
       } else if (draft.step === 1) {
@@ -9083,6 +9175,7 @@
         description: draft.description || null,
         labels: [...draft.labels],
         scope: providerScopeLabel(draft),
+        tenantId: draft.isGlobal ? null : (draft.tenantId || null),
         created: formatInstanceTypeCreated(),
       });
       toast(`Created instance type ${draft.name}.`);
@@ -9151,7 +9244,7 @@
 
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-di', draft,
-          'Name the disk image, add an optional description, and choose tenant scope.');
+          'Name the disk image, assign it to a tenant (or make it global), and add an optional description.');
         bindTenantEditor('create-di', draft, renderCreateDiskImageWizard);
         bindLabelsEditor('create-di', draft, renderCreateDiskImageWizard);
       } else if (draft.step === 1) {
@@ -9266,6 +9359,7 @@
         guestOs: draft.guestOsFamily,
         architecture: [...draft.architectures],
         scope: providerScopeLabel(draft),
+        tenantId: draft.isGlobal ? null : (draft.tenantId || null),
         sourceType: 'Registry',
         sourceRef: draft.image,
         description: draft.description || null,
