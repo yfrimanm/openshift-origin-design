@@ -839,6 +839,31 @@
       color: var(--vmaas-text-subtle, #6a6e73);
       font-size: 12px;
     }
+    .tenant-multi__chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 8px;
+      max-width: 28rem;
+    }
+    .tenant-multi__option-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+    }
+    .tenant-multi__check {
+      flex: 0 0 auto;
+      width: 1rem;
+      margin-top: 2px;
+      color: var(--vmaas-blue, #0066cc);
+      font-size: 12px;
+      line-height: 1;
+      visibility: hidden;
+    }
+    .tenant-typeahead__option.pf-m-selected .tenant-multi__check {
+      visibility: visible;
+    }
     .tenant-typeahead__option--empty {
       color: var(--vmaas-text-subtle, #6a6e73);
       cursor: default;
@@ -3920,20 +3945,67 @@
     .catalog-tenant-dd { flex: 0 0 auto; }
     #catalog-publish-menu.catalog-filter-menu,
     #catalog-tenant-menu.catalog-filter-menu {
-      min-width: 14rem;
-      width: 14rem;
-      max-width: 14rem;
+      min-width: 16rem;
+      width: 16rem;
+      max-width: 18rem;
       border: 1px solid #d2d2d2;
       border-radius: var(--pf-t--global--border--radius--small, 4px);
       box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
-      max-height: 18rem;
-      overflow-y: auto;
+      max-height: 22rem;
+      overflow: hidden;
     }
     #catalog-publish-menu .pf-v6-c-menu__content,
     #catalog-publish-menu .pf-v6-c-menu__list,
     #catalog-tenant-menu .pf-v6-c-menu__content,
     #catalog-tenant-menu .pf-v6-c-menu__list {
       padding: 0;
+    }
+    #catalog-tenant-menu .pf-v6-c-menu__content {
+      display: flex;
+      flex-direction: column;
+      max-height: 22rem;
+    }
+    #catalog-tenant-menu .pf-v6-c-menu__list {
+      overflow-y: auto;
+      max-height: min(16rem, 50vh);
+    }
+    .catalog-tenant-menu__search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--vmaas-border-light, #d2d2d2);
+      flex: 0 0 auto;
+    }
+    .catalog-tenant-menu__search i {
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 12px;
+    }
+    .catalog-tenant-menu__search input {
+      flex: 1 1 auto;
+      min-width: 0;
+      border: 0;
+      outline: none;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+    }
+    .catalog-filter-item__sub {
+      display: block;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .catalog-filter-empty {
+      padding: 12px 16px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 13px;
+    }
+    .tenant-typeahead__option-title {
+      display: block;
+      font-weight: 500;
     }
     #catalog-publish-menu .catalog-filter-item,
     #catalog-tenant-menu .catalog-filter-item {
@@ -7179,9 +7251,16 @@
       { id: 'net-shared', name: 'org-shared', type: 'Shared', project: 'vmaas', cidr: '10.40.0.0/22', status: 'Ready', vms: 0 },
     ];
 
-    /** Mutable catalogs for creatable Project / Group selects in Create VM */
-    const PROJECTS = ['project-a', 'yifat', 'vmaas'];
-    const GROUPS = ['production', 'staging', 'workloads'];
+    /** Mutable catalogs for creatable Project / Group selects in Create VM / Create network */
+    const PROJECTS = [
+      'project-a', 'yifat', 'vmaas', 'default', 'openshift-virt',
+      'team-platform', 'team-ml', 'team-edge', 'sandbox', 'ci-cd',
+      'production', 'staging', 'shared-services', 'demo-lab', 'customer-engineering',
+    ];
+    const GROUPS = [
+      'production', 'staging', 'workloads', 'batch', 'interactive',
+      'gpu-pool', 'edge-nodes', 'shared', 'quarantine', 'research',
+    ];
     const state = {
       wizard: 'vm', // vm | network
       step: 0,
@@ -12206,17 +12285,20 @@
           </div>
           <div class="form-field">
             <label for="f-net-project">Project <span class="req">*</span></label>
-            ${pfSelect({
+            ${pfCreatableSearch({
               id: 'f-net-project',
-              required: true,
-              optionsHtml: `
-                <option value="project-a" ${n.project === 'project-a' ? 'selected' : ''}>project-a</option>
-                <option value="yifat" ${n.project === 'yifat' ? 'selected' : ''}>yifat</option>
-                <option value="vmaas" ${n.project === 'vmaas' ? 'selected' : ''}>vmaas</option>
-              `,
+              placeholder: 'Search project',
+              value: n.project || 'project-a',
+              ariaLabel: 'Search project',
             })}
           </div>
         `;
+        wireCreatableSearch({
+          id: 'f-net-project',
+          options: PROJECTS,
+          noun: 'project',
+          onChange: value => { n.project = value || 'project-a'; },
+        });
         return;
       }
       if (key === 'net-addressing') {
@@ -15019,8 +15101,7 @@
       { id: 'large', instanceTypeName: 'catalog-large', rateHour: '$4.25/hr', rateMonth: '$2,850/mo per instance' },
     ];
 
-    const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'tenant-c'];
-    /** Provider-scoped create wizards — searchable tenant options (not tiles). */
+    /** Shared searchable tenant catalog (create wizards, catalog visibility, filters). */
     const PROVIDER_TENANTS = [
       { id: 'harborline-capital', name: 'harborline-capital', domain: 'harborlinecapital.com' },
       { id: 'north-summit-bank', name: 'north-summit-bank', domain: 'northsummitbank.com' },
@@ -15208,7 +15289,8 @@
         case 'visibility':
           if (snapshot.visibility === 'tenant') {
             const tenants = snapshot.tenants ? snapshot.tenants.split('|').filter(Boolean) : [];
-            return esc(`Tenant scoped (${tenants.join(', ') || '—'})`);
+            const names = tenants.map(id => providerTenantById(id)?.name || id);
+            return esc(`Tenant scoped (${names.join(', ') || '—'})`);
           }
           return 'Global public';
         case 'bootDiskGiB':
@@ -15676,12 +15758,43 @@
       }
 
       if (key === 'ci-visibility') {
-        const tenantOptions = PLATFORM_TENANTS.filter(t => {
-          const q = (c.tenantFilter || '').toLowerCase();
-          if (!q) return true;
-          return t.toLowerCase().includes(q);
-        });
+        const tenants = typeof PROVIDER_TENANTS !== 'undefined' ? PROVIDER_TENANTS : [];
+        const filter = (c.tenantFilter || '').trim().toLowerCase();
+        const tenantOptions = tenants.filter(t =>
+          !filter || `${t.name} ${t.domain} ${t.id}`.toLowerCase().includes(filter)
+        );
         const selectedTenants = new Set(c.tenants || []);
+        const selectedList = (c.tenants || [])
+          .map(id => providerTenantById(id) || { id, name: id, domain: '' });
+        const chipsHtml = selectedList.length ? `
+          <div class="tenant-multi__chips" id="ci-tenants-chips" aria-label="Selected tenants">
+            ${selectedList.map(t => `
+              <span class="label-chip">
+                ${escAttr(t.name)}
+                <button type="button" class="label-chip__remove" data-tenant-remove="${escAttr(t.id)}"
+                  aria-label="Remove ${escAttr(t.name)}">×</button>
+              </span>`).join('')}
+          </div>` : '';
+        const listHtml = c.tenantMenuOpen ? `
+          <ul class="tenant-typeahead__list" role="listbox" id="ci-tenant-list" aria-multiselectable="true">
+            ${tenantOptions.length ? tenantOptions.map(t => {
+              const selected = selectedTenants.has(t.id);
+              return `
+              <li role="none">
+                <button type="button" class="tenant-typeahead__option${selected ? ' pf-m-selected' : ''}"
+                  role="option" data-tenant-id="${escAttr(t.id)}"
+                  aria-selected="${selected ? 'true' : 'false'}">
+                  <span class="tenant-multi__option-row">
+                    <span class="tenant-multi__check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                    <span>
+                      <span class="tenant-typeahead__option-title">${escAttr(t.name)}</span>
+                      <span class="tenant-typeahead__option-sub">${escAttr(t.domain)}</span>
+                    </span>
+                  </span>
+                </button>
+              </li>`;
+            }).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No tenants found</span></li>'}
+          </ul>` : '';
         panel.innerHTML = `
           <h3>Visibility</h3>
           <p class="step-help">Control which tenants can discover and order this catalog item.</p>
@@ -15705,58 +15818,103 @@
           </div>
           ${c.visibility === 'tenant' ? `
           <div class="form-field ${state.fieldErrors.ciTenants ? 'pf-m-error' : ''}" style="margin-top:20px;">
-            <label id="ci-tenants-label">Tenants <span class="req">*</span></label>
-            <div class="arch-multi" id="ci-tenants-multi">
-              <button type="button" class="arch-multi__toggle" id="ci-tenants-toggle" aria-expanded="${c.tenantMenuOpen}" aria-haspopup="listbox" aria-labelledby="ci-tenants-label">
-                <span class="placeholder" id="ci-tenants-label-text">${c.tenants?.length ? c.tenants.join(', ') : 'Select tenants'}</span>
-                <span class="pf-v6-c-form-control__toggle-icon" aria-hidden="true"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-              </button>
-              <ul class="arch-multi__menu" id="ci-tenants-menu" role="listbox" aria-labelledby="ci-tenants-label" ${c.tenantMenuOpen ? '' : 'hidden'}>
-                <li class="arch-multi__search-rich">
-                  <div class="rich-select__search">
-                    <i class="fa-solid fa-search" aria-hidden="true"></i>
-                    <input type="search" id="ci-tenant-search" placeholder="Search tenants" value="${String(c.tenantFilter || '').replace(/"/g, '&quot;')}" aria-label="Search tenants" />
-                  </div>
-                </li>
-                <li class="arch-multi__menu-divider" aria-hidden="true"><hr class="rich-select__menu-divider" /></li>
-                <li class="arch-multi__menu-list">
-                  ${tenantOptions.length ? `<ul>
-                ${tenantOptions.map(t => `
-                  <li><label><input type="checkbox" name="ciTenant" value="${t}" ${selectedTenants.has(t) ? 'checked' : ''} /> ${t}</label></li>
-                `).join('')}
-                  </ul>` : emptyStateMenuSearchHtml('tenants')}
-                </li>
-              </ul>
+            <label for="ci-tenant-search">Tenants <span class="req">*</span></label>
+            ${chipsHtml}
+            <div class="tenant-typeahead${c.tenantMenuOpen ? ' pf-m-expanded' : ''}" id="ci-tenants-multi">
+              <div class="tenant-typeahead__control">
+                <input type="text" id="ci-tenant-search" class="tenant-typeahead__input"
+                  value="${escAttr(c.tenantFilter || '')}"
+                  placeholder="Search and select tenants" autocomplete="off"
+                  aria-autocomplete="list" aria-expanded="${c.tenantMenuOpen ? 'true' : 'false'}"
+                  aria-controls="ci-tenant-list" />
+                <button type="button" class="tenant-typeahead__toggle" id="ci-tenants-toggle"
+                  aria-label="Toggle tenant list" aria-expanded="${c.tenantMenuOpen ? 'true' : 'false'}">
+                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </button>
+              </div>
+              ${listHtml}
             </div>
+            <p class="form-helper">Search scales for large tenant lists. Select one or more tenants.</p>
           </div>` : ''}
         `;
         panel.querySelectorAll('input[name="ciVisibility"]').forEach(r => {
           r.addEventListener('change', () => {
             c.visibility = r.value;
-            if (c.visibility === 'global') c.tenants = [];
+            if (c.visibility === 'global') {
+              c.tenants = [];
+              c.tenantFilter = '';
+              c.tenantMenuOpen = false;
+            }
+            delete state.fieldErrors.ciTenants;
             renderWizard();
           });
         });
-        const tenantsToggle = panel.querySelector('#ci-tenants-toggle');
-        tenantsToggle?.addEventListener('click', e => {
+        const openTenantMenu = (clearFilter = false) => {
+          c.tenantMenuOpen = true;
+          if (clearFilter) c.tenantFilter = '';
+          renderWizard();
+          requestAnimationFrame(() => panel.querySelector('#ci-tenant-search')?.focus());
+        };
+        panel.querySelector('#ci-tenants-toggle')?.addEventListener('mousedown', e => {
           e.preventDefault();
           e.stopPropagation();
-          c.tenantMenuOpen = !c.tenantMenuOpen;
-          renderWizard();
+          if (c.tenantMenuOpen) {
+            c.tenantMenuOpen = false;
+            renderWizard();
+          } else {
+            openTenantMenu(false);
+          }
         });
-        panel.querySelector('#ci-tenant-search')?.addEventListener('input', e => {
+        const search = panel.querySelector('#ci-tenant-search');
+        search?.addEventListener('focus', () => {
+          if (!c.tenantMenuOpen) openTenantMenu(false);
+        });
+        search?.addEventListener('input', e => {
           c.tenantFilter = e.target.value;
           c.tenantMenuOpen = true;
           renderWizard();
-          panel.querySelector('#ci-tenant-search')?.focus();
-        });
-        panel.querySelectorAll('input[name="ciTenant"]').forEach(cb => {
-          cb.addEventListener('change', () => {
-            c.tenants = [...panel.querySelectorAll('input[name="ciTenant"]:checked')].map(el => el.value);
-            const label = panel.querySelector('#ci-tenants-label-text');
-            if (label) label.textContent = c.tenants.length ? c.tenants.join(', ') : 'Select tenants';
+          requestAnimationFrame(() => {
+            const el = panel.querySelector('#ci-tenant-search');
+            if (el) {
+              el.focus();
+              const len = el.value.length;
+              el.setSelectionRange(len, len);
+            }
           });
         });
+        panel.querySelectorAll('#ci-tenant-list [data-tenant-id]').forEach(btn => {
+          btn.addEventListener('mousedown', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = btn.dataset.tenantId;
+            const set = new Set(c.tenants || []);
+            if (set.has(id)) set.delete(id);
+            else set.add(id);
+            c.tenants = [...set];
+            if (c.tenants.length) delete state.fieldErrors.ciTenants;
+            renderWizard();
+            requestAnimationFrame(() => panel.querySelector('#ci-tenant-search')?.focus());
+          });
+        });
+        panel.querySelectorAll('[data-tenant-remove]').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.preventDefault();
+            const id = btn.dataset.tenantRemove;
+            c.tenants = (c.tenants || []).filter(t => t !== id);
+            renderWizard();
+          });
+        });
+        if (c.tenantMenuOpen) {
+          const onDoc = e => {
+            const root = panel.querySelector('#ci-tenants-multi');
+            if (root && !root.contains(e.target)) {
+              c.tenantMenuOpen = false;
+              document.removeEventListener('mousedown', onDoc, true);
+              renderWizard();
+            }
+          };
+          setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
+        }
         return;
       }
 
@@ -15827,7 +15985,7 @@
             `)}
             ${reviewSection('Visibility', 'ci-visibility', `
               ${reviewRow('Visibility', c.visibility === 'tenant'
-                ? `Tenant scoped (${(c.tenants || []).join(', ') || '—'})`
+                ? `Tenant scoped (${(c.tenants || []).map(id => providerTenantById(id)?.name || id).join(', ') || '—'})`
                 : 'Global public')}
             `)}
             ${reviewSection('Storage', 'ci-storage', `
@@ -15868,9 +16026,7 @@
       if (boot) c.bootDiskGiB = Number(boot.value) || c.bootDiskGiB;
       const vis = document.querySelector('input[name="ciVisibility"]:checked');
       if (vis) c.visibility = vis.value;
-      if (document.querySelectorAll('input[name="ciTenant"]').length) {
-        c.tenants = [...document.querySelectorAll('input[name="ciTenant"]:checked')].map(el => el.value);
-      }
+      // Tenants are maintained live by the searchable multi-select (no checkbox sync).
     }
 
     function validateCatalogCreateStep(key) {
@@ -16643,15 +16799,50 @@
       const menu = document.getElementById('catalog-tenant-menu');
       if (!menu) return;
       const current = state.catalogTenantFilter || 'all';
-      const options = [{ id: 'all', label: 'All tenants' }, ...PLATFORM_TENANTS.map(t => ({ id: t, label: t }))];
-      const items = options.map(o => catalogFilterMenuItem({
-        value: o.id,
-        label: o.label,
-        selected: current === o.id,
-        dataAttr: 'data-catalog-tenant',
-        dataValue: o.id,
-      })).join('');
-      menu.innerHTML = `<div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list" role="none">${items}</ul></div>`;
+      const q = (state.catalogTenantMenuFilter || '').trim().toLowerCase();
+      const tenants = (typeof PROVIDER_TENANTS !== 'undefined' ? PROVIDER_TENANTS : [])
+        .filter(t => !q || `${t.name} ${t.domain} ${t.id}`.toLowerCase().includes(q));
+      const options = [
+        { id: 'all', label: 'All tenants', sub: '' },
+        ...tenants.map(t => ({ id: t.id, label: t.name, sub: t.domain })),
+      ];
+      const items = options.map(o => {
+        const selected = current === o.id;
+        return `
+          <li class="pf-v6-c-menu__list-item" role="none">
+            <button type="button" class="pf-v6-c-menu__item catalog-filter-item${selected ? ' pf-m-selected' : ''}"
+              role="menuitem" data-catalog-tenant="${escAttr(o.id)}" ${selected ? 'aria-current="true"' : ''}>
+              <span class="pf-v6-c-menu__item-main">
+                <span class="pf-v6-c-menu__item-text">
+                  ${escAttr(o.label)}
+                  ${o.sub ? `<span class="catalog-filter-item__sub">${escAttr(o.sub)}</span>` : ''}
+                </span>
+              </span>
+              <span class="catalog-filter-check" aria-hidden="true">${selected ? '<i class="fas fa-check"></i>' : ''}</span>
+            </button>
+          </li>`;
+      }).join('');
+      menu.innerHTML = `
+        <div class="pf-v6-c-menu__content">
+          <div class="catalog-tenant-menu__search">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <input type="search" id="catalog-tenant-menu-search" placeholder="Search tenants"
+              value="${escAttr(state.catalogTenantMenuFilter || '')}" aria-label="Search tenants" />
+          </div>
+          <ul class="pf-v6-c-menu__list" role="menu">${items || '<li class="catalog-filter-empty">No tenants found</li>'}</ul>
+        </div>`;
+      const search = menu.querySelector('#catalog-tenant-menu-search');
+      search?.addEventListener('input', e => {
+        state.catalogTenantMenuFilter = e.target.value;
+        buildCatalogTenantMenu();
+        requestAnimationFrame(() => {
+          const el = document.getElementById('catalog-tenant-menu-search');
+          if (!el) return;
+          el.focus();
+          const len = el.value.length;
+          el.setSelectionRange(len, len);
+        });
+      });
       if (menu.dataset.wired) return;
       menu.dataset.wired = '1';
       menu.addEventListener('click', e => {
@@ -16659,9 +16850,11 @@
         const btn = e.target.closest('[data-catalog-tenant]');
         if (!btn) return;
         state.catalogTenantFilter = btn.dataset.catalogTenant;
+        state.catalogTenantMenuFilter = '';
         const label = document.getElementById('catalog-tenant-label');
         if (label) {
-          label.textContent = btn.dataset.catalogTenant === 'all' ? 'All tenants' : btn.dataset.catalogTenant;
+          const t = providerTenantById(btn.dataset.catalogTenant);
+          label.textContent = btn.dataset.catalogTenant === 'all' ? 'All tenants' : (t?.name || btn.dataset.catalogTenant);
         }
         setCatalogTenantMenuOpen(false);
         renderCatalog();
