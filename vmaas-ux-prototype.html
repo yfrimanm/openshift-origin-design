@@ -3489,7 +3489,7 @@
       display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 20px 0 0;
     }
 
-    /* PF6 Felt selectable boxes (cards-as-tiles) — Guest OS, etc. */
+    /* PF6 Felt selectable boxes (cards-as-tiles) — Guest OS, tenant access, etc. */
     .felt-select-boxes {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -9373,24 +9373,8 @@
 
 
 
-    function renderGuestOsSelectBoxes({ name, selected, labelledBy }) {
-      const options = [
-        {
-          value: 'Linux',
-          title: 'Linux',
-          desc: 'Linux-based guest operating systems',
-          iconClass: 'fa-brands fa-linux',
-          iconMod: 'linux',
-        },
-        {
-          value: 'Microsoft Windows',
-          title: 'Microsoft Windows',
-          desc: 'Windows-based guest operating systems',
-          iconClass: 'fa-brands fa-windows',
-          iconMod: 'windows',
-        },
-      ];
-      const current = selected || 'Linux';
+    function renderFeltSelectBoxes({ name, selected, labelledBy, options }) {
+      const current = selected ?? options[0]?.value;
       return `
         <div class="felt-select-boxes" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
           ${options.map(opt => {
@@ -9400,7 +9384,7 @@
               <input class="felt-select-box__input" type="radio" name="${name}" value="${opt.value}"
                 ${isSelected ? 'checked' : ''} />
               <span class="felt-select-box__badge">Selected</span>
-              <span class="felt-select-box__icon felt-select-box__icon--${opt.iconMod}" aria-hidden="true">
+              <span class="felt-select-box__icon${opt.iconMod ? ` felt-select-box__icon--${opt.iconMod}` : ''}" aria-hidden="true">
                 <i class="${opt.iconClass}"></i>
               </span>
               <span class="felt-select-box__text">
@@ -9410,6 +9394,54 @@
             </label>`;
           }).join('')}
         </div>`;
+    }
+
+    function renderGuestOsSelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'Linux',
+        labelledBy,
+        options: [
+          {
+            value: 'Linux',
+            title: 'Linux',
+            desc: 'Linux-based guest operating systems',
+            iconClass: 'fa-brands fa-linux',
+            iconMod: 'linux',
+          },
+          {
+            value: 'Microsoft Windows',
+            title: 'Microsoft Windows',
+            desc: 'Windows-based guest operating systems',
+            iconClass: 'fa-brands fa-windows',
+            iconMod: 'windows',
+          },
+        ],
+      });
+    }
+
+    function renderTenantAccessSelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'locked',
+        labelledBy,
+        options: [
+          {
+            value: 'locked',
+            title: 'Locked',
+            desc: 'Tenants cannot change it.',
+            iconClass: 'fa-solid fa-lock',
+            iconMod: 'locked',
+          },
+          {
+            value: 'editable',
+            title: 'Editable at provisioning',
+            desc: 'Tenants can change at launch.',
+            iconClass: 'fa-solid fa-lock-open',
+            iconMod: 'editable',
+          },
+        ],
+      });
     }
 
     function renderReviewRows(rows) {
@@ -15441,7 +15473,7 @@
           return disk ? esc(`${disk.title} (${disk.family} · ${disk.arch})`) : '—';
         }
         case 'tenantAccess':
-          return snapshot.tenantAccess === 'editable' ? 'Editable' : 'Locked';
+          return snapshot.tenantAccess === 'editable' ? 'Editable at provisioning' : 'Locked';
         case 'instanceTypeId':
           return esc(resolveCatalogItemCompute({ instanceTypeId: snapshot.instanceTypeId }).summary);
         case 'visibility':
@@ -15784,25 +15816,13 @@
             </div>
           </div>
           <hr class="form-section-divider" />
-          <h4 class="config-section-title">Tenant access to hardware and OS</h4>
+          <h4 class="config-section-title" id="ci-tenant-access-label">Tenant access to hardware and OS</h4>
           <div class="form-field">
-            <div class="radio-stack" role="radiogroup" aria-labelledby="ci-tenant-access-label">
-              <span class="pf-v6-screen-reader" id="ci-tenant-access-label">Tenant access to hardware and OS</span>
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciTenantAccess" value="locked" ${c.tenantAccess === 'locked' ? 'checked' : ''} />
-                  Locked ${fieldGovLabel('locked')}
-                </label>
-                <p class="form-helper">Tenants cannot change the guest operating system or hardware.</p>
-              </div>
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciTenantAccess" value="editable" ${c.tenantAccess === 'editable' ? 'checked' : ''} />
-                  Editable ${fieldGovLabel('editable')}
-                </label>
-                <p class="form-helper">Tenants can change the guest operating system or hardware at provisioning.</p>
-              </div>
-            </div>
+            ${renderTenantAccessSelectBoxes({
+              name: 'ciTenantAccess',
+              selected: c.tenantAccess || 'locked',
+              labelledBy: 'ci-tenant-access-label',
+            })}
           </div>
         `;
         panel.querySelectorAll('input[name="ciTenantAccess"]').forEach(r => {
@@ -16067,7 +16087,7 @@
 
       const disk = getCatalogDiskImage(c.diskImageId);
       const compute = resolveCatalogItemCompute({ instanceTypeId: c.instanceTypeId || c.computeResourceId });
-      const accessLabel = c.tenantAccess === 'editable' ? 'Editable' : 'Locked';
+      const accessLabel = c.tenantAccess === 'editable' ? 'Editable at provisioning' : 'Locked';
       const reviewRow = (label, value, { block = false } = {}) => `
         <div class="review-nebius__row${block ? ' review-nebius__row--block' : ''}">
           <span class="review-nebius__label">${label}</span>
