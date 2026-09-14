@@ -490,53 +490,81 @@
     .create-it-page.create-resource-wiz {
       max-width: none;
     }
+    .create-it-page.create-resource-wiz > .vm-detail__breadcrumb {
+      margin: 0 0 8px;
+    }
+    .create-it-page.create-resource-wiz > .page-title {
+      margin: 0 0 24px;
+    }
     .create-resource-wiz__layout {
       display: grid;
       grid-template-columns: 15.625rem minmax(0, 40rem);
-      gap: 0 32px;
-      margin-top: 8px;
+      gap: 0;
+      margin-top: 0;
       min-height: 28rem;
       border: none;
       border-radius: 0;
       background: transparent;
       overflow: visible;
+      align-items: stretch;
     }
     @media (max-width: 768px) {
-      .create-resource-wiz__layout { grid-template-columns: 1fr; }
+      .create-resource-wiz__layout {
+        grid-template-columns: 1fr;
+      }
+      .create-resource-wiz__nav {
+        border-inline-end: none;
+        border-block-end: 1px solid var(--vmaas-border-light, #d2d2d2);
+        padding-block-end: 8px;
+        margin-block-end: 16px;
+      }
+      .create-resource-wiz__main {
+        padding-inline-start: 0;
+      }
     }
     .create-resource-wiz__nav {
       margin: 0;
-      padding: 8px 0;
+      padding: 0 12px 0 0;
       background: transparent;
-      border-inline-end: none;
+      /* Single divider only — do not also border the main pane */
+      border-inline-end: 1px solid var(--vmaas-border-light, #d2d2d2);
+      box-shadow: none;
     }
     .create-resource-wiz__nav-list {
       list-style: none;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     .create-resource-wiz__nav-btn {
       display: flex;
       align-items: center;
       gap: 12px;
       width: 100%;
-      padding: 10px 12px;
+      /* Flush with page title / breadcrumb left edge */
+      padding: 8px 12px 8px 0;
       border: 0;
-      border-radius: 4px;
+      border-radius: 16px;
       background: transparent;
       color: var(--vmaas-text, #151515);
       font: inherit;
       font-size: 14px;
+      line-height: 1.4;
       text-align: left;
       cursor: pointer;
     }
+    .create-resource-wiz__nav-btn:hover:not(:disabled):not([aria-current="step"]) {
+      background: rgba(0, 0, 0, 0.04);
+    }
     .create-resource-wiz__nav-btn[aria-current="step"] {
       background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
-    }
-    .create-resource-wiz__nav-btn:hover { background: rgba(0,0,0,.04); }
-    .create-resource-wiz__nav-btn[aria-current="step"] {
-      background: var(--pf-t--global--background--color--primary--default, #fff);
       font-weight: 600;
+      color: var(--vmaas-text, #151515);
+      padding-inline-start: 8px;
+      margin-inline-start: -8px;
+      width: calc(100% + 8px);
     }
     .create-resource-wiz__nav-btn:disabled {
       color: var(--vmaas-text-subtle, #6a6e73);
@@ -553,6 +581,7 @@
       font-size: 12px;
       font-weight: 600;
       flex: 0 0 auto;
+      line-height: 1;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
       background: var(--vmaas-blue, #0066cc);
@@ -569,11 +598,15 @@
       flex-direction: column;
       min-width: 0;
       min-height: 0;
+      padding-inline-start: 32px;
+      border: none;
+      box-shadow: none;
     }
     .create-resource-wiz__panel {
       flex: 1 1 auto;
       padding: 0;
       max-width: 40rem;
+      border: none;
     }
     .create-resource-wiz__panel h3 {
       margin: 0 0 8px;
@@ -608,10 +641,12 @@
       gap: 8px;
       align-items: center;
       min-height: 36px;
-      padding: 6px 8px;
+      padding: 4px 8px;
       border: 1px solid var(--vmaas-border, #c7c7c7);
-      border-radius: 4px;
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
       background: #fff;
+      box-sizing: border-box;
+      max-width: 28rem;
     }
     .label-chip-input:focus-within {
       border-color: var(--vmaas-blue, #0066cc);
@@ -638,10 +673,33 @@
     .label-chip-input__field {
       flex: 1 1 8rem;
       min-width: 8rem;
-      border: 0;
+      width: auto !important;
+      min-height: 0 !important;
+      margin: 0;
+      padding: 4px !important;
+      border: 0 !important;
+      border-radius: 0 !important;
       outline: none;
+      box-shadow: none !important;
+      background: transparent !important;
       font: inherit;
       font-size: 14px;
+    }
+    /* Defeat .form-field input[type=text] so Labels / Tenant don’t get a nested border */
+    .form-field .label-chip-input input[type="text"],
+    .form-field .label-chip-input__field,
+    .form-field .tenant-typeahead__input,
+    .form-field .tenant-typeahead input[type="text"] {
+      width: auto;
+      min-height: 0;
+      padding: 4px 12px;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+    .form-field .label-chip-input input[type="text"],
+    .form-field .label-chip-input__field {
       padding: 4px;
     }
     .tenant-typeahead { position: relative; max-width: 28rem; }
@@ -3088,6 +3146,25 @@
       width: 100%; padding: 6px 12px; font-size: 14px; min-height: 36px; box-sizing: border-box;
       border: 1px solid var(--vmaas-border); border-radius: var(--pf-t--global--border--radius--small, 4px);
       background: #fff; color: var(--vmaas-text);
+    }
+    /* Nested chip / typeahead inputs — single outer chrome only (no double border) */
+    .form-field .label-chip-input input[type="text"],
+    .form-field .label-chip-input__field,
+    .form-field .tenant-typeahead__input,
+    .form-field .tenant-typeahead input[type="text"] {
+      width: auto !important;
+      min-height: 0 !important;
+      padding: 4px !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      outline: none;
+    }
+    .form-field .tenant-typeahead__input {
+      padding: 6px 12px !important;
+      flex: 1 1 auto;
+      min-width: 0;
     }
     /* Nested PF form-control inputs use PF chrome — don’t double-style them as plain inputs */
     .form-field .pf-v6-c-form-control > input[type="text"],
