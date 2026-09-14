@@ -567,18 +567,19 @@
       color: var(--vmaas-text-subtle, #6a6e73);
       cursor: default;
     }
+    /* Ethan: only the current step is a filled circle; other steps are plain numbers */
     .create-resource-wiz__nav-num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: 1.5rem;
       height: 1.5rem;
-      border-radius: 50%;
-      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border: 0;
+      border-radius: 0;
       background: transparent;
       color: var(--vmaas-text-subtle, #6a6e73);
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 400;
       flex: 0 0 auto;
       line-height: 1;
     }
@@ -594,19 +595,24 @@
       background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
+      border-radius: 50%;
       background: var(--vmaas-blue, #0066cc);
-      border-color: var(--vmaas-blue, #0066cc);
       color: #fff;
+      font-size: 12px;
+      font-weight: 600;
     }
     .create-resource-wiz__nav-btn.pf-m-visited:not([aria-current="step"]) .create-resource-wiz__nav-num {
+      border-radius: 50%;
       background: var(--pf-t--global--color--nonstatus--green--default, #3e8635);
-      border-color: transparent;
       color: #fff;
+      font-size: 12px;
+      font-weight: 600;
     }
     .create-resource-wiz__nav-btn:disabled .create-resource-wiz__nav-num {
-      border-color: var(--vmaas-border-light, #d2d2d2);
-      color: var(--vmaas-text-subtle, #6a6e73);
+      border: 0;
       background: transparent;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-weight: 400;
     }
     .create-resource-wiz__main {
       display: flex;
