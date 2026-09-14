@@ -486,6 +486,209 @@
       gap: 16px; /* PF button spacing */
       margin-top: 8px; /* last field already contributes 24px */
     }
+    /* Provider create wizards — Ethan External IP pool spine (in-page) */
+    .create-it-page.create-resource-wiz {
+      max-width: none;
+    }
+    .create-resource-wiz__layout {
+      display: grid;
+      grid-template-columns: 15.625rem minmax(0, 1fr);
+      gap: 0;
+      margin-top: 8px;
+      min-height: 28rem;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    @media (max-width: 768px) {
+      .create-resource-wiz__layout { grid-template-columns: 1fr; }
+    }
+    .create-resource-wiz__nav {
+      margin: 0;
+      padding: 16px 0;
+      background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
+      border-inline-end: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .create-resource-wiz__nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .create-resource-wiz__nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 16px;
+      border: 0;
+      background: transparent;
+      color: var(--vmaas-text, #151515);
+      font: inherit;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .create-resource-wiz__nav-btn:hover { background: rgba(0,0,0,.04); }
+    .create-resource-wiz__nav-btn[aria-current="step"] {
+      background: #fff;
+      box-shadow: inset 3px 0 0 var(--vmaas-blue, #0066cc);
+      font-weight: 600;
+    }
+    .create-resource-wiz__nav-btn:disabled {
+      color: var(--vmaas-text-subtle, #6a6e73);
+      cursor: default;
+    }
+    .create-resource-wiz__nav-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      font-size: 12px;
+      font-weight: 600;
+      flex: 0 0 auto;
+    }
+    .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
+      background: var(--vmaas-blue, #0066cc);
+      border-color: var(--vmaas-blue, #0066cc);
+      color: #fff;
+    }
+    .create-resource-wiz__nav-btn.pf-m-visited .create-resource-wiz__nav-num {
+      background: var(--pf-t--global--color--nonstatus--green--default, #3e8635);
+      border-color: transparent;
+      color: #fff;
+    }
+    .create-resource-wiz__main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+    .create-resource-wiz__panel {
+      flex: 1 1 auto;
+      padding: 24px 28px;
+      max-width: 40rem;
+    }
+    .create-resource-wiz__panel h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .create-resource-wiz__help {
+      margin: 0 0 24px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .create-resource-wiz__footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+      padding: 16px 28px;
+      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+      background: #fff;
+    }
+    .create-resource-wiz .form-field { margin-bottom: 24px; }
+    .create-resource-wiz .form-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .label-chip-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+      padding: 6px 8px;
+      border: 1px solid var(--vmaas-border, #c7c7c7);
+      border-radius: 4px;
+      background: #fff;
+    }
+    .label-chip-input:focus-within {
+      border-color: var(--vmaas-blue, #0066cc);
+      box-shadow: 0 0 0 1px var(--vmaas-blue, #0066cc);
+    }
+    .label-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f0f0f0;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .label-chip__remove {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      color: #6a6e73;
+      line-height: 1;
+    }
+    .label-chip-input__field {
+      flex: 1 1 8rem;
+      min-width: 8rem;
+      border: 0;
+      outline: none;
+      font: inherit;
+      font-size: 14px;
+      padding: 4px;
+    }
+    .tenant-typeahead { position: relative; max-width: 28rem; }
+    .tenant-typeahead__list {
+      position: absolute;
+      z-index: 20;
+      left: 0; right: 0;
+      margin: 4px 0 0;
+      padding: 4px 0;
+      list-style: none;
+      max-height: 220px;
+      overflow: auto;
+      background: #fff;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .tenant-typeahead__option {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+    .tenant-typeahead__option:hover,
+    .tenant-typeahead__option[aria-selected="true"] {
+      background: #e7f1fa;
+    }
+    .tenant-typeahead__option-sub {
+      display: block;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 12px;
+    }
+    .review-summary-dl {
+      display: grid;
+      grid-template-columns: 10rem 1fr;
+      gap: 12px 24px;
+      margin: 0;
+      font-size: 14px;
+    }
+    .review-summary-dl dt {
+      margin: 0;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-weight: 500;
+    }
+    .review-summary-dl dd { margin: 0; font-weight: 600; word-break: break-word; }
+
     .page-title {
       margin: 0; display: flex; align-items: center; gap: 8px;
       /* Size/weight from pf-v6-c-title pf-m-2xl pf-m-page-title (24px / bold) */
@@ -5328,7 +5531,7 @@
           </section>
 
           <section class="view" id="view-create-disk-image">
-            <div class="create-it-page">
+            <div class="create-it-page create-resource-wiz">
               <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
                 <ol class="pf-v6-c-breadcrumb__list">
                   <li class="pf-v6-c-breadcrumb__item">
@@ -5343,87 +5546,24 @@
                 </ol>
               </nav>
               <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Create disk image</h2>
-              <form id="create-di-form" novalidate>
-                <div class="form-field" id="create-di-name-field">
-                  <label for="create-di-name">Name <span class="req">*</span></label>
-                  <input type="text" id="create-di-name" name="name" autocomplete="off" required />
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">Name must be a valid DNS label (RFC 1035).</span>
-                      </div>
-                    </div>
+              <div class="create-resource-wiz__layout" id="create-di-wizard">
+                <nav class="create-resource-wiz__nav" aria-label="Create disk image steps">
+                  <ol class="create-resource-wiz__nav-list" id="create-di-nav"></ol>
+                </nav>
+                <div class="create-resource-wiz__main">
+                  <div class="create-resource-wiz__panel" id="create-di-panel" tabindex="-1"></div>
+                  <div class="create-resource-wiz__footer">
+                    <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-di-back" disabled>Back</button>
+                    <button type="button" class="pf-v6-c-button pf-m-primary" id="create-di-next">Next</button>
+                    <button type="button" class="pf-v6-c-button pf-m-link" id="create-di-cancel">Cancel</button>
                   </div>
                 </div>
-                <div class="form-field" id="create-di-source-ref-field">
-                  <label for="create-di-source-ref">Image <span class="req">*</span></label>
-                  <input type="text" id="create-di-source-ref" name="sourceRef" autocomplete="off" required />
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">Example: quay.io/containerdisks/fedora:latest</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="form-field" id="create-di-guest-os-field">
-                  <label id="create-di-guest-os-label">Guest operating system <span class="req">*</span></label>
-                  <div class="di-os-radios" role="radiogroup" aria-labelledby="create-di-guest-os-label">
-                    <label class="form-check">
-                      <input type="radio" name="guestOsFamily" id="create-di-guest-os-linux" value="Linux" checked required />
-                      Linux
-                    </label>
-                    <label class="form-check">
-                      <input type="radio" name="guestOsFamily" id="create-di-guest-os-windows" value="Microsoft Windows" />
-                      Microsoft Windows
-                    </label>
-                  </div>
-                </div>
-                <div class="form-field" id="create-di-arch-field">
-                  <label id="create-di-arch-label">Architecture <span class="req">*</span></label>
-                  <div class="arch-multi" id="create-di-arch">
-                    <button type="button" class="arch-multi__toggle" id="create-di-arch-toggle" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="create-di-arch-label">
-                      <span class="placeholder" id="create-di-arch-label-text">Select options</span>
-                      <span class="pf-v6-c-form-control__toggle-icon" aria-hidden="true"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-                    </button>
-                    <ul class="arch-multi__menu" id="create-di-arch-menu" role="listbox" aria-labelledby="create-di-arch-label" hidden>
-                      <li><label><input type="checkbox" name="architecture" value="amd64" /> amd64</label></li>
-                      <li><label><input type="checkbox" name="architecture" value="arm64" /> arm64</label></li>
-                      <li><label><input type="checkbox" name="architecture" value="s390x" /> s390x</label></li>
-                    </ul>
-                  </div>
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">You may select multiple architecture types.</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="form-field">
-                  <label for="create-di-scope">Visibility</label>
-                  <span class="pf-v6-c-form-control">
-                    <select id="create-di-scope" name="scope">
-                      <option value="Global" selected>Global</option>
-                      <option value="project-a">project-a</option>
-                      <option value="yifat">yifat</option>
-                      <option value="vmaas">vmaas</option>
-                    </select>
-                    <span class="pf-v6-c-form-control__utilities">
-                      <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-                    </span>
-                  </span>
-                </div>
-                <div class="create-it-actions">
-                  <button type="submit" class="pf-v6-c-button pf-m-primary" id="create-di-submit">Create</button>
-                  <button type="button" class="pf-v6-c-button pf-m-link" id="create-di-cancel">Cancel</button>
-                </div>
-              </form>
+              </div>
             </div>
           </section>
 
           <section class="view" id="view-create-instance-type">
-            <div class="create-it-page">
+            <div class="create-it-page create-resource-wiz">
               <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
                 <ol class="pf-v6-c-breadcrumb__list">
                   <li class="pf-v6-c-breadcrumb__item">
@@ -5438,71 +5578,22 @@
                 </ol>
               </nav>
               <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Create instance type</h2>
-              <form id="create-it-form" novalidate>
-                <div class="form-field" id="create-it-name-field">
-                  <label for="create-it-name">Name <span class="req">*</span></label>
-                  <input type="text" id="create-it-name" name="name" autocomplete="off" required />
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">Name must be a valid DNS label (RFC 1035)</span>
-                      </div>
-                    </div>
+              <div class="create-resource-wiz__layout" id="create-it-wizard">
+                <nav class="create-resource-wiz__nav" aria-label="Create instance type steps">
+                  <ol class="create-resource-wiz__nav-list" id="create-it-nav"></ol>
+                </nav>
+                <div class="create-resource-wiz__main">
+                  <div class="create-resource-wiz__panel" id="create-it-panel" tabindex="-1"></div>
+                  <div class="create-resource-wiz__footer">
+                    <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-it-back" disabled>Back</button>
+                    <button type="button" class="pf-v6-c-button pf-m-primary" id="create-it-next">Next</button>
+                    <button type="button" class="pf-v6-c-button pf-m-link" id="create-it-cancel">Cancel</button>
                   </div>
                 </div>
-                <div class="form-field">
-                  <label for="create-it-description">Description</label>
-                  <textarea id="create-it-description" name="description" rows="3"></textarea>
-                </div>
-                <div class="form-field">
-                  <label for="create-it-cpu">CPU cores <span class="req">*</span></label>
-                  <input type="number" id="create-it-cpu" class="unit-size-input" name="cpu" min="1" step="1" value="1" required />
-                </div>
-                <div class="form-field">
-                  <label for="create-it-memory">Memory (GiB) <span class="req">*</span></label>
-                  <input type="number" id="create-it-memory" class="unit-size-input" name="memory" min="1" step="1" value="2" required />
-                </div>
-                <h3 class="create-it-section-title">GPU</h3>
-                <div class="form-field">
-                  <label for="create-it-gpu-count">GPU count</label>
-                  <input type="number" id="create-it-gpu-count" class="unit-size-input" name="gpuCount" min="0" step="1" value="0" />
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">Number of GPU devices of this type</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="form-field">
-                  <label for="create-it-gpu-resource">Resource name</label>
-                  <input type="text" id="create-it-gpu-resource" name="gpuResource" placeholder="e.g nvidia.com/A100" autocomplete="off" />
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">Kubernetes device plugin resource name.</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="form-field">
-                  <label for="create-it-gpu-pci">PCI device selector</label>
-                  <input type="text" id="create-it-gpu-pci" name="gpuPci" placeholder="2080" autocomplete="off" />
-                  <div class="pf-v6-c-form__helper-text">
-                    <div class="pf-v6-c-helper-text">
-                      <div class="pf-v6-c-helper-text__item">
-                        <span class="pf-v6-c-helper-text__item-text">PCI device selector identifying the GPU hardware.</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="create-it-actions">
-                  <button type="submit" class="pf-v6-c-button pf-m-primary" id="create-it-submit">Create</button>
-                  <button type="button" class="pf-v6-c-button pf-m-link" id="create-it-cancel">Cancel</button>
-                </div>
-              </form>
+              </div>
             </div>
           </section>
+
         </div>
         <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="wiz-title">
     <div class="pf-v6-c-wizard">
@@ -7004,6 +7095,8 @@
       itActionsOpen: false,
       itActionsName: null, // instance type targeted by #it-actions-menu (detail Actions or list kebab)
       selectedDiskImageName: null,
+      createDiskImage: null,
+      createInstanceType: null,
       diActionsOpen: false,
       diActionsName: null,
       diShowObsolete: false,
@@ -8533,17 +8626,294 @@
       return `${m}/${d}/${y}, ${hh}:${mm}`;
     }
 
+    const PROVIDER_CREATE_STEPS = [
+      { key: 'general', label: 'General' },
+      { key: 'configuration', label: 'Configuration' },
+      { key: 'review', label: 'Review' },
+    ];
+
+    function escAttr(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function defaultCreateDiskImageState() {
+      return {
+        step: 0,
+        maxVisited: 0,
+        isGlobal: true,
+        tenantId: '',
+        tenantFilter: '',
+        tenantMenuOpen: false,
+        name: '',
+        description: '',
+        labels: [],
+        labelDraft: '',
+        image: '',
+        guestOsFamily: 'Linux',
+        architectures: [],
+        fieldErrors: {},
+      };
+    }
+
+    function defaultCreateInstanceTypeState() {
+      return {
+        step: 0,
+        maxVisited: 0,
+        isGlobal: true,
+        tenantId: '',
+        tenantFilter: '',
+        tenantMenuOpen: false,
+        name: '',
+        description: '',
+        labels: [],
+        labelDraft: '',
+        cpu: 1,
+        memoryGiB: 2,
+        gpuCount: 0,
+        gpuResource: '',
+        gpuPci: '',
+        fieldErrors: {},
+      };
+    }
+
+    function providerTenantById(id) {
+      return (typeof PROVIDER_TENANTS !== 'undefined' ? PROVIDER_TENANTS : [])
+        .find(t => t.id === id) || null;
+    }
+
+    function providerScopeLabel(draft) {
+      if (draft.isGlobal) return 'Global';
+      return providerTenantById(draft.tenantId)?.name || '—';
+    }
+
+    function isValidDnsLabel(name) {
+      return /^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/.test(name);
+    }
+
+    function renderProviderCreateNav(navId, draft, rerender) {
+      const nav = document.getElementById(navId);
+      if (!nav) return;
+      nav.innerHTML = PROVIDER_CREATE_STEPS.map((step, index) => {
+        const current = index === draft.step;
+        const visited = index < draft.step;
+        const disabled = index > draft.maxVisited;
+        return `<li>
+          <button type="button"
+            class="create-resource-wiz__nav-btn${visited ? ' pf-m-visited' : ''}"
+            data-provider-step="${index}"
+            ${current ? 'aria-current="step"' : ''}
+            ${disabled ? 'disabled' : ''}>
+            <span class="create-resource-wiz__nav-num" aria-hidden="true">${index + 1}</span>
+            <span>${step.label}</span>
+          </button>
+        </li>`;
+      }).join('');
+      nav.querySelectorAll('[data-provider-step]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.providerStep);
+          if (Number.isNaN(idx) || idx > draft.maxVisited) return;
+          syncProviderCreateDraftFromDom(draft);
+          draft.step = idx;
+          rerender();
+        });
+      });
+    }
+
+    function renderLabelsEditor(prefix, draft) {
+      const chips = (draft.labels || []).map((label, i) => `
+        <span class="label-chip">
+          ${escAttr(label)}
+          <button type="button" class="label-chip__remove" data-label-remove="${i}" aria-label="Remove ${escAttr(label)}">×</button>
+        </span>`).join('');
+      return `
+        <div class="form-field">
+          <label for="${prefix}-label-input">Labels</label>
+          <div class="label-chip-input" id="${prefix}-labels">
+            ${chips}
+            <input type="text" class="label-chip-input__field" id="${prefix}-label-input"
+              value="${escAttr(draft.labelDraft || '')}"
+              placeholder="Add label and press Enter" aria-label="Add label" />
+          </div>
+          <div class="pf-v6-c-form__helper-text">
+            <div class="pf-v6-c-helper-text">
+              <div class="pf-v6-c-helper-text__item">
+                <span class="pf-v6-c-helper-text__item-text">Optional. Press Enter to add each label.</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function bindLabelsEditor(prefix, draft, rerender) {
+      const input = document.getElementById(`${prefix}-label-input`);
+      input?.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const value = (input.value || '').trim();
+        if (!value) return;
+        if (!draft.labels.includes(value)) draft.labels.push(value);
+        draft.labelDraft = '';
+        rerender();
+      });
+      input?.addEventListener('input', () => { draft.labelDraft = input.value; });
+      document.querySelectorAll(`#${prefix}-labels [data-label-remove]`).forEach(btn => {
+        btn.addEventListener('click', () => {
+          draft.labels.splice(Number(btn.dataset.labelRemove), 1);
+          rerender();
+        });
+      });
+    }
+
+    function renderTenantEditor(prefix, draft) {
+      const tenants = typeof PROVIDER_TENANTS !== 'undefined' ? PROVIDER_TENANTS : [];
+      const selected = providerTenantById(draft.tenantId);
+      const filter = (draft.tenantFilter || '').trim().toLowerCase();
+      const options = tenants.filter(t => !filter || `${t.name} ${t.domain}`.toLowerCase().includes(filter));
+      const list = (!draft.isGlobal && draft.tenantMenuOpen) ? `
+        <ul class="tenant-typeahead__list" role="listbox" id="${prefix}-tenant-list">
+          ${options.length ? options.map(t => `
+            <li role="none">
+              <button type="button" class="tenant-typeahead__option" role="option"
+                data-tenant-id="${escAttr(t.id)}" ${draft.tenantId === t.id ? 'aria-selected="true"' : ''}>
+                ${escAttr(t.name)}
+                <span class="tenant-typeahead__option-sub">${escAttr(t.domain)}</span>
+              </button>
+            </li>`).join('') : '<li><span class="tenant-typeahead__option">No tenants found</span></li>'}
+        </ul>` : '';
+      return `
+        <div class="form-field">
+          <label class="form-check" for="${prefix}-global">
+            <input type="checkbox" id="${prefix}-global" ${draft.isGlobal ? 'checked' : ''} />
+            Make this resource global
+          </label>
+          <div class="pf-v6-c-form__helper-text">
+            <div class="pf-v6-c-helper-text">
+              <div class="pf-v6-c-helper-text__item">
+                <span class="pf-v6-c-helper-text__item-text">Global resources are available to all tenants.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-field" id="${prefix}-tenant-field" ${draft.isGlobal ? 'hidden' : ''}>
+          <label for="${prefix}-tenant-input">Tenant <span class="req">*</span></label>
+          <div class="tenant-typeahead">
+            <input type="text" id="${prefix}-tenant-input"
+              value="${escAttr(draft.tenantMenuOpen ? (draft.tenantFilter || '') : (selected?.name || ''))}"
+              placeholder="Search tenants" autocomplete="off"
+              aria-autocomplete="list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
+              ${draft.isGlobal ? 'disabled' : ''} />
+            ${list}
+          </div>
+          ${draft.fieldErrors?.tenant ? `<div class="pf-v6-c-form__helper-text"><span class="pf-v6-c-helper-text__item-text" style="color:#b1380b">${escAttr(draft.fieldErrors.tenant)}</span></div>` : ''}
+        </div>`;
+    }
+
+    function bindTenantEditor(prefix, draft, rerender) {
+      document.getElementById(`${prefix}-global`)?.addEventListener('change', e => {
+        draft.isGlobal = !!e.target.checked;
+        if (draft.isGlobal) {
+          draft.tenantId = '';
+          draft.tenantFilter = '';
+          draft.tenantMenuOpen = false;
+        }
+        if (draft.fieldErrors) delete draft.fieldErrors.tenant;
+        rerender();
+      });
+      const input = document.getElementById(`${prefix}-tenant-input`);
+      input?.addEventListener('focus', () => {
+        if (draft.isGlobal) return;
+        draft.tenantMenuOpen = true;
+        draft.tenantFilter = draft.tenantFilter || '';
+        rerender();
+        requestAnimationFrame(() => document.getElementById(`${prefix}-tenant-input`)?.focus());
+      });
+      input?.addEventListener('input', () => {
+        draft.tenantFilter = input.value;
+        draft.tenantMenuOpen = true;
+        rerender();
+        requestAnimationFrame(() => {
+          const el = document.getElementById(`${prefix}-tenant-input`);
+          if (!el) return;
+          el.focus();
+          const len = el.value.length;
+          el.setSelectionRange(len, len);
+        });
+      });
+      document.querySelectorAll(`#${prefix}-tenant-list [data-tenant-id]`).forEach(btn => {
+        btn.addEventListener('click', () => {
+          draft.tenantId = btn.dataset.tenantId;
+          draft.tenantFilter = '';
+          draft.tenantMenuOpen = false;
+          if (draft.fieldErrors) delete draft.fieldErrors.tenant;
+          rerender();
+        });
+      });
+    }
+
+    function renderGeneralStep(prefix, draft, help) {
+      const nameErr = draft.fieldErrors?.name;
+      return `
+        <h3>General</h3>
+        <p class="create-resource-wiz__help">${help}</p>
+        ${renderTenantEditor(prefix, draft)}
+        <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="${prefix}-name-field">
+          <label for="${prefix}-name">Name <span class="req">*</span></label>
+          <input type="text" id="${prefix}-name" value="${escAttr(draft.name)}" autocomplete="off" required />
+          <div class="pf-v6-c-form__helper-text">
+            <div class="pf-v6-c-helper-text">
+              <div class="pf-v6-c-helper-text__item">
+                <span class="pf-v6-c-helper-text__item-text">${escAttr(nameErr || 'Name must be a valid DNS label (RFC 1035).')}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="${prefix}-description">Description</label>
+          <textarea id="${prefix}-description" rows="3">${escAttr(draft.description)}</textarea>
+        </div>
+        ${renderLabelsEditor(prefix, draft)}
+      `;
+    }
+
+    function syncGeneralFields(prefix, draft) {
+      draft.name = (document.getElementById(`${prefix}-name`)?.value || '').trim();
+      draft.description = (document.getElementById(`${prefix}-description`)?.value || '').trim();
+      draft.labelDraft = document.getElementById(`${prefix}-label-input`)?.value || draft.labelDraft || '';
+      const globalEl = document.getElementById(`${prefix}-global`);
+      if (globalEl) draft.isGlobal = !!globalEl.checked;
+    }
+
+    function validateGeneralStep(draft, existingNames) {
+      const errors = {};
+      if (!draft.name || !isValidDnsLabel(draft.name)) {
+        errors.name = 'Enter a valid DNS label (RFC 1035).';
+      } else if (existingNames.includes(draft.name)) {
+        errors.name = `${draft.name} already exists.`;
+      }
+      if (!draft.isGlobal && !draft.tenantId) {
+        errors.tenant = 'Select a tenant, or make this resource global.';
+      }
+      draft.fieldErrors = errors;
+      return Object.keys(errors).length === 0;
+    }
+
+    function renderReviewRows(rows) {
+      return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
+        <dt>${label}</dt><dd>${value}</dd>`).join('')}</dl>`;
+    }
+
+    function syncProviderCreateDraftFromDom(draft) {
+      if (!draft) return;
+      if (draft === state.createInstanceType) syncCreateInstanceTypeFields();
+      if (draft === state.createDiskImage) syncCreateDiskImageFields();
+    }
+
+    /* —— Create instance type wizard —— */
     function resetCreateInstanceTypeForm() {
-      const form = document.getElementById('create-it-form');
-      if (!form) return;
-      form.reset();
-      const cpu = document.getElementById('create-it-cpu');
-      const memory = document.getElementById('create-it-memory');
-      const gpuCount = document.getElementById('create-it-gpu-count');
-      if (cpu) cpu.value = '1';
-      if (memory) memory.value = '2';
-      if (gpuCount) gpuCount.value = '0';
-      document.getElementById('create-it-name-field')?.classList.remove('pf-m-error');
+      state.createInstanceType = defaultCreateInstanceTypeState();
     }
 
     function openCreateInstanceType() {
@@ -8553,61 +8923,363 @@
       setVmActionsMenuOpen(false);
       resetCreateInstanceTypeForm();
       setView('create-instance-type');
-      document.getElementById('create-it-name')?.focus();
+      renderCreateInstanceTypeWizard();
     }
 
     function closeCreateInstanceType() {
+      state.createInstanceType = null;
       setView('instance-types');
       renderInstanceTypes();
     }
 
-    function isValidDnsLabel(name) {
-      return /^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$/.test(name);
+    function syncCreateInstanceTypeFields() {
+      const draft = state.createInstanceType;
+      if (!draft) return;
+      if (draft.step === 0) syncGeneralFields('create-it', draft);
+      if (draft.step === 1) {
+        draft.cpu = Number(document.getElementById('create-it-cpu')?.value);
+        draft.memoryGiB = Number(document.getElementById('create-it-memory')?.value);
+        draft.gpuCount = Number(document.getElementById('create-it-gpu-count')?.value || 0);
+        draft.gpuResource = (document.getElementById('create-it-gpu-resource')?.value || '').trim();
+        draft.gpuPci = (document.getElementById('create-it-gpu-pci')?.value || '').trim();
+      }
     }
 
-    function submitCreateInstanceType(e) {
-      e.preventDefault();
-      const nameField = document.getElementById('create-it-name-field');
-      const name = (document.getElementById('create-it-name')?.value || '').trim();
-      const cpu = Number(document.getElementById('create-it-cpu')?.value);
-      const memoryGiB = Number(document.getElementById('create-it-memory')?.value);
-      const gpuCount = Number(document.getElementById('create-it-gpu-count')?.value || 0);
-      const gpuResource = (document.getElementById('create-it-gpu-resource')?.value || '').trim();
-      const gpuPci = (document.getElementById('create-it-gpu-pci')?.value || '').trim();
-      const description = (document.getElementById('create-it-description')?.value || '').trim();
+    function validateCreateInstanceTypeStep() {
+      const draft = state.createInstanceType;
+      if (!draft) return false;
+      if (draft.step === 0) return validateGeneralStep(draft, INSTANCE_TYPES.map(it => it.name));
+      if (draft.step === 1) {
+        const errors = {};
+        if (!Number.isFinite(draft.cpu) || draft.cpu < 1) errors.cpu = 'Enter CPU cores.';
+        if (!Number.isFinite(draft.memoryGiB) || draft.memoryGiB < 1) errors.memory = 'Enter memory in GiB.';
+        draft.fieldErrors = errors;
+        return Object.keys(errors).length === 0;
+      }
+      return true;
+    }
 
-      if (!name || !isValidDnsLabel(name)) {
-        nameField?.classList.add('pf-m-error');
-        document.getElementById('create-it-name')?.focus();
-        toast('Enter a valid DNS label for Name (RFC 1035).');
+    function renderCreateInstanceTypeWizard() {
+      const draft = state.createInstanceType || defaultCreateInstanceTypeState();
+      state.createInstanceType = draft;
+      const panel = document.getElementById('create-it-panel');
+      const back = document.getElementById('create-it-back');
+      const next = document.getElementById('create-it-next');
+      if (!panel) return;
+      renderProviderCreateNav('create-it-nav', draft, renderCreateInstanceTypeWizard);
+      if (back) back.disabled = draft.step === 0;
+      if (next) next.textContent = draft.step === PROVIDER_CREATE_STEPS.length - 1 ? 'Create instance type' : 'Next';
+
+      if (draft.step === 0) {
+        panel.innerHTML = renderGeneralStep('create-it', draft,
+          'Name the instance type, add an optional description, and choose tenant scope.');
+        bindTenantEditor('create-it', draft, renderCreateInstanceTypeWizard);
+        bindLabelsEditor('create-it', draft, renderCreateInstanceTypeWizard);
+      } else if (draft.step === 1) {
+        panel.innerHTML = `
+          <h3>Configuration</h3>
+          <p class="create-resource-wiz__help">Define compute resources for this instance type.</p>
+          <div class="form-field">
+            <label for="create-it-cpu">CPU cores <span class="req">*</span></label>
+            <input type="number" id="create-it-cpu" class="unit-size-input" min="1" step="1" value="${escAttr(draft.cpu)}" required />
+          </div>
+          <div class="form-field">
+            <label for="create-it-memory">Memory (GiB) <span class="req">*</span></label>
+            <input type="number" id="create-it-memory" class="unit-size-input" min="1" step="1" value="${escAttr(draft.memoryGiB)}" required />
+          </div>
+          <h3 class="create-it-section-title">GPU</h3>
+          <div class="form-field">
+            <label for="create-it-gpu-count">GPU count</label>
+            <input type="number" id="create-it-gpu-count" class="unit-size-input" min="0" step="1" value="${escAttr(draft.gpuCount)}" />
+            <div class="pf-v6-c-form__helper-text"><div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
+              <span class="pf-v6-c-helper-text__item-text">Number of GPU devices of this type</span>
+            </div></div></div>
+          </div>
+          <div class="form-field">
+            <label for="create-it-gpu-resource">Resource name</label>
+            <input type="text" id="create-it-gpu-resource" value="${escAttr(draft.gpuResource)}" placeholder="e.g nvidia.com/A100" autocomplete="off" />
+            <div class="pf-v6-c-form__helper-text"><div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
+              <span class="pf-v6-c-helper-text__item-text">Kubernetes device plugin resource name.</span>
+            </div></div></div>
+          </div>
+          <div class="form-field">
+            <label for="create-it-gpu-pci">PCI device selector</label>
+            <input type="text" id="create-it-gpu-pci" value="${escAttr(draft.gpuPci)}" placeholder="2080" autocomplete="off" />
+            <div class="pf-v6-c-form__helper-text"><div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
+              <span class="pf-v6-c-helper-text__item-text">PCI device selector identifying the GPU hardware.</span>
+            </div></div></div>
+          </div>`;
+      } else {
+        const labels = draft.labels.length ? draft.labels.map(escAttr).join(', ') : '—';
+        panel.innerHTML = `
+          <h3>Review</h3>
+          <p class="create-resource-wiz__help">Confirm instance type details before creating.</p>
+          ${renderReviewRows([
+            ['Name', escAttr(draft.name)],
+            ['Description', escAttr(draft.description || '—')],
+            ['Scope', escAttr(providerScopeLabel(draft))],
+            ['Labels', labels],
+            ['CPU cores', escAttr(draft.cpu)],
+            ['Memory (GiB)', escAttr(draft.memoryGiB)],
+            ['GPU count', escAttr(draft.gpuCount || 0)],
+            ['Resource name', escAttr(draft.gpuResource || '—')],
+            ['PCI device selector', escAttr(draft.gpuPci || '—')],
+          ])}`;
+      }
+    }
+
+    function goCreateInstanceTypeNext() {
+      const draft = state.createInstanceType;
+      if (!draft) return;
+      syncCreateInstanceTypeFields();
+      if (!validateCreateInstanceTypeStep()) {
+        renderCreateInstanceTypeWizard();
+        toast(Object.values(draft.fieldErrors || {})[0] || 'Fix the highlighted fields.');
         return;
       }
-      nameField?.classList.remove('pf-m-error');
-      if (!Number.isFinite(cpu) || cpu < 1 || !Number.isFinite(memoryGiB) || memoryGiB < 1) {
+      if (draft.step >= PROVIDER_CREATE_STEPS.length - 1) {
+        submitCreateInstanceType();
+        return;
+      }
+      draft.step += 1;
+      draft.maxVisited = Math.max(draft.maxVisited, draft.step);
+      draft.fieldErrors = {};
+      renderCreateInstanceTypeWizard();
+    }
+
+    function goCreateInstanceTypeBack() {
+      const draft = state.createInstanceType;
+      if (!draft || draft.step === 0) return;
+      syncCreateInstanceTypeFields();
+      draft.step -= 1;
+      renderCreateInstanceTypeWizard();
+    }
+
+    function submitCreateInstanceType() {
+      const draft = state.createInstanceType;
+      if (!draft) return;
+      syncCreateInstanceTypeFields();
+      if (!validateGeneralStep(draft, INSTANCE_TYPES.map(it => it.name))) {
+        draft.step = 0;
+        renderCreateInstanceTypeWizard();
+        toast(Object.values(draft.fieldErrors)[0] || 'Fix General step errors.');
+        return;
+      }
+      if (!Number.isFinite(draft.cpu) || draft.cpu < 1 || !Number.isFinite(draft.memoryGiB) || draft.memoryGiB < 1) {
+        draft.step = 1;
+        validateCreateInstanceTypeStep();
+        renderCreateInstanceTypeWizard();
         toast('CPU cores and Memory (GiB) are required.');
         return;
       }
-      if (INSTANCE_TYPES.some(it => it.name === name)) {
-        nameField?.classList.add('pf-m-error');
-        toast(`Instance type ${name} already exists.`);
-        return;
-      }
-
       INSTANCE_TYPES.unshift({
-        name,
+        name: draft.name,
         lifecycle: 'Active',
-        cpu,
-        memoryGiB,
-        gpus: gpuCount > 0 ? gpuCount : null,
-        gpuResource: gpuResource || null,
-        gpuPci: gpuPci || null,
-        description: description || null,
+        cpu: draft.cpu,
+        memoryGiB: draft.memoryGiB,
+        gpus: draft.gpuCount > 0 ? draft.gpuCount : null,
+        gpuResource: draft.gpuResource || null,
+        gpuPci: draft.gpuPci || null,
+        description: draft.description || null,
+        labels: [...draft.labels],
+        scope: providerScopeLabel(draft),
         created: formatInstanceTypeCreated(),
       });
-      toast(`Created instance type ${name}.`);
-      closeCreateInstanceType();
+      toast(`Created instance type ${draft.name}.`);
+      state.selectedInstanceTypeName = draft.name;
+      state.createInstanceType = null;
+      setView('instance-type');
+      renderInstanceTypeDetail();
     }
 
+    /* —— Create disk image wizard —— */
+    function resetCreateDiskImageForm() {
+      state.createDiskImage = defaultCreateDiskImageState();
+    }
+
+    function openCreateDiskImage() {
+      closeVmKebabMenu();
+      closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
+      setVmActionsMenuOpen(false);
+      resetCreateDiskImageForm();
+      setView('create-disk-image');
+      renderCreateDiskImageWizard();
+    }
+
+    function closeCreateDiskImage() {
+      state.createDiskImage = null;
+      setView('disk-images');
+      renderDiskImages();
+    }
+
+    function syncCreateDiskImageFields() {
+      const draft = state.createDiskImage;
+      if (!draft) return;
+      if (draft.step === 0) syncGeneralFields('create-di', draft);
+      if (draft.step === 1) {
+        draft.image = (document.getElementById('create-di-image')?.value || '').trim();
+        draft.guestOsFamily = document.querySelector('input[name="createDiGuestOs"]:checked')?.value || draft.guestOsFamily || 'Linux';
+        draft.architectures = [...document.querySelectorAll('input[name="createDiArch"]:checked')].map(el => el.value);
+      }
+    }
+
+    function validateCreateDiskImageStep() {
+      const draft = state.createDiskImage;
+      if (!draft) return false;
+      if (draft.step === 0) return validateGeneralStep(draft, DISK_IMAGES.map(di => di.name));
+      if (draft.step === 1) {
+        const errors = {};
+        if (!draft.image) errors.image = 'Enter an image reference.';
+        if (!draft.architectures?.length) errors.architectures = 'Select at least one architecture.';
+        draft.fieldErrors = errors;
+        return Object.keys(errors).length === 0;
+      }
+      return true;
+    }
+
+    function renderCreateDiskImageWizard() {
+      const draft = state.createDiskImage || defaultCreateDiskImageState();
+      state.createDiskImage = draft;
+      const panel = document.getElementById('create-di-panel');
+      const back = document.getElementById('create-di-back');
+      const next = document.getElementById('create-di-next');
+      if (!panel) return;
+      renderProviderCreateNav('create-di-nav', draft, renderCreateDiskImageWizard);
+      if (back) back.disabled = draft.step === 0;
+      if (next) next.textContent = draft.step === PROVIDER_CREATE_STEPS.length - 1 ? 'Create disk image' : 'Next';
+
+      if (draft.step === 0) {
+        panel.innerHTML = renderGeneralStep('create-di', draft,
+          'Name the disk image, add an optional description, and choose tenant scope.');
+        bindTenantEditor('create-di', draft, renderCreateDiskImageWizard);
+        bindLabelsEditor('create-di', draft, renderCreateDiskImageWizard);
+      } else if (draft.step === 1) {
+        const archOpts = ['amd64', 'arm64', 's390x'];
+        const imageErr = draft.fieldErrors?.image;
+        const archErr = draft.fieldErrors?.architectures;
+        panel.innerHTML = `
+          <h3>Configuration</h3>
+          <p class="create-resource-wiz__help">Provide the image reference and guest operating system details.</p>
+          <div class="form-field${imageErr ? ' pf-m-error' : ''}" id="create-di-image-field">
+            <label for="create-di-image">Image <span class="req">*</span></label>
+            <input type="text" id="create-di-image" value="${escAttr(draft.image)}" autocomplete="off" required />
+            <div class="pf-v6-c-form__helper-text">
+              <div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
+                <span class="pf-v6-c-helper-text__item-text">${escAttr(imageErr || 'Example: quay.io/containerdisks/fedora:latest')}</span>
+              </div></div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label id="create-di-guest-os-label">Guest operating system <span class="req">*</span></label>
+            <div class="di-os-radios" role="radiogroup" aria-labelledby="create-di-guest-os-label">
+              <label class="form-check">
+                <input type="radio" name="createDiGuestOs" value="Linux" ${draft.guestOsFamily === 'Linux' ? 'checked' : ''} />
+                Linux
+              </label>
+              <label class="form-check">
+                <input type="radio" name="createDiGuestOs" value="Microsoft Windows" ${draft.guestOsFamily === 'Microsoft Windows' ? 'checked' : ''} />
+                Microsoft Windows
+              </label>
+            </div>
+          </div>
+          <div class="form-field${archErr ? ' pf-m-error' : ''}" id="create-di-arch-field">
+            <label id="create-di-arch-label">Architecture <span class="req">*</span></label>
+            <div class="di-os-radios" role="group" aria-labelledby="create-di-arch-label">
+              ${archOpts.map(a => `
+                <label class="form-check">
+                  <input type="checkbox" name="createDiArch" value="${a}" ${draft.architectures.includes(a) ? 'checked' : ''} />
+                  ${a}
+                </label>`).join('')}
+            </div>
+            <div class="pf-v6-c-form__helper-text">
+              <div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
+                <span class="pf-v6-c-helper-text__item-text">${escAttr(archErr || 'You may select multiple architecture types.')}</span>
+              </div></div>
+            </div>
+          </div>`;
+      } else {
+        const labels = draft.labels.length ? draft.labels.map(escAttr).join(', ') : '—';
+        const arch = draft.architectures.length ? draft.architectures.map(escAttr).join(', ') : '—';
+        panel.innerHTML = `
+          <h3>Review</h3>
+          <p class="create-resource-wiz__help">Confirm disk image details before creating.</p>
+          ${renderReviewRows([
+            ['Name', escAttr(draft.name)],
+            ['Description', escAttr(draft.description || '—')],
+            ['Scope', escAttr(providerScopeLabel(draft))],
+            ['Labels', labels],
+            ['Image', escAttr(draft.image)],
+            ['Guest operating system', escAttr(draft.guestOsFamily)],
+            ['Architecture', arch],
+          ])}`;
+      }
+    }
+
+    function goCreateDiskImageNext() {
+      const draft = state.createDiskImage;
+      if (!draft) return;
+      syncCreateDiskImageFields();
+      if (!validateCreateDiskImageStep()) {
+        renderCreateDiskImageWizard();
+        toast(Object.values(draft.fieldErrors || {})[0] || 'Fix the highlighted fields.');
+        return;
+      }
+      if (draft.step >= PROVIDER_CREATE_STEPS.length - 1) {
+        submitCreateDiskImage();
+        return;
+      }
+      draft.step += 1;
+      draft.maxVisited = Math.max(draft.maxVisited, draft.step);
+      draft.fieldErrors = {};
+      renderCreateDiskImageWizard();
+    }
+
+    function goCreateDiskImageBack() {
+      const draft = state.createDiskImage;
+      if (!draft || draft.step === 0) return;
+      syncCreateDiskImageFields();
+      draft.step -= 1;
+      renderCreateDiskImageWizard();
+    }
+
+    function submitCreateDiskImage() {
+      const draft = state.createDiskImage;
+      if (!draft) return;
+      syncCreateDiskImageFields();
+      if (!validateGeneralStep(draft, DISK_IMAGES.map(di => di.name))) {
+        draft.step = 0;
+        renderCreateDiskImageWizard();
+        toast(Object.values(draft.fieldErrors)[0] || 'Fix General step errors.');
+        return;
+      }
+      if (!draft.image || !draft.architectures?.length) {
+        draft.step = 1;
+        validateCreateDiskImageStep();
+        renderCreateDiskImageWizard();
+        toast('Image and Architecture are required.');
+        return;
+      }
+      DISK_IMAGES.unshift({
+        name: draft.name,
+        lifecycle: 'Available',
+        guestOs: draft.guestOsFamily,
+        architecture: [...draft.architectures],
+        scope: providerScopeLabel(draft),
+        sourceType: 'Registry',
+        sourceRef: draft.image,
+        description: draft.description || null,
+        labels: [...draft.labels],
+        created: formatInstanceTypeCreated(),
+        deprecationTs: null,
+        obsolescenceTs: null,
+      });
+      toast(`Created disk image ${draft.name}.`);
+      state.selectedDiskImageName = draft.name;
+      state.createDiskImage = null;
+      setView('disk-image');
+      renderDiskImageDetail();
+    }
 
     let nicDetailPopoverTrigger = null;
 
@@ -14082,6 +14754,24 @@
     ];
 
     const PLATFORM_TENANTS = ['tenant-a', 'tenant-b', 'tenant-c'];
+    /** Provider-scoped create wizards — searchable tenant options (not tiles). */
+    const PROVIDER_TENANTS = [
+      { id: 'harborline-capital', name: 'harborline-capital', domain: 'harborlinecapital.com' },
+      { id: 'north-summit-bank', name: 'north-summit-bank', domain: 'northsummitbank.com' },
+      { id: 'tenant-a', name: 'tenant-a', domain: 'tenant-a.example.com' },
+      { id: 'tenant-b', name: 'tenant-b', domain: 'tenant-b.example.com' },
+      { id: 'tenant-c', name: 'tenant-c', domain: 'tenant-c.example.com' },
+      { id: 'acme-corp', name: 'acme-corp', domain: 'acme.example.com' },
+      { id: 'globex', name: 'globex', domain: 'globex.example.com' },
+      { id: 'initech', name: 'initech', domain: 'initech.example.com' },
+      { id: 'umbrella', name: 'umbrella', domain: 'umbrella.example.com' },
+      { id: 'stark-industries', name: 'stark-industries', domain: 'stark.example.com' },
+      { id: 'wayne-enterprises', name: 'wayne-enterprises', domain: 'wayne.example.com' },
+      { id: 'osac-demo', name: 'osac-demo', domain: 'demo.osac.example.com' },
+      { id: 'red-hat-lab', name: 'red-hat-lab', domain: 'lab.example.com' },
+      { id: 'edge-retail', name: 'edge-retail', domain: 'edge-retail.example.com' },
+      { id: 'fintech-one', name: 'fintech-one', domain: 'fintech-one.example.com' },
+    ];
 
     let PROVIDER_CATALOG_ITEMS = [
       {
@@ -15995,122 +16685,6 @@
       }).join('');
     }
 
-    function getSelectedArchitectures() {
-      return [...document.querySelectorAll('#create-di-arch-menu input[name="architecture"]:checked')]
-        .map(el => el.value);
-    }
-
-    function syncArchitectureToggleLabel() {
-      const label = document.getElementById('create-di-arch-label-text');
-      if (!label) return;
-      const selected = getSelectedArchitectures();
-      if (!selected.length) {
-        label.textContent = 'Select options';
-        label.classList.add('placeholder');
-      } else {
-        label.textContent = selected.join(', ');
-        label.classList.remove('placeholder');
-      }
-    }
-
-    function setArchitectureMenuOpen(open) {
-      const menu = document.getElementById('create-di-arch-menu');
-      const toggle = document.getElementById('create-di-arch-toggle');
-      if (!menu || !toggle) return;
-      menu.hidden = !open;
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-
-    function resetCreateDiskImageForm() {
-      const form = document.getElementById('create-di-form');
-      if (!form) return;
-      form.reset();
-      const guestOsLinux = document.getElementById('create-di-guest-os-linux');
-      const scope = document.getElementById('create-di-scope');
-      if (guestOsLinux) guestOsLinux.checked = true;
-      if (scope) scope.value = 'Global';
-      document.querySelectorAll('#create-di-arch-menu input[name="architecture"]').forEach(el => { el.checked = false; });
-      syncArchitectureToggleLabel();
-      setArchitectureMenuOpen(false);
-      document.getElementById('create-di-name-field')?.classList.remove('pf-m-error');
-      document.getElementById('create-di-source-ref-field')?.classList.remove('pf-m-error');
-      document.getElementById('create-di-arch-field')?.classList.remove('pf-m-error');
-    }
-
-    function openCreateDiskImage() {
-      closeVmKebabMenu();
-      closeInstanceTypeActionsMenu();
-      closeDiskImageActionsMenu();
-      setVmActionsMenuOpen(false);
-      resetCreateDiskImageForm();
-      setView('create-disk-image');
-      document.getElementById('create-di-name')?.focus();
-    }
-
-    function closeCreateDiskImage() {
-      setArchitectureMenuOpen(false);
-      setView('disk-images');
-      renderDiskImages();
-    }
-
-    function submitCreateDiskImage(e) {
-      e.preventDefault();
-      const nameField = document.getElementById('create-di-name-field');
-      const sourceRefField = document.getElementById('create-di-source-ref-field');
-      const archField = document.getElementById('create-di-arch-field');
-      const name = (document.getElementById('create-di-name')?.value || '').trim();
-      const sourceRef = (document.getElementById('create-di-source-ref')?.value || '').trim();
-      const guestOs = document.querySelector('#create-di-form input[name="guestOsFamily"]:checked')?.value || 'Linux';
-      const scope = document.getElementById('create-di-scope')?.value || 'Global';
-      const architecture = getSelectedArchitectures();
-
-      let valid = true;
-      if (!name || !isValidDnsLabel(name)) {
-        nameField?.classList.add('pf-m-error');
-        valid = false;
-      } else {
-        nameField?.classList.remove('pf-m-error');
-      }
-      if (!sourceRef) {
-        sourceRefField?.classList.add('pf-m-error');
-        valid = false;
-      } else {
-        sourceRefField?.classList.remove('pf-m-error');
-      }
-      if (!architecture.length) {
-        archField?.classList.add('pf-m-error');
-        valid = false;
-      } else {
-        archField?.classList.remove('pf-m-error');
-      }
-      if (!valid) {
-        toast('Fill in required fields with valid values.');
-        return;
-      }
-      if (DISK_IMAGES.some(di => di.name === name)) {
-        nameField?.classList.add('pf-m-error');
-        toast(`Disk image ${name} already exists.`);
-        return;
-      }
-
-      DISK_IMAGES.unshift({
-        name,
-        lifecycle: 'Available',
-        guestOs,
-        architecture,
-        scope,
-        sourceType: 'Registry',
-        sourceRef,
-        created: formatInstanceTypeCreated(),
-        deprecationTs: null,
-        obsolescenceTs: null,
-      });
-      toast(`Created disk image ${name}.`);
-      state.selectedDiskImageName = name;
-      setView('disk-image');
-      renderDiskImageDetail();
-    }
-
     function applyRole() {
       const key = document.getElementById('role-select').value;
       const role = ROLES[key];
@@ -16540,40 +17114,23 @@
     document.getElementById('btn-create-instance-type')?.addEventListener('click', () => {
       openCreateInstanceType();
     });
-    document.getElementById('create-it-form')?.addEventListener('submit', submitCreateInstanceType);
     document.getElementById('create-it-cancel')?.addEventListener('click', closeCreateInstanceType);
     document.getElementById('create-it-crumb-list')?.addEventListener('click', e => {
       e.preventDefault();
       closeCreateInstanceType();
     });
-    document.getElementById('create-it-name')?.addEventListener('input', () => {
-      document.getElementById('create-it-name-field')?.classList.remove('pf-m-error');
-    });
+    document.getElementById('create-it-back')?.addEventListener('click', goCreateInstanceTypeBack);
+    document.getElementById('create-it-next')?.addEventListener('click', goCreateInstanceTypeNext);
     document.getElementById('btn-create-disk-image')?.addEventListener('click', () => {
       openCreateDiskImage();
     });
-    document.getElementById('create-di-form')?.addEventListener('submit', submitCreateDiskImage);
     document.getElementById('create-di-cancel')?.addEventListener('click', closeCreateDiskImage);
     document.getElementById('create-di-crumb-list')?.addEventListener('click', e => {
       e.preventDefault();
       closeCreateDiskImage();
     });
-    document.getElementById('create-di-name')?.addEventListener('input', () => {
-      document.getElementById('create-di-name-field')?.classList.remove('pf-m-error');
-    });
-    document.getElementById('create-di-source-ref')?.addEventListener('input', () => {
-      document.getElementById('create-di-source-ref-field')?.classList.remove('pf-m-error');
-    });
-    document.getElementById('create-di-arch-toggle')?.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      const menu = document.getElementById('create-di-arch-menu');
-      setArchitectureMenuOpen(!!menu?.hidden);
-    });
-    document.getElementById('create-di-arch-menu')?.addEventListener('change', () => {
-      syncArchitectureToggleLabel();
-      document.getElementById('create-di-arch-field')?.classList.remove('pf-m-error');
-    });
+    document.getElementById('create-di-back')?.addEventListener('click', goCreateDiskImageBack);
+    document.getElementById('create-di-next')?.addEventListener('click', goCreateDiskImageNext);
     document.getElementById('di-show-obsolete')?.addEventListener('change', e => {
       state.diShowObsolete = !!e.target.checked;
       renderDiskImages();
@@ -16644,9 +17201,6 @@
         && !e.target.closest('#ci-detail-actions-btn')
         && !e.target.closest('[data-ci-kebab]')) {
         closeCatalogItemActionsMenu();
-      }
-      if (!e.target.closest('#create-di-arch')) {
-        setArchitectureMenuOpen(false);
       }
     });
     function bindNavExpandable(toggleId, itemId) {
