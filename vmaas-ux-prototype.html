@@ -541,8 +541,8 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-      /* Ethan External IP pool: ~1.9× badge height between step circles (~52px at 28px badges) */
-      gap: 52px;
+      /* Ethan Review nav: compact step rhythm (~16px between 28px badges) */
+      gap: 16px;
     }
     .create-resource-wiz__nav-list > li {
       margin: 0;
@@ -555,7 +555,8 @@
       flex-direction: row;
       align-items: center;
       gap: 8px;
-      width: 100%;
+      width: fit-content;
+      max-width: 100%;
       min-height: 28px;
       padding: 0;
       border: 0;
@@ -574,7 +575,10 @@
     .create-resource-wiz__nav-btn[aria-current="step"] {
       font-weight: 600;
       color: var(--vmaas-text, #151515);
-      background: transparent;
+      /* Ethan: current-step pill wraps number + label */
+      background: rgba(199, 199, 199, 0.25);
+      border-radius: 999px;
+      padding-inline-end: 8px;
     }
     .create-resource-wiz__nav-btn:disabled {
       color: var(--vmaas-text-subtle, #6a6e73);
@@ -612,7 +616,7 @@
       line-height: 1;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-label {
-      background: rgba(199, 199, 199, 0.25);
+      background: transparent;
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
@@ -873,19 +877,33 @@
       color: var(--vmaas-text-subtle, #6a6e73);
       cursor: default;
     }
+    /* Ethan Review: stacked label above value (not side-by-side) */
     .review-summary-dl {
-      display: grid;
-      grid-template-columns: 10rem 1fr;
-      gap: 12px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       margin: 0;
+      max-width: 36rem;
       font-size: 14px;
+    }
+    .review-summary-dl > div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
     .review-summary-dl dt {
       margin: 0;
-      color: var(--vmaas-text-subtle, #6a6e73);
-      font-weight: 500;
+      color: var(--vmaas-text, #151515);
+      font-weight: 600;
+      line-height: 1.4;
     }
-    .review-summary-dl dd { margin: 0; font-weight: 600; word-break: break-word; }
+    .review-summary-dl dd {
+      margin: 0;
+      color: var(--vmaas-text, #151515);
+      font-weight: 400;
+      line-height: 1.4;
+      word-break: break-word;
+    }
 
     .page-title {
       margin: 0; display: flex; align-items: center; gap: 8px;
@@ -9250,7 +9268,7 @@
 
     function renderReviewRows(rows) {
       return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
-        <dt>${label}</dt><dd>${value}</dd>`).join('')}</dl>`;
+        <div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>`;
     }
 
     function syncProviderCreateDraftFromDom(draft) {
@@ -9360,8 +9378,6 @@
       } else {
         const labels = draft.labels.length ? draft.labels.map(escAttr).join(', ') : '—';
         panel.innerHTML = `
-          <h3>Review</h3>
-          <p class="create-resource-wiz__help">Confirm instance type details before creating.</p>
           ${renderReviewRows([
             ['Name', escAttr(draft.name)],
             ['Description', escAttr(draft.description || '—')],
@@ -9551,8 +9567,6 @@
         const labels = draft.labels.length ? draft.labels.map(escAttr).join(', ') : '—';
         const arch = draft.architectures.length ? draft.architectures.map(escAttr).join(', ') : '—';
         panel.innerHTML = `
-          <h3>Review</h3>
-          <p class="create-resource-wiz__help">Confirm disk image details before creating.</p>
           ${renderReviewRows([
             ['Name', escAttr(draft.name)],
             ['Description', escAttr(draft.description || '—')],
