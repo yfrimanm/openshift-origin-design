@@ -577,8 +577,9 @@
       height: 1.75rem;
       border: 0;
       border-radius: var(--pf-t--global--border--radius--large, 999px);
-      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
-      color: var(--pf-t--global--text--color--regular, #151515);
+      /* Solid soft fill like Ethan/PF wizard ::before — avoid transparent PF tokens */
+      background: #f0f0f0;
+      color: #151515;
       font-size: var(--pf-t--global--font--size--body--default, 14px);
       font-weight: 400;
       flex: 0 0 auto;
@@ -607,8 +608,9 @@
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn:disabled .create-resource-wiz__nav-num {
-      background: transparent;
-      color: var(--pf-t--global--text--color--disabled, #6a6e73);
+      /* Keep soft filled badge (Ethan/PF) — muted text only */
+      background: #f0f0f0;
+      color: #6a6e73;
     }
     .create-resource-wiz__main {
       display: flex;
@@ -8926,6 +8928,10 @@
     }
 
     function bindLabelsEditor(prefix, draft, rerender) {
+      const refresh = () => {
+        if (typeof syncGeneralFields === 'function') syncGeneralFields(prefix, draft);
+        rerender();
+      };
       const input = document.getElementById(`${prefix}-label-input`);
       input?.addEventListener('keydown', e => {
         if (e.key !== 'Enter') return;
@@ -8934,13 +8940,13 @@
         if (!value) return;
         if (!draft.labels.includes(value)) draft.labels.push(value);
         draft.labelDraft = '';
-        rerender();
+        refresh();
       });
       input?.addEventListener('input', () => { draft.labelDraft = input.value; });
       document.querySelectorAll(`#${prefix}-labels [data-label-remove]`).forEach(btn => {
         btn.addEventListener('click', () => {
           draft.labels.splice(Number(btn.dataset.labelRemove), 1);
-          rerender();
+          refresh();
         });
       });
     }
@@ -9001,6 +9007,11 @@
     }
 
     function bindTenantEditor(prefix, draft, rerender) {
+      const refresh = () => {
+        // Persist Name/Description/etc. before DOM replace (tenant interactions re-render)
+        if (typeof syncGeneralFields === 'function') syncGeneralFields(prefix, draft);
+        rerender();
+      };
       document.getElementById(`${prefix}-global`)?.addEventListener('change', e => {
         draft.isGlobal = !!e.target.checked;
         if (draft.isGlobal) {
@@ -9009,14 +9020,14 @@
           draft.tenantMenuOpen = false;
         }
         if (draft.fieldErrors) delete draft.fieldErrors.tenant;
-        rerender();
+        refresh();
       });
 
       const openMenu = (clearFilter = false) => {
         if (draft.isGlobal) return;
         draft.tenantMenuOpen = true;
         if (clearFilter) draft.tenantFilter = '';
-        rerender();
+        refresh();
         requestAnimationFrame(() => {
           const el = document.getElementById(`${prefix}-tenant-input`);
           if (!el) return;
@@ -9038,7 +9049,7 @@
       input?.addEventListener('input', e => {
         draft.tenantFilter = e.target.value;
         draft.tenantMenuOpen = true;
-        rerender();
+        refresh();
         requestAnimationFrame(() => {
           const el = document.getElementById(`${prefix}-tenant-input`);
           if (!el) return;
@@ -9050,7 +9061,7 @@
       input?.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
           draft.tenantMenuOpen = false;
-          rerender();
+          refresh();
         } else if (e.key === 'ArrowDown' && !draft.tenantMenuOpen) {
           e.preventDefault();
           openMenu(false);
@@ -9063,7 +9074,7 @@
         if (draft.isGlobal) return;
         if (draft.tenantMenuOpen) {
           draft.tenantMenuOpen = false;
-          rerender();
+          refresh();
         } else {
           openMenu(true);
         }
@@ -9077,7 +9088,7 @@
           draft.tenantFilter = '';
           draft.tenantMenuOpen = false;
           if (draft.fieldErrors) delete draft.fieldErrors.tenant;
-          rerender();
+          refresh();
         });
       });
 
@@ -9087,7 +9098,7 @@
           if (root && !root.contains(e.target)) {
             draft.tenantMenuOpen = false;
             document.removeEventListener('mousedown', onDoc, true);
-            rerender();
+            refresh();
           }
         };
         setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
