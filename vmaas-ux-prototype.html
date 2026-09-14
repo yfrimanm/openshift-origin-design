@@ -496,6 +496,11 @@
     .create-it-page.create-resource-wiz > .page-title {
       margin: 0 0 24px;
     }
+    .create-it-page.create-resource-wiz > .vm-detail__breadcrumb .pf-v6-c-breadcrumb__list {
+      padding-inline-start: 0;
+      margin: 0;
+    }
+
     .create-resource-wiz__layout {
       display: grid;
       grid-template-columns: 15.625rem minmax(0, 40rem);
@@ -539,19 +544,22 @@
       gap: 4px;
     }
     /* Ethan / PF wizard nav: number circle stays outside the current-step pill */
+    /* Ethan/PF: equal-height num + label, vertically centered on one axis */
     .create-resource-wiz__nav-btn {
       display: flex;
+      flex-direction: row;
       align-items: center;
       gap: 8px;
       width: 100%;
-      padding: 4px 0;
+      min-height: 28px;
+      padding: 0;
       border: 0;
       border-radius: 0;
       background: transparent;
       color: var(--vmaas-text, #151515);
       font: inherit;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1;
       text-align: left;
       cursor: pointer;
     }
@@ -567,48 +575,53 @@
       color: var(--vmaas-text-subtle, #6a6e73);
       cursor: default;
     }
-    /* Ethan: only the current step is a filled circle; other steps are plain numbers */
-    /* PF6 wizard ::before number badge — filled chip, not a hollow ring */
     .create-resource-wiz__nav-num {
+      box-sizing: border-box;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 1.75rem;
-      height: 1.75rem;
+      width: 28px;
+      height: 28px;
+      margin: 0;
+      padding: 0;
       border: 0;
-      border-radius: var(--pf-t--global--border--radius--large, 999px);
-      /* Solid soft fill like Ethan/PF wizard ::before — avoid transparent PF tokens */
+      border-radius: 999px;
       background: #f0f0f0;
       color: #151515;
-      font-size: var(--pf-t--global--font--size--body--default, 14px);
+      font-size: 14px;
       font-weight: 400;
-      flex: 0 0 auto;
+      flex: 0 0 28px;
       line-height: 1;
     }
     .create-resource-wiz__nav-label {
+      box-sizing: border-box;
       display: inline-flex;
       align-items: center;
-      min-height: 1.75rem;
-      padding: 6px 8px;
-      border-radius: var(--pf-t--global--border--radius--action--plain--default, 6px);
+      height: 28px;
+      min-height: 28px;
+      max-height: 28px;
+      margin: 0;
+      padding: 0 8px;
+      border-radius: 6px;
       background: transparent;
+      line-height: 1;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-label {
-      background: var(--pf-t--global--background--color--action--plain--clicked, rgba(199, 199, 199, 0.25));
+      background: rgba(199, 199, 199, 0.25);
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
-      background: var(--pf-t--global--color--brand--default, #0066cc);
-      color: var(--pf-t--global--text--color--on-brand--default, #fff);
+      background: #0066cc;
+      color: #fff;
       font-weight: 600;
     }
+
     .create-resource-wiz__nav-btn.pf-m-visited:not([aria-current="step"]) .create-resource-wiz__nav-num {
       background: var(--pf-t--global--color--nonstatus--green--default, #3e8635);
       color: #fff;
       font-weight: 600;
     }
     .create-resource-wiz__nav-btn:disabled .create-resource-wiz__nav-num {
-      /* Keep soft filled badge (Ethan/PF) — muted text only */
       background: #f0f0f0;
       color: #6a6e73;
     }
