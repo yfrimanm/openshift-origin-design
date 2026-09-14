@@ -7,6 +7,7 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 | **Overview** | Goal, personas, UX summary, links |
 | **Create Virtual machine** | List + Create wizard |
 | **VM Overview** | Day-2 details Overview |
+| **Catalog** | Provider list / create Visibility / detail / edit Review / delete |
 | **Instance types** | Provider list / create / details |
 | **Disk images** | Provider list / create / details |
 
@@ -15,14 +16,14 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 | | |
 |---|---|
 | **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, provider **Catalog**, plus **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533&vm=azure-baboon-27) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533&role=provider) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814) |
+| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814&vm=azure-baboon-27) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814&role=provider) |
 | **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
 | **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
 
-**Source snapshot:** Pages build `?v=20260910-1533` (screenshots captured 2026-09-10).
+**Source snapshot:** Pages build `?v=20260914-183814` (screenshots refreshed 2026-09-14 — Create wizard typeahead rich-selects).
 
 ---
 
@@ -47,6 +48,7 @@ Document the current OSAC VMaaS HTML prototype so engineering and stakeholders c
 | Area | Decision |
 |---|---|
 | **IA (Create)** | Select template → Details → Compute resource → Storage → Network → Review and create |
+| **Create dropdowns** | Shared **typeahead rich-select** (FormControl toggle + search menu), matching **Compute resource**: Project, Storage tier (boot + extra disks), Virtual network, Subnet. Security groups stay multi-select chips. |
 | **After create** | Lands on new VM Overview + success toast |
 | **Overview Details** | Stacked label-above-value in **Overview** \| **Configuration** columns; VNC stays in the same card |
 | **Instance types** | Provider list + create form + 3-column detail (Overview / Compute / GPU); lifecycle Actions |
@@ -78,6 +80,7 @@ Figure: Row Actions kebab
 
 ### Step 1 — Select template
 
+- **Project** is a typeahead rich-select (same chrome as Compute resource)
 - Project scopes available templates and creation target
 - Selecting a template opens **Template settings** drawer (Locked / Editable governance)
 
@@ -102,6 +105,7 @@ Figure: Details
 ### Step 3 — Compute resource
 
 - Size locked or editable per template governance
+- **Compute resource** typeahead rich-select: FormControl toggle, stacked title + description when applicable, searchable menu (reference pattern for other wizard dropdowns)
 
 ![Figure: Compute resource](videos/vmaas-prototype-ux-doc/05-compute.png)
 
@@ -109,16 +113,22 @@ Figure: Compute resource
 
 ### Step 4 — Storage
 
-- Boot disk size / storage tier
+- Boot disk size / **Storage tier**
+- **Storage tier** (boot + each extra disk) uses the same typeahead rich-select as Compute resource (stacked title/description + search) — not a native `<select>`
 - Additional disks via inline **Add disk** sets (not a modal on this step)
 
 ![Figure: Storage](videos/vmaas-prototype-ux-doc/06-storage.png)
 
-Figure: Storage
+Figure: Storage (editable template — Storage tier matches Compute rich-select chrome)
+
+![Figure: Storage tier menu open](videos/vmaas-prototype-ux-doc/06b-storage-tier-open.png)
+
+Figure: Storage tier — typeahead menu (search + stacked title/description options)
 
 ### Step 5 — Network
 
-- Virtual network, subnet, security groups
+- **Virtual network** and **Subnet** (primary + additional) use the same typeahead rich-select chrome as Compute
+- **Security groups** remain a multi-select chip control (intentional; not a single-select dropdown)
 - Additional networks via inline **Add network** sets
 
 ![Figure: Network](videos/vmaas-prototype-ux-doc/07-network.png)

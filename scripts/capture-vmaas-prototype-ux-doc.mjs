@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, 'videos', 'vmaas-prototype-ux-doc');
 const BASE =
   process.env.VMAAS_MOCK_URL ||
-  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533';
+  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814';
 
 async function shot(page, name) {
   const file = path.join(outDir, `${name}.png`);
@@ -108,9 +108,7 @@ async function main() {
   await waitStep(page, 'Network');
   await shot(page, '07-network');
 
-  // Fill required network fields if empty so Review is reachable
-  const netSelect = page.locator('#wiz-panel select, #wiz-panel [aria-label*="Virtual network"], #wiz-panel .pf-v6-c-menu-toggle').first();
-  // Prefer known mock controls
+  // Fill required network fields if empty so Review is reachable (typeahead rich-selects)
   for (const sel of ['#f-network', '#f-vn', '#f-subnet', '#f-sg']) {
     const el = page.locator(sel);
     if (await el.count()) {
@@ -122,19 +120,25 @@ async function main() {
       }
     }
   }
-  // Click first available option in rich selects if present
-  const toggles = page.locator('#wiz-panel .pf-v6-c-menu-toggle:not([disabled])');
-  const toggleCount = await toggles.count();
+  const richToggles = page.locator('#wiz-panel .rich-select__toggle:not([disabled])');
+  const toggleCount = await richToggles.count();
   for (let i = 0; i < Math.min(toggleCount, 3); i++) {
-    const t = toggles.nth(i);
+    const t = richToggles.nth(i);
     const text = ((await t.innerText()) || '').trim();
-    if (/select|choose|—|-/i.test(text) || !text) {
-      await t.click();
-      await page.waitForTimeout(200);
-      const opt = page.locator('.pf-v6-c-menu__item:not([disabled]), [role="option"]').first();
-      if (await opt.count()) await opt.click();
-      await page.waitForTimeout(200);
+    if (!/select|choose|—|-|^$/i.test(text) && text.length > 1) continue;
+    await t.click();
+    await page.waitForTimeout(250);
+    const opt = page
+      .locator(
+        '.rich-select.pf-m-expanded .rich-select__option:visible, #wiz-panel .rich-select__menu:not([hidden]) .rich-select__option:visible'
+      )
+      .first();
+    if (await opt.count()) {
+      await opt.click({ timeout: 3000 }).catch(() => {});
+    } else {
+      await page.keyboard.press('Escape').catch(() => {});
     }
+    await page.waitForTimeout(200);
   }
 
   await clickNext(page);
