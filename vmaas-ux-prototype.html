@@ -538,15 +538,15 @@
       flex-direction: column;
       gap: 4px;
     }
+    /* Ethan / PF wizard nav: number circle stays outside the current-step pill */
     .create-resource-wiz__nav-btn {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
-      /* Flush with page title / breadcrumb left edge */
-      padding: 8px 12px 8px 0;
+      padding: 4px 0;
       border: 0;
-      border-radius: 16px;
+      border-radius: 0;
       background: transparent;
       color: var(--vmaas-text, #151515);
       font: inherit;
@@ -555,16 +555,13 @@
       text-align: left;
       cursor: pointer;
     }
-    .create-resource-wiz__nav-btn:hover:not(:disabled):not([aria-current="step"]) {
+    .create-resource-wiz__nav-btn:hover:not(:disabled):not([aria-current="step"]) .create-resource-wiz__nav-label {
       background: rgba(0, 0, 0, 0.04);
     }
     .create-resource-wiz__nav-btn[aria-current="step"] {
-      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
       font-weight: 600;
       color: var(--vmaas-text, #151515);
-      padding-inline-start: 8px;
-      margin-inline-start: -8px;
-      width: calc(100% + 8px);
+      background: transparent;
     }
     .create-resource-wiz__nav-btn:disabled {
       color: var(--vmaas-text-subtle, #6a6e73);
@@ -578,20 +575,38 @@
       height: 1.5rem;
       border-radius: 50%;
       border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      background: transparent;
+      color: var(--vmaas-text-subtle, #6a6e73);
       font-size: 12px;
       font-weight: 600;
       flex: 0 0 auto;
       line-height: 1;
+    }
+    .create-resource-wiz__nav-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.5rem;
+      padding: 4px 12px;
+      border-radius: 16px;
+      background: transparent;
+    }
+    .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-label {
+      background: var(--pf-t--global--background--color--secondary--default, #f0f0f0);
     }
     .create-resource-wiz__nav-btn[aria-current="step"] .create-resource-wiz__nav-num {
       background: var(--vmaas-blue, #0066cc);
       border-color: var(--vmaas-blue, #0066cc);
       color: #fff;
     }
-    .create-resource-wiz__nav-btn.pf-m-visited .create-resource-wiz__nav-num {
+    .create-resource-wiz__nav-btn.pf-m-visited:not([aria-current="step"]) .create-resource-wiz__nav-num {
       background: var(--pf-t--global--color--nonstatus--green--default, #3e8635);
       border-color: transparent;
       color: #fff;
+    }
+    .create-resource-wiz__nav-btn:disabled .create-resource-wiz__nav-num {
+      border-color: var(--vmaas-border-light, #d2d2d2);
+      color: var(--vmaas-text-subtle, #6a6e73);
+      background: transparent;
     }
     .create-resource-wiz__main {
       display: flex;
@@ -8855,7 +8870,7 @@
             ${current ? 'aria-current="step"' : ''}
             ${disabled ? 'disabled' : ''}>
             <span class="create-resource-wiz__nav-num" aria-hidden="true">${index + 1}</span>
-            <span>${step.label}</span>
+            <span class="create-resource-wiz__nav-label">${step.label}</span>
           </button>
         </li>`;
       }).join('');
