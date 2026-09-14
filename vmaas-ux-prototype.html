@@ -671,6 +671,18 @@
       background: transparent;
     }
     .create-resource-wiz .form-field { margin-bottom: 24px; }
+    /* Step 1 controls share the same full-width block as Configuration (step 2) inputs */
+    .create-resource-wiz .name-row,
+    .create-resource-wiz .tenant-typeahead,
+    .create-resource-wiz .label-chip-input,
+    .create-resource-wiz .tenant-multi__chips,
+    .create-resource-wiz .form-field > input:not([type="checkbox"]):not([type="radio"]),
+    .create-resource-wiz .form-field > textarea,
+    .create-resource-wiz .form-field > select {
+      max-width: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
     .create-resource-wiz .form-field label {
       display: block;
       margin-bottom: 8px;
