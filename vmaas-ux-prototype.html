@@ -5533,7 +5533,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · tpl spec badges</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · tpl cards v2</span>
         </div>
       </div>
       <div class="console__body">
@@ -6710,41 +6710,22 @@
       const os = String(t.os || '');
       return os.replace(/^Red Hat Enterprise Linux/, 'RHEL') || name || t.osImage || '—';
     }
-    function templateOsImageIconHtml(t) {
-      const icons = {
-        rhel: 'fa-brands fa-redhat',
-        windows: 'fa-brands fa-windows',
-        fedora: 'fa-brands fa-fedora',
-        centos: 'fa-solid fa-circle-nodes',
-      };
-      const cls = icons[t?.osKey] || '';
-      if (!cls) return '';
-      return `<i class="${cls} catalog-disk-image-value__icon" aria-hidden="true"></i>`;
+    function templateSizeGovBadge(editable) {
+      const label = editable ? 'Size editable' : 'Size locked';
+      const mod = editable ? ' catalog-gov-badge--editable' : '';
+      return `<span class="catalog-gov-badge${mod}">${label}</span>`;
     }
-    function templateSpecValueHtml(value, govKind) {
-      const esc = String(value || '—').replace(/</g, '&lt;');
-      if (!govKind) return esc;
-      return `<span class="catalog-spec-value-with-badge"><span>${esc}</span>${catalogGovBadge(govKind)}</span>`;
-    }
-    function templateCardSpecsHtml(t, specs, storage) {
-      const fieldBeh = getTemplateFields(t);
-      const imageLabel = String(t.osImage || '—').replace(/</g, '&lt;');
-      const computeGov = fieldBeh.compute === 'editable' ? 'editable' : null;
-      const storageGov = fieldBeh.bootDisk === 'editable' ? 'editable' : null;
+    function templateCardSpecsHtml(specs, storage) {
       const rows = [
-        {
-          label: 'Image',
-          valueHtml: `<span class="catalog-disk-image-value">${templateOsImageIconHtml(t)}<span>${imageLabel}</span>${catalogGovBadge('locked')}</span>`,
-        },
-        { label: 'vCPU', valueHtml: templateSpecValueHtml(specs.cpu, computeGov) },
-        { label: 'Memory', valueHtml: templateSpecValueHtml(specs.mem, computeGov) },
-        { label: 'Storage', valueHtml: templateSpecValueHtml(storage, storageGov) },
+        { label: 'vCPU', value: specs.cpu },
+        { label: 'Memory', value: specs.mem },
+        { label: 'Storage', value: storage },
       ];
       return `<dl class="catalog-card-specs tpl-card__catalog-specs">
         ${rows.map(row => `
           <div class="catalog-card-specs__row">
             <dt class="catalog-card-specs__label">${row.label}</dt>
-            <dd class="catalog-card-specs__value">${row.valueHtml}</dd>
+            <dd class="catalog-card-specs__value">${row.value}</dd>
           </div>`).join('')}
       </dl>`;
     }
@@ -13636,9 +13617,10 @@
             </span>
             <div class="tpl-card__title-row">
               <span class="tpl-card__title" title="${cardName(t)}">${cardName(t)}</span>
+              ${templateSizeGovBadge(sizeEditable)}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
-            ${templateCardSpecsHtml(t, specs, cardStorage(t))}
+            ${templateCardSpecsHtml(specs, cardStorage(t))}
             <div class="tpl-card__footer">
               <span class="tpl-card__cost-label">Estimate cost</span>
               <span class="tpl-card__cost-values">
@@ -13661,6 +13643,7 @@
                   <i class="${cardIcon(t)}"></i>
                 </span>
                 <span class="tpl-list__name-link">${cardName(t)}</span>
+                ${templateSizeGovBadge(sizeEditable)}
               </span>
             </td>
             <td>${specs.cpu}</td>
