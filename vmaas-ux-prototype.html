@@ -9589,51 +9589,44 @@
     }
 
     function renderGuestOsSelectBoxes({ name, selected, labelledBy }) {
-      return renderFeltSelectBoxes({
-        name,
-        selected: selected || 'Linux',
-        labelledBy,
-        options: [
-          {
-            value: 'Linux',
-            title: 'Linux',
-            desc: 'Linux-based guest operating systems',
-            iconClass: 'fa-brands fa-linux',
-            iconMod: 'linux',
-          },
-          {
-            value: 'Microsoft Windows',
-            title: 'Microsoft Windows',
-            desc: 'Windows-based guest operating systems',
-            iconClass: 'fa-brands fa-windows',
-            iconMod: 'windows',
-          },
-        ],
-      });
+      const current = selected || 'Linux';
+      const opts = [
+        { value: 'Linux', label: 'Linux' },
+        { value: 'Microsoft Windows', label: 'Microsoft Windows' },
+      ];
+      return `<div class="di-os-radios" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
+        ${opts.map(opt => `
+          <label class="form-check">
+            <input type="radio" name="${name}" value="${opt.value}" ${current === opt.value ? 'checked' : ''} />
+            ${opt.label}
+          </label>`).join('')}
+      </div>`;
     }
 
     function renderTenantAccessSelectBoxes({ name, selected, labelledBy }) {
-      return renderFeltSelectBoxes({
-        name,
-        selected: selected || 'locked',
-        labelledBy,
-        options: [
-          {
-            value: 'locked',
-            title: 'Locked',
-            desc: 'Tenants cannot change the guest operating system or hardware.',
-            iconClass: 'fa-solid fa-lock',
-            iconMod: 'locked',
-          },
-          {
-            value: 'editable',
-            title: 'Editable at provisioning',
-            desc: 'Tenants can change the guest operating system or hardware at provisioning.',
-            iconClass: 'fa-solid fa-lock-open',
-            iconMod: 'editable',
-          },
-        ],
-      });
+      const current = selected || 'locked';
+      const opts = [
+        {
+          value: 'locked',
+          label: 'Locked',
+          desc: 'Tenants cannot change the guest operating system or hardware.',
+        },
+        {
+          value: 'editable',
+          label: 'Editable',
+          desc: 'Tenants can change the guest operating system or hardware at provisioning.',
+        },
+      ];
+      return `<div class="radio-stack" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
+        ${opts.map(opt => `
+          <div class="radio-stack__item">
+            <label class="form-check">
+              <input type="radio" name="${name}" value="${opt.value}" ${current === opt.value ? 'checked' : ''} />
+              ${opt.label}
+            </label>
+            <p class="form-helper">${opt.desc}</p>
+          </div>`).join('')}
+      </div>`;
     }
 
     function renderReviewRows(rows) {
