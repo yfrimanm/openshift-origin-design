@@ -3601,6 +3601,14 @@
     .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--windows {
       color: var(--pf-t--global--border--color--clicked, #0066cc);
     }
+    .felt-select-box__icon--locked { color: #6a6e73; }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--locked {
+      color: var(--pf-t--global--border--color--clicked, #0066cc);
+    }
+    .felt-select-box__icon--editable { color: #0066cc; }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--editable {
+      color: var(--pf-t--global--border--color--clicked, #0066cc);
+    }
     .felt-select-box__text {
       display: flex;
       flex-direction: column;
@@ -4951,7 +4959,6 @@
       max-width: 100%;
     }
     .tpl-card__title-row .tpl-card__title { min-width: 0; margin: 0; }
-    .tpl-card__title-row .catalog-gov-badge { flex: 0 0 auto; }
     .tpl-card__footer--custom {
       flex-direction: column;
       align-items: flex-start;
@@ -5499,7 +5506,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · template cards</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · felt restore</span>
         </div>
       </div>
       <div class="console__body">
@@ -6675,11 +6682,6 @@
       if (name && !/^(rhel|windows|fedora)\./i.test(name)) return name;
       const os = String(t.os || '');
       return os.replace(/^Red Hat Enterprise Linux/, 'RHEL') || name || t.osImage || '—';
-    }
-    function templateSizeGovBadge(editable) {
-      const label = editable ? 'Size editable' : 'Size locked';
-      const mod = editable ? ' catalog-gov-badge--editable' : '';
-      return `<span class="catalog-gov-badge${mod}">${label}</span>`;
     }
     /** Icon-only Locked / Editable cue next to titles (shape + accessible name).
      *  scope === 'size' → template card/list title (compute + boot disk only). */
@@ -9668,29 +9670,27 @@
     }
 
     function renderTenantAccessSelectBoxes({ name, selected, labelledBy }) {
-      const current = selected || 'locked';
-      const opts = [
-        {
-          value: 'locked',
-          label: 'Locked',
-          desc: 'Tenants cannot change the guest operating system or hardware.',
-        },
-        {
-          value: 'editable',
-          label: 'Editable',
-          desc: 'Tenants can change the guest operating system or hardware at provisioning.',
-        },
-      ];
-      return `<div class="radio-stack" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
-        ${opts.map(opt => `
-          <div class="radio-stack__item">
-            <label class="form-check">
-              <input type="radio" name="${name}" value="${opt.value}" ${current === opt.value ? 'checked' : ''} />
-              ${opt.label}
-            </label>
-            <p class="form-helper">${opt.desc}</p>
-          </div>`).join('')}
-      </div>`;
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'locked',
+        labelledBy,
+        options: [
+          {
+            value: 'locked',
+            title: 'Locked',
+            desc: 'Tenants cannot change the guest operating system or hardware.',
+            iconClass: 'fa-solid fa-lock',
+            iconMod: 'locked',
+          },
+          {
+            value: 'editable',
+            title: 'Editable at provisioning',
+            desc: 'Tenants can change the guest operating system or hardware at provisioning.',
+            iconClass: 'fa-solid fa-lock-open',
+            iconMod: 'editable',
+          },
+        ],
+      });
     }
 
     function renderReviewRows(rows) {
@@ -13558,7 +13558,7 @@
             </span>
             <div class="tpl-card__title-row">
               <span class="tpl-card__title" title="${cardName(t)}">${cardName(t)}</span>
-              ${templateSizeGovBadge(sizeEditable)}
+              ${sizeEditable ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
             <div class="tpl-card__specs">
@@ -13597,7 +13597,7 @@
                   <i class="${cardIcon(t)}"></i>
                 </span>
                 <span class="tpl-list__name-link">${cardName(t)}</span>
-                ${templateSizeGovBadge(sizeEditable)}
+                ${sizeEditable ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
               </span>
             </td>
             <td>${specs.cpu}</td>
