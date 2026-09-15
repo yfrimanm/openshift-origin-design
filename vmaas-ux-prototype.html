@@ -5533,7 +5533,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · tpl cards v2</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · review pencils</span>
         </div>
       </div>
       <div class="console__body">
@@ -9755,6 +9755,22 @@
     function renderReviewRows(rows) {
       return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
         <div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>`;
+    }
+    function reviewNebiusSection(title, stepKey, rowsHtml, idPrefix = 'review') {
+      return `
+        <section class="review-nebius__section" aria-labelledby="${idPrefix}-${stepKey}">
+          <div class="review-nebius__head">
+            <h4 class="review-nebius__title" id="${idPrefix}-${stepKey}">${title}</h4>
+            <button type="button" class="review-nebius__edit" data-review-goto="${stepKey}"
+              aria-label="Edit ${title}">
+              <i class="fa-solid fa-pen" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="review-nebius__card">
+            ${rowsHtml}
+          </div>
+        </section>
+      `;
     }
 
     function syncProviderCreateDraftFromDom(draft) {
@@ -15020,21 +15036,6 @@
             <span class="review-nebius__value">${value}</span>
           </div>
         `;
-        const reviewSection = (title, stepKey, rowsHtml) => `
-          <section class="review-nebius__section" aria-labelledby="review-${stepKey}">
-            <div class="review-nebius__head">
-              <h4 class="review-nebius__title" id="review-${stepKey}">${title}</h4>
-              <button type="button" class="review-nebius__edit" data-review-goto="${stepKey}"
-                aria-label="Edit ${title}">
-                <i class="fas fa-pencil" aria-hidden="true"></i>
-              </button>
-            </div>
-            <div class="review-nebius__card">
-              ${rowsHtml}
-            </div>
-          </section>
-        `;
-
         const preset = d.catalogPreset;
         const computeChanged = preset?.computeResource && d.computeResource
           && d.computeResource !== preset.computeResource;
@@ -15054,7 +15055,7 @@
           <h3>Review and create</h3>
           <p class="step-help">Confirm your settings before creating the Virtual machine.</p>
           <div class="review-nebius">
-            ${reviewSection('Details', 'details', `
+            ${reviewNebiusSection('Details', 'details', `
               ${reviewRow('Template', catalogName)}
               ${reviewRow('Name', d.name || '—')}
               ${reviewRow('Description', d.description || '—')}
@@ -15065,10 +15066,10 @@
                 : reviewRow('SSH public key', sshVal)}
               ${reviewRow('Cloud-init', cloudInitVal)}
             `)}
-            ${reviewSection('Compute resource', 'config-compute', `
+            ${reviewNebiusSection('Compute resource', 'config-compute', `
               ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
             `)}
-            ${reviewSection('Storage', 'config-storage', `
+            ${reviewNebiusSection('Storage', 'config-storage', `
               ${reviewRow('Boot disk', reviewValue(bootDisk, diskChanged))}
               ${(d.extraDisks || []).length
                 ? (d.extraDisks || []).map((disk, i) => {
@@ -15079,7 +15080,7 @@
                   }).join('')
                 : reviewRow('Additional disks', 'None')}
             `)}
-            ${reviewSection('Network', 'config-network', `
+            ${reviewNebiusSection('Network', 'config-network', `
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
               ${reviewRow('Security groups', sgs)}
@@ -16623,20 +16624,6 @@
           <span class="review-nebius__label">${label}</span>
           <span class="review-nebius__value">${value}</span>
         </div>
-      `;
-      const reviewSection = (title, stepKey, rowsHtml) => `
-        <section class="review-nebius__section" aria-labelledby="ci-review-${stepKey}">
-          <div class="review-nebius__head">
-            <h4 class="review-nebius__title" id="ci-review-${stepKey}">${title}</h4>
-            <button type="button" class="review-nebius__edit" data-review-goto="${stepKey}"
-              aria-label="Edit ${title}">
-              <i class="fas fa-pencil" aria-hidden="true"></i>
-            </button>
-          </div>
-          <div class="review-nebius__card">
-            ${rowsHtml}
-          </div>
-        </section>
       `;
       const esc = value => String(value ?? '—').replace(/</g, '&lt;');
       if (state.catalogEditId) {
