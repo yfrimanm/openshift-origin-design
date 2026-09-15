@@ -3609,6 +3609,14 @@
     .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--editable {
       color: var(--pf-t--global--border--color--clicked, #0066cc);
     }
+    .felt-select-box__icon--global { color: #0066cc; }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--global {
+      color: var(--pf-t--global--border--color--clicked, #0066cc);
+    }
+    .felt-select-box__icon--tenant { color: #6a6e73; }
+    .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__icon--tenant {
+      color: var(--pf-t--global--border--color--clicked, #0066cc);
+    }
     .felt-select-box__text {
       display: flex;
       flex-direction: column;
@@ -5533,7 +5541,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · review pencils</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · visibility cards</span>
         </div>
       </div>
       <div class="console__body">
@@ -9747,6 +9755,30 @@
             title: 'Editable at provisioning',
             desc: 'Tenants can change the guest operating system or hardware at provisioning.',
             govBadge: 'editable',
+          },
+        ],
+      });
+    }
+
+    function renderVisibilitySelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'global',
+        labelledBy,
+        options: [
+          {
+            value: 'global',
+            title: 'Global public',
+            desc: 'Available to all tenants when published',
+            iconClass: 'fa-solid fa-globe',
+            iconMod: 'global',
+          },
+          {
+            value: 'tenant',
+            title: 'Tenant scoped',
+            desc: 'Visible only to selected tenants',
+            iconClass: 'fa-solid fa-building',
+            iconMod: 'tenant',
           },
         ],
       });
@@ -16494,25 +16526,14 @@
             }).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No tenants found</span></li>'}
           </ul>` : '';
         panel.innerHTML = `
-          <h3>Visibility</h3>
+          <h3 id="ci-visibility-label">Visibility</h3>
           <p class="create-resource-wiz__help">Control which tenants can discover and order this catalog item.</p>
           <div class="form-field">
-            <div class="radio-stack" role="radiogroup" aria-label="Catalog item visibility">
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciVisibility" value="global" ${(c.visibility || 'global') !== 'tenant' ? 'checked' : ''} />
-                  Global public
-                </label>
-                <p class="form-helper">Available to all tenants when published</p>
-              </div>
-              <div class="radio-stack__item">
-                <label class="form-check">
-                  <input type="radio" name="ciVisibility" value="tenant" ${c.visibility === 'tenant' ? 'checked' : ''} />
-                  Tenant scoped
-                </label>
-                <p class="form-helper">Visible only to selected tenants</p>
-              </div>
-            </div>
+            ${renderVisibilitySelectBoxes({
+              name: 'ciVisibility',
+              selected: c.visibility || 'global',
+              labelledBy: 'ci-visibility-label',
+            })}
           </div>
           ${c.visibility === 'tenant' ? `
           <div class="form-field ${state.fieldErrors.ciTenants ? 'pf-m-error' : ''}" style="margin-top:20px;">
