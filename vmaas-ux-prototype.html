@@ -5493,11 +5493,11 @@
               <option value="user">Tenant User</option>
               <option value="provider">Cloud provider admin</option>
             </select>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · catalog align</span>
             <span class="pf-v6-c-form-control__utilities">
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · catalog align</span>
         </div>
       </div>
       <div class="console__body">
@@ -6013,6 +6013,38 @@
                     <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-it-back" disabled>Back</button>
                     <button type="button" class="pf-v6-c-button pf-m-primary" id="create-it-next">Next</button>
                     <button type="button" class="pf-v6-c-button pf-m-link" id="create-it-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" id="view-create-catalog-item">
+            <div class="create-it-page create-resource-wiz">
+              <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+                <ol class="pf-v6-c-breadcrumb__list">
+                  <li class="pf-v6-c-breadcrumb__item">
+                    <a href="#" class="pf-v6-c-breadcrumb__link" id="create-ci-crumb-catalog">Catalog</a>
+                  </li>
+                  <li class="pf-v6-c-breadcrumb__item">
+                    <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                      <i class="fas fa-angle-right" aria-hidden="true"></i>
+                    </span>
+                    <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page" id="create-ci-crumb-current">Create catalog item</span>
+                  </li>
+                </ol>
+              </nav>
+              <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title" id="create-ci-page-title">Create catalog item</h2>
+              <div class="create-resource-wiz__layout" id="create-ci-wizard">
+                <nav class="create-resource-wiz__nav" aria-label="Create catalog item steps">
+                  <ol class="create-resource-wiz__nav-list" id="create-ci-nav"></ol>
+                </nav>
+                <div class="create-resource-wiz__main">
+                  <div class="create-resource-wiz__panel" id="create-ci-panel" tabindex="-1"></div>
+                  <div class="create-resource-wiz__footer">
+                    <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-ci-back" disabled>Back</button>
+                    <button type="button" class="pf-v6-c-button pf-m-primary" id="create-ci-next">Next</button>
+                    <button type="button" class="pf-v6-c-button pf-m-link" id="create-ci-cancel">Cancel</button>
                   </div>
                 </div>
               </div>
@@ -9178,7 +9210,7 @@
       const navId = id === 'vm' ? 'vms'
         : (id === 'create-instance-type' || id === 'instance-type') ? 'instance-types'
         : (id === 'create-disk-image' || id === 'disk-image') ? 'disk-images'
-        : (id === 'catalog-item') ? 'templates'
+        : (id === 'create-catalog-item' || id === 'catalog-item') ? 'templates'
         : id;
       document.querySelectorAll('.console__nav [data-nav]').forEach(n => {
         n.classList.toggle('pf-m-current', n.dataset.nav === navId);
@@ -15732,6 +15764,8 @@
 
     function defaultCatalogCreateState() {
       return {
+        step: 0,
+        maxVisited: 0,
         name: generateCatalogItemName(),
         description: '',
         guestOsFamily: 'Linux',
@@ -15925,28 +15959,14 @@
     function openCatalogItemWizard() {
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
+      closeCatalogItemActionsMenu();
       state.catalogEditId = null;
       state.catalogEditOriginal = null;
       state.wizard = 'catalog-create';
-      state.step = 0;
-      state.maxVisited = 0;
       state.fieldErrors = {};
       state.catalogCreate = defaultCatalogCreateState();
-      const wizTitle = document.getElementById('wiz-title');
-      const wizDesc = document.getElementById('wiz-desc');
-      if (wizTitle) wizTitle.textContent = 'Create catalog item';
-      if (wizDesc) {
-        wizDesc.hidden = false;
-        wizDesc.innerHTML = '<nav class="wiz-breadcrumb" aria-label="Breadcrumb"><a href="#" id="ci-wiz-crumb-catalog">Catalog</a> › Create catalog item</nav>';
-        wizDesc.querySelector('#ci-wiz-crumb-catalog')?.addEventListener('click', e => {
-          e.preventDefault();
-          requestCloseWizard();
-        });
-      }
-      document.getElementById('cost-estimate')?.setAttribute('hidden', '');
-      document.getElementById('overlay').classList.add('pf-m-open');
-      document.body.style.overflow = 'hidden';
-      renderWizard();
+      setView('create-catalog-item');
+      renderCreateCatalogItemWizard();
     }
 
     function openCatalogItemEdit(id) {
@@ -15957,10 +15977,10 @@
       closeCatalogItemActionsMenu();
       state.catalogEditId = id;
       state.wizard = 'catalog-create';
-      state.step = 0;
-      state.maxVisited = 0;
       state.fieldErrors = {};
       state.catalogCreate = {
+        step: 0,
+        maxVisited: 4,
         name: item.name,
         description: item.description || '',
         guestOsFamily: item.guestOsFamily || 'Linux',
@@ -15979,21 +15999,8 @@
         tenantFilter: '',
       };
       state.catalogEditOriginal = snapshotCatalogEditState(state.catalogCreate);
-      const wizTitle = document.getElementById('wiz-title');
-      const wizDesc = document.getElementById('wiz-desc');
-      if (wizTitle) wizTitle.textContent = 'Edit catalog item';
-      if (wizDesc) {
-        wizDesc.hidden = false;
-        wizDesc.innerHTML = '<nav class="wiz-breadcrumb" aria-label="Breadcrumb"><a href="#" id="ci-wiz-crumb-catalog">Catalog</a> › Edit catalog item</nav>';
-        wizDesc.querySelector('#ci-wiz-crumb-catalog')?.addEventListener('click', e => {
-          e.preventDefault();
-          requestCloseWizard();
-        });
-      }
-      document.getElementById('cost-estimate')?.setAttribute('hidden', '');
-      document.getElementById('overlay').classList.add('pf-m-open');
-      document.body.style.overflow = 'hidden';
-      renderWizard();
+      setView('create-catalog-item');
+      renderCreateCatalogItemWizard();
     }
 
     function bindRichSelect(root, {
@@ -16028,6 +16035,100 @@
       }
     }
 
+    function renderCatalogCreateNav(navId, draft, rerender) {
+      const nav = document.getElementById(navId);
+      if (!nav) return;
+      const steps = catalogStepsForRole();
+      nav.innerHTML = steps.map((step, index) => {
+        const current = index === draft.step;
+        const visited = index < draft.step;
+        const disabled = index > draft.maxVisited;
+        return `<li>
+          <button type="button"
+            class="create-resource-wiz__nav-btn${visited ? ' pf-m-visited' : ''}"
+            data-catalog-step="${index}"
+            ${current ? 'aria-current="step"' : ''}
+            ${disabled ? 'disabled' : ''}>
+            <span class="create-resource-wiz__nav-num" aria-hidden="true">${index + 1}</span>
+            <span class="create-resource-wiz__nav-label">${step.label}</span>
+          </button>
+        </li>`;
+      }).join('');
+      nav.querySelectorAll('[data-catalog-step]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.catalogStep);
+          if (Number.isNaN(idx) || idx > draft.maxVisited) return;
+          readCatalogCreateFields();
+          draft.step = idx;
+          rerender();
+        });
+      });
+    }
+
+    function renderCreateCatalogItemWizard() {
+      const c = state.catalogCreate;
+      if (!c) return;
+      const panel = document.getElementById('create-ci-panel');
+      const back = document.getElementById('create-ci-back');
+      const next = document.getElementById('create-ci-next');
+      const steps = catalogStepsForRole();
+      const key = steps[c.step]?.key;
+      if (!panel || !key) return;
+      renderCatalogCreateNav('create-ci-nav', c, renderCreateCatalogItemWizard);
+      if (back) back.disabled = c.step === 0;
+      if (next) {
+        if (key === 'ci-review' && state.catalogEditId) {
+          readCatalogCreateFields();
+          next.innerHTML = '<span class="pf-v6-c-button__text">Save changes</span><span class="pf-v6-c-button__icon"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>';
+          next.disabled = !catalogEditHasChanges();
+        } else {
+          next.textContent = key === 'ci-review' ? 'Create catalog item' : 'Next';
+          next.disabled = false;
+        }
+      }
+      const title = document.getElementById('create-ci-page-title');
+      const crumb = document.getElementById('create-ci-crumb-current');
+      const editing = !!state.catalogEditId;
+      if (title) title.textContent = editing ? 'Edit catalog item' : 'Create catalog item';
+      if (crumb) crumb.textContent = editing ? 'Edit catalog item' : 'Create catalog item';
+      renderCatalogCreatePanel(panel, key);
+    }
+
+    function closeCreateCatalogItem() {
+      state.catalogCreate = null;
+      state.catalogEditId = null;
+      state.catalogEditOriginal = null;
+      state.fieldErrors = {};
+      if (state.wizard === 'catalog-create') state.wizard = 'vm';
+      setView('templates');
+      renderCatalog();
+      if (isProviderCatalogRole()) renderCatalogTenantFilter();
+    }
+
+    function goCreateCatalogItemNext() {
+      const c = state.catalogCreate;
+      if (!c) return;
+      const steps = catalogStepsForRole();
+      const key = steps[c.step]?.key;
+      readCatalogCreateFields();
+      if (!validateCatalogCreateStep(key)) return;
+      if (c.step >= steps.length - 1) {
+        finishCatalogCreate();
+        return;
+      }
+      c.step += 1;
+      c.maxVisited = Math.max(c.maxVisited, c.step);
+      renderCreateCatalogItemWizard();
+    }
+
+    function goCreateCatalogItemBack() {
+      const c = state.catalogCreate;
+      if (!c || c.step === 0) return;
+      readCatalogCreateFields();
+      c.step -= 1;
+      renderCreateCatalogItemWizard();
+    }
+
     function renderCatalogCreatePanel(panel, key) {
       const c = state.catalogCreate;
       if (!c) return;
@@ -16040,7 +16141,7 @@
         const selectedDisk = getCatalogDiskImage(c.diskImageId);
         panel.innerHTML = `
           <h3>Details</h3>
-          <p class="step-help">Set the catalog item identity and the guest OS image tenants will receive.</p>
+          <p class="create-resource-wiz__help">Set the catalog item identity and the guest OS image tenants will receive.</p>
           <div class="form-field ${state.fieldErrors.ciName ? 'pf-m-error' : ''}">
             <label for="ci-name">Name <span class="req">*</span></label>
             <div class="name-row">
@@ -16105,7 +16206,7 @@
             c.guestOsFamily = r.value;
             const options = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
             if (!options.some(d => d.id === c.diskImageId)) c.diskImageId = options[0]?.id || '';
-            renderWizard();
+            renderCreateCatalogItemWizard();
           });
         });
         const diskRoot = panel.querySelector('#ci-disk-image-select');
@@ -16115,11 +16216,11 @@
           optionSel: '[data-disk-image]',
           onOpen: () => { c.diskImageMenuOpen = true; },
           onClose: () => { c.diskImageMenuOpen = false; },
-          onSelect: opt => { c.diskImageId = opt.dataset.diskImage; renderWizard(); },
+          onSelect: opt => { c.diskImageId = opt.dataset.diskImage; renderCreateCatalogItemWizard(); },
         });
         panel.querySelector('#ci-disk-image-search')?.addEventListener('input', e => {
           c.diskImageFilter = e.target.value;
-          renderWizard();
+          renderCreateCatalogItemWizard();
           panel.querySelector('#ci-disk-image-search')?.focus();
         });
         return;
@@ -16138,7 +16239,7 @@
         });
         panel.innerHTML = `
           <h3>Instance type &amp; Access</h3>
-          <p class="step-help">Choose an instance type for this catalog item. GPU configuration is defined on the instance type.</p>
+          <p class="create-resource-wiz__help">Choose an instance type for this catalog item. GPU configuration is defined on the instance type.</p>
           <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Instance type <span class="req">*</span></h4>
           <div class="form-field">
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
@@ -16188,7 +16289,7 @@
         panel.querySelectorAll('input[name="ciTenantAccess"]').forEach(r => {
           r.addEventListener('change', () => {
             c.tenantAccess = r.value;
-            renderWizard();
+            renderCreateCatalogItemWizard();
           });
         });
         bindRichSelect(panel.querySelector('#ci-compute-select'), {
@@ -16197,11 +16298,11 @@
           optionSel: '[data-compute]',
           onOpen: () => { c.computeMenuOpen = true; },
           onClose: () => { c.computeMenuOpen = false; },
-          onSelect: opt => { c.instanceTypeId = opt.dataset.compute; renderWizard(); },
+          onSelect: opt => { c.instanceTypeId = opt.dataset.compute; renderCreateCatalogItemWizard(); },
         });
         panel.querySelector('#ci-compute-search')?.addEventListener('input', e => {
           c.computeFilter = e.target.value;
-          renderWizard();
+          renderCreateCatalogItemWizard();
           panel.querySelector('#ci-compute-search')?.focus();
         });
         return;
@@ -16242,7 +16343,7 @@
         ` : '';
         panel.innerHTML = `
           <h3>Storage</h3>
-          <p class="step-help">Set the boot disk size. Add additional disks if you need more storage.</p>
+          <p class="create-resource-wiz__help">Set the boot disk size. Add additional disks if you need more storage.</p>
           <div class="vm-config__fields">
             <div class="form-field">
               <label for="ci-boot-disk">Boot disk size (GiB) <span class="req">*</span></label>
@@ -16265,14 +16366,14 @@
           e.preventDefault();
           const id = `ci-disk-${Date.now()}`;
           c.extraDisks.push({ id, name: `disk-${c.extraDisks.length + 1}`, size: 30, unit: 'GiB' });
-          renderWizard();
+          renderCreateCatalogItemWizard();
         });
         panel.querySelectorAll('[data-remove-ci-disk]').forEach(btn => {
           btn.addEventListener('click', e => {
             e.preventDefault();
             const id = btn.dataset.removeCiDisk;
             c.extraDisks = c.extraDisks.filter(d => d.id !== id);
-            renderWizard();
+            renderCreateCatalogItemWizard();
           });
         });
         panel.querySelectorAll('[data-ci-disk-size]').forEach(input => {
@@ -16324,7 +16425,7 @@
           </ul>` : '';
         panel.innerHTML = `
           <h3>Visibility</h3>
-          <p class="step-help">Control which tenants can discover and order this catalog item.</p>
+          <p class="create-resource-wiz__help">Control which tenants can discover and order this catalog item.</p>
           <div class="form-field">
             <div class="radio-stack" role="radiogroup" aria-label="Catalog item visibility">
               <div class="radio-stack__item">
@@ -16373,13 +16474,13 @@
               c.tenantMenuOpen = false;
             }
             delete state.fieldErrors.ciTenants;
-            renderWizard();
+            renderCreateCatalogItemWizard();
           });
         });
         const openTenantMenu = (clearFilter = false) => {
           c.tenantMenuOpen = true;
           if (clearFilter) c.tenantFilter = '';
-          renderWizard();
+          renderCreateCatalogItemWizard();
           requestAnimationFrame(() => panel.querySelector('#ci-tenant-search')?.focus());
         };
         panel.querySelector('#ci-tenants-toggle')?.addEventListener('mousedown', e => {
@@ -16387,7 +16488,7 @@
           e.stopPropagation();
           if (c.tenantMenuOpen) {
             c.tenantMenuOpen = false;
-            renderWizard();
+            renderCreateCatalogItemWizard();
           } else {
             openTenantMenu(false);
           }
@@ -16399,7 +16500,7 @@
         search?.addEventListener('input', e => {
           c.tenantFilter = e.target.value;
           c.tenantMenuOpen = true;
-          renderWizard();
+          renderCreateCatalogItemWizard();
           requestAnimationFrame(() => {
             const el = panel.querySelector('#ci-tenant-search');
             if (el) {
@@ -16419,7 +16520,7 @@
             else set.add(id);
             c.tenants = [...set];
             if (c.tenants.length) delete state.fieldErrors.ciTenants;
-            renderWizard();
+            renderCreateCatalogItemWizard();
             requestAnimationFrame(() => panel.querySelector('#ci-tenant-search')?.focus());
           });
         });
@@ -16428,7 +16529,7 @@
             e.preventDefault();
             const id = btn.dataset.tenantRemove;
             c.tenants = (c.tenants || []).filter(t => t !== id);
-            renderWizard();
+            renderCreateCatalogItemWizard();
           });
         });
         if (c.tenantMenuOpen) {
@@ -16437,7 +16538,7 @@
             if (root && !root.contains(e.target)) {
               c.tenantMenuOpen = false;
               document.removeEventListener('mousedown', onDoc, true);
-              renderWizard();
+              renderCreateCatalogItemWizard();
             }
           };
           setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
@@ -16487,7 +16588,7 @@
               </div>
             `).join('')}
           </div>`
-            : `<p class="step-help">No changes yet. Update a step to see a before-and-after summary here.</p>`}
+            : `<p class="create-resource-wiz__help">No changes yet. Update a step to see a before-and-after summary here.</p>`}
           <div class="pf-v6-c-alert pf-m-inline pf-m-info catalog-edit-review__alert" role="status">
             <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
             <div class="pf-v6-c-alert__title">Changes apply immediately</div>
@@ -16495,45 +16596,38 @@
           </div>
         `;
       } else {
+        const visibilityValue = c.visibility === 'tenant'
+          ? `Tenant scoped (${(c.tenants || []).map(id => providerTenantById(id)?.name || id).join(', ') || '—'})`
+          : 'Global public';
+        const extraDisksValue = c.extraDisks?.length
+          ? c.extraDisks.map((d, i) => `Disk set ${i + 1}: ${d.size} GiB`).join('; ')
+          : 'None';
         panel.innerHTML = `
           <h3>Review and create</h3>
-          <p class="step-help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it.</p>
-          <div class="review-nebius">
-            ${reviewSection('Details', 'ci-details', `
-              ${reviewRow('Name', esc(c.name))}
-              ${reviewRow('Description', c.description ? esc(c.description) : '—')}
-              ${reviewRow('Guest operating system', esc(c.guestOsFamily))}
-              ${reviewRow('Disk image', disk ? `${disk.title} (${disk.family} · ${disk.arch})` : '—')}
-              ${reviewRow('Status', 'Unpublished')}
-            `)}
-            ${reviewSection('Instance type &amp; Access', 'ci-access', `
-              ${reviewRow('Instance type', compute.summary.replace(/</g, '&lt;'))}
-              ${reviewRow('Tenant access', accessLabel)}
-            `)}
-            ${reviewSection('Visibility', 'ci-visibility', `
-              ${reviewRow('Visibility', c.visibility === 'tenant'
-                ? `Tenant scoped (${(c.tenants || []).map(id => providerTenantById(id)?.name || id).join(', ') || '—'})`
-                : 'Global public')}
-            `)}
-            ${reviewSection('Storage', 'ci-storage', `
-              ${reviewRow('Boot disk', `${c.bootDiskGiB || 30} GiB`)}
-              ${reviewRow('Additional disks', c.extraDisks?.length
-                ? c.extraDisks.map((d, i) => `Disk set ${i + 1}: ${d.size} GiB`).join('; ')
-                : 'None')}
-            `)}
-          </div>
-        `;
+          <p class="create-resource-wiz__help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it.</p>
+          ${renderReviewRows([
+            ['Name', esc(c.name)],
+            ['Description', c.description ? esc(c.description) : '—'],
+            ['Guest operating system', esc(c.guestOsFamily)],
+            ['Disk image', disk ? esc(`${disk.title} (${disk.family} · ${disk.arch})`) : '—'],
+            ['Status', 'Unpublished'],
+            ['Instance type', compute.summary.replace(/</g, '&lt;')],
+            ['Tenant access', accessLabel],
+            ['Visibility', esc(visibilityValue)],
+            ['Boot disk', `${c.bootDiskGiB || 30} GiB`],
+            ['Additional disks', esc(extraDisksValue)],
+          ])}`;
       }
       panel.querySelectorAll('[data-review-goto]').forEach(btn => {
         btn.addEventListener('click', () => {
           const targetKey = btn.dataset.reviewGoto;
-          const steps = stepsForType();
+          const steps = catalogStepsForRole();
           const idx = steps.findIndex(s => s.key === targetKey);
           if (idx < 0) return;
           readCatalogCreateFields();
-          state.step = idx;
-          state.maxVisited = Math.max(state.maxVisited, idx);
-          renderWizard();
+          c.step = idx;
+          c.maxVisited = Math.max(c.maxVisited, idx);
+          renderCreateCatalogItemWizard();
         });
       });
     }
@@ -16560,22 +16654,22 @@
       const c = state.catalogCreate;
       if (!c) return true;
       if (key === 'ci-details') {
-        if (!c.name?.trim()) {
-          state.fieldErrors = { ciName: 'Name is required.' };
-          renderWizard();
-          toast('Enter a name to continue.');
+        if (!c.name?.trim() || !isValidDnsLabel(c.name.trim())) {
+          state.fieldErrors = { ciName: 'Enter a valid DNS-style name (lowercase letters, numbers, hyphens).' };
+          renderCreateCatalogItemWizard();
+          toast('Enter a valid name to continue.');
           return false;
         }
         if (!c.diskImageId) {
           state.fieldErrors = { ciDiskImage: 'Select a disk image.' };
-          renderWizard();
+          renderCreateCatalogItemWizard();
           toast('Select a disk image to continue.');
           return false;
         }
       }
       if (key === 'ci-visibility' && c.visibility === 'tenant' && !(c.tenants || []).length) {
         state.fieldErrors = { ciTenants: 'Select at least one tenant.' };
-        renderWizard();
+        renderCreateCatalogItemWizard();
         toast('Select at least one tenant for tenant-scoped visibility.');
         return false;
       }
@@ -16608,14 +16702,10 @@
         if (item) {
           Object.assign(item, baseItem, scope || {});
         }
-        closeWizard();
-        document.getElementById('wiz-desc').hidden = true;
-        document.getElementById('wiz-desc').textContent = '';
-        document.getElementById('wiz-title').textContent = 'Create Virtual machine';
-        state.wizard = 'vm';
         state.catalogCreate = null;
         state.catalogEditId = null;
         state.catalogEditOriginal = null;
+        state.wizard = 'vm';
         if (document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')) {
           renderCatalogItemDetail();
         } else {
@@ -16643,14 +16733,10 @@
           created: formatInstanceTypeCreated(),
         });
       }
-      closeWizard();
-      document.getElementById('wiz-desc').hidden = true;
-      document.getElementById('wiz-desc').textContent = '';
-      document.getElementById('wiz-title').textContent = 'Create Virtual machine';
-      state.wizard = 'vm';
       state.catalogCreate = null;
       state.catalogEditId = null;
       state.catalogEditOriginal = null;
+      state.wizard = 'vm';
       setView('templates');
       renderCatalog();
       toast(`Created catalog item ${c.name}. It is unpublished until you publish it.`, 'success');
@@ -17705,7 +17791,8 @@
         || document.getElementById('view-create-instance-type')?.classList.contains('pf-m-active')
         || document.getElementById('view-create-disk-image')?.classList.contains('pf-m-active');
       const onCatalog = document.getElementById('view-templates')?.classList.contains('pf-m-active')
-        || document.getElementById('view-catalog-item')?.classList.contains('pf-m-active');
+        || document.getElementById('view-catalog-item')?.classList.contains('pf-m-active')
+        || document.getElementById('view-create-catalog-item')?.classList.contains('pf-m-active');
       if (role.canManageInfrastructure) {
         if (!onInfra && !onCatalog) {
           setView('templates');
@@ -17723,11 +17810,11 @@
         renderCatalog();
         if (role.canManageProviderCatalog) renderCatalogTenantFilter();
       }
-      if (state.wizard === 'catalog-create') {
+      if (state.catalogCreate) {
         const steps = catalogStepsForRole();
-        if (state.step >= steps.length) state.step = steps.length - 1;
-        state.maxVisited = Math.min(state.maxVisited, steps.length - 1);
-        renderWizard();
+        if (state.catalogCreate.step >= steps.length) state.catalogCreate.step = steps.length - 1;
+        state.catalogCreate.maxVisited = Math.min(state.catalogCreate.maxVisited, steps.length - 1);
+        renderCreateCatalogItemWizard();
       }
     }
 
@@ -18116,6 +18203,13 @@
       closeCreateDiskImage();
     });
     document.getElementById('create-di-back')?.addEventListener('click', goCreateDiskImageBack);
+    document.getElementById('create-ci-cancel')?.addEventListener('click', closeCreateCatalogItem);
+    document.getElementById('create-ci-crumb-catalog')?.addEventListener('click', e => {
+      e.preventDefault();
+      closeCreateCatalogItem();
+    });
+    document.getElementById('create-ci-back')?.addEventListener('click', goCreateCatalogItemBack);
+    document.getElementById('create-ci-next')?.addEventListener('click', goCreateCatalogItemNext);
     document.getElementById('create-di-next')?.addEventListener('click', goCreateDiskImageNext);
     document.getElementById('di-show-obsolete')?.addEventListener('change', e => {
       state.diShowObsolete = !!e.target.checked;
