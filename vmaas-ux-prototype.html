@@ -3622,6 +3622,19 @@
       color: var(--pf-t--global--text--color--regular, #151515);
       line-height: 1.4;
     }
+    .felt-select-box__title--with-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      max-width: 100%;
+    }
+    .felt-select-box__title--with-badge .felt-select-box__title-text {
+      min-width: 0;
+    }
+    .felt-select-box__title--with-badge .catalog-gov-badge {
+      flex: 0 0 auto;
+    }
     .felt-select-box__desc {
       font-size: 12px;
       font-weight: 400;
@@ -4959,6 +4972,7 @@
       max-width: 100%;
     }
     .tpl-card__title-row .tpl-card__title { min-width: 0; margin: 0; }
+    .tpl-card__title-row .catalog-gov-badge { flex: 0 0 auto; }
     .tpl-card__footer--custom {
       flex-direction: column;
       align-items: flex-start;
@@ -5506,7 +5520,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · v3 felt+icons</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · gov labels</span>
         </div>
       </div>
       <div class="console__body">
@@ -6682,6 +6696,11 @@
       if (name && !/^(rhel|windows|fedora)\./i.test(name)) return name;
       const os = String(t.os || '');
       return os.replace(/^Red Hat Enterprise Linux/, 'RHEL') || name || t.osImage || '—';
+    }
+    function templateSizeGovBadge(editable) {
+      const label = editable ? 'Size editable' : 'Size locked';
+      const mod = editable ? ' catalog-gov-badge--editable' : '';
+      return `<span class="catalog-gov-badge${mod}">${label}</span>`;
     }
     /** Icon-only Locked / Editable cue next to titles (shape + accessible name).
      *  scope === 'size' → template card/list title (compute + boot disk only). */
@@ -9622,22 +9641,37 @@
 
 
 
+    function catalogGovBadge(kind) {
+      if (kind === 'editable') {
+        return '<span class="catalog-gov-badge catalog-gov-badge--editable">Editable</span>';
+      }
+      return '<span class="catalog-gov-badge">Locked</span>';
+    }
+
     function renderFeltSelectBoxes({ name, selected, labelledBy, options }) {
       const current = selected ?? options[0]?.value;
       return `
         <div class="felt-select-boxes" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
           ${options.map(opt => {
             const isSelected = current === opt.value;
+            const iconHtml = opt.iconClass ? `
+              <span class="felt-select-box__icon${opt.iconMod ? ` felt-select-box__icon--${opt.iconMod}` : ''}" aria-hidden="true">
+                <i class="${opt.iconClass}"></i>
+              </span>` : '';
+            const titleHtml = opt.govBadge
+              ? `<span class="felt-select-box__title felt-select-box__title--with-badge">
+                  <span class="felt-select-box__title-text">${opt.title}</span>
+                  ${catalogGovBadge(opt.govBadge)}
+                </span>`
+              : `<span class="felt-select-box__title">${opt.title}</span>`;
             return `
             <label class="felt-select-box">
               <input class="felt-select-box__input" type="radio" name="${name}" value="${opt.value}"
                 ${isSelected ? 'checked' : ''} />
               <span class="felt-select-box__badge">Selected</span>
-              <span class="felt-select-box__icon${opt.iconMod ? ` felt-select-box__icon--${opt.iconMod}` : ''}" aria-hidden="true">
-                <i class="${opt.iconClass}"></i>
-              </span>
+              ${iconHtml}
               <span class="felt-select-box__text">
-                <span class="felt-select-box__title">${opt.title}</span>
+                ${titleHtml}
                 <span class="felt-select-box__desc">${opt.desc}</span>
               </span>
             </label>`;
@@ -9679,15 +9713,13 @@
             value: 'locked',
             title: 'Locked',
             desc: 'Tenants cannot change the guest operating system or hardware.',
-            iconClass: 'fa-solid fa-lock',
-            iconMod: 'locked',
+            govBadge: 'locked',
           },
           {
             value: 'editable',
             title: 'Editable at provisioning',
             desc: 'Tenants can change the guest operating system or hardware at provisioning.',
-            iconClass: 'fa-solid fa-lock-open',
-            iconMod: 'editable',
+            govBadge: 'editable',
           },
         ],
       });
@@ -13558,7 +13590,7 @@
             </span>
             <div class="tpl-card__title-row">
               <span class="tpl-card__title" title="${cardName(t)}">${cardName(t)}</span>
-              ${sizeEditable ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
+              ${templateSizeGovBadge(sizeEditable)}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
             <div class="tpl-card__specs">
@@ -13597,7 +13629,7 @@
                   <i class="${cardIcon(t)}"></i>
                 </span>
                 <span class="tpl-list__name-link">${cardName(t)}</span>
-                ${sizeEditable ? fieldGovLabel('editable', 'size') : fieldGovLabel('locked', 'size')}
+                ${templateSizeGovBadge(sizeEditable)}
               </span>
             </td>
             <td>${specs.cpu}</td>
@@ -16779,13 +16811,6 @@
       const mod = key === 'live' ? 'pf-m-live' : 'pf-m-unpublished';
       const label = key === 'live' ? 'Live' : 'Unpublished';
       return `<span class="publish-label ${mod}">${label}</span>`;
-    }
-
-    function catalogGovBadge(kind) {
-      if (kind === 'editable') {
-        return '<span class="catalog-gov-badge catalog-gov-badge--editable">Editable</span>';
-      }
-      return '<span class="catalog-gov-badge">Locked</span>';
     }
 
     function catalogDiskImageIconHtml(diskImage) {
