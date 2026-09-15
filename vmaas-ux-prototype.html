@@ -5080,6 +5080,10 @@
       color: var(--vmaas-text);
       line-height: 1.3;
     }
+    .tpl-drawer__gov-panel-head .catalog-gov-badge {
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+    }
     .tpl-drawer__gov-list {
       margin: 0;
       padding: 0;
@@ -5140,6 +5144,11 @@
     .vm-config__fields > .tpl-fixed-panel,
     .vm-config__fields > .config-section-help {
       margin-bottom: 0;
+    }
+    .tpl-card .catalog-card-specs.tpl-card__catalog-specs {
+      margin: 12px 0 0;
+      padding-bottom: 0;
+      border-bottom: none;
     }
     .tpl-card__specs {
       display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5520,7 +5529,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · 20:06 · gov labels v4</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · tpl cards + drawer badges</span>
         </div>
       </div>
       <div class="console__body">
@@ -6701,6 +6710,20 @@
       const label = editable ? 'Size editable' : 'Size locked';
       const mod = editable ? ' catalog-gov-badge--editable' : '';
       return `<span class="catalog-gov-badge${mod}">${label}</span>`;
+    }
+    function templateCardSpecsHtml(specs, storage) {
+      const rows = [
+        { label: 'vCPU', value: specs.cpu },
+        { label: 'Memory', value: specs.mem },
+        { label: 'Storage', value: storage },
+      ];
+      return `<dl class="catalog-card-specs tpl-card__catalog-specs">
+        ${rows.map(row => `
+          <div class="catalog-card-specs__row">
+            <dt class="catalog-card-specs__label">${row.label}</dt>
+            <dd class="catalog-card-specs__value">${row.value}</dd>
+          </div>`).join('')}
+      </dl>`;
     }
     /** Icon-only Locked / Editable cue next to titles (shape + accessible name).
      *  scope === 'size' → template card/list title (compute + boot disk only). */
@@ -13593,20 +13616,7 @@
               ${templateSizeGovBadge(sizeEditable)}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
-            <div class="tpl-card__specs">
-              <div>
-                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting CPU' : 'CPU'}</span>
-                <span class="tpl-card__spec-value">${specs.cpu}</span>
-              </div>
-              <div>
-                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting memory' : 'Memory'}</span>
-                <span class="tpl-card__spec-value">${specs.mem}</span>
-              </div>
-              <div>
-                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting storage' : 'Storage'}</span>
-                <span class="tpl-card__spec-value">${cardStorage(t)}</span>
-              </div>
-            </div>
+            ${templateCardSpecsHtml(specs, cardStorage(t))}
             <div class="tpl-card__footer">
               <span class="tpl-card__cost-label">Estimate cost</span>
               <span class="tpl-card__cost-values">
@@ -13693,7 +13703,7 @@
             <section class="tpl-drawer__gov-panel tpl-drawer__gov-panel--${kind}" aria-labelledby="tpl-gov-${kind}">
               <div class="tpl-drawer__gov-panel-head">
                 <h5 class="tpl-drawer__gov-panel-title" id="tpl-gov-${kind}">${title}</h5>
-                ${fieldGovLabel(kind)}
+                ${catalogGovBadge(kind)}
               </div>
               ${govList(items)}
             </section>
