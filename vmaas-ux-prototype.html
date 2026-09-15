@@ -3881,11 +3881,15 @@
       color: var(--vmaas-text);
       min-width: 0;
     }
-    .catalog-disk-image-value {
+    .catalog-disk-image-value,
+    .catalog-card-specs__value .catalog-spec-value-with-badge {
       display: inline-flex;
       align-items: center;
       flex-wrap: wrap;
       gap: var(--pf-t--global--spacer--sm, 8px);
+    }
+    .catalog-card-specs__value .catalog-gov-badge {
+      flex: 0 0 auto;
     }
     .catalog-disk-image-value__icon {
       flex: 0 0 auto;
@@ -5529,7 +5533,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · tpl cards + drawer badges</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 15 · tpl spec badges</span>
         </div>
       </div>
       <div class="console__body">
@@ -6561,7 +6565,7 @@
         mem: '2 GiB',
         storage: '5 GiB',
         workload: 'Server',
-        description: 'RHEL 10 with a 5 GiB boot disk.',
+        description: 'RHEL 10 · 5 GiB boot disk',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6583,7 +6587,7 @@
         mem: '2 GiB',
         storage: '10 GiB',
         workload: 'Server',
-        description: 'RHEL 9 with a 10 GiB boot disk.',
+        description: 'RHEL 9 · 10 GiB boot disk',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6605,7 +6609,7 @@
         mem: '8 GiB',
         storage: '20 GiB',
         workload: 'Server',
-        description: 'Windows Server 2025 with a 20 GiB boot disk.',
+        description: 'Windows Server 2025 · 20 GiB boot disk',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6627,7 +6631,7 @@
         mem: '2 GiB',
         storage: '20 GiB',
         workload: 'Server',
-        description: 'Fedora with a 20 GiB boot disk.',
+        description: 'Fedora · 20 GiB boot disk',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6649,7 +6653,7 @@
         mem: '2 GiB',
         storage: '20 GiB',
         workload: 'Server',
-        description: 'RHEL 10 with editable compute and disk. Image is locked by the template.',
+        description: 'Editable size · image locked',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6671,7 +6675,7 @@
         mem: '16 GiB',
         storage: '40 GiB',
         workload: 'Server',
-        description: 'RHEL 10 XL defaults with editable compute and disk. Image is locked by the template.',
+        description: 'XL defaults · editable size · image locked',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6706,22 +6710,41 @@
       const os = String(t.os || '');
       return os.replace(/^Red Hat Enterprise Linux/, 'RHEL') || name || t.osImage || '—';
     }
-    function templateSizeGovBadge(editable) {
-      const label = editable ? 'Size editable' : 'Size locked';
-      const mod = editable ? ' catalog-gov-badge--editable' : '';
-      return `<span class="catalog-gov-badge${mod}">${label}</span>`;
+    function templateOsImageIconHtml(t) {
+      const icons = {
+        rhel: 'fa-brands fa-redhat',
+        windows: 'fa-brands fa-windows',
+        fedora: 'fa-brands fa-fedora',
+        centos: 'fa-solid fa-circle-nodes',
+      };
+      const cls = icons[t?.osKey] || '';
+      if (!cls) return '';
+      return `<i class="${cls} catalog-disk-image-value__icon" aria-hidden="true"></i>`;
     }
-    function templateCardSpecsHtml(specs, storage) {
+    function templateSpecValueHtml(value, govKind) {
+      const esc = String(value || '—').replace(/</g, '&lt;');
+      if (!govKind) return esc;
+      return `<span class="catalog-spec-value-with-badge"><span>${esc}</span>${catalogGovBadge(govKind)}</span>`;
+    }
+    function templateCardSpecsHtml(t, specs, storage) {
+      const fieldBeh = getTemplateFields(t);
+      const imageLabel = String(t.osImage || '—').replace(/</g, '&lt;');
+      const computeGov = fieldBeh.compute === 'editable' ? 'editable' : null;
+      const storageGov = fieldBeh.bootDisk === 'editable' ? 'editable' : null;
       const rows = [
-        { label: 'vCPU', value: specs.cpu },
-        { label: 'Memory', value: specs.mem },
-        { label: 'Storage', value: storage },
+        {
+          label: 'Image',
+          valueHtml: `<span class="catalog-disk-image-value">${templateOsImageIconHtml(t)}<span>${imageLabel}</span>${catalogGovBadge('locked')}</span>`,
+        },
+        { label: 'vCPU', valueHtml: templateSpecValueHtml(specs.cpu, computeGov) },
+        { label: 'Memory', valueHtml: templateSpecValueHtml(specs.mem, computeGov) },
+        { label: 'Storage', valueHtml: templateSpecValueHtml(storage, storageGov) },
       ];
       return `<dl class="catalog-card-specs tpl-card__catalog-specs">
         ${rows.map(row => `
           <div class="catalog-card-specs__row">
             <dt class="catalog-card-specs__label">${row.label}</dt>
-            <dd class="catalog-card-specs__value">${row.value}</dd>
+            <dd class="catalog-card-specs__value">${row.valueHtml}</dd>
           </div>`).join('')}
       </dl>`;
     }
@@ -13613,10 +13636,9 @@
             </span>
             <div class="tpl-card__title-row">
               <span class="tpl-card__title" title="${cardName(t)}">${cardName(t)}</span>
-              ${templateSizeGovBadge(sizeEditable)}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
-            ${templateCardSpecsHtml(specs, cardStorage(t))}
+            ${templateCardSpecsHtml(t, specs, cardStorage(t))}
             <div class="tpl-card__footer">
               <span class="tpl-card__cost-label">Estimate cost</span>
               <span class="tpl-card__cost-values">
@@ -13639,7 +13661,6 @@
                   <i class="${cardIcon(t)}"></i>
                 </span>
                 <span class="tpl-list__name-link">${cardName(t)}</span>
-                ${templateSizeGovBadge(sizeEditable)}
               </span>
             </td>
             <td>${specs.cpu}</td>
@@ -13753,7 +13774,7 @@
                   </span>
                   <div class="tpl-drawer__heading">
                     <h4 class="tpl-drawer__title" id="tpl-drawer-title">${cardName(selected)}</h4>
-                    <p class="tpl-drawer__sub">${sizeEditable ? 'Editable size · locked image' : `${selected.os} VM`}</p>
+                    <p class="tpl-drawer__sub">${selected.description || (sizeEditable ? 'Editable size · image locked' : `${selected.os} VM`)}</p>
                   </div>
                 </div>
                 <button type="button" class="tpl-drawer__close" id="tpl-drawer-close" aria-label="Close details">&times;</button>
