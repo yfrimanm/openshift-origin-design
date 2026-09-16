@@ -951,7 +951,10 @@
     }
     .vm-detail__header {
       display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
-      gap: 12px; margin-bottom: 8px;
+      gap: 12px;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--vmaas-border, #d2d2d2);
     }
     .vm-detail__title-row {
       display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
@@ -1186,7 +1189,17 @@
     @media (max-width: 1100px) { .vm-overview-v2 { grid-template-columns: 1fr; } }
     .vm-overview-v2__main { min-width: 0; }
     .vm-overview-v2__aside { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-    .vm-overview-v2__section { padding-top: 20px; }
+    .vm-overview-v2__details { padding-top: 0; }
+    .vm-overview-v2__detail-cols {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(160px, 0.75fr);
+      gap: 8px 40px;
+      align-items: start;
+    }
+    @media (max-width: 992px) {
+      .vm-overview-v2__detail-cols { grid-template-columns: 1fr; gap: 28px; }
+    }
+    .vm-overview-v2__section { padding-top: 24px; }
     .vm-overview-v2__section-head {
       display: flex;
       align-items: center;
@@ -1194,28 +1207,21 @@
       gap: 12px;
       margin-bottom: 12px;
     }
-    .vm-overview-v2__section-title {
-      margin: 0 0 12px;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--vmaas-text);
-    }
-    .vm-overview-v2__section-head .vm-overview-v2__section-title {
+    .vm-overview-v2__section-head .ethan-detail-col__title {
       margin: 0;
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
+    .ethan-detail-col__title--section { margin-bottom: 12px; }
     .vm-overview-v2__divider {
       border: none;
       border-top: 1px solid var(--vmaas-border-light);
-      margin: 20px 0 0;
-    }
-    .vm-overview-v2__divider--page {
-      margin: 16px 0 20px;
+      margin: 24px 0 0;
     }
     .ethan-detail-col__title--spacer {
       visibility: hidden;
+      user-select: none;
     }
     .vm-overview-v2__panel {
       background: var(--pf-t--global--background--color--secondary--default, #f5f5f5);
@@ -5644,7 +5650,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview polish</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview v2 verified</span>
         </div>
       </div>
       <div class="console__body">
@@ -12093,14 +12099,13 @@
             </button>
           </div>
         </div>
-        <hr class="vm-overview-v2__divider vm-overview-v2__divider--page" aria-hidden="true" />
       `;
 
       const body = `
         <div class="vm-overview-v2">
           <div class="vm-overview-v2__main">
             <section class="vm-overview-v2__details" aria-label="Details">
-              <div class="ethan-detail-cols">
+              <div class="vm-overview-v2__detail-cols">
                 <section class="ethan-detail-col" aria-labelledby="vm-overview-title">
                   <h4 class="ethan-detail-col__title" id="vm-overview-title">Overview</h4>
                   ${itField('Project', projectDisplay)}
@@ -12124,7 +12129,7 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
-              <h3 class="vm-overview-v2__section-title" id="vm-network-title">Network (${nics.length})</h3>
+              <h4 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-network-title">Network (${nics.length})</h4>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table" aria-label="Networks">
                   <thead>
@@ -12155,7 +12160,7 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">
-              <h3 class="vm-overview-v2__section-title" id="vm-storage-title">Storage (${diskRows.length})</h3>
+              <h4 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-storage-title">Storage (${diskRows.length})</h4>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
                   <thead>
@@ -12184,12 +12189,12 @@
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-util-title">
               <div class="vm-overview-v2__section-head">
-                <h3 class="vm-overview-v2__section-title" id="vm-util-title">
+                <h4 class="ethan-detail-col__title" id="vm-util-title">
                   Utilization
                   <button type="button" class="util-title-info" id="btn-util-help" data-util-help aria-label="Utilization information" aria-haspopup="dialog" aria-expanded="false">
                     <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                   </button>
-                </h3>
+                </h4>
                 <span class="filter-select filter-select--static">Last 5 minutes <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
               </div>
               ${renderVmUtilizationTiles(v, u)}
