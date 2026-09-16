@@ -5553,7 +5553,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · di validation red</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · validation aligned</span>
         </div>
       </div>
       <div class="console__body">
@@ -7366,13 +7366,7 @@
     }
 
     function fieldErrorHtml(field) {
-      const msg = state.fieldErrors?.[field];
-      if (!msg) return '';
-      return `
-        <p class="field-error" id="err-${field}" role="alert">
-          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-          <span>${msg}</span>
-        </p>`;
+      return providerFieldErrorHtml(state.fieldErrors?.[field], `err-${field}`);
     }
 
     function clearFieldErrors() {
@@ -9492,7 +9486,7 @@
             </div>
           </div>
         </div>
-        <div class="form-field" id="${prefix}-tenant-field" ${draft.isGlobal ? 'hidden' : ''}>
+        <div class="form-field${draft.fieldErrors?.tenant ? ' pf-m-error' : ''}" id="${prefix}-tenant-field" ${draft.isGlobal ? 'hidden' : ''}>
           <label for="${prefix}-tenant-input">Tenant <span class="req">*</span></label>
           <div class="tenant-typeahead${draft.tenantMenuOpen ? ' pf-m-expanded' : ''}">
             <div class="tenant-typeahead__control">
@@ -9501,6 +9495,7 @@
                 placeholder="Search and select a tenant" autocomplete="off"
                 aria-autocomplete="list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
                 aria-controls="${prefix}-tenant-list"
+                ${draft.fieldErrors?.tenant ? `aria-describedby="${prefix}-tenant-error" aria-invalid="true"` : ''}
                 ${draft.isGlobal ? 'disabled' : ''} />
               <button type="button" class="tenant-typeahead__toggle" id="${prefix}-tenant-toggle"
                 aria-label="Toggle tenant list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
@@ -9510,7 +9505,7 @@
             </div>
             ${list}
           </div>
-          ${draft.fieldErrors?.tenant ? `<div class="pf-v6-c-form__helper-text"><span class="pf-v6-c-helper-text__item-text" style="color:#b1380b">${escAttr(draft.fieldErrors.tenant)}</span></div>` : ''}
+          ${providerFieldErrorHtml(draft.fieldErrors?.tenant, `${prefix}-tenant-error`)}
         </div>`;
     }
 
@@ -9620,18 +9615,23 @@
           <label for="${prefix}-name">Name <span class="req">*</span></label>
           <div class="name-row">
             <input type="text" id="${prefix}-name" value="${escAttr(draft.name)}" autocomplete="off" required
-              aria-describedby="${prefix}-name-help" />
+              ${nameErr
+                ? `aria-describedby="${prefix}-name-error" aria-invalid="true"`
+                : `aria-describedby="${prefix}-name-help"`} />
             <button type="button" class="icon-btn" id="${prefix}-regen-name" title="Generate name" aria-label="Generate name">
               <i class="fa-solid fa-rotate" aria-hidden="true"></i>
             </button>
           </div>
+          ${nameErr
+            ? providerFieldErrorHtml(nameErr, `${prefix}-name-error`)
+            : `
           <div class="pf-v6-c-form__helper-text">
             <div class="pf-v6-c-helper-text">
               <div class="pf-v6-c-helper-text__item">
-                <span class="pf-v6-c-helper-text__item-text" id="${prefix}-name-help">${escAttr(nameErr || 'Enter a valid DNS label (RFC 1035), or click Generate to create one.')}</span>
+                <span class="pf-v6-c-helper-text__item-text" id="${prefix}-name-help">Enter a valid DNS label (RFC 1035), or click Generate to create one.</span>
               </div>
             </div>
-          </div>
+          </div>`}
         </div>
         <div class="form-field">
           <label for="${prefix}-description">Description</label>
@@ -9643,19 +9643,22 @@
     }
 
 
-    function bindProviderNameRegen(prefix, draft, kind) {
+    function bindProviderNameRegen(prefix, draft, kind, rerender) {
       document.getElementById(`${prefix}-regen-name`)?.addEventListener('click', () => {
         draft.name = generateProviderResourceName(kind);
         if (draft.fieldErrors) delete draft.fieldErrors.name;
+        if (rerender) {
+          rerender();
+          const input = document.getElementById(`${prefix}-name`);
+          input?.focus();
+          input?.select();
+          return;
+        }
         const input = document.getElementById(`${prefix}-name`);
         if (input) {
           input.value = draft.name;
           input.focus();
           input.select();
-        }
-        const help = document.getElementById(`${prefix}-name-help`);
-        if (help && !draft.fieldErrors?.name) {
-          help.textContent = 'Enter a valid DNS label (RFC 1035), or click Generate to create one.';
         }
         document.getElementById(`${prefix}-name-field`)?.classList.remove('pf-m-error');
       });
@@ -9883,20 +9886,26 @@
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-it', draft,
           'Name the instance type, assign it to a tenant (or make it global), and add an optional description.');
-        bindProviderNameRegen('create-it', draft, 'instance-type');
+        bindProviderNameRegen('create-it', draft, 'instance-type', renderCreateInstanceTypeWizard);
         bindTenantEditor('create-it', draft, renderCreateInstanceTypeWizard);
         bindLabelsEditor('create-it', draft, renderCreateInstanceTypeWizard);
       } else if (draft.step === 1) {
+        const cpuErr = draft.fieldErrors?.cpu;
+        const memoryErr = draft.fieldErrors?.memory;
         panel.innerHTML = `
           <h3>Configuration</h3>
           <p class="create-resource-wiz__help">Define compute resources for this instance type.</p>
-          <div class="form-field">
+          <div class="form-field${cpuErr ? ' pf-m-error' : ''}">
             <label for="create-it-cpu">CPU cores <span class="req">*</span></label>
-            <input type="number" id="create-it-cpu" class="unit-size-input" min="1" step="1" value="${escAttr(draft.cpu)}" required />
+            <input type="number" id="create-it-cpu" class="unit-size-input" min="1" step="1" value="${escAttr(draft.cpu)}" required
+              ${cpuErr ? 'aria-describedby="create-it-cpu-error" aria-invalid="true"' : ''} />
+            ${providerFieldErrorHtml(cpuErr, 'create-it-cpu-error')}
           </div>
-          <div class="form-field">
+          <div class="form-field${memoryErr ? ' pf-m-error' : ''}">
             <label for="create-it-memory">Memory (GiB) <span class="req">*</span></label>
-            <input type="number" id="create-it-memory" class="unit-size-input" min="1" step="1" value="${escAttr(draft.memoryGiB)}" required />
+            <input type="number" id="create-it-memory" class="unit-size-input" min="1" step="1" value="${escAttr(draft.memoryGiB)}" required
+              ${memoryErr ? 'aria-describedby="create-it-memory-error" aria-invalid="true"' : ''} />
+            ${providerFieldErrorHtml(memoryErr, 'create-it-memory-error')}
           </div>
           <h3 class="create-it-section-title">GPU</h3>
           <div class="form-field">
@@ -10062,7 +10071,7 @@
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-di', draft,
           'Name the disk image, assign it to a tenant (or make it global), and add an optional description.');
-        bindProviderNameRegen('create-di', draft, 'disk-image');
+        bindProviderNameRegen('create-di', draft, 'disk-image', renderCreateDiskImageWizard);
         bindTenantEditor('create-di', draft, renderCreateDiskImageWizard);
         bindLabelsEditor('create-di', draft, renderCreateDiskImageWizard);
       } else if (draft.step === 1) {
@@ -13073,7 +13082,9 @@
                   <i class="fa-solid fa-rotate" aria-hidden="true"></i>
                 </button>
               </div>
-              ${isCatalogFlow ? '<p class="form-helper" id="f-name-help">Enter a name, or click the Generate icon to create one.</p>' : ''}
+              ${isCatalogFlow && !state.fieldErrors.name
+                ? '<p class="form-helper" id="f-name-help">Enter a name, or click the Generate icon to create one.</p>'
+                : ''}
               ${fieldErrorHtml('name')}
             </div>
             <div class="form-field">
@@ -13896,12 +13907,10 @@
             <div>
               <h3>Select template</h3>
               <p class="step-help">Choose a project to see the templates available to you there. The Virtual machine will be created in that project. Then select a template to review details and click Next.</p>
-              ${state.fieldErrors.catalog ? `
-                <p class="field-error tpl-step__error" id="err-catalog" role="alert">
-                  <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-                  <span>${state.fieldErrors.catalog}</span>
-                </p>
-              ` : ''}
+              ${(() => {
+                const catalogErr = providerFieldErrorHtml(state.fieldErrors.catalog, 'err-catalog');
+                return catalogErr ? `<div class="tpl-step__error">${catalogErr}</div>` : '';
+              })()}
             </div>
             <div class="tpl-toolbar">
               <div class="tpl-toolbar__project">
@@ -16258,11 +16267,15 @@
           <div class="form-field ${state.fieldErrors.ciName ? 'pf-m-error' : ''}">
             <label for="ci-name">Name <span class="req">*</span></label>
             <div class="name-row">
-              <input type="text" id="ci-name" value="${String(c.name).replace(/"/g, '&quot;')}" required />
+              <input type="text" id="ci-name" value="${String(c.name).replace(/"/g, '&quot;')}" required
+                ${state.fieldErrors.ciName ? 'aria-describedby="err-ciName" aria-invalid="true"' : 'aria-describedby="ci-name-help"'} />
               <button type="button" class="icon-btn" id="ci-regen-name" title="Generate name" aria-label="Generate name">
                 <i class="fa-solid fa-rotate" aria-hidden="true"></i>
               </button>
             </div>
+            ${state.fieldErrors.ciName
+              ? providerFieldErrorHtml(state.fieldErrors.ciName, 'err-ciName')
+              : '<p class="form-helper" id="ci-name-help">Enter a valid DNS-style name, or click Generate to create one.</p>'}
           </div>
           <div class="form-field">
             <label for="ci-description">Description</label>
@@ -16307,12 +16320,15 @@
                 </div>
               </div>
             </div>
+            ${providerFieldErrorHtml(state.fieldErrors.ciDiskImage, 'err-ciDiskImage')}
           </div>
         `;
         panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
           c.name = generateCatalogItemName();
+          delete state.fieldErrors.ciName;
           const input = panel.querySelector('#ci-name');
           if (input) input.value = c.name;
+          renderCreateCatalogItemWizard();
         });
         panel.querySelectorAll('input[name="ciGuestOs"]').forEach(r => {
           r.addEventListener('change', () => {
@@ -16329,7 +16345,11 @@
           optionSel: '[data-disk-image]',
           onOpen: () => { c.diskImageMenuOpen = true; },
           onClose: () => { c.diskImageMenuOpen = false; },
-          onSelect: opt => { c.diskImageId = opt.dataset.diskImage; renderCreateCatalogItemWizard(); },
+          onSelect: opt => {
+            c.diskImageId = opt.dataset.diskImage;
+            delete state.fieldErrors.ciDiskImage;
+            renderCreateCatalogItemWizard();
+          },
         });
         panel.querySelector('#ci-disk-image-search')?.addEventListener('input', e => {
           c.diskImageFilter = e.target.value;
@@ -16564,7 +16584,9 @@
               </div>
               ${listHtml}
             </div>
-            <p class="form-helper">Search scales for large tenant lists. Select one or more tenants.</p>
+            ${state.fieldErrors.ciTenants
+              ? providerFieldErrorHtml(state.fieldErrors.ciTenants, 'err-ciTenants')
+              : '<p class="form-helper">Search scales for large tenant lists. Select one or more tenants.</p>'}
           </div>` : ''}
         `;
         panel.querySelectorAll('input[name="ciVisibility"]').forEach(r => {
