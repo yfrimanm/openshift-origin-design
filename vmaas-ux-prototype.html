@@ -1180,6 +1180,14 @@
       align-self: flex-start;
       justify-content: flex-end;
     }
+    .ethan-detail-header--vm .ethan-detail-header__actions-divider {
+      width: 1px;
+      height: 1.5rem;
+      margin: 0 4px;
+      background: var(--vmaas-border, #d2d2d2);
+      align-self: center;
+      flex-shrink: 0;
+    }
     .ethan-detail-header--vm .ethan-detail-header__title {
       display: inline-flex;
       align-items: center;
@@ -1211,15 +1219,25 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .vm-overview-v2__section-head .ethan-detail-col__title {
       margin: 0;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      font-size: var(--pf-t--global--font--size--heading--h4, 1rem);
+      font-weight: var(--pf-t--global--font--weight--heading--bold, 700);
+      line-height: var(--pf-t--global--font--line-height--heading, 1.3);
+      color: var(--vmaas-text, #151515);
     }
-    .vm-overview-v2__section > .ethan-detail-col__title { margin-bottom: 16px; }
+    .vm-overview-v2__section > .ethan-detail-col__title {
+      margin: 0 0 16px;
+      font-size: var(--pf-t--global--font--size--heading--h4, 1rem);
+      font-weight: var(--pf-t--global--font--weight--heading--bold, 700);
+      line-height: var(--pf-t--global--font--line-height--heading, 1.3);
+      color: var(--vmaas-text, #151515);
+    }
     .vm-overview-v2__divider {
       border: none;
       border-top: 1px solid var(--vmaas-border-light);
@@ -1235,7 +1253,13 @@
       margin: 16px 0 0;
       min-height: 48px;
     }
-    .overview-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .vm-overview-v2 .overview-table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .vm-overview-v2 .overview-table col.overview-col { width: 20%; }
     .overview-table th,
     .overview-table td {
       text-align: left;
@@ -1243,6 +1267,8 @@
       vertical-align: top;
       border-bottom: 1px solid var(--vmaas-border-light);
     }
+    .vm-overview-v2 .overview-table th:first-child,
+    .vm-overview-v2 .overview-table td:first-child { padding-left: 0; }
     .overview-table th {
       font-size: var(--pf-t--global--font--size--body--sm, 0.75rem);
       font-weight: 400;
@@ -5652,7 +5678,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview polish</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview tables</span>
         </div>
       </div>
       <div class="console__body">
@@ -12051,7 +12077,7 @@
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
           <ol class="pf-v6-c-breadcrumb__list">
             <li class="pf-v6-c-breadcrumb__item">
-              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-vms>Services</a>
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-vms>Virtual machines</a>
             </li>
             <li class="pf-v6-c-breadcrumb__item">
               <span class="pf-v6-c-breadcrumb__item-divider">
@@ -12076,6 +12102,7 @@
               <span class="pf-v6-c-button__icon"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
               <span class="pf-v6-c-button__text">Open console</span>
             </button>
+            <span class="ethan-detail-header__actions-divider" aria-hidden="true"></span>
             <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="start" ${canStart ? '' : `disabled title="${startTip}"`}>
               <span class="pf-v6-c-button__text">Start</span>
             </button>
@@ -12125,7 +12152,10 @@
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
               <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
               <div class="vm-overview__table-wrap">
-                <table class="overview-table" aria-label="Networks">
+                <table class="overview-table overview-table--network" aria-label="Networks">
+                  <colgroup>
+                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" />
+                  </colgroup>
                   <thead>
                     <tr>
                       <th scope="col">Name</th>
@@ -12157,24 +12187,27 @@
               <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage (${diskRows.length})</h3>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
+                  <colgroup>
+                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" />
+                  </colgroup>
                   <thead>
                     <tr>
-                      <th scope="col">Name</th>
+                      <th scope="col" colspan="2">Name</th>
                       <th scope="col">Size</th>
-                      <th scope="col">Storage tier</th>
+                      <th scope="col" colspan="2">Storage tier</th>
                     </tr>
                   </thead>
                   <tbody>
                     ${diskRows.map(d => `
                       <tr>
-                        <td>
+                        <td colspan="2">
                           <span class="overview-table__name">
                             ${d.label}
                             ${d.bootable ? '<span class="pf-v6-c-badge pf-m-read bootable-badge">Bootable</span>' : ''}
                           </span>
                         </td>
                         <td>${d.size}</td>
-                        <td>${d.tier}</td>
+                        <td colspan="2">${d.tier}</td>
                       </tr>`).join('')}
                   </tbody>
                 </table>
