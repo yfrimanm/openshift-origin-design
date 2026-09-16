@@ -13075,7 +13075,7 @@
                 <input type="text" id="f-name" value="${d.name}"
                   placeholder="${isCatalogFlow ? 'e.g. cyan-narwhal-42' : 'Enter a name or click the refresh icon to generate one'}"
                   ${isCatalogFlow
-                    ? `aria-describedby="${state.fieldErrors.name ? 'f-name-help err-name' : 'f-name-help'}"`
+                    ? (state.fieldErrors.name ? 'aria-describedby="err-name"' : 'aria-describedby="f-name-help"')
                     : (state.fieldErrors.name ? 'aria-describedby="err-name"' : '')}
                   ${state.fieldErrors.name ? 'aria-invalid="true"' : ''} />
                 <button type="button" class="icon-btn" id="f-regen" title="Generate name" aria-label="Generate name">
