@@ -5678,7 +5678,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview tables</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · tenant before name</span>
         </div>
       </div>
       <div class="console__body">
@@ -9759,10 +9759,9 @@
         setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
       }
     }
-    function renderGeneralStep(prefix, draft, help) {
+    function renderGeneralStep(prefix, draft, help, { tenantFirst = false } = {}) {
       const nameErr = draft.fieldErrors?.name;
-      return `
-        <p class="create-resource-wiz__help">${help}</p>
+      const nameField = `
         <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="${prefix}-name-field">
           <label for="${prefix}-name">Name <span class="req">*</span></label>
           <div class="name-row">
@@ -9784,13 +9783,20 @@
               </div>
             </div>
           </div>`}
-        </div>
+        </div>`;
+      const descriptionField = `
         <div class="form-field">
           <label for="${prefix}-description">Description</label>
           <textarea id="${prefix}-description" rows="3">${escAttr(draft.description)}</textarea>
-        </div>
-        ${renderTenantEditor(prefix, draft)}
-        ${renderLabelsEditor(prefix, draft)}
+        </div>`;
+      const tenantField = renderTenantEditor(prefix, draft);
+      const labelsField = renderLabelsEditor(prefix, draft);
+      const fields = tenantFirst
+        ? [tenantField, nameField, descriptionField, labelsField]
+        : [nameField, descriptionField, tenantField, labelsField];
+      return `
+        <p class="create-resource-wiz__help">${help}</p>
+        ${fields.join('')}
       `;
     }
 
@@ -10037,7 +10043,8 @@
 
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-it', draft,
-          'Name the instance type, assign it to a tenant (or make it global), and add an optional description.');
+          'Assign the instance type to a tenant (or make it global), then enter a name. Names are unique per tenant.',
+          { tenantFirst: true });
         bindProviderNameRegen('create-it', draft, 'instance-type', renderCreateInstanceTypeWizard);
         bindTenantEditor('create-it', draft, renderCreateInstanceTypeWizard);
         bindLabelsEditor('create-it', draft, renderCreateInstanceTypeWizard);
@@ -10222,7 +10229,8 @@
 
       if (draft.step === 0) {
         panel.innerHTML = renderGeneralStep('create-di', draft,
-          'Name the disk image, assign it to a tenant (or make it global), and add an optional description.');
+          'Assign the disk image to a tenant (or make it global), then enter a name. Names are unique per tenant.',
+          { tenantFirst: true });
         bindProviderNameRegen('create-di', draft, 'disk-image', renderCreateDiskImageWizard);
         bindTenantEditor('create-di', draft, renderCreateDiskImageWizard);
         bindLabelsEditor('create-di', draft, renderCreateDiskImageWizard);
