@@ -5553,7 +5553,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · di arch validation</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · di validation red</span>
         </div>
       </div>
       <div class="console__body">
@@ -8456,6 +8456,11 @@
       `;
     }
 
+    function providerFieldErrorHtml(msg, id = '') {
+      if (!msg) return '';
+      return `<p class="field-error"${id ? ` id="${id}"` : ''} role="alert"><span>${escAttr(msg)}</span></p>`;
+    }
+
     function pfGroupSelect({ id, optionsHtml }) {
       return `
         <span class="pf-v6-c-form-control folder-search pf-m-placeholder">
@@ -10069,12 +10074,11 @@
           <p class="create-resource-wiz__help">Provide the image reference and guest operating system details.</p>
           <div class="form-field${imageErr ? ' pf-m-error' : ''}" id="create-di-image-field">
             <label for="create-di-image">Image <span class="req">*</span></label>
-            <input type="text" id="create-di-image" value="${escAttr(draft.image)}" autocomplete="off" required />
-            <div class="pf-v6-c-form__helper-text">
-              <div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
-                <span class="pf-v6-c-helper-text__item-text">${escAttr(imageErr || 'Example: quay.io/containerdisks/fedora:latest')}</span>
-              </div></div>
-            </div>
+            <input type="text" id="create-di-image" value="${escAttr(draft.image)}" autocomplete="off" required
+              ${imageErr ? 'aria-describedby="create-di-image-error"' : 'aria-describedby="create-di-image-help"'} />
+            ${imageErr
+              ? providerFieldErrorHtml(imageErr, 'create-di-image-error')
+              : pfHelperText('Example: quay.io/containerdisks/fedora:latest', 'create-di-image-help')}
           </div>
           <div class="form-field">
             <label id="create-di-guest-os-label">Guest operating system <span class="req">*</span></label>
@@ -10094,11 +10098,7 @@
                   ${a}
                 </label>`).join('')}
             </div>
-            ${archErr ? `
-            <p class="field-error" id="create-di-arch-error" role="alert">
-              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-              <span>${escAttr(archErr)}</span>
-            </p>` : `
+            ${archErr ? providerFieldErrorHtml(archErr, 'create-di-arch-error') : `
             <div class="pf-v6-c-form__helper-text">
               <div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item">
                 <span class="pf-v6-c-helper-text__item-text" id="create-di-arch-help">You may select multiple architecture types.</span>
