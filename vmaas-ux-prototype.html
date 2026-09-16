@@ -1198,8 +1198,8 @@
     .vm-overview-v2__details { padding-top: 0; }
     .vm-overview-v2__detail-cols {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(160px, 0.75fr);
-      gap: 24px 48px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 32px;
       align-items: start;
     }
     @media (max-width: 992px) {
@@ -1219,7 +1219,7 @@
       align-items: center;
       gap: 6px;
     }
-    .ethan-detail-col__title--section { margin-bottom: 12px; }
+    .vm-overview-v2__section > .ethan-detail-col__title { margin-bottom: 16px; }
     .vm-overview-v2__divider {
       border: none;
       border-top: 1px solid var(--vmaas-border-light);
@@ -1243,7 +1243,13 @@
       vertical-align: top;
       border-bottom: 1px solid var(--vmaas-border-light);
     }
-    .overview-table th { font-weight: 600; color: var(--vmaas-text); }
+    .overview-table th {
+      font-size: var(--pf-t--global--font--size--body--sm, 0.75rem);
+      font-weight: 400;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      border-bottom: 1px solid var(--vmaas-border-light);
+      padding-bottom: 8px;
+    }
     .overview-table tr:last-child > * { border-bottom: none; }
     .overview-table--storage tbody tr > * { border-bottom: none; }
     .overview-table__name {
@@ -5646,7 +5652,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview Ethan v2</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview polish</span>
         </div>
       </div>
       <div class="console__body">
@@ -12038,11 +12044,14 @@
       const u = { ...baseUtil, ...(v.utilizationDisplay || {}) };
       const alerts = Array.isArray(v.alerts) ? v.alerts : [];
 
+      const canDelete = !running && !starting;
+      const deleteTip = canDelete ? '' : (starting ? startingReason : 'The Virtual machine is running');
+
       const header = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
           <ol class="pf-v6-c-breadcrumb__list">
             <li class="pf-v6-c-breadcrumb__item">
-              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-vms>Virtual machines</a>
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-vms>Services</a>
             </li>
             <li class="pf-v6-c-breadcrumb__item">
               <span class="pf-v6-c-breadcrumb__item-divider">
@@ -12057,10 +12066,7 @@
             <div class="ethan-detail-header__title-row">
               <span class="catalog-detail-header__icon" aria-hidden="true"><i class="pf-v6-pficon-virtual-machine"></i></span>
               <div>
-                <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">
-                  ${v.name}
-                  <span class="pf-v6-c-badge pf-m-read vm-arch-badge">${v.arch || 'amd64'}</span>
-                </h2>
+                <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${v.name}</h2>
                 <p class="ethan-detail-header__subtitle">Review configuration, networking, storage, and utilization for this Virtual machine.</p>
               </div>
             </div>
@@ -12082,14 +12088,8 @@
             <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="pause" ${canPause ? '' : `disabled title="${pauseTip}"`}>
               <span class="pf-v6-c-button__text">Pause</span>
             </button>
-            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="vm-detail-actions-btn"
-              data-vm-kebab="${v.name}" aria-expanded="false" aria-haspopup="menu" aria-controls="vm-kebab-menu">
-              <span class="pf-v6-c-menu-toggle__text">Actions</span>
-              <span class="pf-v6-c-menu-toggle__controls">
-                <span class="pf-v6-c-menu-toggle__toggle-icon">
-                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
-                </span>
-              </span>
+            <button type="button" class="pf-v6-c-button pf-m-danger pf-m-secondary" id="vm-detail-delete-btn" ${canDelete ? '' : `disabled title="${deleteTip}"`}>
+              <span class="pf-v6-c-button__text">Delete</span>
             </button>
           </div>
         </div>
@@ -12123,7 +12123,7 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
-              <h3 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-network-title">Network (${nics.length})</h3>
+              <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table" aria-label="Networks">
                   <thead>
@@ -12154,7 +12154,7 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">
-              <h3 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-storage-title">Storage (${diskRows.length})</h3>
+              <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage (${diskRows.length})</h3>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
                   <thead>
@@ -12229,10 +12229,9 @@
           applyVmPowerAction(b.dataset.vmAction, v.name);
         });
       });
-      root.querySelector('#vm-detail-actions-btn')?.addEventListener('click', e => {
-        e.stopPropagation();
-        hidePfTooltip();
-        openVmKebabMenu(v.name, e.currentTarget);
+      root.querySelector('#vm-detail-delete-btn')?.addEventListener('click', () => {
+        if (!canDelete) return;
+        openDeleteVmModal(v.name);
       });
       root.querySelector('#vm-open-console')?.addEventListener('click', () => {
         openVmConsolePlaceholder(state.selectedVmName || v.name);
