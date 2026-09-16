@@ -1164,36 +1164,42 @@
       vertical-align: middle;
     }
 
-    /* —— VM Overview v2 (Sep 2026 redesign) —— */
-    .vm-detail__open-console {
+    /* —— VM Overview v2 — Ethan bare-metal styling —— */
+    .ethan-detail-header--vm {
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--vmaas-border, #d2d2d2);
+      align-items: flex-start;
+    }
+    .ethan-detail-header--vm .ethan-detail-header__main {
+      flex: 1 1 280px;
+      min-width: 0;
+    }
+    .ethan-detail-header--vm .ethan-detail-header__actions {
+      margin-left: auto;
+      align-self: flex-start;
+      justify-content: flex-end;
+    }
+    .ethan-detail-header--vm .ethan-detail-header__title {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-right: 4px;
-      padding: 6px 10px;
-      border: none;
-      background: none;
-      color: var(--vmaas-blue);
-      font: inherit;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 4px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    .vm-detail__open-console:hover { background: #e7f1fa; text-decoration: underline; }
     .vm-overview-v2 {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-      gap: 24px;
+      gap: 24px 32px;
       align-items: start;
     }
     @media (max-width: 1100px) { .vm-overview-v2 { grid-template-columns: 1fr; } }
     .vm-overview-v2__main { min-width: 0; }
-    .vm-overview-v2__aside { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .vm-overview-v2__aside { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
     .vm-overview-v2__details { padding-top: 0; }
     .vm-overview-v2__detail-cols {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(160px, 0.75fr);
-      gap: 8px 40px;
+      gap: 24px 48px;
       align-items: start;
     }
     @media (max-width: 992px) {
@@ -1223,20 +1229,10 @@
       visibility: hidden;
       user-select: none;
     }
-    .vm-overview-v2__panel {
-      background: var(--pf-t--global--background--color--secondary--default, #f5f5f5);
-      border-radius: 8px;
-      padding: 16px;
-      min-height: 100px;
-    }
-    .vm-overview-v2__panel-title {
-      margin: 0 0 12px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--vmaas-text);
-    }
-    .vm-overview-v2__panel-body--empty {
-      margin: 0;
+    .vm-overview-v2__aside-card.catalog-hw-specs { min-height: 100px; }
+    .vm-overview-v2__aside-card .vm-alerts-list { margin-top: 16px; }
+    .vm-overview-v2__aside-empty {
+      margin: 16px 0 0;
       min-height: 48px;
     }
     .overview-table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -5650,7 +5646,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview v2 verified</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · vm overview Ethan styling</span>
         </div>
       </div>
       <div class="console__body">
@@ -12056,39 +12052,37 @@
             </li>
           </ol>
         </nav>
-        <div class="vm-detail__header">
-          <div class="vm-detail__title-row">
-            <h2 class="vm-detail__title pf-v6-c-title pf-m-2xl pf-m-page-title">
-              <span class="res-icon res-icon--vm" aria-hidden="true">VM</span>
-              ${v.name}
-              <span class="pf-v6-c-badge pf-m-read vm-arch-badge">${v.arch || 'amd64'}</span>
-            </h2>
+        <div class="ethan-detail-header ethan-detail-header--vm">
+          <div class="ethan-detail-header__main">
+            <div class="ethan-detail-header__title-row">
+              <span class="catalog-detail-header__icon" aria-hidden="true"><i class="pf-v6-pficon-virtual-machine"></i></span>
+              <div>
+                <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">
+                  ${v.name}
+                  <span class="pf-v6-c-badge pf-m-read vm-arch-badge">${v.arch || 'amd64'}</span>
+                </h2>
+                <p class="ethan-detail-header__subtitle">Review configuration, networking, storage, and utilization for this Virtual machine.</p>
+              </div>
+            </div>
           </div>
-          <div class="vm-detail__actions" role="group" aria-label="VM actions">
-            <button type="button" class="vm-detail__open-console" id="vm-open-console">
-              Open console <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+          <div class="ethan-detail-header__actions" role="group" aria-label="VM actions">
+            <button type="button" class="pf-v6-c-button pf-m-primary" id="vm-open-console">
+              <span class="pf-v6-c-button__icon"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+              <span class="pf-v6-c-button__text">Open console</span>
             </button>
-            <span class="vm-action-icon-wrap" data-pf-tooltip="${stopTip}">
-              <button type="button" class="vm-action-icon" data-vm-action="stop" aria-label="Stop" ${canStop ? '' : 'disabled'}>
-                <i class="fa-solid fa-stop" aria-hidden="true"></i>
-              </button>
-            </span>
-            <span class="vm-action-icon-wrap" data-pf-tooltip="${restartTip}">
-              <button type="button" class="vm-action-icon" data-vm-action="restart" aria-label="Restart" ${canRestart ? '' : 'disabled'}>
-                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-              </button>
-            </span>
-            <span class="vm-action-icon-wrap" data-pf-tooltip="${pauseTip}">
-              <button type="button" class="vm-action-icon" data-vm-action="pause" aria-label="Pause" ${canPause ? '' : 'disabled'}>
-                <i class="fa-solid fa-pause" aria-hidden="true"></i>
-              </button>
-            </span>
-            <span class="vm-action-icon-wrap" data-pf-tooltip="${startTip}">
-              <button type="button" class="vm-action-icon" data-vm-action="start" aria-label="Start" ${canStart ? '' : 'disabled'}>
-                <i class="fa-solid fa-play" aria-hidden="true"></i>
-              </button>
-            </span>
-            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary vm-action-menu" id="vm-detail-actions-btn"
+            <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="start" ${canStart ? '' : `disabled title="${startTip}"`}>
+              <span class="pf-v6-c-button__text">Start</span>
+            </button>
+            <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="restart" ${canRestart ? '' : `disabled title="${restartTip}"`}>
+              <span class="pf-v6-c-button__text">Restart</span>
+            </button>
+            <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="stop" ${canStop ? '' : `disabled title="${stopTip}"`}>
+              <span class="pf-v6-c-button__text">Stop</span>
+            </button>
+            <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="pause" ${canPause ? '' : `disabled title="${pauseTip}"`}>
+              <span class="pf-v6-c-button__text">Pause</span>
+            </button>
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="vm-detail-actions-btn"
               data-vm-kebab="${v.name}" aria-expanded="false" aria-haspopup="menu" aria-controls="vm-kebab-menu">
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
               <span class="pf-v6-c-menu-toggle__controls">
@@ -12107,14 +12101,14 @@
             <section class="vm-overview-v2__details" aria-label="Details">
               <div class="vm-overview-v2__detail-cols">
                 <section class="ethan-detail-col" aria-labelledby="vm-overview-title">
-                  <h4 class="ethan-detail-col__title" id="vm-overview-title">Overview</h4>
+                  <h3 class="ethan-detail-col__title" id="vm-overview-title">Overview</h3>
                   ${itField('Project', projectDisplay)}
                   ${itField('Status', statusCell(v.status, v.name))}
                   ${itField('Created', v.created || '—')}
                   ${itField('Catalog item', catalogItemDisplay)}
                 </section>
                 <section class="ethan-detail-col" aria-labelledby="vm-config-title">
-                  <h4 class="ethan-detail-col__title" id="vm-config-title">Configuration</h4>
+                  <h3 class="ethan-detail-col__title" id="vm-config-title">Configuration</h3>
                   ${itField('Operating system', osDisplay)}
                   ${itField('Compute resource', computeFields.computeResource)}
                   ${itField('Image', imageDisplay)}
@@ -12122,14 +12116,14 @@
                   ${itField('Memory', computeFields.memory)}
                 </section>
                 <section class="ethan-detail-col" aria-labelledby="vm-ssh-title">
-                  <h4 class="ethan-detail-col__title ethan-detail-col__title--spacer" id="vm-ssh-title" aria-hidden="true">&nbsp;</h4>
+                  <h3 class="ethan-detail-col__title ethan-detail-col__title--spacer" id="vm-ssh-title" aria-hidden="true">&nbsp;</h3>
                   ${itField('SSH public key', sshDisplay)}
                 </section>
               </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
-              <h4 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-network-title">Network (${nics.length})</h4>
+              <h3 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-network-title">Network (${nics.length})</h3>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table" aria-label="Networks">
                   <thead>
@@ -12160,7 +12154,7 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">
-              <h4 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-storage-title">Storage (${diskRows.length})</h4>
+              <h3 class="ethan-detail-col__title ethan-detail-col__title--section" id="vm-storage-title">Storage (${diskRows.length})</h3>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
                   <thead>
@@ -12189,20 +12183,20 @@
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-util-title">
               <div class="vm-overview-v2__section-head">
-                <h4 class="ethan-detail-col__title" id="vm-util-title">
+                <h3 class="ethan-detail-col__title" id="vm-util-title">
                   Utilization
                   <button type="button" class="util-title-info" id="btn-util-help" data-util-help aria-label="Utilization information" aria-haspopup="dialog" aria-expanded="false">
                     <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                   </button>
-                </h4>
+                </h3>
                 <span class="filter-select filter-select--static">Last 5 minutes <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
               </div>
               ${renderVmUtilizationTiles(v, u)}
             </section>
           </div>
           <aside class="vm-overview-v2__aside" aria-label="Sidebar">
-            <div class="vm-overview-v2__panel">
-              <h3 class="vm-overview-v2__panel-title">Alerts</h3>
+            <section class="catalog-hw-specs vm-overview-v2__aside-card" aria-labelledby="vm-alerts-title">
+              <h3 class="catalog-hw-specs__title" id="vm-alerts-title">Alerts</h3>
               ${alerts.length ? `
                 <ul class="vm-alerts-list" aria-label="Alerts">
                   ${alerts.slice(0, 3).map(a => `
@@ -12212,12 +12206,12 @@
                     </li>
                   `).join('')}
                 </ul>
-              ` : '<p class="vm-overview-v2__panel-body--empty" aria-hidden="true">&nbsp;</p>'}
-            </div>
-            <div class="vm-overview-v2__panel">
-              <h3 class="vm-overview-v2__panel-title">Recent activity</h3>
-              <p class="vm-overview-v2__panel-body--empty" aria-hidden="true">&nbsp;</p>
-            </div>
+              ` : '<p class="vm-overview-v2__aside-empty" aria-hidden="true">&nbsp;</p>'}
+            </section>
+            <section class="catalog-hw-specs vm-overview-v2__aside-card" aria-labelledby="vm-activity-title">
+              <h3 class="catalog-hw-specs__title" id="vm-activity-title">Recent activity</h3>
+              <p class="vm-overview-v2__aside-empty" aria-hidden="true">&nbsp;</p>
+            </section>
           </aside>
         </div>
       `;
