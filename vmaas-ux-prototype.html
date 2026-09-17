@@ -2271,6 +2271,20 @@
       max-width: 16rem;
       text-align: start;
     }
+    #vm-overview-row-menu:not(.pf-m-open) { display: none; }
+    #vm-overview-row-menu.pf-m-open {
+      display: block;
+      position: fixed;
+      z-index: 500;
+      min-width: 12rem;
+      max-width: 16rem;
+      background: color-mix(in srgb, var(--pf-t--global--background--color--secondary--default, #f2f2f2) 84%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid var(--pf-t--global--border--color--glass--default, rgba(255, 255, 255, 0.45));
+      border-radius: var(--pf-t--global--border--radius--glass--default, 12px);
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, 0 4px 16px rgba(0, 0, 0, 0.12));
+    }
     .side-table td.side-table__actions .overview-row-menu,
     .overview-table td.overview-table__actions .overview-row-menu,
     .side-table td.side-table__actions .overview-row-menu .pf-v6-c-menu__item,
@@ -2699,6 +2713,29 @@
       box-shadow: var(--pf-t--global--box-shadow--md, 0 4px 16px rgba(0, 0, 0, 0.16));
       padding: 0; overflow: hidden;
       isolation: isolate;
+    }
+    /* VM modals — PF6 Felt glass menus */
+    #compute-overlay .rich-select__menu,
+    #nic-overlay .rich-select__menu,
+    #disk-overlay .rich-select__menu,
+    #nic-overlay .sg-select__menu {
+      background: color-mix(in srgb, var(--pf-t--global--background--color--secondary--default, #f2f2f2) 84%, transparent) !important;
+      background-color: color-mix(in srgb, var(--pf-t--global--background--color--secondary--default, #f2f2f2) 84%, transparent) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: var(--pf-t--global--border--width--glass--default, 1px) solid var(--pf-t--global--border--color--glass--default, rgba(255, 255, 255, 0.45));
+      border-radius: var(--pf-t--global--border--radius--glass--default, 12px);
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, 0 4px 16px rgba(0, 0, 0, 0.12));
+    }
+    #compute-overlay .rich-select__menu .pf-v6-c-menu__list,
+    #compute-overlay .rich-select__menu .rich-select__menu-list,
+    #nic-overlay .rich-select__menu .pf-v6-c-menu__list,
+    #nic-overlay .rich-select__menu .rich-select__menu-list,
+    #disk-overlay .rich-select__menu .pf-v6-c-menu__list,
+    #disk-overlay .rich-select__menu .rich-select__menu-list,
+    #nic-overlay .sg-select__menu {
+      background: transparent !important;
+      background-color: transparent !important;
     }
     .rich-select__menu[hidden] { display: none !important; }
     .rich-select__menu .pf-v6-c-menu__list,
@@ -5740,7 +5777,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · VM overview edits</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · modal glass + kebabs</span>
         </div>
       </div>
       <div class="console__body">
@@ -6541,6 +6578,12 @@
     </div>
   </div>
 
+  <div class="pf-v6-c-menu" id="vm-overview-row-menu" hidden role="menu" aria-label="Row actions">
+    <div class="pf-v6-c-menu__content">
+      <ul class="pf-v6-c-menu__list" role="menu" id="vm-overview-row-menu-list"></ul>
+    </div>
+  </div>
+
   <div class="pf-v6-c-backdrop" id="columns-overlay" aria-hidden="true">
     <div class="pf-v6-l-bullseye" style="display:flex;align-items:center;justify-content:center;min-height:100%;padding:1rem;">
       <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="columns-modal-title" aria-describedby="columns-modal-desc" id="columns-modal">
@@ -7203,33 +7246,78 @@
     }
 
 
+    function renderEditComputeModal() {
+      const m = state.editComputeModal;
+      const body = document.getElementById('compute-modal-body');
+      if (!m || !body) return;
+      const options = filteredVmComputeResources(m.filter).map(c => {
+        const parts = computeResourceParts(c.id);
+        const rate = formatComputeHourlyRate(c.hourly);
+        return {
+          id: c.id,
+          title: parts.title,
+          desc: [parts.desc, rate].filter(Boolean).join(' · '),
+        };
+      });
+      body.innerHTML = `
+        <div class="form-field">
+          <label id="f-edit-compute-resource-label">Compute resource <span class="req">*</span></label>
+          ${renderTypeaheadRichSelectHtml({
+            rootId: 'edit-compute-select',
+            toggleId: 'edit-compute-toggle',
+            menuId: 'edit-compute-menu',
+            searchId: 'edit-compute-search',
+            labelId: 'f-edit-compute-resource-label',
+            open: m.menuOpen,
+            filter: m.filter,
+            searchPlaceholder: 'Search compute resources',
+            selectedId: m.selectedId,
+            placeholder: 'Select a compute resource',
+            options,
+            optionAttr: 'data-edit-compute',
+            stacked: true,
+            hiddenInputId: 'f-edit-compute-resource',
+            emptyNoun: 'compute resources',
+          })}
+        </div>
+      `;
+      const root = body.querySelector('#edit-compute-select');
+      bindRichSelect(root, {
+        toggleSel: '#edit-compute-toggle',
+        menuSel: '#edit-compute-menu',
+        optionSel: '[data-edit-compute]',
+        onOpen: () => { m.menuOpen = true; },
+        onClose: () => { m.menuOpen = false; },
+        onSelect: opt => {
+          m.selectedId = opt.dataset.editCompute;
+          renderEditComputeModal();
+        },
+      });
+      body.querySelector('#edit-compute-search')?.addEventListener('input', e => {
+        m.filter = e.target.value;
+        m.menuOpen = true;
+        renderEditComputeModal();
+        body.querySelector('#edit-compute-search')?.focus();
+      });
+    }
+
     function openEditComputeModal() {
       const vm = VMS.find(v => v.name === state.selectedVmName);
       if (!vm) return;
-      const current = resolveVmComputeId(vm);
-      const body = document.getElementById('compute-modal-body');
-      if (body) {
-        body.innerHTML = `
-          <div class="form-field">
-            <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
-            ${pfSelect({
-              id: 'f-edit-compute-resource',
-              ariaLabel: 'Compute resource',
-              required: true,
-              optionsHtml: COMPUTE_RESOURCES.map(c =>
-                `<option value="${c.id}" ${current === c.id ? 'selected' : ''}>${c.label}</option>`
-              ).join(''),
-            })}
-          </div>
-        `;
-      }
+      state.editComputeModal = {
+        selectedId: resolveVmComputeId(vm),
+        menuOpen: false,
+        filter: '',
+      };
+      renderEditComputeModal();
       const overlay = document.getElementById('compute-overlay');
       overlay?.classList.add('pf-m-open');
       overlay?.setAttribute('aria-hidden', 'false');
-      setTimeout(() => document.getElementById('f-edit-compute-resource')?.focus(), 0);
+      setTimeout(() => document.getElementById('edit-compute-toggle')?.focus(), 0);
     }
 
     function closeEditComputeModal() {
+      state.editComputeModal = null;
       const overlay = document.getElementById('compute-overlay');
       overlay?.classList.remove('pf-m-open');
       overlay?.setAttribute('aria-hidden', 'true');
@@ -7237,7 +7325,8 @@
 
     function saveEditComputeModal() {
       const vm = VMS.find(v => v.name === state.selectedVmName);
-      const id = document.getElementById('f-edit-compute-resource')?.value;
+      const id = state.editComputeModal?.selectedId
+        || document.getElementById('f-edit-compute-resource')?.value;
       if (!vm || !id) return;
       const specs = computeResourceSpecs(id);
       vm.computeResource = id;
@@ -7867,6 +7956,9 @@
       vmConfigSection: 'details', // details | storage | network | …
       nicMenuOpen: null, // nic name with open kebab (unused)
       overviewMenuOpen: null, // 'nic:<name>' | 'disk:<index>'
+      overviewRowMenuBtn: null,
+      overviewRowMenuConfig: null,
+      editComputeModal: null, // { selectedId, menuOpen, filter }
       deleteResource: null, // { kind: 'nic'|'disk', name, index? }
       deleteCatalogItemId: null,
       nicModal: null, // { context, view, name, model, network, bootSource, mac, linkState }
@@ -8476,8 +8568,10 @@
       mainHtml = '',
       stacked = false,
       extraClass = '',
+      disabled = false,
     }) {
-      const classes = ['pf-v6-c-form-control', 'rich-select__control', extraClass].filter(Boolean).join(' ');
+      const classes = ['pf-v6-c-form-control', 'rich-select__control', extraClass, disabled ? 'pf-m-disabled' : '']
+        .filter(Boolean).join(' ');
       const mainClass = stacked ? 'rich-select__toggle-main rich-select__toggle-main--stacked' : 'rich-select__toggle-main';
       return `
         <span class="${classes}">
@@ -8486,7 +8580,8 @@
             ${ariaLabel ? `aria-label="${ariaLabel}"` : ''}
             aria-expanded="${ariaExpanded}"
             aria-haspopup="listbox"
-            ${ariaControls ? `aria-controls="${ariaControls}"` : ''}>
+            ${ariaControls ? `aria-controls="${ariaControls}"` : ''}
+            ${disabled ? 'disabled aria-disabled="true"' : ''}>
             <span class="${mainClass}">${mainHtml}</span>
           </button>
           <span class="pf-v6-c-form-control__utilities">
@@ -10647,14 +10742,10 @@
       };
     }
 
-    /** PF6 kebab menu for Overview Network/Storage row actions (Ethan: Delete is danger). */
-    function overviewRowActionsMenu({
-      editAttr, editValue,
-      deleteEnabled, deleteReason, deleteAttr, deleteValue,
-    }) {
+    function overviewRowMenuListHtml({ deleteEnabled, deleteReason }) {
       const deleteItem = deleteEnabled
         ? `<li class="pf-v6-c-menu__list-item" role="none">
-             <button class="pf-v6-c-menu__item pf-m-danger" type="button" role="menuitem" ${deleteAttr}="${deleteValue}">
+             <button class="pf-v6-c-menu__item pf-m-danger" type="button" role="menuitem" data-overview-row-delete>
                <span class="pf-v6-c-menu__item-main">
                  <span class="pf-v6-c-menu__item-text">Delete</span>
                </span>
@@ -10669,21 +10760,124 @@
              </button>
            </li>`;
       return `
-    <div class="pf-v6-c-menu overview-row-menu" role="menu">
-      <div class="pf-v6-c-menu__content">
-        <ul class="pf-v6-c-menu__list" role="menu">
           <li class="pf-v6-c-menu__list-item" role="none">
-            <button class="pf-v6-c-menu__item" type="button" role="menuitem" ${editAttr}="${editValue}">
+            <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-overview-row-edit>
               <span class="pf-v6-c-menu__item-main">
                 <span class="pf-v6-c-menu__item-text">Edit</span>
               </span>
             </button>
           </li>
           <li class="pf-v6-c-divider" role="separator"></li>
-          ${deleteItem}
-        </ul>
-      </div>
-    </div>`;
+          ${deleteItem}`;
+    }
+
+    function closeOverviewRowMenu() {
+      const menu = document.getElementById('vm-overview-row-menu');
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('pf-m-open');
+      }
+      document.querySelectorAll('[data-overview-row-menu].pf-m-expanded').forEach(btn => {
+        btn.classList.remove('pf-m-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      state.overviewMenuOpen = null;
+      state.overviewRowMenuBtn = null;
+      state.overviewRowMenuConfig = null;
+    }
+
+    function openOverviewRowMenu(btn, config) {
+      const menu = document.getElementById('vm-overview-row-menu');
+      const list = document.getElementById('vm-overview-row-menu-list');
+      if (!menu || !list || !btn || !config) return;
+      const alreadyOpen = state.overviewMenuOpen === config.key;
+      closeOverviewRowMenu();
+      closeVmDetailActionsMenu();
+      if (alreadyOpen) return;
+
+      list.innerHTML = overviewRowMenuListHtml(config);
+      menu.hidden = false;
+      menu.classList.add('pf-m-open');
+      btn.classList.add('pf-m-expanded');
+      btn.setAttribute('aria-expanded', 'true');
+      state.overviewMenuOpen = config.key;
+      state.overviewRowMenuBtn = btn;
+      state.overviewRowMenuConfig = config;
+
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = Math.max(menu.offsetWidth || 192, 192);
+      const left = Math.min(window.innerWidth - menuWidth - 8, Math.max(8, rect.right - menuWidth));
+      let top = rect.bottom + 4;
+      menu.style.left = `${left}px`;
+      menu.style.top = `${top}px`;
+      requestAnimationFrame(() => {
+        const h = menu.offsetHeight || 0;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 4);
+          menu.style.top = `${top}px`;
+        }
+      });
+    }
+
+    function applyOverviewRowMenuAction(action) {
+      const config = state.overviewRowMenuConfig;
+      if (!config) return;
+      closeOverviewRowMenu();
+      if (action === 'edit' && config.kind === 'nic') {
+        openEditNetworkModal(config.editValue);
+        return;
+      }
+      if (action === 'edit' && config.kind === 'disk') {
+        openEditDiskModal(Number(config.editValue));
+        return;
+      }
+      if (action === 'delete' && config.kind === 'nic') {
+        openDeleteResourceModal({ kind: 'nic', name: config.deleteValue });
+        return;
+      }
+      if (action === 'delete' && config.kind === 'disk') {
+        const vm = VMS.find(v => v.name === state.selectedVmName);
+        const idx = Number(config.deleteValue);
+        const dsk = (vm?.disks || [])[idx];
+        const detail = normalizeDisk(dsk || {});
+        openDeleteResourceModal({ kind: 'disk', name: detail.name, index: idx });
+      }
+    }
+
+    function renderListRichSelectHtml({
+      rootId, toggleId, menuId, labelId, open, selectedId, placeholder, options, disabled = false,
+    }) {
+      const selected = options.find(o => o.id === selectedId);
+      const toggleLabel = selected?.label || placeholder;
+      return `
+        <div class="rich-select ${open ? 'pf-m-expanded' : ''}" id="${rootId}">
+          ${pfRichSelectToggle({
+            id: toggleId,
+            ariaLabelledby: labelId,
+            ariaExpanded: !!open,
+            ariaControls: menuId,
+            disabled,
+            extraClass: selected ? '' : 'pf-m-placeholder',
+            mainHtml: `<span class="rich-select__toggle-label">${richSelectEsc(toggleLabel)}</span>`,
+          })}
+          <div class="pf-v6-c-menu rich-select__menu" id="${menuId}" role="listbox" ${open ? '' : 'hidden'}>
+            <div class="rich-select__menu-list">
+              ${options.map(o => `
+                <button type="button"
+                  class="pf-v6-c-menu__item rich-select__option ${o.id === selectedId ? 'pf-m-selected' : ''}"
+                  data-rich-option="${richSelectEsc(o.id)}" role="option">
+                  <span class="pf-v6-c-menu__item-main">
+                    <span class="rich-select__option-body">
+                      <span class="rich-select__option-title">${richSelectEsc(o.label)}</span>
+                    </span>
+                  </span>
+                </button>
+              `).join('') || emptyStateMenuSearchHtml('options')}
+            </div>
+          </div>
+          <input type="hidden" id="${rootId}-value" value="${richSelectEsc(selectedId || '')}" />
+        </div>
+      `;
     }
 
 
@@ -11098,6 +11292,8 @@
         virtualNetwork: defaultNet?.id || '',
         subnet: defaultNet?.subnets?.[0] || '',
         securityGroups: [DEFAULT_SECURITY_GROUP],
+        vnMenuOpen: false,
+        subnetMenuOpen: false,
         sgMenuOpen: false,
         error: '',
       };
@@ -11107,7 +11303,7 @@
       const overlay = document.getElementById('nic-overlay');
       overlay?.classList.add('pf-m-open');
       overlay?.setAttribute('aria-hidden', 'false');
-      setTimeout(() => document.getElementById('net-f-virtual-network')?.focus(), 0);
+      setTimeout(() => document.getElementById('net-vn-toggle')?.focus(), 0);
     }
 
     function openEditNetworkModal(nicName) {
@@ -11124,6 +11320,8 @@
         virtualNetwork: detail.virtualNetwork,
         subnet: detail.subnet,
         securityGroups: [...(detail.securityGroups || [])],
+        vnMenuOpen: false,
+        subnetMenuOpen: false,
         sgMenuOpen: false,
         error: '',
       };
@@ -11133,7 +11331,7 @@
       const overlay = document.getElementById('nic-overlay');
       overlay?.classList.add('pf-m-open');
       overlay?.setAttribute('aria-hidden', 'false');
-      setTimeout(() => document.getElementById('net-f-virtual-network')?.focus(), 0);
+      setTimeout(() => document.getElementById('net-vn-toggle')?.focus(), 0);
     }
 
     function closeAddNetworkModal() {
@@ -11178,6 +11376,8 @@
         </span>
       `).join('');
       const sgOpen = !!m.sgMenuOpen;
+      const vnOptions = CONFIG_VIRTUAL_NETWORKS.map(n => ({ id: n.id, label: n.label }));
+      const subnetOptions = subnetOpts.map(s => ({ id: s, label: s }));
       body.innerHTML = `
         ${m.error ? `
         <p class="nic-modal__error" role="alert" style="margin:0 0 12px;">
@@ -11186,18 +11386,17 @@
         </p>
         ` : ''}
         <div class="form-field">
-          <label for="net-f-virtual-network">Virtual network <span class="req">*</span></label>
-          ${pfSelect({
-            id: 'net-f-virtual-network',
-            ariaLabel: 'Virtual network',
-            required: true,
-            extraClass: m.virtualNetwork ? '' : 'pf-m-placeholder',
-            optionsHtml: `
-              <option value="" ${!m.virtualNetwork ? 'selected' : ''} disabled hidden>Select a virtual network</option>
-              ${CONFIG_VIRTUAL_NETWORKS.map(n =>
-                `<option value="${n.id}" ${m.virtualNetwork === n.id ? 'selected' : ''}>${n.label}</option>`
-              ).join('')}
-            `,
+          <label id="net-f-virtual-network-label">Virtual network <span class="req">*</span></label>
+          ${renderListRichSelectHtml({
+            rootId: 'net-vn-select',
+            toggleId: 'net-vn-toggle',
+            menuId: 'net-vn-menu',
+            labelId: 'net-f-virtual-network-label',
+            open: !!m.vnMenuOpen,
+            selectedId: m.virtualNetwork,
+            placeholder: 'Select a virtual network',
+            options: vnOptions,
+            disabled: !CONFIG_VIRTUAL_NETWORKS.length,
           })}
           <p class="form-helper">Network name ${m.mode === 'edit' ? 'is' : 'will be'} <code>${previewName}</code>.</p>
           ${CONFIG_VIRTUAL_NETWORKS.length ? '' : `
@@ -11208,19 +11407,17 @@
           `}
         </div>
         <div class="form-field" style="margin-top:16px;">
-          <label for="net-f-subnet">Subnet <span class="req">*</span></label>
-          ${pfSelect({
-            id: 'net-f-subnet',
-            ariaLabel: 'Subnet',
-            required: true,
+          <label id="net-f-subnet-label">Subnet <span class="req">*</span></label>
+          ${renderListRichSelectHtml({
+            rootId: 'net-subnet-select',
+            toggleId: 'net-subnet-toggle',
+            menuId: 'net-subnet-menu',
+            labelId: 'net-f-subnet-label',
+            open: !!m.subnetMenuOpen,
+            selectedId: m.subnet,
+            placeholder: 'Select a subnet',
+            options: subnetOptions,
             disabled: !m.virtualNetwork,
-            extraClass: m.subnet ? '' : 'pf-m-placeholder',
-            optionsHtml: `
-              <option value="" ${!m.subnet ? 'selected' : ''} disabled hidden>Select a subnet</option>
-              ${subnetOpts.map(s =>
-                `<option value="${s}" ${m.subnet === s ? 'selected' : ''}>${s}</option>`
-              ).join('')}
-            `,
           })}
         </div>
         <div class="form-field" style="margin-top:16px;">
@@ -11262,22 +11459,51 @@
       `;
 
       const refresh = () => renderAddNetworkModal();
-      document.getElementById('net-f-virtual-network')?.addEventListener('change', e => {
-        m.virtualNetwork = e.target.value;
-        m.subnet = '';
-        m.securityGroups = [];
-        m.sgMenuOpen = false;
-        const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
-        if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
-        if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
-        refresh();
-      });
-      document.getElementById('net-f-subnet')?.addEventListener('change', e => {
-        m.subnet = e.target.value;
-        if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
-        m.sgMenuOpen = false;
-        refresh();
-      });
+      const vnRoot = document.getElementById('net-vn-select');
+      if (vnRoot && CONFIG_VIRTUAL_NETWORKS.length) {
+        bindRichSelect(vnRoot, {
+          toggleSel: '#net-vn-toggle',
+          menuSel: '#net-vn-menu',
+          optionSel: '[data-rich-option]',
+          onOpen: () => {
+            m.vnMenuOpen = true;
+            m.subnetMenuOpen = false;
+            m.sgMenuOpen = false;
+          },
+          onClose: () => { m.vnMenuOpen = false; },
+          onSelect: opt => {
+            m.virtualNetwork = opt.dataset.richOption;
+            m.subnet = '';
+            m.securityGroups = [];
+            m.vnMenuOpen = false;
+            const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+            if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
+            if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+            refresh();
+          },
+        });
+      }
+      const subnetRoot = document.getElementById('net-subnet-select');
+      if (subnetRoot && m.virtualNetwork) {
+        bindRichSelect(subnetRoot, {
+          toggleSel: '#net-subnet-toggle',
+          menuSel: '#net-subnet-menu',
+          optionSel: '[data-rich-option]',
+          onOpen: () => {
+            m.subnetMenuOpen = true;
+            m.vnMenuOpen = false;
+            m.sgMenuOpen = false;
+          },
+          onClose: () => { m.subnetMenuOpen = false; },
+          onSelect: opt => {
+            m.subnet = opt.dataset.richOption;
+            if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+            m.subnetMenuOpen = false;
+            m.sgMenuOpen = false;
+            refresh();
+          },
+        });
+      }
       const sgRoot = document.getElementById('net-f-security-groups');
       const sgEnabled = !!(m.virtualNetwork && m.subnet);
       if (sgRoot && sgEnabled) {
@@ -11966,7 +12192,7 @@
 
     function openDeleteResourceModal(payload) {
       state.deleteResource = payload;
-      state.overviewMenuOpen = null;
+      closeOverviewRowMenu();
       const overlay = document.getElementById('delete-resource-overlay');
       const title = document.getElementById('delete-resource-title-text');
       const nameEl = document.getElementById('delete-resource-name');
@@ -12079,7 +12305,7 @@
       state.vmDetailTab = tab;
       state.vmConfigSection = 'details';
       state.nicMenuOpen = null;
-      state.overviewMenuOpen = null;
+      closeOverviewRowMenu();
       setView('vm');
       renderVmDetail();
     }
@@ -12192,6 +12418,7 @@
     }
 
     function renderVmDetail() {
+      closeOverviewRowMenu();
       const root = document.getElementById('vm-detail-root');
       if (!root) return;
       const raw = VMS.find(v => v.name === state.selectedVmName);
@@ -12371,7 +12598,6 @@
                       const sgs = (detail.securityGroups || []).join(', ') || '—';
                       const menuKey = `nic:${detail.name}`;
                       const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
-                      const canDeleteNic = nics.length >= 2;
                       return `
                       <tr>
                         <td>${detail.name}</td>
@@ -12381,18 +12607,10 @@
                         <td>${detail.subnet || '—'}</td>
                         <td class="overview-table__actions">
                           <div class="nic-actions-wrap">
-                            <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-menu="${menuKey}"
-                              aria-label="Actions for ${detail.name}" aria-expanded="${menuOpen}" aria-haspopup="menu"${addDisabledAttrs}>
+                            <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}"
+                              aria-label="Actions for ${detail.name}" aria-expanded="${menuOpen}" aria-haspopup="menu" aria-controls="vm-overview-row-menu"${addDisabledAttrs}>
                               <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
                             </button>
-                            ${menuOpen ? overviewRowActionsMenu({
-                              editAttr: 'data-overview-edit-nic',
-                              editValue: detail.name,
-                              deleteEnabled: canDeleteNic,
-                              deleteReason: 'At least one network is required.',
-                              deleteAttr: 'data-overview-delete-nic',
-                              deleteValue: detail.name,
-                            }) : ''}
                           </div>
                         </td>
                       </tr>`;
@@ -12436,18 +12654,10 @@
                         <td>${d.tier}</td>
                         <td class="overview-table__actions">
                           <div class="nic-actions-wrap">
-                            <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-menu="${menuKey}"
-                              aria-label="Actions for ${d.detailName}" aria-expanded="${menuOpen}" aria-haspopup="menu"${addDisabledAttrs}>
+                            <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}"
+                              aria-label="Actions for ${d.detailName}" aria-expanded="${menuOpen}" aria-haspopup="menu" aria-controls="vm-overview-row-menu"${addDisabledAttrs}>
                               <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
                             </button>
-                            ${menuOpen ? overviewRowActionsMenu({
-                              editAttr: 'data-overview-edit-disk',
-                              editValue: String(d.diskIdx),
-                              deleteEnabled: !d.bootable,
-                              deleteReason: 'The boot disk cannot be deleted.',
-                              deleteAttr: 'data-overview-delete-disk',
-                              deleteValue: String(d.diskIdx),
-                            }) : ''}
                           </div>
                         </td>
                       </tr>`;
@@ -12518,51 +12728,35 @@
         if (!canEditConfig) return;
         openEditComputeModal();
       });
-      root.querySelectorAll('[data-overview-menu]').forEach(b => {
+      root.querySelectorAll('[data-overview-row-menu]').forEach(b => {
         b.addEventListener('click', e => {
           e.stopPropagation();
-          const key = b.dataset.overviewMenu;
-          state.overviewMenuOpen = state.overviewMenuOpen === key ? null : key;
-          renderVmDetail();
-          if (state.overviewMenuOpen) {
-            requestAnimationFrame(() => {
-              document.querySelectorAll('[data-overview-menu]').forEach(el => {
-                if (el.dataset.overviewMenu === key) el.focus({ preventScroll: true });
-              });
-            });
+          if (!canEditConfig) return;
+          const key = b.dataset.overviewRowMenu;
+          const [kind, value] = key.split(':');
+          let config;
+          if (kind === 'nic') {
+            config = {
+              key,
+              kind: 'nic',
+              editValue: value,
+              deleteEnabled: nics.length >= 2,
+              deleteReason: 'At least one network is required.',
+              deleteValue: value,
+            };
+          } else {
+            const diskIdx = Number(value);
+            const row = diskRows.find(d => d.diskIdx === diskIdx);
+            config = {
+              key,
+              kind: 'disk',
+              editValue: String(diskIdx),
+              deleteEnabled: !row?.bootable,
+              deleteReason: 'The boot disk cannot be deleted.',
+              deleteValue: String(diskIdx),
+            };
           }
-        });
-      });
-      root.querySelectorAll('[data-overview-delete-nic]').forEach(b => {
-        b.addEventListener('click', e => {
-          e.stopPropagation();
-          openDeleteResourceModal({ kind: 'nic', name: b.dataset.overviewDeleteNic });
-          renderVmDetail();
-        });
-      });
-      root.querySelectorAll('[data-overview-delete-disk]').forEach(b => {
-        b.addEventListener('click', e => {
-          e.stopPropagation();
-          if (b.disabled) return;
-          const idx = Number(b.dataset.overviewDeleteDisk);
-          const dsk = (v.disks || [])[idx];
-          const detail = normalizeDisk(dsk || {});
-          openDeleteResourceModal({ kind: 'disk', name: detail.name, index: idx });
-          renderVmDetail();
-        });
-      });
-      root.querySelectorAll('[data-overview-edit-nic]').forEach(b => {
-        b.addEventListener('click', e => {
-          e.stopPropagation();
-          state.overviewMenuOpen = null;
-          openEditNetworkModal(b.dataset.overviewEditNic);
-        });
-      });
-      root.querySelectorAll('[data-overview-edit-disk]').forEach(b => {
-        b.addEventListener('click', e => {
-          e.stopPropagation();
-          state.overviewMenuOpen = null;
-          openEditDiskModal(Number(b.dataset.overviewEditDisk));
+          openOverviewRowMenu(b, config);
         });
       });
     }
@@ -18116,7 +18310,7 @@
       syncVmActions();
       // Refresh Overview so config edit controls match the role
       if (state.selectedVmName && document.getElementById('view-vm')?.classList.contains('pf-m-active')) {
-        state.overviewMenuOpen = null;
+        closeOverviewRowMenu();
         renderVmDetail();
       }
       // If Networks hidden while viewing it, bounce to VMs
@@ -18600,16 +18794,33 @@
       e.preventDefault();
       applyVmDetailAction(btn.dataset.vmDetailAction);
     });
+    document.getElementById('vm-overview-row-menu')?.addEventListener('click', e => {
+      if (e.target.closest('[data-overview-row-edit]')) {
+        e.preventDefault();
+        e.stopPropagation();
+        applyOverviewRowMenuAction('edit');
+        return;
+      }
+      const del = e.target.closest('[data-overview-row-delete]');
+      if (del && !del.disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        applyOverviewRowMenuAction('delete');
+      }
+    });
     document.getElementById('vm-tbody')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-open-vm]');
       if (!btn) return;
       openVmDetail(btn.dataset.openVm, 'overview');
     });
     document.addEventListener('click', e => {
-      if ((state.nicMenuOpen || state.overviewMenuOpen) && !e.target.closest('.nic-actions-wrap')) {
+      if (state.overviewMenuOpen
+        && !e.target.closest('#vm-overview-row-menu')
+        && !e.target.closest('[data-overview-row-menu]')) {
+        closeOverviewRowMenu();
+      }
+      if (state.nicMenuOpen && !e.target.closest('.nic-actions-wrap')) {
         state.nicMenuOpen = null;
-        state.overviewMenuOpen = null;
-        if (document.getElementById('view-vm')?.classList.contains('pf-m-active')) renderVmDetail();
       }
       if (state.itActionsOpen
         && !e.target.closest('#it-actions-menu')
