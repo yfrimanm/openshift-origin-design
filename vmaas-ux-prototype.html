@@ -2440,6 +2440,7 @@
       border-radius: 16px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
       padding: 0;
+      overflow: visible;
     }
     #compute-overlay .pf-v6-c-modal-box__header {
       padding: 24px 24px 0;
@@ -2470,6 +2471,7 @@
     }
     #compute-overlay .pf-v6-c-modal-box__body {
       padding: 16px 24px 8px;
+      overflow: visible;
     }
     #compute-overlay .pf-v6-c-modal-box__footer {
       display: flex;
@@ -5777,7 +5779,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · modal glass + kebabs</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · compute dropdown fix</span>
         </div>
       </div>
       <div class="console__body">
@@ -7246,11 +7248,11 @@
     }
 
 
-    function renderEditComputeModal() {
+    function renderEditComputeModal(focusId = '') {
       const m = state.editComputeModal;
       const body = document.getElementById('compute-modal-body');
       if (!m || !body) return;
-      const options = filteredVmComputeResources(m.filter).map(c => {
+      const allOptions = COMPUTE_RESOURCES.map(c => {
         const parts = computeResourceParts(c.id);
         const rate = formatComputeHourlyRate(c.hourly);
         return {
@@ -7273,7 +7275,7 @@
             searchPlaceholder: 'Search compute resources',
             selectedId: m.selectedId,
             placeholder: 'Select a compute resource',
-            options,
+            options: allOptions,
             optionAttr: 'data-edit-compute',
             stacked: true,
             hiddenInputId: 'f-edit-compute-resource',
@@ -7281,24 +7283,64 @@
           })}
         </div>
       `;
-      const root = body.querySelector('#edit-compute-select');
-      bindRichSelect(root, {
-        toggleSel: '#edit-compute-toggle',
-        menuSel: '#edit-compute-menu',
-        optionSel: '[data-edit-compute]',
-        onOpen: () => { m.menuOpen = true; },
-        onClose: () => { m.menuOpen = false; },
-        onSelect: opt => {
-          m.selectedId = opt.dataset.editCompute;
-          renderEditComputeModal();
-        },
+
+      document.getElementById('edit-compute-toggle')?.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        m.menuOpen = !m.menuOpen;
+        if (!m.menuOpen) m.filter = '';
+        renderEditComputeModal(m.menuOpen ? 'edit-compute-search' : 'edit-compute-toggle');
       });
-      body.querySelector('#edit-compute-search')?.addEventListener('input', e => {
-        m.filter = e.target.value;
-        m.menuOpen = true;
+      body.querySelectorAll('[data-edit-compute]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          m.selectedId = btn.dataset.editCompute;
+          m.menuOpen = false;
+          m.filter = '';
+          renderEditComputeModal('edit-compute-toggle');
+        });
+      });
+      const search = document.getElementById('edit-compute-search');
+      if (search) {
+        search.addEventListener('input', e => {
+          m.filter = e.target.value;
+          m.menuOpen = true;
+          renderEditComputeModal('edit-compute-search');
+        });
+        search.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            m.menuOpen = false;
+            m.filter = '';
+            renderEditComputeModal('edit-compute-toggle');
+          }
+        });
+      }
+
+      if (body._computeSelectAbort) body._computeSelectAbort.abort();
+      const ac = new AbortController();
+      body._computeSelectAbort = ac;
+      document.addEventListener('mousedown', e => {
+        if (!state.editComputeModal) return;
+        if (e.target.closest('#edit-compute-select')) return;
+        if (!state.editComputeModal.menuOpen) return;
+        state.editComputeModal.menuOpen = false;
+        state.editComputeModal.filter = '';
         renderEditComputeModal();
-        body.querySelector('#edit-compute-search')?.focus();
-      });
+      }, { signal: ac.signal });
+
+      if (focusId) {
+        setTimeout(() => {
+          const el = document.getElementById(focusId);
+          if (!el) return;
+          el.focus();
+          if (focusId === 'edit-compute-search') {
+            const len = el.value.length;
+            try { el.setSelectionRange(len, len); } catch (_) { /* ignore */ }
+          }
+        }, 0);
+      }
     }
 
     function openEditComputeModal() {
@@ -7349,9 +7391,15 @@
         }
       });
       document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && document.getElementById('compute-overlay')?.classList.contains('pf-m-open')) {
-          closeEditComputeModal();
+        if (e.key !== 'Escape' || !document.getElementById('compute-overlay')?.classList.contains('pf-m-open')) return;
+        if (state.editComputeModal?.menuOpen) {
+          e.stopPropagation();
+          state.editComputeModal.menuOpen = false;
+          state.editComputeModal.filter = '';
+          renderEditComputeModal('edit-compute-toggle');
+          return;
         }
+        closeEditComputeModal();
       });
     }
 
