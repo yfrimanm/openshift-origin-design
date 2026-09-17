@@ -1284,6 +1284,17 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+    .overview-table .overview-table__actions {
+      width: 3rem;
+      padding-right: 0;
+      text-align: right;
+      vertical-align: middle;
+    }
+    .vm-overview-v2 .overview-table .nic-actions-wrap {
+      display: inline-flex;
+      justify-content: flex-end;
+      position: relative;
+    }
     .vm-overview-v2 .util-grid { margin-top: 4px; }
 
     /* Instance type details — Ethan subnet-details pattern:
@@ -5724,7 +5735,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · catalog detail Ethan</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · VM overview edits</span>
         </div>
       </div>
       <div class="console__body">
@@ -9265,8 +9276,6 @@
 
     function vmDetailSecondaryActions(canDelete, deleteTip) {
       return [
-        { id: 'edit', label: 'Edit' },
-        { id: 'duplicate', label: 'Duplicate' },
         { id: 'delete', label: 'Delete', danger: true, disabled: !canDelete, title: deleteTip },
       ];
     }
@@ -9348,14 +9357,6 @@
       const vm = VMS.find(x => x.name === name);
       if (!vm) return;
       closeVmDetailActionsMenu();
-      if (actionId === 'edit') {
-        toast(`Edit ${name} (prototype).`);
-        return;
-      }
-      if (actionId === 'duplicate') {
-        toast(`Duplicate ${name} (prototype).`, 'success');
-        return;
-      }
       if (actionId === 'delete') {
         const running = vm.status === 'running';
         const starting = vm.status === 'starting';
@@ -12227,17 +12228,30 @@
         { name: 'Boot disk', size: 30, unit: 'GiB', bootable: true, storageTierLabel: 'Balanced' },
         { name: 'cloud-init-disk', size: 'Dynamic', storageTierLabel: 'Balanced' },
       ];
-      const diskRows = disks.map((dsk, i) => {
+      const diskRows = disks.map((dsk, diskIdx) => {
         const detail = normalizeDisk(dsk);
-        const label = dsk.label || detail.name || (dsk.bootable ? 'Boot disk' : `Disk ${i + 1}`);
+        const label = dsk.label || detail.name || (dsk.bootable ? 'Boot disk' : `Disk ${diskIdx + 1}`);
         const size = typeof dsk.size === 'number' ? `${dsk.size} ${dsk.unit || 'GiB'}` : (dsk.size || detail.size || '—');
         const tier = dsk.storageTierLabel || detail.storageTier || 'Balanced';
-        return { label, size, tier, bootable: !!(dsk.bootable || /boot/i.test(label)) };
+        return {
+          label,
+          size,
+          tier,
+          bootable: !!(dsk.bootable || /boot/i.test(label)),
+          diskIdx,
+          detailName: detail.name,
+        };
       });
 
       const baseUtil = getVmUtilization(v);
       const u = { ...baseUtil, ...(v.utilizationDisplay || {}) };
       const alerts = Array.isArray(v.alerts) ? v.alerts : [];
+      const role = getActiveRole();
+      const canEditConfig = !!role.canEditConfig;
+      const noEditReason = 'No configuration edits for this role';
+      const editDisabledAttr = canEditConfig ? '' : ' disabled';
+      const editTitleAttr = canEditConfig ? ' title="Edit"' : ` title="${noEditReason}"`;
+      const addDisabledAttrs = canEditConfig ? '' : ` disabled title="${noEditReason}"`;
 
       const header = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
@@ -12310,7 +12324,13 @@
                 <section class="ethan-detail-col" aria-labelledby="vm-config-title">
                   <h3 class="ethan-detail-col__title" id="vm-config-title">Configuration</h3>
                   ${itField('Operating system', osDisplay)}
-                  ${itField('Compute resource', computeFields.computeResource)}
+                  ${itField('Compute resource', `
+                    <span class="vm-compute-row">
+                      ${computeFields.computeResource}
+                      <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources"${editTitleAttr}${editDisabledAttr}>
+                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                      </button>
+                    </span>`)}
                   ${itField('Disk image', imageDisplay)}
                 </section>
                 <section class="ethan-detail-col" aria-labelledby="vm-ssh-title">
@@ -12321,11 +12341,14 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
-              <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
+              <div class="vm-overview-v2__section-head">
+                <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
+                <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net"${addDisabledAttrs}>Add network</button>
+              </div>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--network" aria-label="Networks">
                   <colgroup>
-                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" />
+                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col overview-col--actions" />
                   </colgroup>
                   <thead>
                     <tr>
@@ -12334,12 +12357,16 @@
                       <th scope="col">IP address</th>
                       <th scope="col">Security groups</th>
                       <th scope="col">Subnet</th>
+                      <th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody>
                     ${nics.map(n => {
                       const detail = normalizeNic(n);
                       const sgs = (detail.securityGroups || []).join(', ') || '—';
+                      const menuKey = `nic:${detail.name}`;
+                      const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                      const canDeleteNic = nics.length >= 2;
                       return `
                       <tr>
                         <td>${detail.name}</td>
@@ -12347,6 +12374,22 @@
                         <td>${detail.ip || '—'}</td>
                         <td>${sgs}</td>
                         <td>${detail.subnet || '—'}</td>
+                        <td class="overview-table__actions">
+                          <div class="nic-actions-wrap">
+                            <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-menu="${menuKey}"
+                              aria-label="Actions for ${detail.name}" aria-expanded="${menuOpen}" aria-haspopup="menu"${addDisabledAttrs}>
+                              <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                            </button>
+                            ${menuOpen ? overviewRowActionsMenu({
+                              editAttr: 'data-overview-edit-nic',
+                              editValue: detail.name,
+                              deleteEnabled: canDeleteNic,
+                              deleteReason: 'At least one network is required.',
+                              deleteAttr: 'data-overview-delete-nic',
+                              deleteValue: detail.name,
+                            }) : ''}
+                          </div>
+                        </td>
                       </tr>`;
                     }).join('')}
                   </tbody>
@@ -12355,31 +12398,55 @@
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">
-              <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage (${diskRows.length})</h3>
+              <div class="vm-overview-v2__section-head">
+                <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage (${diskRows.length})</h3>
+                <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk"${addDisabledAttrs}>Add disk</button>
+              </div>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
                   <colgroup>
-                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" />
+                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col overview-col--actions" />
                   </colgroup>
                   <thead>
                     <tr>
-                      <th scope="col" colspan="2">Name</th>
+                      <th scope="col">Name</th>
                       <th scope="col">Size</th>
-                      <th scope="col" colspan="2">Storage tier</th>
+                      <th scope="col">Storage tier</th>
+                      <th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody>
-                    ${diskRows.map(d => `
+                    ${diskRows.map(d => {
+                      const menuKey = `disk:${d.diskIdx}`;
+                      const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                      return `
                       <tr>
-                        <td colspan="2">
+                        <td>
                           <span class="overview-table__name">
                             ${d.label}
                             ${d.bootable ? '<span class="pf-v6-c-badge pf-m-read bootable-badge">Bootable</span>' : ''}
                           </span>
                         </td>
                         <td>${d.size}</td>
-                        <td colspan="2">${d.tier}</td>
-                      </tr>`).join('')}
+                        <td>${d.tier}</td>
+                        <td class="overview-table__actions">
+                          <div class="nic-actions-wrap">
+                            <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-menu="${menuKey}"
+                              aria-label="Actions for ${d.detailName}" aria-expanded="${menuOpen}" aria-haspopup="menu"${addDisabledAttrs}>
+                              <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                            </button>
+                            ${menuOpen ? overviewRowActionsMenu({
+                              editAttr: 'data-overview-edit-disk',
+                              editValue: String(d.diskIdx),
+                              deleteEnabled: !d.bootable,
+                              deleteReason: 'The boot disk cannot be deleted.',
+                              deleteAttr: 'data-overview-delete-disk',
+                              deleteValue: String(d.diskIdx),
+                            }) : ''}
+                          </div>
+                        </td>
+                      </tr>`;
+                    }).join('')}
                   </tbody>
                 </table>
               </div>
@@ -12439,6 +12506,59 @@
       });
       root.querySelector('#vm-open-console')?.addEventListener('click', () => {
         openVmConsolePlaceholder(state.selectedVmName || v.name);
+      });
+      root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNetworkModal('vm-detail'));
+      root.querySelector('#btn-overview-add-disk')?.addEventListener('click', () => openAddDiskModal('vm-detail'));
+      root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
+        if (!canEditConfig) return;
+        openEditComputeModal();
+      });
+      root.querySelectorAll('[data-overview-menu]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          const key = b.dataset.overviewMenu;
+          state.overviewMenuOpen = state.overviewMenuOpen === key ? null : key;
+          renderVmDetail();
+          if (state.overviewMenuOpen) {
+            requestAnimationFrame(() => {
+              document.querySelectorAll('[data-overview-menu]').forEach(el => {
+                if (el.dataset.overviewMenu === key) el.focus({ preventScroll: true });
+              });
+            });
+          }
+        });
+      });
+      root.querySelectorAll('[data-overview-delete-nic]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          openDeleteResourceModal({ kind: 'nic', name: b.dataset.overviewDeleteNic });
+          renderVmDetail();
+        });
+      });
+      root.querySelectorAll('[data-overview-delete-disk]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          if (b.disabled) return;
+          const idx = Number(b.dataset.overviewDeleteDisk);
+          const dsk = (v.disks || [])[idx];
+          const detail = normalizeDisk(dsk || {});
+          openDeleteResourceModal({ kind: 'disk', name: detail.name, index: idx });
+          renderVmDetail();
+        });
+      });
+      root.querySelectorAll('[data-overview-edit-nic]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          state.overviewMenuOpen = null;
+          openEditNetworkModal(b.dataset.overviewEditNic);
+        });
+      });
+      root.querySelectorAll('[data-overview-edit-disk]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          state.overviewMenuOpen = null;
+          openEditDiskModal(Number(b.dataset.overviewEditDisk));
+        });
       });
     }
 
