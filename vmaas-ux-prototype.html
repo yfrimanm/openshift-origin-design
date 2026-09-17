@@ -1364,9 +1364,11 @@
     }
     /* Actions / kebab menus — Ethan / Instance type pattern: Delete is danger/red */
     #it-actions-menu:not(.pf-m-open),
-    #di-actions-menu:not(.pf-m-open) { display: none; }
+    #di-actions-menu:not(.pf-m-open),
+    #vm-detail-actions-menu:not(.pf-m-open) { display: none; }
     #it-actions-menu.pf-m-open,
-    #di-actions-menu.pf-m-open {
+    #di-actions-menu.pf-m-open,
+    #vm-detail-actions-menu.pf-m-open {
       display: block;
       position: fixed;
       z-index: 450;
@@ -1375,6 +1377,7 @@
     }
     #it-actions-menu .pf-v6-c-divider,
     #di-actions-menu .pf-v6-c-divider,
+    #vm-detail-actions-menu .pf-v6-c-divider,
     #vm-kebab-menu .pf-v6-c-divider,
     #vm-actions-menu .pf-v6-c-divider,
     .overview-row-menu .pf-v6-c-divider {
@@ -1382,6 +1385,7 @@
     }
     #it-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     #di-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
+    #vm-detail-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     #vm-kebab-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     #vm-actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
     .actions-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text,
@@ -4041,7 +4045,7 @@
       line-height: 1.4;
       color: #4d4d4d;
     }
-    .catalog-gov-badge--editable { background: #e7f1fa; color: #004080; }
+    .catalog-gov-badge--editable { background: #ece7f4; color: #5e40be; }
     .catalog-detail-spec-badges {
       display: inline-flex;
       align-items: center;
@@ -4089,7 +4093,7 @@
       flex-wrap: wrap;
       gap: 8px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 400;
       line-height: 1.4;
       color: var(--vmaas-text, #151515);
       word-break: break-word;
@@ -4156,14 +4160,56 @@
       cursor: pointer;
     }
     .catalog-summary__clear:hover { text-decoration: underline; }
+    /* Ethan catalog item detail — provider view: Overview | Publishing | Hardware specs */
+    .ethan-detail-header--catalog {
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--vmaas-border, #d2d2d2);
+      align-items: flex-start;
+    }
+    .ethan-detail-header--catalog .ethan-detail-header__actions {
+      margin-left: auto;
+      align-self: flex-start;
+      justify-content: flex-end;
+    }
+    .ethan-detail-panel.catalog-detail-panel {
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+    .catalog-detail-panel .ethan-detail-col__title,
+    .catalog-detail-panel .catalog-hw-specs__title {
+      margin-bottom: 24px;
+    }
+    .catalog-detail-panel .ethan-detail-field {
+      margin-bottom: 20px;
+    }
+    .catalog-detail-panel .publish-label {
+      font-weight: 400;
+    }
+    .catalog-detail-visibility {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .catalog-detail-visibility i {
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 14px;
+    }
     .catalog-detail-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 24px 32px;
       align-items: start;
     }
+    .catalog-detail-grid--provider {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px 40px;
+    }
+    @media (max-width: 1024px) {
+      .catalog-detail-grid--provider { grid-template-columns: 1fr; }
+    }
     @media (max-width: 900px) {
-      .catalog-detail-grid { grid-template-columns: 1fr; }
+      .catalog-detail-grid:not(.catalog-detail-grid--provider) { grid-template-columns: 1fr; }
     }
     .catalog-detail-grid__meta {
       display: grid;
@@ -5678,7 +5724,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 16 · tenant before name</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · catalog detail Ethan</span>
         </div>
       </div>
       <div class="console__body">
@@ -6470,6 +6516,12 @@
   <div class="pf-v6-c-menu" id="ci-actions-menu" hidden role="menu" aria-label="Catalog item actions">
     <div class="pf-v6-c-menu__content">
       <ul class="pf-v6-c-menu__list" role="menu" id="ci-actions-menu-list"></ul>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-menu" id="vm-detail-actions-menu" hidden role="menu" aria-label="Virtual machine actions">
+    <div class="pf-v6-c-menu__content">
+      <ul class="pf-v6-c-menu__list" role="menu" id="vm-detail-actions-menu-list"></ul>
     </div>
   </div>
 
@@ -7778,6 +7830,8 @@
       },
       selectedVms: new Set(),
       kebabVmName: null,
+      vmDetailActionsOpen: false,
+      vmDetailActionsName: null,
       deleteVmName: null,
       vmFilter: '',
       filters: { project: [], status: [], os: [], hardware: [] },
@@ -9196,11 +9250,118 @@
       menu.hidden = true;
       menu.classList.remove('pf-m-open');
       closeVmKebabFlyouts();
-      document.querySelectorAll('.vm-table .kebab.pf-m-expanded, #vm-detail-actions-btn.pf-m-expanded').forEach(b => {
+      document.querySelectorAll('.vm-table .kebab.pf-m-expanded').forEach(b => {
         b.classList.remove('pf-m-expanded');
         b.setAttribute('aria-expanded', 'false');
       });
       state.kebabVmName = null;
+    }
+
+    function vmDiskImageDisplay(v) {
+      const raw = v.imageLabel || v.preference || '—';
+      if (raw === '—') return raw;
+      return String(raw).replace(/\s*\(Hardened\)\s*/i, '').trim();
+    }
+
+    function vmDetailSecondaryActions(canDelete, deleteTip) {
+      return [
+        { id: 'edit', label: 'Edit' },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true, disabled: !canDelete, title: deleteTip },
+      ];
+    }
+
+    function closeVmDetailActionsMenu() {
+      const menu = document.getElementById('vm-detail-actions-menu');
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('pf-m-open');
+      }
+      document.getElementById('vm-detail-actions-btn')?.classList.remove('pf-m-expanded');
+      document.getElementById('vm-detail-actions-btn')?.setAttribute('aria-expanded', 'false');
+      state.vmDetailActionsOpen = false;
+      state.vmDetailActionsName = null;
+    }
+
+    function openVmDetailActionsMenu(btn, vmName) {
+      const menu = document.getElementById('vm-detail-actions-menu');
+      const list = document.getElementById('vm-detail-actions-menu-list');
+      const name = vmName || state.selectedVmName;
+      const vm = VMS.find(x => x.name === name);
+      if (!menu || !list || !btn || !vm) return;
+
+      const running = vm.status === 'running';
+      const starting = vm.status === 'starting';
+      const canDelete = !running && !starting;
+      const startingReason = 'The Virtual machine is starting';
+      const notRunningReason = 'The Virtual machine is running';
+      const deleteTip = canDelete ? '' : (starting ? startingReason : notRunningReason);
+
+      const alreadyOpen = state.vmDetailActionsOpen && state.vmDetailActionsName === name;
+      closeVmDetailActionsMenu();
+      closeInstanceTypeActionsMenu();
+      closeDiskImageActionsMenu();
+      closeCatalogItemActionsMenu();
+      closeVmKebabMenu();
+      if (alreadyOpen) return;
+
+      const actions = vmDetailSecondaryActions(canDelete, deleteTip);
+      list.innerHTML = actions.map((a, i) => {
+        const sep = a.danger && i > 0 ? '<li class="pf-v6-c-divider" role="separator"></li>' : '';
+        const dangerClass = a.danger ? ' pf-m-danger' : '';
+        const disabledClass = a.disabled ? ' pf-m-disabled' : '';
+        const disabledAttr = a.disabled ? ' disabled' : '';
+        const titleAttr = a.title ? ` title="${String(a.title).replace(/"/g, '&quot;')}"` : '';
+        return `${sep}<li class="pf-v6-c-menu__list-item${disabledClass}" role="none">
+          <button class="pf-v6-c-menu__item${dangerClass}" type="button" role="menuitem" data-vm-detail-action="${a.id}"${disabledAttr}${titleAttr}>
+            <span class="pf-v6-c-menu__item-main">
+              <span class="pf-v6-c-menu__item-text">${a.label}</span>
+            </span>
+          </button>
+        </li>`;
+      }).join('');
+
+      menu.hidden = false;
+      menu.classList.add('pf-m-open');
+      btn.classList.add('pf-m-expanded');
+      btn.setAttribute('aria-expanded', 'true');
+      state.vmDetailActionsOpen = true;
+      state.vmDetailActionsName = name;
+
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = Math.max(menu.offsetWidth || 220, 220);
+      const left = Math.min(window.innerWidth - menuWidth - 8, Math.max(8, rect.right - menuWidth));
+      let top = rect.bottom + 4;
+      menu.style.left = `${left}px`;
+      menu.style.top = `${top}px`;
+      requestAnimationFrame(() => {
+        const h = menu.offsetHeight || 0;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 4);
+          menu.style.top = `${top}px`;
+        }
+      });
+    }
+
+    function applyVmDetailAction(actionId) {
+      const name = state.vmDetailActionsName || state.selectedVmName;
+      const vm = VMS.find(x => x.name === name);
+      if (!vm) return;
+      closeVmDetailActionsMenu();
+      if (actionId === 'edit') {
+        toast(`Edit ${name} (prototype).`);
+        return;
+      }
+      if (actionId === 'duplicate') {
+        toast(`Duplicate ${name} (prototype).`, 'success');
+        return;
+      }
+      if (actionId === 'delete') {
+        const running = vm.status === 'running';
+        const starting = vm.status === 'starting';
+        if (running || starting) return;
+        openDeleteVmModal(name);
+      }
     }
 
     function renderKebabControlFlyout(vm) {
@@ -12055,7 +12216,7 @@
         ? osKnown
         : '<span class="muted">—</span><span class="form-helper" style="display:block;margin-top:2px;">Guest agent not reporting</span>';
       const computeFields = vmComputeOverviewFields(v);
-      const imageDisplay = v.imageLabel || v.preference || '—';
+      const imageDisplay = vmDiskImageDisplay(v);
       const catalogItemDisplay = v.catalogItem || '—';
       const sshDisplay = /win/i.test(String(v.os || v.osFull || ''))
         ? 'Not applicable'
@@ -12077,9 +12238,6 @@
       const baseUtil = getVmUtilization(v);
       const u = { ...baseUtil, ...(v.utilizationDisplay || {}) };
       const alerts = Array.isArray(v.alerts) ? v.alerts : [];
-
-      const canDelete = !running && !starting;
-      const deleteTip = canDelete ? '' : (starting ? startingReason : 'The Virtual machine is running');
 
       const header = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
@@ -12123,8 +12281,15 @@
             <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="pause" ${canPause ? '' : `disabled title="${pauseTip}"`}>
               <span class="pf-v6-c-button__text">Pause</span>
             </button>
-            <button type="button" class="pf-v6-c-button pf-m-danger pf-m-secondary" id="vm-detail-delete-btn" ${canDelete ? '' : `disabled title="${deleteTip}"`}>
-              <span class="pf-v6-c-button__text">Delete</span>
+            <span class="ethan-detail-header__actions-divider" aria-hidden="true"></span>
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="vm-detail-actions-btn"
+              aria-expanded="false" aria-haspopup="menu" aria-controls="vm-detail-actions-menu">
+              <span class="pf-v6-c-menu-toggle__text">Actions</span>
+              <span class="pf-v6-c-menu-toggle__controls">
+                <span class="pf-v6-c-menu-toggle__toggle-icon">
+                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                </span>
+              </span>
             </button>
           </div>
         </div>
@@ -12146,7 +12311,7 @@
                   <h3 class="ethan-detail-col__title" id="vm-config-title">Configuration</h3>
                   ${itField('Operating system', osDisplay)}
                   ${itField('Compute resource', computeFields.computeResource)}
-                  ${itField('Image', imageDisplay)}
+                  ${itField('Disk image', imageDisplay)}
                   ${itField('vCPU', computeFields.vcpu)}
                   ${itField('Memory', computeFields.memory)}
                 </section>
@@ -12179,7 +12344,7 @@
                       const sgs = (detail.securityGroups || []).join(', ') || '—';
                       return `
                       <tr>
-                        <td><button type="button" class="name-link">${detail.name}</button></td>
+                        <td>${detail.name}</td>
                         <td>${detail.virtualNetwork}</td>
                         <td>${detail.ip || '—'}</td>
                         <td>${sgs}</td>
@@ -12270,9 +12435,9 @@
           applyVmPowerAction(b.dataset.vmAction, v.name);
         });
       });
-      root.querySelector('#vm-detail-delete-btn')?.addEventListener('click', () => {
-        if (!canDelete) return;
-        openDeleteVmModal(v.name);
+      root.querySelector('#vm-detail-actions-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        openVmDetailActionsMenu(e.currentTarget, v.name);
       });
       root.querySelector('#vm-open-console')?.addEventListener('click', () => {
         openVmConsolePlaceholder(state.selectedVmName || v.name);
@@ -15471,6 +15636,7 @@
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
       closeVmKebabMenu();
+      closeVmDetailActionsMenu();
       if (alreadyOpen) return;
 
       // Ethan subnet Actions pattern — Delete uses danger/red
@@ -16894,6 +17060,7 @@
       closeCatalogItemActionsMenu();
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
+      closeVmDetailActionsMenu();
       if (alreadyOpen) return;
 
       const actions = catalogItemActions().filter(a => {
@@ -17030,7 +17197,7 @@
             </li>
           </ol>
         </nav>
-        <div class="ethan-detail-header">
+        <div class="ethan-detail-header ethan-detail-header--catalog">
           <div class="ethan-detail-header__main">
             <div class="ethan-detail-header__title-row">
               <span class="catalog-detail-header__icon" aria-hidden="true"><i class="pf-v6-pficon-virtual-machine"></i></span>
@@ -17045,6 +17212,7 @@
               <span class="pf-v6-c-button__icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></span>
               <span class="pf-v6-c-button__text">Launch instance</span>
             </button>
+            ${isProvider ? `
             <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" id="ci-detail-actions-btn"
               aria-expanded="false" aria-haspopup="menu" aria-controls="ci-actions-menu">
               <span class="pf-v6-c-menu-toggle__text">Actions</span>
@@ -17054,30 +17222,43 @@
                 </span>
               </span>
             </button>
+            ` : ''}
           </div>
         </div>
-        <div class="ethan-detail-panel">
+        <div class="ethan-detail-panel catalog-detail-panel">
+          ${isProvider ? `
+          <div class="catalog-detail-grid catalog-detail-grid--provider">
+            <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
+              <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
+              ${itField('Service', 'Virtual machines')}
+              ${itField('Status', publishLabelHtml(item.publishState))}
+              ${itField('Rate', catalogRateLine(item))}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="ci-publishing-title">
+              <h3 class="ethan-detail-col__title" id="ci-publishing-title">Publishing</h3>
+              ${itField('Visibility', `<span class="catalog-detail-visibility"><i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i><span>${scopeLabel}</span></span>`)}
+              ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
+            </section>
+            <section class="catalog-hw-specs" aria-labelledby="ci-hardware-title">
+              <h3 class="catalog-hw-specs__title" id="ci-hardware-title">Hardware specifications</h3>
+              <dl class="catalog-hw-specs__list">
+                ${catalogDetailHardwareSpecsHtml(item)}
+              </dl>
+            </section>
+          </div>
+          ` : `
           <div class="catalog-detail-grid">
             <div class="catalog-detail-grid__meta">
               <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
                 <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
                 ${itField('Service', 'Virtual machines')}
-                ${isProvider ? itField('Status', publishLabelHtml(item.publishState)) : ''}
                 ${itField('Rate', catalogRateLine(item))}
               </section>
-              ${isProvider ? `
-              <section class="ethan-detail-col" aria-labelledby="ci-publishing-title">
-                <h3 class="ethan-detail-col__title" id="ci-publishing-title">Publishing</h3>
-                ${itField('Visibility', `<i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i> ${scopeLabel}`)}
-                ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
-              </section>
-              ` : `
               <section class="ethan-detail-col" aria-labelledby="ci-project-title">
                 <h3 class="ethan-detail-col__title" id="ci-project-title">Project</h3>
                 ${itField('Project', String(item.project || '—').replace(/</g, '&lt;'))}
                 ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
               </section>
-              `}
             </div>
             <section class="catalog-hw-specs" aria-labelledby="ci-hardware-title">
               <h3 class="catalog-hw-specs__title" id="ci-hardware-title">Hardware specifications</h3>
@@ -17086,6 +17267,7 @@
               </dl>
             </section>
           </div>
+          `}
         </div>
       `;
 
@@ -17569,6 +17751,7 @@
       closeDiskImageActionsMenu();
       closeInstanceTypeActionsMenu();
       closeVmKebabMenu();
+      closeVmDetailActionsMenu();
       if (alreadyOpen) return;
 
       const actions = diskImageLifecycleActions(di.lifecycle);
@@ -18159,6 +18342,7 @@
       state.selectedDiskImageName = null;
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
+      closeVmDetailActionsMenu();
       const nav = b.dataset.nav;
       setView(nav);
       if (nav === 'templates') {
@@ -18287,6 +18471,12 @@
       e.preventDefault();
       applyDiskImageLifecycleAction(btn.dataset.diAction);
     });
+    document.getElementById('vm-detail-actions-menu')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-vm-detail-action]');
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      applyVmDetailAction(btn.dataset.vmDetailAction);
+    });
     document.getElementById('vm-tbody')?.addEventListener('click', e => {
       const btn = e.target.closest('[data-open-vm]');
       if (!btn) return;
@@ -18315,6 +18505,11 @@
         && !e.target.closest('#ci-detail-actions-btn')
         && !e.target.closest('[data-ci-kebab]')) {
         closeCatalogItemActionsMenu();
+      }
+      if (state.vmDetailActionsOpen
+        && !e.target.closest('#vm-detail-actions-menu')
+        && !e.target.closest('#vm-detail-actions-btn')) {
+        closeVmDetailActionsMenu();
       }
     });
     function bindNavExpandable(toggleId, itemId) {
