@@ -2564,12 +2564,10 @@
       border-radius: 16px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
       padding: 0;
+      overflow: visible;
     }
-    #nic-overlay .pf-v6-c-modal-box {
-      overflow: auto;
-    }
-    #disk-overlay .pf-v6-c-modal-box,
-    #disk-modal {
+    #nic-overlay .pf-v6-c-modal-box__body,
+    #disk-overlay .nic-modal__body {
       overflow: visible;
     }
     #disk-overlay .nic-modal__body {
@@ -2715,29 +2713,6 @@
       box-shadow: var(--pf-t--global--box-shadow--md, 0 4px 16px rgba(0, 0, 0, 0.16));
       padding: 0; overflow: hidden;
       isolation: isolate;
-    }
-    /* VM modals — PF6 Felt glass menus */
-    #compute-overlay .rich-select__menu,
-    #nic-overlay .rich-select__menu,
-    #disk-overlay .rich-select__menu,
-    #nic-overlay .sg-select__menu {
-      background: color-mix(in srgb, var(--pf-t--global--background--color--secondary--default, #f2f2f2) 84%, transparent) !important;
-      background-color: color-mix(in srgb, var(--pf-t--global--background--color--secondary--default, #f2f2f2) 84%, transparent) !important;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: var(--pf-t--global--border--width--glass--default, 1px) solid var(--pf-t--global--border--color--glass--default, rgba(255, 255, 255, 0.45));
-      border-radius: var(--pf-t--global--border--radius--glass--default, 12px);
-      box-shadow: var(--pf-t--global--box-shadow--glass--default, 0 4px 16px rgba(0, 0, 0, 0.12));
-    }
-    #compute-overlay .rich-select__menu .pf-v6-c-menu__list,
-    #compute-overlay .rich-select__menu .rich-select__menu-list,
-    #nic-overlay .rich-select__menu .pf-v6-c-menu__list,
-    #nic-overlay .rich-select__menu .rich-select__menu-list,
-    #disk-overlay .rich-select__menu .pf-v6-c-menu__list,
-    #disk-overlay .rich-select__menu .rich-select__menu-list,
-    #nic-overlay .sg-select__menu {
-      background: transparent !important;
-      background-color: transparent !important;
     }
     .rich-select__menu[hidden] { display: none !important; }
     .rich-select__menu .pf-v6-c-menu__list,
@@ -5779,7 +5754,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · compute dropdown fix</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · modal dropdowns = wizard</span>
         </div>
       </div>
       <div class="console__body">
@@ -7252,95 +7227,82 @@
       const m = state.editComputeModal;
       const body = document.getElementById('compute-modal-body');
       if (!m || !body) return;
-      const allOptions = COMPUTE_RESOURCES.map(c => {
-        const parts = computeResourceParts(c.id);
-        const rate = formatComputeHourlyRate(c.hourly);
-        return {
-          id: c.id,
-          title: parts.title,
-          desc: [parts.desc, rate].filter(Boolean).join(' · '),
-        };
-      });
+      const selectedParts = computeResourceParts(m.selectedId);
+      const toggleDesc = selectedParts.desc || '';
+      const vmComputeOptions = filteredVmComputeResources(m.filter);
       body.innerHTML = `
         <div class="form-field">
           <label id="f-edit-compute-resource-label">Compute resource <span class="req">*</span></label>
-          ${renderTypeaheadRichSelectHtml({
-            rootId: 'edit-compute-select',
-            toggleId: 'edit-compute-toggle',
-            menuId: 'edit-compute-menu',
-            searchId: 'edit-compute-search',
-            labelId: 'f-edit-compute-resource-label',
-            open: m.menuOpen,
-            filter: m.filter,
-            searchPlaceholder: 'Search compute resources',
-            selectedId: m.selectedId,
-            placeholder: 'Select a compute resource',
-            options: allOptions,
-            optionAttr: 'data-edit-compute',
-            stacked: true,
-            hiddenInputId: 'f-edit-compute-resource',
-            emptyNoun: 'compute resources',
-          })}
+          <div class="rich-select rich-select--typeahead ${m.menuOpen ? 'pf-m-expanded' : ''}" id="edit-compute-select">
+            ${pfRichSelectToggle({
+              id: 'edit-compute-toggle',
+              ariaLabelledby: 'f-edit-compute-resource-label',
+              ariaExpanded: m.menuOpen,
+              ariaControls: 'edit-compute-menu',
+              stacked: true,
+              mainHtml: `
+                <span class="rich-select__toggle-label">${richSelectEsc(selectedParts.title)}</span>
+                ${toggleDesc ? `<span class="rich-select__toggle-desc">${richSelectEsc(toggleDesc)}</span>` : ''}
+              `,
+            })}
+            <div class="pf-v6-c-menu rich-select__menu" id="edit-compute-menu" role="listbox" ${m.menuOpen ? '' : 'hidden'}>
+              <div class="rich-select__search">
+                <i class="fa-solid fa-search" aria-hidden="true"></i>
+                <input type="search" id="edit-compute-search" placeholder="Search compute resources"
+                  value="${richSelectEsc(m.filter)}" aria-label="Search compute resources" />
+              </div>
+              <hr class="rich-select__menu-divider" />
+              <div class="rich-select__menu-list">
+                ${vmComputeOptions.map(c => {
+                  const parts = computeResourceParts(c.id);
+                  const rate = formatComputeHourlyRate(c.hourly);
+                  const desc = [parts.desc, rate].filter(Boolean).join(' · ');
+                  return `
+                  <button type="button" class="pf-v6-c-menu__item rich-select__option ${m.selectedId === c.id ? 'pf-m-selected' : ''}"
+                    data-edit-compute="${richSelectEsc(c.id)}" role="option">
+                    <span class="pf-v6-c-menu__item-main">
+                      <span class="rich-select__option-body">
+                        <span class="rich-select__option-title">${richSelectEsc(parts.title)}</span>
+                        <span class="rich-select__option-desc">${richSelectEsc(desc)}</span>
+                      </span>
+                    </span>
+                  </button>`;
+                }).join('') || emptyStateMenuSearchHtml('compute resources')}
+              </div>
+            </div>
+            <input type="hidden" id="f-edit-compute-resource" value="${richSelectEsc(m.selectedId)}" />
+          </div>
         </div>
       `;
 
-      document.getElementById('edit-compute-toggle')?.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        m.menuOpen = !m.menuOpen;
-        if (!m.menuOpen) m.filter = '';
-        renderEditComputeModal(m.menuOpen ? 'edit-compute-search' : 'edit-compute-toggle');
-      });
-      body.querySelectorAll('[data-edit-compute]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          m.selectedId = btn.dataset.editCompute;
+      wireModalTypeaheadRichSelect(body, fid => renderEditComputeModal(fid), {
+        toggleId: 'edit-compute-toggle',
+        searchId: 'edit-compute-search',
+        optionSel: '[data-edit-compute]',
+        getOptionId: opt => opt.dataset.editCompute,
+        getOpen: () => m.menuOpen,
+        setOpen: v => { m.menuOpen = v; },
+        setFilter: v => { m.filter = v; },
+        onSelectId: id => {
+          m.selectedId = id;
           m.menuOpen = false;
           m.filter = '';
           renderEditComputeModal('edit-compute-toggle');
-        });
+        },
       });
-      const search = document.getElementById('edit-compute-search');
-      if (search) {
-        search.addEventListener('input', e => {
-          m.filter = e.target.value;
-          m.menuOpen = true;
-          renderEditComputeModal('edit-compute-search');
-        });
-        search.addEventListener('keydown', e => {
-          if (e.key === 'Escape') {
-            e.stopPropagation();
-            m.menuOpen = false;
-            m.filter = '';
-            renderEditComputeModal('edit-compute-toggle');
-          }
-        });
-      }
 
       if (body._computeSelectAbort) body._computeSelectAbort.abort();
       const ac = new AbortController();
       body._computeSelectAbort = ac;
       document.addEventListener('mousedown', e => {
-        if (!state.editComputeModal) return;
+        if (!state.editComputeModal?.menuOpen) return;
         if (e.target.closest('#edit-compute-select')) return;
-        if (!state.editComputeModal.menuOpen) return;
         state.editComputeModal.menuOpen = false;
         state.editComputeModal.filter = '';
         renderEditComputeModal();
       }, { signal: ac.signal });
 
-      if (focusId) {
-        setTimeout(() => {
-          const el = document.getElementById(focusId);
-          if (!el) return;
-          el.focus();
-          if (focusId === 'edit-compute-search') {
-            const len = el.value.length;
-            try { el.setSelectionRange(len, len); } catch (_) { /* ignore */ }
-          }
-        }, 0);
-      }
+      focusRichSelectField(focusId);
     }
 
     function openEditComputeModal() {
@@ -8753,6 +8715,57 @@
         state.focusRichSearchId = searchId;
         renderWizard();
       });
+    }
+
+    function focusRichSelectField(focusId) {
+      if (!focusId) return;
+      setTimeout(() => {
+        const el = document.getElementById(focusId);
+        if (!el) return;
+        el.focus();
+        if (el.type === 'search') {
+          const len = el.value.length;
+          try { el.setSelectionRange(len, len); } catch (_) { /* ignore */ }
+        }
+      }, 0);
+    }
+
+    /** Modal typeahead — same markup as wizard; re-render on toggle/search. */
+    function wireModalTypeaheadRichSelect(container, rerender, {
+      toggleId, searchId, optionSel, getOptionId,
+      getOpen, setOpen, setFilter, onSelectId,
+    }) {
+      container.querySelector(`#${toggleId}`)?.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const willOpen = !getOpen();
+        setOpen(willOpen);
+        if (!willOpen) setFilter('');
+        rerender(willOpen ? searchId : toggleId);
+      });
+      container.querySelectorAll(optionSel).forEach(opt => {
+        opt.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          onSelectId(getOptionId(opt));
+        });
+      });
+      const search = container.querySelector(`#${searchId}`);
+      if (search) {
+        search.addEventListener('input', e => {
+          setFilter(e.target.value);
+          setOpen(true);
+          rerender(searchId);
+        });
+        search.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            setOpen(false);
+            setFilter('');
+            rerender(toggleId);
+          }
+        });
+      }
     }
 
     function restoreRichSearchFocus(panel) {
@@ -11341,7 +11354,9 @@
         subnet: defaultNet?.subnets?.[0] || '',
         securityGroups: [DEFAULT_SECURITY_GROUP],
         vnMenuOpen: false,
+        vnFilter: '',
         subnetMenuOpen: false,
+        subnetFilter: '',
         sgMenuOpen: false,
         error: '',
       };
@@ -11369,7 +11384,9 @@
         subnet: detail.subnet,
         securityGroups: [...(detail.securityGroups || [])],
         vnMenuOpen: false,
+        vnFilter: '',
         subnetMenuOpen: false,
+        subnetFilter: '',
         sgMenuOpen: false,
         error: '',
       };
@@ -11396,7 +11413,7 @@
       return !!(m.virtualNetwork && m.subnet && Array.isArray(m.securityGroups) && m.securityGroups.length);
     }
 
-    function renderAddNetworkModal() {
+    function renderAddNetworkModal(focusId = '') {
       const m = state.networkModal;
       const body = document.getElementById('nic-modal-body');
       const footer = document.getElementById('nic-modal-footer');
@@ -11424,8 +11441,7 @@
         </span>
       `).join('');
       const sgOpen = !!m.sgMenuOpen;
-      const vnOptions = CONFIG_VIRTUAL_NETWORKS.map(n => ({ id: n.id, label: n.label }));
-      const subnetOptions = subnetOpts.map(s => ({ id: s, label: s }));
+      const subnetEnabled = !!m.virtualNetwork;
       body.innerHTML = `
         ${m.error ? `
         <p class="nic-modal__error" role="alert" style="margin:0 0 12px;">
@@ -11435,16 +11451,22 @@
         ` : ''}
         <div class="form-field">
           <label id="net-f-virtual-network-label">Virtual network <span class="req">*</span></label>
-          ${renderListRichSelectHtml({
+          ${renderTypeaheadRichSelectHtml({
             rootId: 'net-vn-select',
             toggleId: 'net-vn-toggle',
             menuId: 'net-vn-menu',
+            searchId: 'net-vn-search',
             labelId: 'net-f-virtual-network-label',
             open: !!m.vnMenuOpen,
+            filter: m.vnFilter || '',
+            searchPlaceholder: 'Search virtual networks',
             selectedId: m.virtualNetwork,
             placeholder: 'Select a virtual network',
-            options: vnOptions,
+            optionAttr: 'data-net-vn',
+            hiddenInputId: 'net-f-virtual-network',
             disabled: !CONFIG_VIRTUAL_NETWORKS.length,
+            emptyNoun: 'virtual networks',
+            options: CONFIG_VIRTUAL_NETWORKS.map(n => ({ id: n.id, title: n.label })),
           })}
           <p class="form-helper">Network name ${m.mode === 'edit' ? 'is' : 'will be'} <code>${previewName}</code>.</p>
           ${CONFIG_VIRTUAL_NETWORKS.length ? '' : `
@@ -11456,16 +11478,22 @@
         </div>
         <div class="form-field" style="margin-top:16px;">
           <label id="net-f-subnet-label">Subnet <span class="req">*</span></label>
-          ${renderListRichSelectHtml({
+          ${renderTypeaheadRichSelectHtml({
             rootId: 'net-subnet-select',
             toggleId: 'net-subnet-toggle',
             menuId: 'net-subnet-menu',
+            searchId: 'net-subnet-search',
             labelId: 'net-f-subnet-label',
-            open: !!m.subnetMenuOpen,
+            open: !!m.subnetMenuOpen && subnetEnabled,
+            filter: m.subnetFilter || '',
+            searchPlaceholder: 'Search subnets',
             selectedId: m.subnet,
             placeholder: 'Select a subnet',
-            options: subnetOptions,
-            disabled: !m.virtualNetwork,
+            optionAttr: 'data-net-subnet',
+            hiddenInputId: 'net-f-subnet',
+            disabled: !subnetEnabled,
+            emptyNoun: 'subnets',
+            options: subnetOpts.map(s => ({ id: s, title: s })),
           })}
         </div>
         <div class="form-field" style="margin-top:16px;">
@@ -11506,52 +11534,82 @@
         <button type="button" class="pf-v6-c-button pf-m-link" id="net-modal-cancel">Cancel</button>
       `;
 
-      const refresh = () => renderAddNetworkModal();
-      const vnRoot = document.getElementById('net-vn-select');
-      if (vnRoot && CONFIG_VIRTUAL_NETWORKS.length) {
-        bindRichSelect(vnRoot, {
-          toggleSel: '#net-vn-toggle',
-          menuSel: '#net-vn-menu',
-          optionSel: '[data-rich-option]',
-          onOpen: () => {
-            m.vnMenuOpen = true;
-            m.subnetMenuOpen = false;
-            m.sgMenuOpen = false;
+      const refresh = (focusId = '') => {
+        renderAddNetworkModal(focusId);
+      };
+      if (CONFIG_VIRTUAL_NETWORKS.length) {
+        wireModalTypeaheadRichSelect(body, refresh, {
+          toggleId: 'net-vn-toggle',
+          searchId: 'net-vn-search',
+          optionSel: '[data-net-vn]',
+          getOptionId: opt => opt.dataset.netVn,
+          getOpen: () => m.vnMenuOpen,
+          setOpen: v => {
+            m.vnMenuOpen = v;
+            if (v) {
+              m.subnetMenuOpen = false;
+              m.sgMenuOpen = false;
+            }
           },
-          onClose: () => { m.vnMenuOpen = false; },
-          onSelect: opt => {
-            m.virtualNetwork = opt.dataset.richOption;
+          setFilter: v => { m.vnFilter = v; },
+          onSelectId: value => {
+            m.virtualNetwork = value;
             m.subnet = '';
             m.securityGroups = [];
             m.vnMenuOpen = false;
+            m.vnFilter = '';
+            m.subnetMenuOpen = false;
+            m.subnetFilter = '';
             const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
             if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
             if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
-            refresh();
+            refresh('net-vn-toggle');
           },
         });
       }
-      const subnetRoot = document.getElementById('net-subnet-select');
-      if (subnetRoot && m.virtualNetwork) {
-        bindRichSelect(subnetRoot, {
-          toggleSel: '#net-subnet-toggle',
-          menuSel: '#net-subnet-menu',
-          optionSel: '[data-rich-option]',
-          onOpen: () => {
-            m.subnetMenuOpen = true;
-            m.vnMenuOpen = false;
-            m.sgMenuOpen = false;
+      if (m.virtualNetwork) {
+        wireModalTypeaheadRichSelect(body, refresh, {
+          toggleId: 'net-subnet-toggle',
+          searchId: 'net-subnet-search',
+          optionSel: '[data-net-subnet]',
+          getOptionId: opt => opt.dataset.netSubnet,
+          getOpen: () => m.subnetMenuOpen,
+          setOpen: v => {
+            m.subnetMenuOpen = v;
+            if (v) {
+              m.vnMenuOpen = false;
+              m.sgMenuOpen = false;
+            }
           },
-          onClose: () => { m.subnetMenuOpen = false; },
-          onSelect: opt => {
-            m.subnet = opt.dataset.richOption;
+          setFilter: v => { m.subnetFilter = v; },
+          onSelectId: value => {
+            m.subnet = value;
             if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
             m.subnetMenuOpen = false;
+            m.subnetFilter = '';
             m.sgMenuOpen = false;
-            refresh();
+            refresh('net-subnet-toggle');
           },
         });
       }
+      if (body._netSelectAbort) body._netSelectAbort.abort();
+      const netAc = new AbortController();
+      body._netSelectAbort = netAc;
+      document.addEventListener('mousedown', e => {
+        if (!state.networkModal) return;
+        if (e.target.closest('#net-vn-select') || e.target.closest('#net-subnet-select')) return;
+        if (state.networkModal.vnMenuOpen) {
+          state.networkModal.vnMenuOpen = false;
+          state.networkModal.vnFilter = '';
+          refresh();
+          return;
+        }
+        if (state.networkModal.subnetMenuOpen) {
+          state.networkModal.subnetMenuOpen = false;
+          state.networkModal.subnetFilter = '';
+          refresh();
+        }
+      }, { signal: netAc.signal });
       const sgRoot = document.getElementById('net-f-security-groups');
       const sgEnabled = !!(m.virtualNetwork && m.subnet);
       if (sgRoot && sgEnabled) {
@@ -11590,6 +11648,7 @@
       }
       document.getElementById('net-modal-save')?.addEventListener('click', saveAddNetworkModal);
       document.getElementById('net-modal-cancel')?.addEventListener('click', closeAddNetworkModal);
+      focusRichSelectField(focusId);
     }
 
     function saveAddNetworkModal() {
@@ -11858,7 +11917,7 @@
         && !!m.storageTierId;
     }
 
-    function renderAddDiskModal() {
+    function renderAddDiskModal(focusId = '') {
       const m = state.diskModal;
       const body = document.getElementById('disk-modal-body');
       const footer = document.getElementById('disk-modal-footer');
@@ -11873,47 +11932,6 @@
         m.storageTierId = tiers[0]?.id || '';
       }
       const canSave = canSaveDiskModal(m);
-      const selectedTier = tiers.find(t => t.id === m.storageTierId);
-      const tierFilter = (m.tierFilter || '').toLowerCase();
-      const tierOptions = tiers.filter(t => {
-        if (!tierFilter) return true;
-        return `${t.name} ${t.description || ''}`.toLowerCase().includes(tierFilter);
-      });
-      const tierToggleLabel = selectedTier
-        ? selectedTier.name
-        : 'Select storage tier';
-      const tierMenu = m.tierOpen ? `
-        <div class="pf-v6-c-menu rich-select__menu" id="disk-tier-menu" role="listbox" aria-label="Storage tier">
-          <div class="rich-select__search">
-            <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" id="disk-tier-filter" placeholder="Select storage tier"
-              value="${(m.tierFilter || '').replace(/"/g, '&quot;')}"
-              aria-label="Filter storage tiers"
-              autocomplete="off" />
-          </div>
-          <hr class="rich-select__menu-divider" />
-          <div class="rich-select__menu-list">
-            <ul class="pf-v6-c-menu__list" role="presentation">
-              ${tierOptions.map(opt => `
-                <li class="pf-v6-c-menu__list-item" role="none">
-                  <button type="button"
-                    class="pf-v6-c-menu__item rich-select__option ${opt.id === m.storageTierId ? 'pf-m-selected' : ''}"
-                    role="option" data-disk-tier="${opt.id}" aria-selected="${opt.id === m.storageTierId}">
-                    <span class="pf-v6-c-menu__item-main">
-                      <span class="sc-icon" aria-hidden="true">ST</span>
-                      <span class="pf-v6-c-menu__item-text rich-select__option-body">
-                        <span class="rich-select__option-title">${opt.name}</span>
-                        <span class="rich-select__option-desc">${opt.description || ''}${opt.id === tiers[0]?.id ? ' (default)' : ''}</span>
-                      </span>
-                      <span class="rich-select__check" aria-hidden="true"><i class="fas fa-check"></i></span>
-                    </span>
-                  </button>
-                </li>
-              `).join('') || `<li class="pf-v6-c-menu__list-item" role="none">${emptyStateMenuSearchHtml('storage tiers')}</li>`}
-            </ul>
-          </div>
-        </div>
-      ` : '';
 
       const previewSource = m.context === 'vm-detail'
         ? (() => {
@@ -11938,20 +11956,27 @@
           <p class="form-helper">Disk name will be <code>${previewName}</code>.</p>
         </div>
         <div class="form-field">
-          <label for="disk-tier-toggle" id="disk-tier-label">Storage tier <span class="req">*</span></label>
-          <div class="rich-select ${m.tierOpen ? 'pf-m-expanded' : ''}" id="disk-tier-select">
-            ${pfRichSelectToggle({
-              id: 'disk-tier-toggle',
-              ariaLabelledby: 'disk-tier-label',
-              ariaExpanded: !!m.tierOpen,
-              ariaControls: 'disk-tier-menu',
-              mainHtml: `
-                ${selectedTier ? '<span class="sc-icon" aria-hidden="true">ST</span>' : ''}
-                <span class="rich-select__toggle-label">${tierToggleLabel.replace(/</g, '&lt;')}</span>
-              `,
-            })}
-            ${tierMenu}
-          </div>
+          <label id="disk-tier-label">Storage tier <span class="req">*</span></label>
+          ${renderTypeaheadRichSelectHtml({
+            rootId: 'disk-tier-select',
+            toggleId: 'disk-tier-toggle',
+            menuId: 'disk-tier-menu',
+            searchId: 'disk-tier-search',
+            labelId: 'disk-tier-label',
+            open: !!m.tierOpen,
+            filter: m.tierFilter || '',
+            searchPlaceholder: 'Search storage tiers',
+            selectedId: m.storageTierId,
+            placeholder: 'Select storage tier',
+            optionAttr: 'data-disk-tier',
+            stacked: true,
+            emptyNoun: 'storage tiers',
+            options: tiers.map(t => ({
+              id: t.id,
+              title: t.name,
+              desc: `${t.description || ''}${t.id === tiers[0]?.id ? ' (default)' : ''}`.trim(),
+            })),
+          })}
           <p class="form-helper">Storage tiers are defined by your cloud provider administrator.</p>
           ${tiers.length ? '' : `
             <p class="nic-modal__error" role="alert" style="margin-top:12px;">
@@ -11980,10 +12005,9 @@
         const saveBtn = document.getElementById('disk-modal-save');
         if (saveBtn) saveBtn.disabled = !canSaveDiskModal(m);
       };
-      const rerenderKeepFocus = (focusId) => {
+      const rerenderDisk = (focusId = '') => {
         syncDiskModalDraftFromDom();
-        renderAddDiskModal();
-        if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0);
+        renderAddDiskModal(focusId);
       };
 
       document.getElementById('disk-f-size')?.addEventListener('input', e => {
@@ -11995,56 +12019,36 @@
         refreshSave();
       });
 
-      document.getElementById('disk-tier-toggle')?.addEventListener('click', () => {
-        m.tierOpen = !m.tierOpen;
-        if (!m.tierOpen) m.tierFilter = '';
-        else m.tierFilter = m.tierFilter || '';
-        rerenderKeepFocus(m.tierOpen ? 'disk-tier-filter' : 'disk-tier-toggle');
-      });
-      body.querySelectorAll('[data-disk-tier]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          m.storageTierId = btn.dataset.diskTier;
+      wireModalTypeaheadRichSelect(body, rerenderDisk, {
+        toggleId: 'disk-tier-toggle',
+        searchId: 'disk-tier-search',
+        optionSel: '[data-disk-tier]',
+        getOptionId: opt => opt.dataset.diskTier,
+        getOpen: () => m.tierOpen,
+        setOpen: v => { m.tierOpen = v; },
+        setFilter: v => { m.tierFilter = v; },
+        onSelectId: tierId => {
+          m.storageTierId = tierId;
           m.tierOpen = false;
           m.tierFilter = '';
-          rerenderKeepFocus('disk-tier-toggle');
-        });
+          rerenderDisk('disk-tier-toggle');
+        },
       });
-      const tierFilterInput = document.getElementById('disk-tier-filter');
-      if (tierFilterInput) {
-        tierFilterInput.addEventListener('input', e => {
-          m.tierFilter = e.target.value;
-          m.tierOpen = true;
-          rerenderKeepFocus('disk-tier-filter');
-        });
-        tierFilterInput.addEventListener('keydown', e => {
-          if (e.key === 'Escape') {
-            m.tierOpen = false;
-            m.tierFilter = '';
-            rerenderKeepFocus('disk-tier-toggle');
-          }
-        });
-        if (m.tierOpen) {
-          tierFilterInput.focus();
-          const len = tierFilterInput.value.length;
-          tierFilterInput.setSelectionRange(len, len);
-        }
-      }
 
       if (body._diskSelectAbort) body._diskSelectAbort.abort();
       const ac = new AbortController();
       body._diskSelectAbort = ac;
       document.addEventListener('mousedown', e => {
-        if (!state.diskModal) return;
-        const inTier = e.target.closest('#disk-tier-select');
-        if (!inTier && state.diskModal.tierOpen) {
-          state.diskModal.tierOpen = false;
-          state.diskModal.tierFilter = '';
-          renderAddDiskModal();
-        }
+        if (!state.diskModal?.tierOpen) return;
+        if (e.target.closest('#disk-tier-select')) return;
+        state.diskModal.tierOpen = false;
+        state.diskModal.tierFilter = '';
+        renderAddDiskModal();
       }, { signal: ac.signal });
 
       document.getElementById('disk-modal-save')?.addEventListener('click', saveAddDiskModal);
       document.getElementById('disk-modal-cancel')?.addEventListener('click', closeAddDiskModal);
+      focusRichSelectField(focusId);
     }
 
     function saveAddDiskModal() {
