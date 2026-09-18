@@ -6905,7 +6905,7 @@
         mem: '2 GiB',
         storage: '20 GiB',
         workload: 'Server',
-        description: 'Editable size · choose a disk image',
+        description: '',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6928,7 +6928,7 @@
         mem: '16 GiB',
         storage: '40 GiB',
         workload: 'Server',
-        description: 'XL defaults · editable size · choose a disk image',
+        description: '',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -14177,13 +14177,15 @@
           const drawerTab = state.tplDrawerTab === 'cost' ? 'cost' : 'details';
           const costHourLabel = sizeEditable ? `From ${selRates.hour}` : selRates.hour;
           const computeDigits = selEst.computeHourly > 0 && selEst.computeHourly < 1 ? 3 : 2;
-          const fixedItems = [
-            {
+          const hasDefaultDiskImage = !!selected.diskImageId;
+          const fixedItems = [];
+          if (hasDefaultDiskImage) {
+            fixedItems.push({
               label: 'Disk image',
-              value: templateDefaultDiskImage(selected)?.title || 'Not set',
-              note: selected.diskImageId ? 'Starting default · editable on Details' : 'Choose on Details',
-            },
-          ];
+              value: templateDefaultDiskImage(selected)?.title || '—',
+              note: 'Starting default · editable on Details',
+            });
+          }
           if (fieldBeh.compute === 'locked') {
             fixedItems.push({ label: 'Compute', value: `${selSpecs.cpu} · ${selSpecs.mem}`, note: '' });
           }
@@ -14191,6 +14193,13 @@
             fixedItems.push({ label: 'Boot disk', value: cardStorage(selected), note: '' });
           }
           const editableItems = [];
+          if (!hasDefaultDiskImage) {
+            editableItems.push({
+              label: 'Disk image',
+              value: 'Not set (Select on Details step)',
+              note: '',
+            });
+          }
           if (fieldBeh.compute === 'editable') {
             editableItems.push({
               label: 'Compute',
@@ -14220,7 +14229,9 @@
               `).join('')}
             </ul>
           `;
-          const govPanel = (title, kind, items) => `
+          const govPanel = (title, kind, items) => {
+            if (!items.length) return '';
+            return `
             <section class="tpl-drawer__gov-panel tpl-drawer__gov-panel--${kind}" aria-labelledby="tpl-gov-${kind}">
               <div class="tpl-drawer__gov-panel-head">
                 <h5 class="tpl-drawer__gov-panel-title" id="tpl-gov-${kind}">${title}</h5>
@@ -14229,8 +14240,8 @@
               ${govList(items)}
             </section>
           `;
+          };
           const detailsPanel = `
-                <dl class="tpl-drawer__field"><dt>Description</dt><dd>${selected.description || '—'}</dd></dl>
                 <dl class="tpl-drawer__field"><dt>Workload type</dt><dd>${selected.workload}</dd></dl>
                 <div class="tpl-drawer__gov-stack">
                   <h4 class="tpl-drawer__group-label">Template settings</h4>
@@ -14274,7 +14285,11 @@
                   </span>
                   <div class="tpl-drawer__heading">
                     <h4 class="tpl-drawer__title" id="tpl-drawer-title">${cardName(selected)}</h4>
-                    <p class="tpl-drawer__sub">${selected.description || (sizeEditable ? 'Editable size · image locked' : `${selected.os} VM`)}</p>
+                    ${selected.description
+                      ? `<p class="tpl-drawer__sub">${selected.description}</p>`
+                      : (selected.os
+                        ? `<p class="tpl-drawer__sub">${selected.os} VM</p>`
+                        : '')}
                   </div>
                 </div>
                 <button type="button" class="tpl-drawer__close" id="tpl-drawer-close" aria-label="Close details">&times;</button>
