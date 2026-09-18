@@ -5754,7 +5754,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 17 · modal dropdowns = wizard</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 18 · disk image + access-init</span>
         </div>
       </div>
       <div class="console__body">
@@ -6798,65 +6798,68 @@
     const TEMPLATES = [
       {
         id: 'catalog-item-1',
-        name: 'rhel.10',
-        slug: 'catalog-item-1',
+        name: 'Large VM',
+        slug: 'large-vm',
         project: 'project-a',
+        diskImageId: 'rhel-10',
         osImage: 'rhel.10',
         os: 'Red Hat Enterprise Linux 10',
-        osKey: 'rhel',
+        osKey: 'server',
         osFamily: 'rhel',
-        computeResource: 'small',
-        bootDiskGiB: 5,
-        arch: 'amd64',
-        cpu: '1 vCPU',
-        mem: '2 GiB',
-        storage: '5 GiB',
-        workload: 'Server',
-        description: 'RHEL 10 · 5 GiB boot disk',
-        fields: { compute: 'locked', bootDisk: 'locked' },
-        kind: 'catalog',
-        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'Boot disk', size: 5, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
-      },
-      {
-        id: 'catalog-item-2',
-        name: 'rhel.9',
-        slug: 'catalog-item-2',
-        project: 'project-a',
-        osImage: 'rhel.9',
-        os: 'Red Hat Enterprise Linux 9',
-        osKey: 'rhel',
-        osFamily: 'rhel',
-        computeResource: 'small',
-        bootDiskGiB: 10,
-        arch: 'amd64',
-        cpu: '1 vCPU',
-        mem: '2 GiB',
-        storage: '10 GiB',
-        workload: 'Server',
-        description: 'RHEL 9 · 10 GiB boot disk',
-        fields: { compute: 'locked', bootDisk: 'locked' },
-        kind: 'catalog',
-        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'Boot disk', size: 10, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
-      },
-      {
-        id: 'catalog-item-3',
-        name: 'Windows.2k25',
-        slug: 'catalog-item-3',
-        project: 'project-a',
-        osImage: 'Windows.2k25',
-        os: 'Microsoft Windows Server 2025',
-        osKey: 'windows',
-        osFamily: 'windows',
         computeResource: 'large',
-        bootDiskGiB: 20,
+        bootDiskGiB: 40,
         arch: 'amd64',
         cpu: '2 vCPU',
         mem: '8 GiB',
+        storage: '40 GiB',
+        workload: 'Server',
+        description: 'Larger compute for production workloads',
+        fields: { compute: 'locked', bootDisk: 'locked' },
+        kind: 'catalog',
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        disks: [{ name: 'Boot disk', size: 40, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
+      },
+      {
+        id: 'catalog-item-2',
+        name: 'Medium VM',
+        slug: 'medium-vm',
+        project: 'project-a',
+        diskImageId: 'rhel-94',
+        osImage: 'rhel.9',
+        os: 'Red Hat Enterprise Linux 9',
+        osKey: 'server',
+        osFamily: 'rhel',
+        computeResource: 'medium',
+        bootDiskGiB: 20,
+        arch: 'amd64',
+        cpu: '1 vCPU',
+        mem: '4 GiB',
         storage: '20 GiB',
         workload: 'Server',
-        description: 'Windows Server 2025 · 20 GiB boot disk',
+        description: 'Balanced compute for general workloads',
+        fields: { compute: 'locked', bootDisk: 'locked' },
+        kind: 'catalog',
+        nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
+        disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
+      },
+      {
+        id: 'catalog-item-3',
+        name: 'Small VM',
+        slug: 'small-vm',
+        project: 'project-a',
+        diskImageId: 'ubuntu-2204',
+        osImage: 'ubuntu',
+        os: 'Ubuntu 22.04 LTS',
+        osKey: 'server',
+        osFamily: 'linux',
+        computeResource: 'small',
+        bootDiskGiB: 20,
+        arch: 'amd64',
+        cpu: '1 vCPU',
+        mem: '2 GiB',
+        storage: '20 GiB',
+        workload: 'Server',
+        description: 'Compact compute for light workloads',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6864,35 +6867,37 @@
       },
       {
         id: 'catalog-item-4',
-        name: 'fedora',
-        slug: 'catalog-item-4',
+        name: 'Tiny VM',
+        slug: 'tiny-vm',
         project: 'project-a',
-        osImage: 'fedora',
-        os: 'Fedora Linux',
-        osKey: 'fedora',
-        osFamily: 'fedora',
-        computeResource: 'small',
-        bootDiskGiB: 20,
+        diskImageId: 'rocky-93',
+        osImage: 'rocky',
+        os: 'Rocky Linux 9.3',
+        osKey: 'server',
+        osFamily: 'linux',
+        computeResource: 'nano',
+        bootDiskGiB: 5,
         arch: 'amd64',
         cpu: '1 vCPU',
-        mem: '2 GiB',
-        storage: '20 GiB',
+        mem: '512 MiB',
+        storage: '5 GiB',
         workload: 'Server',
-        description: 'Fedora · 20 GiB boot disk',
+        description: 'Minimal compute for trials and demos',
         fields: { compute: 'locked', bootDisk: 'locked' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
-        disks: [{ name: 'Boot disk', size: 20, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
+        disks: [{ name: 'Boot disk', size: 5, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' }],
       },
       {
         id: 'catalog-custom-1',
-        name: 'RHEL 10 Editable',
-        slug: 'rhel10-editable',
+        name: 'Custom 1',
+        slug: 'custom-1',
         project: 'project-a',
-        osImage: 'rhel.10',
-        os: 'Red Hat Enterprise Linux 10',
-        osKey: 'rhel',
-        osFamily: 'rhel',
+        diskImageId: null,
+        osImage: '',
+        os: '',
+        osKey: 'server',
+        osFamily: '',
         computeResource: 'small',
         bootDiskGiB: 20,
         arch: 'amd64',
@@ -6900,7 +6905,7 @@
         mem: '2 GiB',
         storage: '20 GiB',
         workload: 'Server',
-        description: 'Editable size · image locked',
+        description: 'Editable size · choose a disk image',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6908,13 +6913,14 @@
       },
       {
         id: 'catalog-custom-2',
-        name: 'RHEL 10 Editable (XL)',
-        slug: 'rhel10-editable-xl',
+        name: 'Custom 2',
+        slug: 'custom-2',
         project: 'project-a',
-        osImage: 'rhel.10',
-        os: 'Red Hat Enterprise Linux 10',
-        osKey: 'rhel',
-        osFamily: 'rhel',
+        diskImageId: null,
+        osImage: '',
+        os: '',
+        osKey: 'server',
+        osFamily: '',
         computeResource: 'xlarge',
         bootDiskGiB: 40,
         arch: 'amd64',
@@ -6922,7 +6928,7 @@
         mem: '16 GiB',
         storage: '40 GiB',
         workload: 'Server',
-        description: 'XL defaults · editable size · image locked',
+        description: 'XL defaults · editable size · choose a disk image',
         fields: { compute: 'editable', bootDisk: 'editable' },
         kind: 'catalog',
         nics: [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', subnet: 'bm-compute-a', securityGroups: ['allow-ssh-https'] }],
@@ -6931,11 +6937,11 @@
     ];
 
 
-    /** OSAC-3538: per-field governance. Image is always locked for compute catalog items. */
+    /** OSAC-3538: compute/bootDisk from template; disk image is always editable. */
     function getTemplateFields(tpl) {
       const f = (tpl && tpl.fields) || {};
       return {
-        image: 'locked',
+        image: 'editable',
         compute: f.compute === 'editable' ? 'editable' : 'locked',
         bootDisk: f.bootDisk === 'editable' ? 'editable' : 'locked',
       };
@@ -6952,21 +6958,23 @@
     }
     function templateDisplayName(t) {
       if (!t) return '—';
-      const name = String(t.name || '');
-      if (name && !/^(rhel|windows|fedora)\./i.test(name)) return name;
-      const os = String(t.os || '');
-      return os.replace(/^Red Hat Enterprise Linux/, 'RHEL') || name || t.osImage || '—';
+      return String(t.name || t.os || t.osImage || '—');
+    }
+    function templateDefaultDiskImage(t) {
+      if (!t?.diskImageId) return null;
+      return CATALOG_DISK_IMAGE_OPTIONS.find(d => d.id === t.diskImageId) || null;
     }
     function templateSizeGovBadge(editable) {
       const label = editable ? 'Size editable' : 'Size locked';
       const mod = editable ? ' catalog-gov-badge--editable' : '';
       return `<span class="catalog-gov-badge${mod}">${label}</span>`;
     }
-    function templateCardSpecsHtml(specs, storage) {
+    function templateCardSpecsHtml(specs, storage, diskImageHtml) {
       const rows = [
         { label: 'vCPU', value: specs.cpu },
         { label: 'Memory', value: specs.mem },
         { label: 'Storage', value: storage },
+        { label: 'Disk image', value: diskImageHtml },
       ];
       return `<dl class="catalog-card-specs tpl-card__catalog-specs">
         ${rows.map(row => `
@@ -6975,6 +6983,12 @@
             <dd class="catalog-card-specs__value">${row.value}</dd>
           </div>`).join('')}
       </dl>`;
+    }
+    function templateDiskImageSpecHtml(t) {
+      const disk = templateDefaultDiskImage(t);
+      if (!disk) return 'Not set';
+      const icon = catalogDiskImageIconHtml(disk.title);
+      return `<span class="catalog-disk-image-value">${icon}${String(disk.title).replace(/</g, '&lt;')}${catalogGovBadge('editable')}</span>`;
     }
     /** Text badge Locked / Editable cue next to field labels.
      *  scope === 'size' → Size editable / Size locked (boot disk). */
@@ -7681,7 +7695,9 @@
     }
 
     function isWindowsOs(d = state.data) {
-      return d.osFamily === 'windows' || /win/i.test(String(d.osImage || d.osType || ''));
+      return d.osFamily === 'windows'
+        || d.guestOsFamily === 'Microsoft Windows'
+        || /win/i.test(String(d.osImage || d.osType || ''));
     }
 
     function fieldErrorHtml(field) {
@@ -7718,6 +7734,7 @@
     function validateDetailsFields(d = state.data) {
       const errors = {};
       if (!String(d.name || '').trim()) errors.name = 'Enter a name or generate one.';
+      if (!d.diskImageId) errors.diskImage = 'Select a disk image to continue.';
       return errors;
     }
 
@@ -7752,7 +7769,7 @@
     }
 
     function focusFirstFieldError(errors = state.fieldErrors) {
-      const order = ['catalog', 'name', 'project', 'osImage', 'virtualNetwork', 'subnet', 'securityGroups'];
+      const order = ['catalog', 'name', 'project', 'diskImage', 'osImage', 'virtualNetwork', 'subnet', 'securityGroups'];
       const field = order.find(f => errors?.[f]);
       if (!field) return;
       if (field === 'catalog') {
@@ -7762,6 +7779,7 @@
       const id =
         field === 'name' ? 'f-name'
         : field === 'project' ? (document.getElementById('f-tpl-project') ? 'f-tpl-project' : 'f-project')
+        : field === 'diskImage' ? 'vm-disk-image-toggle'
         : field === 'osImage' ? 'f-os-image'
         : field === 'virtualNetwork' ? 'f-virtual-network'
         : field === 'subnet' ? 'f-subnet'
@@ -7905,7 +7923,13 @@
         cloudInitUser: 'cloud-user',
         cloudInitNetwork: 'Default',
         cloudInit: '',
+        sysprep: '',
+        initMethod: 'cloud-init',
         osImage: 'rhel.10',
+        diskImageId: '',
+        guestOsFamily: 'Linux',
+        diskImageMenuOpen: false,
+        diskImageFilter: '',
         computeResource: 'small',
         bootDiskGiB: 20,
         bootDiskUnit: 'GiB',
@@ -10227,8 +10251,69 @@
             iconClass: 'fa-brands fa-windows',
             iconMod: 'windows',
           },
+          {
+            value: 'Unspecified',
+            title: 'Unspecified',
+            desc: 'Unspecified guest operating systems',
+          },
         ],
       });
+    }
+
+    function renderInitMethodSelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'cloud-init',
+        labelledBy,
+        options: [
+          {
+            value: 'cloud-init',
+            title: 'Cloud init',
+            desc: 'Cloud-init initializes the OS with a specific configuration when the VM is started.',
+            iconClass: 'fa-brands fa-linux',
+            iconMod: 'linux',
+          },
+          {
+            value: 'sysprep',
+            title: 'Sysprep',
+            desc: 'Sysprep automates Windows setup and software provisioning.',
+            iconClass: 'fa-brands fa-windows',
+            iconMod: 'windows',
+          },
+        ],
+      });
+    }
+
+    function initMethodForGuestOs(guestOsFamily) {
+      return guestOsFamily === 'Microsoft Windows' ? 'sysprep' : 'cloud-init';
+    }
+
+    function guestOsFamilyFromDiskImage(disk) {
+      if (!disk) return 'Unspecified';
+      if (disk.guestOs === 'Microsoft Windows') return 'Microsoft Windows';
+      if (disk.guestOs === 'Linux') return 'Linux';
+      return 'Unspecified';
+    }
+
+    function applyDiskImageToForm(d, diskImageId, { syncInit = true } = {}) {
+      const disk = CATALOG_DISK_IMAGE_OPTIONS.find(x => x.id === diskImageId) || null;
+      d.diskImageId = disk ? disk.id : '';
+      if (disk) {
+        d.osImage = disk.title;
+        d.osType = disk.title;
+        d.guestOsFamily = guestOsFamilyFromDiskImage(disk);
+        d.osFamily = disk.guestOs === 'Microsoft Windows' ? 'windows' : 'linux';
+      } else {
+        d.osImage = '';
+        d.osType = '';
+      }
+      if (d.guestOsFamily === 'Microsoft Windows' || d.osFamily === 'windows') {
+        d.sshPublicKey = '';
+        d.sshKeyFileName = '';
+      }
+      if (syncInit) {
+        d.initMethod = initMethodForGuestOs(d.guestOsFamily || 'Linux');
+      }
     }
 
     function renderTenantAccessSelectBoxes({ name, selected, labelledBy }) {
@@ -12826,14 +12911,15 @@
         ];
       }
       if (state.createType === 'template') {
-        /* Option 2: Details (+ Access) → Compute resource → Storage → Network → Review */
+        /* Details (disk image) → Compute → Storage → Network → Access & Initial run → Review */
         return [
           { key: 'catalog', label: 'Select template', navNum: 1 },
           { key: 'details', label: 'Details', navNum: 2 },
           { key: 'config-compute', label: 'Compute resource', navNum: 3 },
           { key: 'config-storage', label: 'Storage', navNum: 4 },
           { key: 'config-network', label: 'Network', navNum: 5 },
-          { key: 'review', label: 'Review and create', navNum: 6 },
+          { key: 'access-init', label: 'Access & Initial run', navNum: 6 },
+          { key: 'review', label: 'Review and create', navNum: 7 },
         ];
       }
       if (state.createType === 'clone') {
@@ -12885,13 +12971,19 @@
       state.data.extraNetworks = [];
       state.diskModal = null;
       state.networkModal = null;
-      state.data.osImage = 'rhel.10';
+      state.data.osImage = '';
+      state.data.diskImageId = '';
+      state.data.guestOsFamily = 'Linux';
+      state.data.diskImageMenuOpen = false;
+      state.data.diskImageFilter = '';
       state.data.computeResource = 'small';
       state.data.bootDiskGiB = 20;
       state.data.bootDiskUnit = 'GiB';
       state.data.bootStorageTierId = 'st-balanced-01';
       state.data.bootStorageTierLabel = 'Balanced';
       state.data.cloudInit = '';
+      state.data.sysprep = '';
+      state.data.initMethod = 'cloud-init';
       state.data.sshPublicKey = '';
       state.data.sshKeyFileName = '';
       state.data.virtualNetwork = '';
@@ -13442,66 +13534,66 @@
       if (key === 'details' || key === 'deploy') {
         const isClone = state.createType === 'clone';
         const isCatalogFlow = key === 'details';
-        let accessHtml = '';
+        let diskImageSection = '';
         if (isCatalogFlow) {
-          if (d.cloudInit == null) d.cloudInit = '';
-          const expanded = !!(d.cloudInit && String(d.cloudInit).trim());
-          const cloudInitField = `
-            <div class="form-field">
-              <label for="f-cloud-init">Cloud-init</label>
-              <textarea id="f-cloud-init" class="cloud-init-input ${expanded ? 'pf-m-expanded' : ''}"
-                rows="${expanded ? 8 : 1}"
-                placeholder="Add cloud-init configuration"
-                aria-label="Cloud-init">${(d.cloudInit || '').replace(/</g, '&lt;')}</textarea>
+          if (d.diskImageMenuOpen == null) d.diskImageMenuOpen = false;
+          if (d.diskImageFilter == null) d.diskImageFilter = '';
+          if (!d.guestOsFamily) d.guestOsFamily = 'Linux';
+          if (d.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(x => x.id === d.diskImageId)) {
+            d.diskImageId = '';
+            d.osImage = '';
+            d.osType = '';
+          }
+          const filteredForFamily = filteredCatalogDiskImages(d.guestOsFamily, d.diskImageFilter);
+          if (d.diskImageId && !filteredForFamily.some(x => x.id === d.diskImageId)) {
+            d.diskImageId = '';
+            d.osImage = '';
+            d.osType = '';
+          }
+          const diskPrompt = !d.diskImageId
+            ? '<p class="form-helper" id="vm-disk-image-prompt">Select a disk image to continue.</p>'
+            : '';
+          diskImageSection = `
+            <hr class="form-section-divider" />
+            <h3>Disk image</h3>
+            <p class="step-help">Choose the guest operating system and disk image for this Virtual machine.</p>
+            <div class="form-field" id="vm-guest-os-field">
+              <label id="vm-guest-os-label">Select guest operating system</label>
+              ${renderGuestOsSelectBoxes({
+                name: 'vmGuestOs',
+                selected: d.guestOsFamily || 'Linux',
+                labelledBy: 'vm-guest-os-label',
+              })}
             </div>
-          `;
-          const windowsAccess = isWindowsOs(d);
-          const hasKey = !!(d.sshPublicKey && String(d.sshPublicKey).trim());
-          const fileName = d.sshKeyFileName || '';
-          accessHtml = windowsAccess ? `
-            <p class="catalog-preset-note">
-              SSH keys are not used for Windows. Set the administrator password after creation, then connect with RDP.
-            </p>
-            ${cloudInitField}
-          ` : `
-            <div class="form-field">
-              <label for="f-ssh-key">SSH public key</label>
-              <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-ssh-upload">
-                <div class="pf-v6-c-file-upload__file-select">
-                  <div class="pf-v6-c-input-group">
-                    <div class="pf-v6-c-input-group__item pf-m-fill">
-                      <span class="pf-v6-c-form-control">
-                        <input class="pf-v6-c-form-control__input" type="text" id="f-ssh-filename" readonly
-                          value="${(fileName || '').replace(/"/g, '&quot;')}"
-                          placeholder="Drag a file here or browse to upload"
-                          aria-label="Drag a file here or browse to upload"
-                          aria-describedby="f-ssh-browse" />
-                      </span>
-                    </div>
-                    <div class="pf-v6-c-input-group__item">
-                      <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-browse">Upload</button>
-                    </div>
-                    <div class="pf-v6-c-input-group__item">
-                      <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-clear"
-                        ${hasKey || fileName ? '' : 'disabled'}>Clear</button>
-                    </div>
-                  </div>
-                  <input type="file" id="f-ssh-file" accept=".pub,text/plain,.txt" hidden
-                    aria-hidden="true" tabindex="-1" />
-                </div>
-                <div class="pf-v6-c-file-upload__file-details" id="f-ssh-details">
-                  <span class="pf-v6-c-form-control pf-m-resize-vertical">
-                    <textarea id="f-ssh-key" class="pf-m-ssh${hasKey ? ' pf-m-has-content' : ''}" rows="4"
-                      aria-label="SSH public key" aria-describedby="f-ssh-help"
-                      placeholder="">${(d.sshPublicKey || '').replace(/</g, '&lt;')}</textarea>
-                  </span>
-                </div>
-              </div>
-              <p class="form-helper" id="f-ssh-help">
-                Paste a public SSH key or upload a file. Supported types: ssh-rsa, ssh-ed25519, and ecdsa-sha2-nistp256/384/521.
-              </p>
+            <div class="form-field ${state.fieldErrors.diskImage ? 'pf-m-error' : ''}" data-field="diskImage" style="margin-top:16px;">
+              <label id="vm-disk-image-label" class="label-with-optional">
+                <span>Select the image reference <span class="req">*</span></span>
+                ${fieldGovBadge('editable')}
+              </label>
+              ${renderTypeaheadRichSelectHtml({
+                rootId: 'vm-disk-image-select',
+                toggleId: 'vm-disk-image-toggle',
+                menuId: 'vm-disk-image-menu',
+                searchId: 'vm-disk-image-search',
+                labelId: 'vm-disk-image-label',
+                open: !!d.diskImageMenuOpen,
+                filter: d.diskImageFilter || '',
+                searchPlaceholder: 'Search disk images',
+                selectedId: d.diskImageId || '',
+                placeholder: 'Select a disk image',
+                optionAttr: 'data-vm-disk-image',
+                emptyNoun: 'disk images',
+                invalid: !!state.fieldErrors.diskImage,
+                describedBy: state.fieldErrors.diskImage ? 'err-diskImage' : (!d.diskImageId ? 'vm-disk-image-prompt' : ''),
+                options: filteredForFamily.map(img => ({
+                  id: img.id,
+                  title: img.title,
+                  desc: `${img.family} · ${img.arch}`,
+                })),
+              })}
+              ${fieldErrorHtml('diskImage')}
+              ${state.fieldErrors.diskImage ? '' : diskPrompt}
             </div>
-            ${cloudInitField}
           `;
         }
         panel.innerHTML = `
@@ -13526,7 +13618,7 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your Virtual machine and optionally set access.</p>
+            <p class="step-help">Name your Virtual machine and choose a disk image.</p>
             <div class="project-context pf-v6-c-alert pf-m-inline pf-m-info" role="status">
               <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
               <div class="pf-v6-c-alert__title">
@@ -13556,17 +13648,7 @@
               <label>Description</label>
               <textarea id="f-desc" placeholder="">${d.description}</textarea>
             </div>
-            ${isCatalogFlow ? `
-            <h4 class="config-section-title label-with-optional">
-              Access
-              <span class="pf-v6-c-label pf-m-outline">
-                <span class="pf-v6-c-label__content">
-                  <span class="pf-v6-c-label__text">Optional</span>
-                </span>
-              </span>
-            </h4>
-            ${accessHtml}
-            ` : ''}
+            ${diskImageSection}
           </div>
           `}
           ${isCatalogFlow ? '' : `
@@ -13621,152 +13703,44 @@
         });
         panel.querySelector('#f-desc')?.addEventListener('input', e => { d.description = e.target.value; });
         if (isCatalogFlow) {
-          const cloudEl = panel.querySelector('#f-cloud-init');
-          if (cloudEl) {
-            const syncCloudHeight = () => {
-              const hasContent = !!cloudEl.value.trim();
-              cloudEl.classList.toggle('pf-m-expanded', hasContent);
-              cloudEl.rows = hasContent ? 8 : 1;
-              cloudEl.style.height = 'auto';
-              if (hasContent) cloudEl.style.height = Math.min(cloudEl.scrollHeight, 280) + 'px';
-              else cloudEl.style.height = '';
-            };
-            syncCloudHeight();
-            cloudEl.addEventListener('input', () => {
-              d.cloudInit = cloudEl.value;
-              syncCloudHeight();
-            });
-            cloudEl.addEventListener('focus', () => {
-              if (!cloudEl.value.trim()) {
-                cloudEl.classList.add('pf-m-expanded');
-                cloudEl.rows = 4;
+          panel.querySelectorAll('input[name="vmGuestOs"]').forEach(r => {
+            r.addEventListener('change', () => {
+              d.guestOsFamily = r.value;
+              const options = filteredCatalogDiskImages(d.guestOsFamily, d.diskImageFilter);
+              if (d.diskImageId && !options.some(o => o.id === d.diskImageId)) {
+                d.diskImageId = '';
+                d.osImage = '';
+                d.osType = '';
               }
-            });
-            cloudEl.addEventListener('blur', () => {
-              if (!cloudEl.value.trim()) {
-                cloudEl.classList.remove('pf-m-expanded');
-                cloudEl.rows = 1;
-                cloudEl.style.height = '';
+              d.osFamily = d.guestOsFamily === 'Microsoft Windows' ? 'windows'
+                : (d.guestOsFamily === 'Linux' ? 'linux' : '');
+              d.initMethod = initMethodForGuestOs(d.guestOsFamily);
+              if (d.guestOsFamily === 'Microsoft Windows') {
+                d.sshPublicKey = '';
+                d.sshKeyFileName = '';
               }
+              d.diskImageMenuOpen = false;
+              renderWizard();
             });
-          }
-          if (!isWindowsOs(d)) {
-            const uploadRoot = panel.querySelector('#f-ssh-upload');
-            const fileInput = panel.querySelector('#f-ssh-file');
-            const filenameInput = panel.querySelector('#f-ssh-filename');
-            const keyArea = panel.querySelector('#f-ssh-key');
-            const clearBtn = panel.querySelector('#f-ssh-clear');
-            const browseBtn = panel.querySelector('#f-ssh-browse');
-
-            const syncSshHeight = () => {
-              if (!keyArea) return;
-              const hasContent = !!keyArea.value.trim();
-              keyArea.classList.toggle('pf-m-has-content', hasContent);
-              keyArea.style.height = 'auto';
-              keyArea.style.height = Math.min(Math.max(keyArea.scrollHeight, 96), 280) + 'px';
-            };
-
-            const syncSshDetailsVisibility = (forceShow = false) => {
-              if (!uploadRoot) return;
-              const filled = !!(keyArea?.value?.trim() || d.sshPublicKey?.trim() || filenameInput?.value);
-              if (forceShow || filled) uploadRoot.classList.add('pf-m-show-details');
-              else if (!uploadRoot.contains(document.activeElement)) {
-                uploadRoot.classList.remove('pf-m-show-details');
-              }
-            };
-
-            const syncClearEnabled = () => {
-              const filled = !!(d.sshPublicKey?.trim() || filenameInput?.value || keyArea?.value?.trim());
-              if (clearBtn) clearBtn.disabled = !filled;
-            };
-            const applyKeyContent = (text, name = '') => {
-              d.sshPublicKey = (text || '').trim();
-              d.sshKeyFileName = name || '';
-              if (keyArea) {
-                keyArea.value = d.sshPublicKey;
-                keyArea.classList.toggle('pf-m-has-content', !!d.sshPublicKey);
-              }
-              if (filenameInput) filenameInput.value = d.sshKeyFileName;
-              syncSshDetailsVisibility(!!d.sshPublicKey || !!d.sshKeyFileName);
-              syncSshHeight();
-              syncClearEnabled();
-            };
-            const readFile = (file) => {
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = () => {
-                applyKeyContent(String(reader.result || '').trim(), file.name);
-              };
-              reader.onerror = () => toast('Could not read the selected file.');
-              reader.readAsText(file);
-            };
-            keyArea?.addEventListener('input', e => {
-              d.sshPublicKey = e.target.value;
-              if (!e.target.value.trim()) d.sshKeyFileName = '';
-              if (filenameInput && !e.target.value.trim()) filenameInput.value = '';
-              keyArea.classList.toggle('pf-m-has-content', !!e.target.value.trim());
-              syncSshDetailsVisibility(true);
-              syncSshHeight();
-              syncClearEnabled();
-            });
-            browseBtn?.addEventListener('click', () => {
-              syncSshDetailsVisibility(true);
-              fileInput?.click();
-            });
-            filenameInput?.addEventListener('click', () => {
-              syncSshDetailsVisibility(true);
-              fileInput?.click();
-            });
-            fileInput?.addEventListener('change', e => {
-              const file = e.target.files && e.target.files[0];
-              readFile(file);
-              e.target.value = '';
-            });
-            clearBtn?.addEventListener('click', () => {
-              applyKeyContent('', '');
-              if (fileInput) fileInput.value = '';
-              syncSshDetailsVisibility(false);
-            });
-            if (uploadRoot) {
-              uploadRoot.addEventListener('focusin', () => syncSshDetailsVisibility(true));
-              uploadRoot.addEventListener('focusout', () => {
-                requestAnimationFrame(() => syncSshDetailsVisibility(false));
-              });
-              ['dragenter', 'dragover'].forEach(evt => {
-                uploadRoot.addEventListener(evt, e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  uploadRoot.classList.add('pf-m-drag-hover');
-                  syncSshDetailsVisibility(true);
-                });
-              });
-              ['dragleave', 'drop'].forEach(evt => {
-                uploadRoot.addEventListener(evt, e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  uploadRoot.classList.remove('pf-m-drag-hover');
-                });
-              });
-              uploadRoot.addEventListener('drop', e => {
-                const file = e.dataTransfer?.files && e.dataTransfer.files[0];
-                if (file) {
-                  readFile(file);
-                  return;
-                }
-                const text = e.dataTransfer?.getData('text/plain');
-                if (text && text.trim()) applyKeyContent(text.trim(), '');
-              });
-              uploadRoot.addEventListener('paste', e => {
-                const text = e.clipboardData?.getData('text/plain');
-                if (!text || !text.trim()) return;
-                e.preventDefault();
-                applyKeyContent(text.trim(), '');
-              });
-            }
-            syncSshDetailsVisibility(!!hasKey);
-            syncSshHeight();
-            syncClearEnabled();
-          }
+          });
+          wireTypeaheadRichSelect(panel, {
+            rootId: 'vm-disk-image-select',
+            toggleId: 'vm-disk-image-toggle',
+            menuId: 'vm-disk-image-menu',
+            searchId: 'vm-disk-image-search',
+            optionSel: '[data-vm-disk-image]',
+            getOptionId: opt => opt.dataset.vmDiskImage,
+            setOpen: (open) => { d.diskImageMenuOpen = open; },
+            setFilter: (v) => { d.diskImageFilter = v; },
+            onSelectId: (id) => {
+              applyDiskImageToForm(d, id, { syncInit: true });
+              d.diskImageMenuOpen = false;
+              d.diskImageFilter = '';
+              clearFieldError('diskImage');
+              renderWizard();
+            },
+          });
+          restoreRichSearchFocus(panel);
         }
         if (!isCatalogFlow && document.getElementById('f-project')) {
           wireCreatableSearch({
@@ -14080,17 +14054,19 @@
           d.subnet = '';
           d.securityGroups = [];
           state.sgMenuOpen = false;
-          // Image is always locked by the catalog item (OSAC-3538).
-          if (tpl.osImage) {
-            d.osImage = tpl.osImage;
-            d.osType = tpl.osImage;
+          // Disk image: prefill when template has a default; always remain editable.
+          if (tpl.diskImageId) {
+            applyDiskImageToForm(d, tpl.diskImageId, { syncInit: true });
+          } else {
+            d.diskImageId = '';
+            d.osImage = '';
+            d.osType = '';
+            d.guestOsFamily = 'Linux';
+            d.osFamily = '';
+            d.initMethod = 'cloud-init';
           }
-          if (tpl.osFamily) d.osFamily = tpl.osFamily;
-          if (tpl.osFamily === 'windows' || /win/i.test(String(d.osImage || ''))) {
-            d.osFamily = 'windows';
-            d.sshPublicKey = '';
-            d.sshKeyFileName = '';
-          }
+          d.diskImageMenuOpen = false;
+          d.diskImageFilter = '';
           if (tpl.computeResource) d.computeResource = tpl.computeResource;
           if (tpl.bootDiskGiB != null) d.bootDiskGiB = tpl.bootDiskGiB;
           const tplBootDisk = (tpl.disks || []).find(disk =>
@@ -14109,6 +14085,7 @@
             templateId: tpl.id,
             label: tpl.name,
             osImage: tpl.osImage || null,
+            diskImageId: tpl.diskImageId || null,
             fields: getTemplateFields(tpl),
             computeResource: tpl.computeResource || null,
             bootDiskGiB: tpl.bootDiskGiB != null ? tpl.bootDiskGiB : null,
@@ -14137,7 +14114,7 @@
           const rates = cardRates(t);
           return `${rates.hour} ${rates.month}`;
         };
-        const cardIcon = (t) => iconFa[t.osKey] || 'fa-solid fa-cube';
+        const cardIcon = (t) => iconFa[t.osKey] || 'fa-solid fa-server';
         const selected = TEMPLATES.find(t => t.id === d.templateId && (t.project || 'project-a') === currentProject);
         const drawerOpen = state.tplDrawerOpen && selected;
         const cards = list.map(t => {
@@ -14147,7 +14124,7 @@
           return `
           <div class="tpl-card ${t.id === d.templateId ? 'pf-m-selected' : ''}"
             data-tpl="${t.id}" role="option" aria-selected="${t.id === d.templateId}" tabindex="0">
-            <span class="tpl-card__icon tpl-card__icon--${t.osKey}" aria-hidden="true">
+            <span class="tpl-card__icon tpl-card__icon--${t.osKey || 'server'}" aria-hidden="true">
               <i class="${cardIcon(t)}"></i>
             </span>
             <div class="tpl-card__title-row">
@@ -14155,7 +14132,7 @@
               ${templateSizeGovBadge(sizeEditable)}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
-            ${templateCardSpecsHtml(specs, cardStorage(t))}
+            ${templateCardSpecsHtml(specs, cardStorage(t), templateDiskImageSpecHtml(t))}
             <div class="tpl-card__footer">
               <span class="tpl-card__cost-label">Estimate cost</span>
               <span class="tpl-card__cost-values">
@@ -14200,7 +14177,11 @@
           const costHourLabel = sizeEditable ? `From ${selRates.hour}` : selRates.hour;
           const computeDigits = selEst.computeHourly > 0 && selEst.computeHourly < 1 ? 3 : 2;
           const fixedItems = [
-            { label: 'OS image', value: selected.osImage || selected.os || '—', note: 'From template' },
+            {
+              label: 'Disk image',
+              value: templateDefaultDiskImage(selected)?.title || 'Not set',
+              note: selected.diskImageId ? 'Starting default · editable on Details' : 'Choose on Details',
+            },
           ];
           if (fieldBeh.compute === 'locked') {
             fixedItems.push({ label: 'Compute', value: `${selSpecs.cpu} · ${selSpecs.mem}`, note: '' });
@@ -14223,7 +14204,7 @@
               note: 'Starting default · Storage step',
             });
           }
-          editableItems.push({ label: 'Access', value: 'SSH key or cloud-init', note: 'Details step' });
+          editableItems.push({ label: 'Access', value: 'SSH key, Cloud-init, or Sysprep', note: 'Access & Initial run step' });
           editableItems.push({ label: 'Network', value: 'Virtual network, subnet, security groups', note: 'Network step' });
           const govList = (items) => `
             <ul class="tpl-drawer__gov-list">
@@ -14607,11 +14588,12 @@
         // Prefill from selected catalog item when empty
         const tpl = TEMPLATES.find(t => t.id === d.templateId);
         if (tpl) {
-          if (!d.osImage && tpl.osImage) d.osImage = tpl.osImage;
-          if (!d.computeResource && tpl.computeResource) d.computeResource = tpl.computeResource;
+          if (!d.diskImageId && tpl.diskImageId) {
+            applyDiskImageToForm(d, tpl.diskImageId, { syncInit: !d.initMethod });
+          }
+          if (tpl.computeResource && !d.computeResource) d.computeResource = tpl.computeResource;
           if (d.bootDiskGiB == null && tpl.bootDiskGiB != null) d.bootDiskGiB = tpl.bootDiskGiB;
         }
-        if (!d.osImage) d.osImage = d.osType || CATALOG_OS_IMAGES[0];
         if (!d.computeResource || !COMPUTE_RESOURCES.some(c => c.id === d.computeResource)) {
           d.computeResource = COMPUTE_RESOURCES[2].id; // small
         }
@@ -14619,6 +14601,8 @@
         if (!d.bootDiskUnit) d.bootDiskUnit = 'GiB';
         if (!Array.isArray(d.securityGroups)) d.securityGroups = [];
         if (d.cloudInit == null) d.cloudInit = '';
+        if (d.sysprep == null) d.sysprep = '';
+        if (!d.initMethod) d.initMethod = initMethodForGuestOs(d.guestOsFamily || 'Linux');
         if (d.virtualNetwork == null) d.virtualNetwork = '';
         if (d.subnet == null) d.subnet = '';
 
@@ -15468,6 +15452,239 @@
           });
         }
 
+      } else if (key === 'access-init') {
+        if (d.cloudInit == null) d.cloudInit = '';
+        if (d.sysprep == null) d.sysprep = '';
+        if (!d.initMethod) d.initMethod = initMethodForGuestOs(d.guestOsFamily || 'Linux');
+        const windowsAccess = isWindowsOs(d);
+        const hasKey = !!(d.sshPublicKey && String(d.sshPublicKey).trim());
+        const fileName = d.sshKeyFileName || '';
+        const initSelected = d.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init';
+        const initValue = initSelected === 'sysprep' ? (d.sysprep || '') : (d.cloudInit || '');
+        const initExpanded = !!(initValue && String(initValue).trim());
+        const initLabel = initSelected === 'sysprep' ? 'Sysprep' : 'Cloud-init';
+        const initPlaceholder = initSelected === 'sysprep'
+          ? 'Add sysprep configuration'
+          : 'Add cloud-init configuration';
+        const sshHtml = windowsAccess ? `
+          <p class="catalog-preset-note">
+            SSH keys are not used for Windows. Set the administrator password after creation, then connect with RDP.
+          </p>
+        ` : `
+          <div class="form-field">
+            <label for="f-ssh-key">SSH public key</label>
+            <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-ssh-upload">
+              <div class="pf-v6-c-file-upload__file-select">
+                <div class="pf-v6-c-input-group">
+                  <div class="pf-v6-c-input-group__item pf-m-fill">
+                    <span class="pf-v6-c-form-control">
+                      <input class="pf-v6-c-form-control__input" type="text" id="f-ssh-filename" readonly
+                        value="${(fileName || '').replace(/"/g, '&quot;')}"
+                        placeholder="Drag a file here or browse to upload"
+                        aria-label="Drag a file here or browse to upload"
+                        aria-describedby="f-ssh-browse" />
+                    </span>
+                  </div>
+                  <div class="pf-v6-c-input-group__item">
+                    <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-browse">Upload</button>
+                  </div>
+                  <div class="pf-v6-c-input-group__item">
+                    <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-clear"
+                      ${hasKey || fileName ? '' : 'disabled'}>Clear</button>
+                  </div>
+                </div>
+                <input type="file" id="f-ssh-file" accept=".pub,text/plain,.txt" hidden
+                  aria-hidden="true" tabindex="-1" />
+              </div>
+              <div class="pf-v6-c-file-upload__file-details" id="f-ssh-details">
+                <span class="pf-v6-c-form-control pf-m-resize-vertical">
+                  <textarea id="f-ssh-key" class="pf-m-ssh${hasKey ? ' pf-m-has-content' : ''}" rows="4"
+                    aria-label="SSH public key" aria-describedby="f-ssh-help"
+                    placeholder="">${(d.sshPublicKey || '').replace(/</g, '&lt;')}</textarea>
+                </span>
+              </div>
+            </div>
+            <p class="form-helper" id="f-ssh-help">
+              Paste a public SSH key or upload a file. Supported types: ssh-rsa, ssh-ed25519, and ecdsa-sha2-nistp256/384/521.
+            </p>
+          </div>
+        `;
+        panel.innerHTML = `
+          <h3 class="label-with-optional">
+            Access &amp; Initial run
+            <span class="pf-v6-c-label pf-m-outline">
+              <span class="pf-v6-c-label__content">
+                <span class="pf-v6-c-label__text">Optional</span>
+              </span>
+            </span>
+          </h3>
+          <p class="step-help">Configure access and the first-boot initialization script for this Virtual machine.</p>
+          ${sshHtml}
+          <hr class="form-section-divider" />
+          <div class="form-field">
+            <label id="vm-init-method-label">Initialization</label>
+            ${renderInitMethodSelectBoxes({
+              name: 'vmInitMethod',
+              selected: initSelected,
+              labelledBy: 'vm-init-method-label',
+            })}
+          </div>
+          <div class="form-field" style="margin-top:16px;">
+            <label for="f-init-config">${initLabel}</label>
+            <textarea id="f-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
+              rows="${initExpanded ? 8 : 1}"
+              placeholder="${initPlaceholder}"
+              aria-label="${initLabel}">${String(initValue).replace(/</g, '&lt;')}</textarea>
+          </div>
+        `;
+        panel.querySelectorAll('input[name="vmInitMethod"]').forEach(r => {
+          r.addEventListener('change', () => {
+            d.initMethod = r.value === 'sysprep' ? 'sysprep' : 'cloud-init';
+            renderWizard();
+          });
+        });
+        const initEl = panel.querySelector('#f-init-config');
+        if (initEl) {
+          const syncInitHeight = () => {
+            const hasContent = !!initEl.value.trim();
+            initEl.classList.toggle('pf-m-expanded', hasContent);
+            initEl.rows = hasContent ? 8 : 1;
+            initEl.style.height = 'auto';
+            if (hasContent) initEl.style.height = Math.min(initEl.scrollHeight, 280) + 'px';
+            else initEl.style.height = '';
+          };
+          syncInitHeight();
+          initEl.addEventListener('input', () => {
+            if (d.initMethod === 'sysprep') d.sysprep = initEl.value;
+            else d.cloudInit = initEl.value;
+            syncInitHeight();
+          });
+          initEl.addEventListener('focus', () => {
+            if (!initEl.value.trim()) {
+              initEl.classList.add('pf-m-expanded');
+              initEl.rows = 4;
+            }
+          });
+          initEl.addEventListener('blur', () => {
+            if (!initEl.value.trim()) {
+              initEl.classList.remove('pf-m-expanded');
+              initEl.rows = 1;
+              initEl.style.height = '';
+            }
+          });
+        }
+        if (!windowsAccess) {
+          const uploadRoot = panel.querySelector('#f-ssh-upload');
+          const fileInput = panel.querySelector('#f-ssh-file');
+          const filenameInput = panel.querySelector('#f-ssh-filename');
+          const keyArea = panel.querySelector('#f-ssh-key');
+          const clearBtn = panel.querySelector('#f-ssh-clear');
+          const browseBtn = panel.querySelector('#f-ssh-browse');
+          const syncSshHeight = () => {
+            if (!keyArea) return;
+            keyArea.classList.toggle('pf-m-has-content', !!keyArea.value.trim());
+            keyArea.style.height = 'auto';
+            keyArea.style.height = Math.min(Math.max(keyArea.scrollHeight, 96), 280) + 'px';
+          };
+          const syncSshDetailsVisibility = (forceShow = false) => {
+            if (!uploadRoot) return;
+            const filled = !!(keyArea?.value?.trim() || d.sshPublicKey?.trim() || filenameInput?.value);
+            if (forceShow || filled) uploadRoot.classList.add('pf-m-show-details');
+            else if (!uploadRoot.contains(document.activeElement)) {
+              uploadRoot.classList.remove('pf-m-show-details');
+            }
+          };
+          const syncClearEnabled = () => {
+            const filled = !!(d.sshPublicKey?.trim() || filenameInput?.value || keyArea?.value?.trim());
+            if (clearBtn) clearBtn.disabled = !filled;
+          };
+          const applyKeyContent = (text, name = '') => {
+            d.sshPublicKey = (text || '').trim();
+            d.sshKeyFileName = name || '';
+            if (keyArea) {
+              keyArea.value = d.sshPublicKey;
+              keyArea.classList.toggle('pf-m-has-content', !!d.sshPublicKey);
+            }
+            if (filenameInput) filenameInput.value = d.sshKeyFileName;
+            syncSshDetailsVisibility(!!d.sshPublicKey || !!d.sshKeyFileName);
+            syncSshHeight();
+            syncClearEnabled();
+          };
+          const readFile = (file) => {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => applyKeyContent(String(reader.result || '').trim(), file.name);
+            reader.onerror = () => toast('Could not read the selected file.');
+            reader.readAsText(file);
+          };
+          keyArea?.addEventListener('input', e => {
+            d.sshPublicKey = e.target.value;
+            if (!e.target.value.trim()) d.sshKeyFileName = '';
+            if (filenameInput && !e.target.value.trim()) filenameInput.value = '';
+            keyArea.classList.toggle('pf-m-has-content', !!e.target.value.trim());
+            syncSshDetailsVisibility(true);
+            syncSshHeight();
+            syncClearEnabled();
+          });
+          browseBtn?.addEventListener('click', () => {
+            syncSshDetailsVisibility(true);
+            fileInput?.click();
+          });
+          filenameInput?.addEventListener('click', () => {
+            syncSshDetailsVisibility(true);
+            fileInput?.click();
+          });
+          fileInput?.addEventListener('change', e => {
+            const file = e.target.files && e.target.files[0];
+            readFile(file);
+            e.target.value = '';
+          });
+          clearBtn?.addEventListener('click', () => {
+            applyKeyContent('', '');
+            if (fileInput) fileInput.value = '';
+            syncSshDetailsVisibility(false);
+          });
+          if (uploadRoot) {
+            uploadRoot.addEventListener('focusin', () => syncSshDetailsVisibility(true));
+            uploadRoot.addEventListener('focusout', () => {
+              requestAnimationFrame(() => syncSshDetailsVisibility(false));
+            });
+            ['dragenter', 'dragover'].forEach(evt => {
+              uploadRoot.addEventListener(evt, e => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadRoot.classList.add('pf-m-drag-hover');
+                syncSshDetailsVisibility(true);
+              });
+            });
+            ['dragleave', 'drop'].forEach(evt => {
+              uploadRoot.addEventListener(evt, e => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadRoot.classList.remove('pf-m-drag-hover');
+              });
+            });
+            uploadRoot.addEventListener('drop', e => {
+              const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+              if (file) {
+                readFile(file);
+                return;
+              }
+              const text = e.dataTransfer?.getData('text/plain');
+              if (text && text.trim()) applyKeyContent(text.trim(), '');
+            });
+            uploadRoot.addEventListener('paste', e => {
+              const text = e.clipboardData?.getData('text/plain');
+              if (!text || !text.trim()) return;
+              e.preventDefault();
+              applyKeyContent(text.trim(), '');
+            });
+          }
+          syncSshDetailsVisibility(!!hasKey);
+          syncSshHeight();
+          syncClearEnabled();
+        }
+
       } else if (state.createType === 'clone') {
         const source = VMS.find(v => v.name === d.cloneSourceName);
         panel.innerHTML = `
@@ -15524,7 +15741,9 @@
         const catalogName = tpl?.name || '—';
         const sshConfigured = !!(d.sshPublicKey && d.sshPublicKey.trim());
         const sshVal = sshConfigured ? 'Configured' : 'Not configured';
-        const osImage = d.osImage || tpl?.osImage || d.osType || '—';
+        const disk = CATALOG_DISK_IMAGE_OPTIONS.find(x => x.id === d.diskImageId);
+        const diskImageLabel = disk?.title || d.osImage || '—';
+        const guestOsLabel = d.guestOsFamily || disk?.guestOs || '—';
         const compute = computeResourceLabel(d.computeResource || tpl?.computeResource);
         const bootDiskNum = d.bootDiskGiB != null
           ? d.bootDiskGiB
@@ -15535,9 +15754,12 @@
         const bootDisk = bootDiskNum != null
           ? `${bootDiskNum} ${d.bootDiskUnit || 'GiB'} | ${bootTierLabel}`
           : '—';
-        const cloudInitVal = (d.cloudInit && d.cloudInit.trim())
-          ? 'Configured'
-          : 'Not configured';
+        const initMethod = d.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init';
+        const initConfigured = initMethod === 'sysprep'
+          ? !!(d.sysprep && d.sysprep.trim())
+          : !!(d.cloudInit && d.cloudInit.trim());
+        const initVal = initConfigured ? 'Configured' : 'Not configured';
+        const initLabel = initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
         const vnet = d.virtualNetwork
           ? (CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork)?.label || d.virtualNetwork)
           : '—';
@@ -15564,6 +15786,8 @@
           && d.bootStorageTierId
           && d.bootStorageTierId !== preset.bootStorageTierId;
         const diskChanged = diskSizeChanged || diskUnitChanged || bootTierChanged;
+        const diskImageChanged = !!preset
+          && (preset.diskImageId || '') !== (d.diskImageId || '');
         const reviewValue = (value, changed) =>
           changed ? `${value} <span class="muted">(customized)</span>` : value;
         const windowsAccess = isWindowsOs(d);
@@ -15577,11 +15801,8 @@
               ${reviewRow('Name', d.name || '—')}
               ${reviewRow('Description', d.description || '—')}
               ${reviewRow('Project', d.project || '—')}
-              ${reviewRow('OS image', osImage)}
-              ${windowsAccess
-                ? reviewRow('Access method', 'Password / RDP after create')
-                : reviewRow('SSH public key', sshVal)}
-              ${reviewRow('Cloud-init', cloudInitVal)}
+              ${reviewRow('Guest OS', guestOsLabel)}
+              ${reviewRow('Disk image', reviewValue(diskImageLabel, diskImageChanged))}
             `)}
             ${reviewNebiusSection('Compute resource', 'config-compute', `
               ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
@@ -15589,9 +15810,9 @@
             ${reviewNebiusSection('Storage', 'config-storage', `
               ${reviewRow('Boot disk', reviewValue(bootDisk, diskChanged))}
               ${(d.extraDisks || []).length
-                ? (d.extraDisks || []).map((disk, i) => {
-                    const size = `${disk.size} ${disk.unit || 'GiB'}`;
-                    const tier = (disk.storageTierLabel || disk.storageTierId || '—')
+                ? (d.extraDisks || []).map((diskExtra, i) => {
+                    const size = `${diskExtra.size} ${diskExtra.unit || 'GiB'}`;
+                    const tier = (diskExtra.storageTierLabel || diskExtra.storageTierId || '—')
                       .replace(/</g, '&lt;');
                     return reviewRow(`Disk ${i + 1}`, `${size} | ${tier}`);
                   }).join('')
@@ -15612,6 +15833,12 @@
                     return reviewRow(`Network ${i + 1}`, `${label} | ${sub} | ${groups}`);
                   }).join('')
                 : reviewRow('Additional networks', 'None')}
+            `)}
+            ${reviewNebiusSection('Access & Initial run', 'access-init', `
+              ${windowsAccess
+                ? reviewRow('Access method', 'Password / RDP after create')
+                : reviewRow('SSH public key', sshVal)}
+              ${reviewRow(initLabel, initVal)}
             `)}
           </div>
         `;
@@ -15712,6 +15939,8 @@
             applyStepValidation(errors);
             return;
           }
+        } else if (key === 'access-init') {
+          clearFieldErrors();
         } else if (key === 'review' || state.step === steps.length - 1) {
           const gate = firstCreateVmGate(state.data);
           if (gate) {
