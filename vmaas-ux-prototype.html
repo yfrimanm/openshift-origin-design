@@ -5005,6 +5005,84 @@
     .tpl-view-toggle button.pf-m-selected {
       background: var(--vmaas-bg-subtle); color: var(--vmaas-text);
     }
+    /* VMs list — card gallery (3 columns) */
+    .vm-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--pf-t--global--spacer--md, 16px);
+      align-items: stretch;
+      padding: 2px 0 8px;
+    }
+    @media (max-width: 1100px) {
+      .vm-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .vm-cards { grid-template-columns: 1fr; }
+    }
+    .vm-list-card {
+      position: relative;
+      gap: 0;
+      min-height: 0;
+    }
+    .vm-list-card__chrome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: -4px 0 8px;
+      min-height: 28px;
+    }
+    .vm-list-card__chrome .pf-v6-c-check {
+      margin: 0;
+    }
+    .vm-list-card__chrome .kebab {
+      margin: 0 -4px 0 auto;
+    }
+    .vm-list-card .tpl-card__icon {
+      margin-bottom: 10px;
+    }
+    .vm-list-card .tpl-card__title {
+      margin-bottom: 8px;
+    }
+    .vm-list-card__status {
+      margin: 0 0 12px;
+      font-size: 14px;
+    }
+    .vm-list-card__meta {
+      margin: 0;
+      display: grid;
+      gap: 6px 12px;
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--vmaas-text-subtle);
+    }
+    .vm-list-card__meta-row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .vm-list-card__meta-row dt {
+      margin: 0;
+      font-weight: 500;
+      color: var(--vmaas-text-subtle);
+    }
+    .vm-list-card__meta-row dd {
+      margin: 0;
+      color: var(--vmaas-text);
+      word-break: break-word;
+    }
+    .vm-list-card__specs {
+      margin: 12px 0 0;
+      padding-top: 10px;
+      border-top: 1px solid var(--vmaas-border-light);
+      font-size: 13px;
+      color: var(--vmaas-text-subtle);
+    }
+    .table-toolbar__right .tpl-view-toggle {
+      margin-left: 0;
+      flex: 0 0 auto;
+    }
     .tpl-body {
       /* Stable columns — drawer overlays instead of reflowing the grid (avoids jump) */
       position: relative;
@@ -5754,7 +5832,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 18 · disk image + access-init</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 21 · VM list cards</span>
         </div>
       </div>
       <div class="console__body">
@@ -6025,7 +6103,10 @@
                   </div>
                 </div>
                 <button type="button" class="icon-tool" id="btn-manage-columns" aria-label="Manage columns" title="Manage columns"><i class="fa-solid fa-columns" aria-hidden="true"></i></button>
-                <button type="button" class="icon-tool" aria-label="Compact list"><i class="fa-solid fa-list"></i></button>
+                <div class="tpl-view-toggle" id="vm-view-toggle" role="group" aria-label="Virtual machines view">
+                  <button type="button" data-vm-view="cards" aria-pressed="false" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+                  <button type="button" data-vm-view="list" class="pf-m-selected" aria-pressed="true" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
+                </div>
                 <div class="pagination" aria-label="Pagination">
                   <span class="pagination__count" id="vm-page-count">1–1 of 1</span>
                   <button type="button" disabled aria-label="First page"><i class="fa-solid fa-angles-left"></i></button>
@@ -6046,6 +6127,7 @@
                   <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
                 </table>
               </div>
+              <div class="vm-cards" id="vm-cards-gallery" hidden role="list" aria-label="Virtual machines"></div>
             </div>
           </section>
 
@@ -7873,6 +7955,7 @@
       fieldErrors: {},
       tplFilter: '',
       tplView: 'cards', // cards | list
+      vmView: 'list', // list | cards
       /* Template step filters — Figma Oeu6pCcWLzQWnQfBjwzbsn */
       tplFilters: {
         osImages: [], // empty = all; values from CATALOG_OS_IMAGES
@@ -9731,16 +9814,101 @@
       setVmBulkMenuOpen(false);
     }
 
+    function syncVmListViewChrome() {
+      const isCards = state.vmView === 'cards';
+      const manageCols = document.getElementById('btn-manage-columns');
+      if (manageCols) manageCols.hidden = isCards;
+      document.querySelectorAll('#vm-view-toggle [data-vm-view]').forEach(btn => {
+        const selected = btn.dataset.vmView === state.vmView;
+        btn.classList.toggle('pf-m-selected', selected);
+        btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      });
+    }
+
+    function vmOsIconKey(v) {
+      const os = String(v?.os || v?.osFull || '').toLowerCase();
+      if (os.includes('win')) return 'windows';
+      if (os.includes('rhel') || os.includes('red hat')) return 'rhel';
+      if (os.includes('fedora')) return 'fedora';
+      if (os.includes('centos')) return 'centos';
+      if (!os) return 'other';
+      return 'other';
+    }
+
+    function vmOsIconFa(key) {
+      const map = {
+        centos: 'fa-brands fa-linux',
+        rhel: 'fa-brands fa-redhat',
+        fedora: 'fa-brands fa-fedora',
+        windows: 'fa-brands fa-windows',
+        other: 'fa-solid fa-server',
+      };
+      return map[key] || map.other;
+    }
+
+    function renderVmListCard(v) {
+      const enriched = enrichVm(v);
+      const osKey = vmOsIconKey(enriched);
+      const selected = state.selectedVms.has(v.name);
+      const ip = !v.ip || v.ip === '—' ? '—' : v.ip;
+      const cpu = enriched.cpu || '';
+      const mem = enriched.mem || '';
+      const specs = [cpu, mem].filter(Boolean).join(' · ');
+      const showProject = isAllProjectsView();
+      return `
+        <article class="tpl-card vm-list-card${selected ? ' pf-m-selected' : ''}"
+          data-vm-card="${v.name}" role="listitem" tabindex="0"
+          aria-label="${v.name}">
+          <div class="vm-list-card__chrome">
+            <label class="pf-v6-c-check pf-m-standalone">
+              <input type="checkbox" class="pf-v6-c-check__input vm-row-check" data-vm="${v.name}"
+                aria-label="Select ${v.name}" ${selected ? 'checked' : ''} />
+            </label>
+            <button type="button" class="kebab" data-vm-kebab="${v.name}"
+              aria-label="Actions for ${v.name}" aria-haspopup="menu" aria-expanded="false">
+              <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+            </button>
+          </div>
+          <span class="tpl-card__icon tpl-card__icon--${osKey}" aria-hidden="true">
+            <i class="${vmOsIconFa(osKey)}"></i>
+          </span>
+          <button type="button" class="tpl-card__title" data-open-vm="${v.name}">${v.name}</button>
+          <div class="vm-list-card__status">${statusCell(v.status, v.name)}</div>
+          <dl class="vm-list-card__meta">
+            ${showProject ? `
+            <div class="vm-list-card__meta-row">
+              <dt>Project</dt>
+              <dd>${projectDisplayName(v.ns) || v.ns || '—'}</dd>
+            </div>` : ''}
+            <div class="vm-list-card__meta-row">
+              <dt>IP</dt>
+              <dd>${ip === '—' ? '<span class="muted">—</span>' : ip}</dd>
+            </div>
+          </dl>
+          ${specs ? `<p class="vm-list-card__specs">${specs}</p>` : ''}
+        </article>
+      `;
+    }
+
     function renderVms(q = state.vmFilter) {
       state.vmFilter = q;
       const rows = filteredVms(q);
       const n = rows.length;
+      const isCards = state.vmView === 'cards';
       document.getElementById('vm-page-count').textContent = n ? `1–${n} of ${n}` : '0–0 of 0';
-      renderVmTableHeader();
-      const cols = visibleVmColumns();
+      syncVmListViewChrome();
       const tbody = document.getElementById('vm-tbody');
+      const tableScroll = document.getElementById('vm-table-scroll');
+      const gallery = document.getElementById('vm-cards-gallery');
       if (!tbody) return;
+
       if (!n) {
+        if (tableScroll) tableScroll.hidden = true;
+        if (gallery) {
+          gallery.hidden = true;
+          gallery.innerHTML = '';
+        }
+        tbody.innerHTML = '';
         const { project, status, os, hardware } = state.filters;
         const search = stripFilterAttributes(q);
         const projectOnly = project.length === 1 && !status.length && !os.length && !hardware.length && !search;
@@ -9758,12 +9926,31 @@
             body: 'Create a virtual machine to get started.',
           });
         }
-        tbody.innerHTML = '';
-        showListEmptyState('vm-table-area', 'vm-table-scroll', 'vm-empty-state', emptyHtml);
+        showListEmptyState('vm-table-area', null, 'vm-empty-state', emptyHtml);
         syncVmBulkSelect();
         return;
       }
-      clearListEmptyState('vm-table-scroll', 'vm-empty-state');
+
+      clearListEmptyState(null, 'vm-empty-state');
+
+      if (isCards) {
+        if (tableScroll) tableScroll.hidden = true;
+        tbody.innerHTML = '';
+        if (gallery) {
+          gallery.hidden = false;
+          gallery.innerHTML = rows.map(renderVmListCard).join('');
+        }
+        syncVmBulkSelect();
+        return;
+      }
+
+      if (gallery) {
+        gallery.hidden = true;
+        gallery.innerHTML = '';
+      }
+      if (tableScroll) tableScroll.hidden = false;
+      renderVmTableHeader();
+      const cols = visibleVmColumns();
       tbody.innerHTML = rows.map(v => `
         <tr class="pf-v6-c-table__tr${state.selectedVms.has(v.name) ? ' pf-m-selected' : ''}">
           <td class="pf-v6-c-table__td">
@@ -18722,13 +18909,14 @@
       if (e.target.checked) selectVmBulk('page');
       else selectVmBulk('none');
     });
-    document.getElementById('vm-tbody')?.addEventListener('change', e => {
+    document.getElementById('vm-table-area')?.addEventListener('change', e => {
       const input = e.target.closest('.vm-row-check');
       if (!input) return;
       const name = input.dataset.vm;
       if (input.checked) state.selectedVms.add(name);
       else state.selectedVms.delete(name);
       input.closest('tr')?.classList.toggle('pf-m-selected', input.checked);
+      input.closest('[data-vm-card]')?.classList.toggle('pf-m-selected', input.checked);
       syncVmBulkSelect();
     });
 
@@ -18801,11 +18989,41 @@
       if (!e.target.closest('#vm-kebab-menu') && !e.target.closest('[data-vm-kebab]')) closeVmKebabMenu();
     });
 
-    document.getElementById('vm-tbody')?.addEventListener('click', e => {
+    document.getElementById('vm-table-area')?.addEventListener('click', e => {
       const kebab = e.target.closest('[data-vm-kebab]');
-      if (!kebab) return;
-      e.stopPropagation();
-      openVmKebabMenu(kebab.dataset.vmKebab, kebab);
+      if (kebab) {
+        e.stopPropagation();
+        openVmKebabMenu(kebab.dataset.vmKebab, kebab);
+        return;
+      }
+      const openBtn = e.target.closest('[data-open-vm]');
+      if (openBtn) {
+        openVmDetail(openBtn.dataset.openVm, 'overview');
+        return;
+      }
+      if (e.target.closest('.vm-row-check, .pf-v6-c-check, .status-link, .kebab, button, a, label, input')) {
+        return;
+      }
+      const card = e.target.closest('[data-vm-card]');
+      if (card) openVmDetail(card.dataset.vmCard, 'overview');
+    });
+
+    document.getElementById('vm-table-area')?.addEventListener('keydown', e => {
+      const card = e.target.closest('[data-vm-card]');
+      if (!card || e.target !== card) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      openVmDetail(card.dataset.vmCard, 'overview');
+    });
+
+    document.getElementById('vm-view-toggle')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-vm-view]');
+      if (!btn) return;
+      const view = btn.dataset.vmView;
+      if (view !== 'cards' && view !== 'list') return;
+      if (state.vmView === view) return;
+      state.vmView = view;
+      renderVms(state.vmFilter);
     });
 
     document.getElementById('vm-kebab-menu')?.addEventListener('click', e => {
@@ -19104,11 +19322,6 @@
         e.stopPropagation();
         applyOverviewRowMenuAction('delete');
       }
-    });
-    document.getElementById('vm-tbody')?.addEventListener('click', e => {
-      const btn = e.target.closest('[data-open-vm]');
-      if (!btn) return;
-      openVmDetail(btn.dataset.openVm, 'overview');
     });
     document.addEventListener('click', e => {
       if (state.overviewMenuOpen
