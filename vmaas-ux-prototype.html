@@ -5005,7 +5005,7 @@
     .tpl-view-toggle button.pf-m-selected {
       background: var(--vmaas-bg-subtle); color: var(--vmaas-text);
     }
-    /* VMs list — card gallery (3 columns) */
+    /* VMs list — card gallery (Ethan-aligned) */
     .vm-cards {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5023,61 +5023,172 @@
       position: relative;
       gap: 0;
       min-height: 0;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
-    .vm-list-card__chrome {
+    .vm-list-card__header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 8px;
-      margin: -4px 0 8px;
-      min-height: 28px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
-    .vm-list-card__chrome .pf-v6-c-check {
+    .vm-list-card__header-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .vm-list-card__header-left .pf-v6-c-check {
+      margin: 0;
+      flex: 0 0 auto;
+    }
+    .vm-list-card__icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      border-radius: 8px;
+      background: var(--vmaas-bg-subtle, #f2f2f2);
+      color: var(--vmaas-text, #151515);
+    }
+    .vm-list-card__header-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      margin: -2px -6px 0 0;
+    }
+    .vm-list-card__header-right .kebab {
       margin: 0;
     }
-    .vm-list-card__chrome .kebab {
-      margin: 0 -4px 0 auto;
+    .vm-list-card__status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      margin: 0;
+      padding: 2px 10px;
+      border: none;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .vm-list-card .tpl-card__icon {
-      margin-bottom: 10px;
+    .vm-list-card__status-pill:focus-visible {
+      outline: 2px solid var(--vmaas-blue);
+      outline-offset: 2px;
+    }
+    .vm-list-card__status-pill--running {
+      background: #e9f5e9;
+      color: #3e8635;
+    }
+    .vm-list-card__status-pill--stopped {
+      background: #f2f2f2;
+      color: #6a6e73;
+    }
+    .vm-list-card__status-pill--paused {
+      background: #fdf7e7;
+      color: #795600;
+    }
+    .vm-list-card__status-pill--error {
+      background: #faeae8;
+      color: #c9190b;
+    }
+    .vm-list-card__status-pill--starting {
+      background: #e7f1fa;
+      color: #002952;
     }
     .vm-list-card .tpl-card__title {
-      margin-bottom: 8px;
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
     }
-    .vm-list-card__status {
-      margin: 0 0 12px;
-      font-size: 14px;
-    }
-    .vm-list-card__meta {
-      margin: 0;
-      display: grid;
-      gap: 6px 12px;
+    .vm-list-card__subtitle {
+      margin: 0 0 16px;
       font-size: 13px;
       line-height: 1.35;
+      font-weight: 400;
       color: var(--vmaas-text-subtle);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
     }
-    .vm-list-card__meta-row {
+    .vm-list-card__subtitle:empty { display: none; margin: 0; }
+    .vm-list-card__specs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0;
+      padding: 0 0 16px;
+      border-bottom: 1px solid var(--vmaas-border-light);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .vm-list-card__spec-row {
       display: grid;
-      grid-template-columns: 72px 1fr;
+      grid-template-columns: 5.5rem minmax(0, 1fr);
       gap: 8px;
       align-items: baseline;
     }
-    .vm-list-card__meta-row dt {
+    .vm-list-card__spec-row dt {
       margin: 0;
-      font-weight: 500;
-      color: var(--vmaas-text-subtle);
-    }
-    .vm-list-card__meta-row dd {
-      margin: 0;
+      font-weight: 600;
       color: var(--vmaas-text);
+      white-space: nowrap;
+    }
+    .vm-list-card__spec-row dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text);
+      min-width: 0;
       word-break: break-word;
     }
-    .vm-list-card__specs {
+    .vm-list-card__disk {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .vm-list-card__disk .catalog-disk-image-value__icon {
+      flex: 0 0 auto;
+      color: #ee0000;
+      font-size: 14px;
+    }
+    .vm-list-card__footer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       margin: 12px 0 0;
-      padding-top: 10px;
-      border-top: 1px solid var(--vmaas-border-light);
       font-size: 13px;
+      line-height: 1.35;
+    }
+    .vm-list-card__footer-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .vm-list-card__footer-row dt {
+      margin: 0;
+      font-weight: 400;
       color: var(--vmaas-text-subtle);
+    }
+    .vm-list-card__footer-row dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text);
+      text-align: right;
+      word-break: break-word;
     }
     .table-toolbar__right .tpl-view-toggle {
       margin-left: 0;
@@ -6785,8 +6896,8 @@
         sshKeyFileName: 'id_ed25519.pub',
         guestAgent: true,
         osFull: 'Red Hat Enterprise Linux 9.5',
-        catalogItem: 'catalog item name',
-        imageLabel: 'RHEL 9.4 (Hardened)',
+        catalogItem: 'rhel-general-purpose',
+        imageLabel: 'RHEL 9.4',
         computeResource: 'small',
         nics: [{
           name: 'tenant-workload',
@@ -6807,11 +6918,11 @@
           network: '5.3 KBps', netIn: '2.9 KBps', netOut: '2.4 KBps',
         },
       },
-      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: '', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', gpuDevices: [{ name: 'nvidia.com/GPU' }], hostDevices: [{ name: 'host-pci-1' }] },
-      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
-      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
-      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
+      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'general-purpose-server', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'bare-metal-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }] },
+      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
+      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', imageLabel: 'Fedora 41', catalogItem: 'developer-workstation', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
+      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
     const FILTER_CATALOG = {
@@ -9826,7 +9937,7 @@
     }
 
     function vmOsIconKey(v) {
-      const os = String(v?.os || v?.osFull || '').toLowerCase();
+      const os = String(v?.os || v?.osFull || v?.imageLabel || '').toLowerCase();
       if (os.includes('win')) return 'windows';
       if (os.includes('rhel') || os.includes('red hat')) return 'rhel';
       if (os.includes('fedora')) return 'fedora';
@@ -9846,46 +9957,126 @@
       return map[key] || map.other;
     }
 
+    function vmCardStatusMeta(status) {
+      const s = String(status || '').toLowerCase();
+      if (s === 'running') return { key: 'running', label: 'Running', mod: 'running' };
+      if (s === 'paused') return { key: 'paused', label: 'Paused', mod: 'paused' };
+      if (s === 'starting') return { key: 'starting', label: 'Starting', mod: 'starting' };
+      if (s === 'errorpvcnotfound' || s === 'error') return { key: 'error', label: 'Error', mod: 'error' };
+      return { key: 'stopped', label: 'Stopped', mod: 'stopped' };
+    }
+
+    function vmCardStatusPill(v) {
+      const meta = vmCardStatusMeta(v.status);
+      const interactive = meta.key !== 'starting';
+      if (!interactive) {
+        return `<span class="vm-list-card__status-pill vm-list-card__status-pill--${meta.mod}">${meta.label}</span>`;
+      }
+      return `<button type="button" class="vm-list-card__status-pill vm-list-card__status-pill--${meta.mod} status-link"
+        data-status-popover="${meta.key}" data-status-vm="${v.name}"
+        aria-haspopup="dialog" aria-expanded="false">${meta.label}</button>`;
+    }
+
+    function vmCardCpuLabel(cpu) {
+      const s = String(cpu || '—').trim();
+      if (s === '—') return s;
+      if (/vCPU/i.test(s)) return s;
+      return s.replace(/\bCPUs?\b/i, 'vCPU');
+    }
+
+    function vmCardDiskImageLabel(v) {
+      const raw = v.imageLabel || v.osFull || v.os || '';
+      if (!raw) return '—';
+      return String(raw).replace(/\s*\(Hardened\)\s*/i, '').trim();
+    }
+
+    function vmCardGpuLabel(v) {
+      const gpus = Array.isArray(v.gpuDevices) ? v.gpuDevices : [];
+      if (!gpus.length) return '';
+      return gpus.map(g => {
+        const n = String(g?.name || g || '').trim();
+        if (!n) return 'GPU';
+        if (/a100/i.test(n)) return n;
+        if (/nvidia/i.test(n)) return 'NVIDIA GPU';
+        return n;
+      }).join(', ');
+    }
+
+    function vmCardSubtitle(v) {
+      return String(v.catalogItem || v.preference || '').trim();
+    }
+
     function renderVmListCard(v) {
       const enriched = enrichVm(v);
-      const osKey = vmOsIconKey(enriched);
       const selected = state.selectedVms.has(v.name);
-      const ip = !v.ip || v.ip === '—' ? '—' : v.ip;
-      const cpu = enriched.cpu || '';
-      const mem = enriched.mem || '';
-      const specs = [cpu, mem].filter(Boolean).join(' · ');
-      const showProject = isAllProjectsView();
+      const diskLabel = vmCardDiskImageLabel(enriched);
+      const diskIcon = typeof catalogDiskImageIconHtml === 'function'
+        ? catalogDiskImageIconHtml(diskLabel)
+        : '';
+      const diskFallbackIcon = diskIcon
+        ? ''
+        : `<i class="${vmOsIconFa(vmOsIconKey(enriched))} catalog-disk-image-value__icon" aria-hidden="true"></i>`;
+      const gpu = vmCardGpuLabel(enriched);
+      const subtitle = vmCardSubtitle(enriched);
+      const created = enriched.created || v.created || '—';
+      const project = projectDisplayName(v.ns) || v.ns || '—';
       return `
         <article class="tpl-card vm-list-card${selected ? ' pf-m-selected' : ''}"
           data-vm-card="${v.name}" role="listitem" tabindex="0"
           aria-label="${v.name}">
-          <div class="vm-list-card__chrome">
-            <label class="pf-v6-c-check pf-m-standalone">
-              <input type="checkbox" class="pf-v6-c-check__input vm-row-check" data-vm="${v.name}"
-                aria-label="Select ${v.name}" ${selected ? 'checked' : ''} />
-            </label>
-            <button type="button" class="kebab" data-vm-kebab="${v.name}"
-              aria-label="Actions for ${v.name}" aria-haspopup="menu" aria-expanded="false">
-              <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
-            </button>
+          <div class="vm-list-card__header">
+            <div class="vm-list-card__header-left">
+              <label class="pf-v6-c-check pf-m-standalone">
+                <input type="checkbox" class="pf-v6-c-check__input vm-row-check" data-vm="${v.name}"
+                  aria-label="Select ${v.name}" ${selected ? 'checked' : ''} />
+              </label>
+              <span class="vm-list-card__icon" aria-hidden="true">
+                <i class="fa-solid fa-server"></i>
+              </span>
+            </div>
+            <div class="vm-list-card__header-right">
+              ${vmCardStatusPill(v)}
+              <button type="button" class="kebab" data-vm-kebab="${v.name}"
+                aria-label="Actions for ${v.name}" aria-haspopup="menu" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
-          <span class="tpl-card__icon tpl-card__icon--${osKey}" aria-hidden="true">
-            <i class="${vmOsIconFa(osKey)}"></i>
-          </span>
           <button type="button" class="tpl-card__title" data-open-vm="${v.name}">${v.name}</button>
-          <div class="vm-list-card__status">${statusCell(v.status, v.name)}</div>
-          <dl class="vm-list-card__meta">
-            ${showProject ? `
-            <div class="vm-list-card__meta-row">
-              <dt>Project</dt>
-              <dd>${projectDisplayName(v.ns) || v.ns || '—'}</dd>
+          <p class="vm-list-card__subtitle">${subtitle ? subtitle.replace(/</g, '&lt;') : ''}</p>
+          <dl class="vm-list-card__specs">
+            <div class="vm-list-card__spec-row">
+              <dt>CPU</dt>
+              <dd>${vmCardCpuLabel(enriched.cpu)}</dd>
+            </div>
+            <div class="vm-list-card__spec-row">
+              <dt>RAM</dt>
+              <dd>${enriched.mem || '—'}</dd>
+            </div>
+            ${gpu ? `
+            <div class="vm-list-card__spec-row">
+              <dt>GPU</dt>
+              <dd>${gpu.replace(/</g, '&lt;')}</dd>
             </div>` : ''}
-            <div class="vm-list-card__meta-row">
-              <dt>IP</dt>
-              <dd>${ip === '—' ? '<span class="muted">—</span>' : ip}</dd>
+            <div class="vm-list-card__spec-row">
+              <dt>Disk image</dt>
+              <dd>
+                <span class="vm-list-card__disk">
+                  ${diskIcon || diskFallbackIcon}${diskLabel.replace(/</g, '&lt;')}
+                </span>
+              </dd>
             </div>
           </dl>
-          ${specs ? `<p class="vm-list-card__specs">${specs}</p>` : ''}
+          <dl class="vm-list-card__footer">
+            <div class="vm-list-card__footer-row">
+              <dt>Project</dt>
+              <dd>${String(project).replace(/</g, '&lt;')}</dd>
+            </div>
+            <div class="vm-list-card__footer-row">
+              <dt>Created</dt>
+              <dd>${String(created).replace(/</g, '&lt;')}</dd>
+            </div>
+          </dl>
         </article>
       `;
     }
