@@ -5106,71 +5106,23 @@
       color: #002952;
     }
     .vm-list-card .tpl-card__title {
-      margin: 0 0 4px;
+      margin: 0 0 16px;
       font-size: 16px;
       font-weight: 700;
       line-height: 1.3;
-    }
-    .vm-list-card__subtitle {
-      margin: 0 0 16px;
-      font-size: 13px;
-      line-height: 1.35;
-      font-weight: 400;
-      color: var(--vmaas-text-subtle);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      word-break: break-word;
-    }
-    .vm-list-card__subtitle:empty { display: none; margin: 0; }
-    .vm-list-card__specs {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 0;
-      padding: 0 0 16px;
-      border-bottom: 1px solid var(--vmaas-border-light);
-      font-size: 14px;
-      line-height: 1.35;
-    }
-    .vm-list-card__spec-row {
-      display: grid;
-      grid-template-columns: 5.5rem minmax(0, 1fr);
-      gap: 8px;
-      align-items: baseline;
-    }
-    .vm-list-card__spec-row dt {
-      margin: 0;
-      font-weight: 600;
-      color: var(--vmaas-text);
-      white-space: nowrap;
-    }
-    .vm-list-card__spec-row dd {
-      margin: 0;
-      font-weight: 400;
-      color: var(--vmaas-text);
-      min-width: 0;
-      word-break: break-word;
-    }
-    .vm-list-card__disk {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-    }
-    .vm-list-card__disk .catalog-disk-image-value__icon {
-      flex: 0 0 auto;
-      color: #ee0000;
-      font-size: 14px;
     }
     .vm-list-card__footer {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin: 12px 0 0;
+      margin: 0;
+      padding-top: 12px;
+      border-top: 1px solid var(--vmaas-border-light);
       font-size: 13px;
       line-height: 1.35;
+    }
+    .vm-list-card__footer--fields {
+      margin-top: 0;
     }
     .vm-list-card__footer-row {
       display: flex;
@@ -9936,27 +9888,6 @@
       });
     }
 
-    function vmOsIconKey(v) {
-      const os = String(v?.os || v?.osFull || v?.imageLabel || '').toLowerCase();
-      if (os.includes('win')) return 'windows';
-      if (os.includes('rhel') || os.includes('red hat')) return 'rhel';
-      if (os.includes('fedora')) return 'fedora';
-      if (os.includes('centos')) return 'centos';
-      if (!os) return 'other';
-      return 'other';
-    }
-
-    function vmOsIconFa(key) {
-      const map = {
-        centos: 'fa-brands fa-linux',
-        rhel: 'fa-brands fa-redhat',
-        fedora: 'fa-brands fa-fedora',
-        windows: 'fa-brands fa-windows',
-        other: 'fa-solid fa-server',
-      };
-      return map[key] || map.other;
-    }
-
     function vmCardStatusMeta(status) {
       const s = String(status || '').toLowerCase();
       if (s === 'running') return { key: 'running', label: 'Running', mod: 'running' };
@@ -9977,48 +9908,11 @@
         aria-haspopup="dialog" aria-expanded="false">${meta.label}</button>`;
     }
 
-    function vmCardCpuLabel(cpu) {
-      const s = String(cpu || '—').trim();
-      if (s === '—') return s;
-      if (/vCPU/i.test(s)) return s;
-      return s.replace(/\bCPUs?\b/i, 'vCPU');
-    }
-
-    function vmCardDiskImageLabel(v) {
-      const raw = v.imageLabel || v.osFull || v.os || '';
-      if (!raw) return '—';
-      return String(raw).replace(/\s*\(Hardened\)\s*/i, '').trim();
-    }
-
-    function vmCardGpuLabel(v) {
-      const gpus = Array.isArray(v.gpuDevices) ? v.gpuDevices : [];
-      if (!gpus.length) return '';
-      return gpus.map(g => {
-        const n = String(g?.name || g || '').trim();
-        if (!n) return 'GPU';
-        if (/a100/i.test(n)) return n;
-        if (/nvidia/i.test(n)) return 'NVIDIA GPU';
-        return n;
-      }).join(', ');
-    }
-
-    function vmCardSubtitle(v) {
-      return String(v.catalogItem || v.preference || '').trim();
-    }
-
     function renderVmListCard(v) {
       const enriched = enrichVm(v);
       const selected = state.selectedVms.has(v.name);
-      const diskLabel = vmCardDiskImageLabel(enriched);
-      const diskIcon = typeof catalogDiskImageIconHtml === 'function'
-        ? catalogDiskImageIconHtml(diskLabel)
-        : '';
-      const diskFallbackIcon = diskIcon
-        ? ''
-        : `<i class="${vmOsIconFa(vmOsIconKey(enriched))} catalog-disk-image-value__icon" aria-hidden="true"></i>`;
-      const gpu = vmCardGpuLabel(enriched);
-      const subtitle = vmCardSubtitle(enriched);
-      const created = enriched.created || v.created || '—';
+      const ip = !v.ip || v.ip === '—' ? '—' : v.ip;
+      const showProject = isAllProjectsView();
       const project = projectDisplayName(v.ns) || v.ns || '—';
       return `
         <article class="tpl-card vm-list-card${selected ? ' pf-m-selected' : ''}"
@@ -10043,38 +9937,15 @@
             </div>
           </div>
           <button type="button" class="tpl-card__title" data-open-vm="${v.name}">${v.name}</button>
-          <p class="vm-list-card__subtitle">${subtitle ? subtitle.replace(/</g, '&lt;') : ''}</p>
-          <dl class="vm-list-card__specs">
-            <div class="vm-list-card__spec-row">
-              <dt>CPU</dt>
-              <dd>${vmCardCpuLabel(enriched.cpu)}</dd>
-            </div>
-            <div class="vm-list-card__spec-row">
-              <dt>RAM</dt>
-              <dd>${enriched.mem || '—'}</dd>
-            </div>
-            ${gpu ? `
-            <div class="vm-list-card__spec-row">
-              <dt>GPU</dt>
-              <dd>${gpu.replace(/</g, '&lt;')}</dd>
-            </div>` : ''}
-            <div class="vm-list-card__spec-row">
-              <dt>Disk image</dt>
-              <dd>
-                <span class="vm-list-card__disk">
-                  ${diskIcon || diskFallbackIcon}${diskLabel.replace(/</g, '&lt;')}
-                </span>
-              </dd>
-            </div>
-          </dl>
-          <dl class="vm-list-card__footer">
+          <dl class="vm-list-card__footer vm-list-card__footer--fields">
+            ${showProject ? `
             <div class="vm-list-card__footer-row">
               <dt>Project</dt>
               <dd>${String(project).replace(/</g, '&lt;')}</dd>
-            </div>
+            </div>` : ''}
             <div class="vm-list-card__footer-row">
-              <dt>Created</dt>
-              <dd>${String(created).replace(/</g, '&lt;')}</dd>
+              <dt>IP address</dt>
+              <dd>${ip === '—' ? '<span class="muted">—</span>' : String(ip).replace(/</g, '&lt;')}</dd>
             </div>
           </dl>
         </article>
