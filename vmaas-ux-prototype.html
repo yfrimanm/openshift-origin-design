@@ -5895,7 +5895,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · access cards no badges</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · catalog optional fields</span>
         </div>
       </div>
       <div class="console__body">
@@ -10604,6 +10604,62 @@
         lockedDesc: 'Tenants can’t change size or hardware.',
         editableDesc: 'Tenants can change size or hardware when they create a VM.',
       });
+    }
+
+    function renderBootSizeAccessSelectBoxes({ name, selected, labelledBy }) {
+      return renderTenantAccessSelectBoxes({
+        name, selected, labelledBy,
+        lockedDesc: 'Tenants can’t change boot disk size.',
+        editableDesc: 'Tenants can change boot disk size when they create a VM.',
+      });
+    }
+
+    function renderBootTierAccessSelectBoxes({ name, selected, labelledBy }) {
+      return renderTenantAccessSelectBoxes({
+        name, selected, labelledBy,
+        lockedDesc: 'Tenants can’t change boot storage tier.',
+        editableDesc: 'Tenants can change boot storage tier when they create a VM.',
+      });
+    }
+
+    function renderExtraDisksAccessSelectBoxes({ name, selected, labelledBy }) {
+      return renderTenantAccessSelectBoxes({
+        name, selected, labelledBy,
+        lockedDesc: 'Tenants can’t add, remove, or change additional disks.',
+        editableDesc: 'Tenants can add, remove, or change additional disks when they create a VM.',
+      });
+    }
+
+    function renderRunStrategyAccessSelectBoxes({ name, selected, labelledBy }) {
+      return renderTenantAccessSelectBoxes({
+        name, selected, labelledBy,
+        lockedDesc: 'Tenants can’t change run strategy.',
+        editableDesc: 'Tenants can change run strategy when they create a VM.',
+      });
+    }
+
+    function renderInitAccessSelectBoxes({ name, selected, labelledBy }) {
+      return renderTenantAccessSelectBoxes({
+        name, selected, labelledBy,
+        lockedDesc: 'Tenants can’t change user data (Cloud-init / Sysprep).',
+        editableDesc: 'Tenants can change user data when they create a VM.',
+      });
+    }
+
+    const CATALOG_RUN_STRATEGY_OPTIONS = [
+      { id: 'Always', label: 'Always', desc: 'Keep the VM running; restart if it stops.' },
+      { id: 'RerunOnFailure', label: 'Rerun on failure', desc: 'Restart the VM only if it fails.' },
+      { id: 'Manual', label: 'Manual', desc: 'Do not start or restart automatically.' },
+      { id: 'Halted', label: 'Halted', desc: 'Keep the VM stopped.' },
+    ];
+
+    function catalogAccessLabel(value) {
+      return value === 'locked' ? 'Locked' : 'Editable at provisioning';
+    }
+
+    function catalogOptionalValueLabel(value, formatter) {
+      if (value == null || value === '') return 'Not set';
+      return formatter ? formatter(value) : String(value);
     }
 
 
@@ -16861,23 +16917,34 @@
         maxVisited: 0,
         name: generateCatalogItemName(),
         description: '',
-        guestOsFamily: 'Linux',
+        guestOsFamily: '',
         diskImageId: '',
         diskImageAccess: 'editable',
-        computeAccess: 'locked',
-        tenantAccess: 'locked',
-        instanceTypeId: 'medium',
+        computeAccess: 'editable',
+        tenantAccess: 'editable',
+        instanceTypeId: '',
+        runStrategy: '',
+        runStrategyAccess: 'editable',
         visibility: 'global',
         tenants: [],
-        bootDiskGiB: 30,
+        bootDiskGiB: null,
+        bootDiskAccess: 'editable',
+        bootStorageTierId: '',
+        bootStorageTierAccess: 'editable',
         extraDisks: [],
+        extraDisksAccess: 'editable',
         initMethod: 'cloud-init',
         cloudInit: '',
         sysprep: '',
+        initAccess: 'editable',
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
         computeFilter: '',
+        runStrategyMenuOpen: false,
+        runStrategyFilter: '',
+        bootTierMenuOpen: false,
+        bootTierFilter: '',
         tenantMenuOpen: false,
         tenantFilter: '',
       };
@@ -16889,11 +16956,13 @@
     }
 
     function getCatalogInstanceTypeOption(id) {
-      return CATALOG_INSTANCE_TYPE_OPTIONS.find(o => o.id === id) || CATALOG_INSTANCE_TYPE_OPTIONS[1];
+      if (!id) return null;
+      return CATALOG_INSTANCE_TYPE_OPTIONS.find(o => o.id === id) || null;
     }
 
     function getCatalogInstanceType(id) {
       const opt = getCatalogInstanceTypeOption(id);
+      if (!opt) return null;
       const it = INSTANCE_TYPES.find(x => x.name === opt.instanceTypeName);
       if (!it) return { ...opt, label: opt.id, cpu: 0, memoryGiB: 0, gpus: null, gpuResource: null };
       return { ...opt, ...it, label: it.label || it.name };
@@ -16905,8 +16974,21 @@
     }
 
     function resolveCatalogItemCompute(item) {
-      const id = item.instanceTypeId || item.computeResourceId;
+      const id = item.instanceTypeId || item.computeResourceId || '';
       const it = getCatalogInstanceType(id);
+      if (!it) {
+        return {
+          id: '',
+          label: 'Not set',
+          instanceTypeName: '',
+          cpu: '—',
+          memory: '—',
+          gpu: '—',
+          rateHour: item.rateHour || '—',
+          rateMonth: item.rateMonth || '—',
+          summary: 'Not set',
+        };
+      }
       return {
         id,
         label: it.label || it.name,
@@ -16940,22 +17022,30 @@
       return {
         name: (c.name || '').trim(),
         description: (c.description || '').trim(),
-        guestOsFamily: c.guestOsFamily || 'Linux',
+        guestOsFamily: c.guestOsFamily || '',
         diskImageId: c.diskImageId || '',
-        diskImageAccess: c.diskImageAccess || (c.diskImageId ? 'locked' : 'editable'),
-        computeAccess: c.computeAccess || c.tenantAccess || 'locked',
-        tenantAccess: c.computeAccess || c.tenantAccess || 'locked',
-        instanceTypeId: c.instanceTypeId || c.computeResourceId || 'medium',
+        diskImageAccess: c.diskImageAccess || 'editable',
+        computeAccess: c.computeAccess || c.tenantAccess || 'editable',
+        tenantAccess: c.computeAccess || c.tenantAccess || 'editable',
+        instanceTypeId: c.instanceTypeId || c.computeResourceId || '',
+        runStrategy: c.runStrategy || '',
+        runStrategyAccess: c.runStrategyAccess || 'editable',
         visibility: c.visibility || 'global',
         tenants: [...(c.tenants || [])].sort().join('|'),
-        bootDiskGiB: Number(c.bootDiskGiB) || 30,
+        bootDiskGiB: c.bootDiskGiB == null || c.bootDiskGiB === '' ? '' : String(Number(c.bootDiskGiB)),
+        bootDiskAccess: c.bootDiskAccess || 'editable',
+        bootStorageTierId: c.bootStorageTierId || '',
+        bootStorageTierAccess: c.bootStorageTierAccess || 'editable',
         extraDisksJson: JSON.stringify((c.extraDisks || []).map(d => ({
           size: d.size,
           unit: d.unit || 'GiB',
+          storageTierId: d.storageTierId || '',
         }))),
+        extraDisksAccess: c.extraDisksAccess || 'editable',
         initMethod: c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init',
         cloudInit: (c.cloudInit || '').trim(),
         sysprep: (c.sysprep || '').trim(),
+        initAccess: c.initAccess || 'editable',
       };
     }
 
@@ -16964,8 +17054,9 @@
       switch (field) {
         case 'name':
         case 'description':
-        case 'guestOsFamily':
           return esc(snapshot[field] || '—');
+        case 'guestOsFamily':
+          return esc(snapshot.guestOsFamily || 'Not set');
         case 'diskImageId': {
           const disk = getCatalogDiskImage(snapshot.diskImageId);
           return disk ? esc(`${disk.title} (${disk.family} · ${disk.arch})`) : '—';
@@ -16973,9 +17064,26 @@
         case 'diskImageAccess':
         case 'computeAccess':
         case 'tenantAccess':
-          return snapshot[field] === 'editable' ? 'Editable at provisioning' : 'Locked';
+        case 'runStrategyAccess':
+        case 'bootDiskAccess':
+        case 'bootStorageTierAccess':
+        case 'extraDisksAccess':
+        case 'initAccess':
+          return catalogAccessLabel(snapshot[field]);
         case 'instanceTypeId':
           return esc(resolveCatalogItemCompute({ instanceTypeId: snapshot.instanceTypeId }).summary);
+        case 'runStrategy': {
+          const opt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === snapshot.runStrategy);
+          return opt ? esc(opt.label) : 'Not set';
+        }
+        case 'bootDiskGiB':
+          return snapshot.bootDiskGiB === '' || snapshot.bootDiskGiB == null
+            ? 'Not set' : `${snapshot.bootDiskGiB} GiB`;
+        case 'bootStorageTierId': {
+          if (!snapshot.bootStorageTierId) return 'Not set';
+          const tier = getStorageTiers().find(t => t.id === snapshot.bootStorageTierId);
+          return esc(tier?.name || snapshot.bootStorageTierId);
+        }
         case 'initMethod':
           return snapshot.initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
         case 'cloudInit':
@@ -16988,8 +17096,6 @@
             return esc(`Tenant scoped (${names.join(', ') || '—'})`);
           }
           return 'Global public';
-        case 'bootDiskGiB':
-          return `${snapshot.bootDiskGiB} GiB`;
         case 'extraDisksJson': {
           const disks = JSON.parse(snapshot.extraDisksJson || '[]');
           return disks.length
@@ -17004,17 +17110,24 @@
     const CATALOG_EDIT_TRACKED_FIELDS = [
       { key: 'name', label: 'Name' },
       { key: 'description', label: 'Description' },
-      { key: 'guestOsFamily', label: 'Guest operating system' },
       { key: 'diskImageId', label: 'Disk image' },
       { key: 'diskImageAccess', label: 'Disk image access' },
+      { key: 'guestOsFamily', label: 'Guest operating system' },
       { key: 'instanceTypeId', label: 'Compute resources' },
       { key: 'computeAccess', label: 'Compute access' },
+      { key: 'runStrategy', label: 'Run strategy' },
+      { key: 'runStrategyAccess', label: 'Run strategy access' },
       { key: 'visibility', label: 'Visibility' },
-      { key: 'bootDiskGiB', label: 'Boot disk' },
+      { key: 'bootDiskGiB', label: 'Boot disk size' },
+      { key: 'bootDiskAccess', label: 'Boot disk size access' },
+      { key: 'bootStorageTierId', label: 'Boot storage tier' },
+      { key: 'bootStorageTierAccess', label: 'Boot storage tier access' },
       { key: 'extraDisksJson', label: 'Additional disks' },
+      { key: 'extraDisksAccess', label: 'Additional disks access' },
       { key: 'initMethod', label: 'Initialization' },
       { key: 'cloudInit', label: 'Cloud-init' },
       { key: 'sysprep', label: 'Sysprep' },
+      { key: 'initAccess', label: 'User data access' },
     ];
 
     function getCatalogEditChanges() {
@@ -17052,7 +17165,7 @@
 
     function catalogComputeToggleSummary(id) {
       const it = getCatalogInstanceType(id);
-      if (!it) return { title: '—', desc: '' };
+      if (!it) return { title: 'Not set', desc: 'Tenants choose compute when creating a VM' };
       return {
         title: it.label || it.name,
         desc: `${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
@@ -17064,10 +17177,10 @@
       return CATALOG_DISK_IMAGE_OPTIONS.filter(d => {
         if (guestOsFamily === 'Microsoft Windows') return d.guestOs === 'Microsoft Windows';
         if (guestOsFamily === 'Linux') return d.guestOs === 'Linux';
-        return true;
+        return true; // no family / unspecified → show all
       }).filter(d => {
         if (!q) return true;
-        const hay = `${d.title} ${d.family} ${d.arch}`.toLowerCase();
+        const hay = `${d.title} ${d.family} ${d.arch} ${d.guestOs || ''}`.toLowerCase();
         return hay.includes(q);
       });
     }
@@ -17095,7 +17208,9 @@
       state.wizard = 'catalog-create';
       state.fieldErrors = {};
       const diskImageId = findCatalogDiskImageIdByTitle(item.diskImage);
-      const computeAccess = item.computeAccess || item.tenantAccess || (item.computeLocked === false ? 'editable' : 'locked');
+      const disk = getCatalogDiskImage(diskImageId);
+      const computeAccess = item.computeAccess || item.tenantAccess
+        || (item.computeLocked === false ? 'editable' : (item.instanceTypeId ? 'locked' : 'editable'));
       const diskImageAccess = item.diskImageAccess
         || (item.diskLocked === false ? 'editable' : (diskImageId ? 'locked' : 'editable'));
       state.catalogCreate = {
@@ -17103,23 +17218,34 @@
         maxVisited: 5,
         name: item.name,
         description: item.description || '',
-        guestOsFamily: item.guestOsFamily || 'Linux',
+        guestOsFamily: item.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : ''),
         diskImageId,
-        diskImageAccess: diskImageId ? diskImageAccess : 'editable',
+        diskImageAccess,
         computeAccess,
         tenantAccess: computeAccess,
-        instanceTypeId: item.instanceTypeId || 'medium',
+        instanceTypeId: item.instanceTypeId || item.computeResourceId || '',
+        runStrategy: item.runStrategy || '',
+        runStrategyAccess: item.runStrategyAccess || 'editable',
         visibility: item.visibility || 'global',
         tenants: [...(item.tenants || [])],
-        bootDiskGiB: item.bootDiskGiB || 30,
+        bootDiskGiB: item.bootDiskGiB != null ? item.bootDiskGiB : null,
+        bootDiskAccess: item.bootDiskAccess || 'editable',
+        bootStorageTierId: item.bootStorageTierId || '',
+        bootStorageTierAccess: item.bootStorageTierAccess || 'editable',
         extraDisks: (item.extraDisks || []).map(d => ({ ...d })),
-        initMethod: item.initMethod === 'sysprep' ? 'sysprep' : (item.initMethod || initMethodForGuestOs(item.guestOsFamily || 'Linux')),
+        extraDisksAccess: item.extraDisksAccess || 'editable',
+        initMethod: item.initMethod === 'sysprep' ? 'sysprep' : (item.initMethod || 'cloud-init'),
         cloudInit: item.cloudInit || '',
         sysprep: item.sysprep || '',
+        initAccess: item.initAccess || (item.initLocked ? 'locked' : 'editable'),
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
         computeFilter: '',
+        runStrategyMenuOpen: false,
+        runStrategyFilter: '',
+        bootTierMenuOpen: false,
+        bootTierFilter: '',
         tenantMenuOpen: false,
         tenantFilter: '',
       };
@@ -17259,15 +17385,21 @@
       if (!c) return;
 
       if (key === 'ci-details') {
-        if (!c.diskImageAccess) c.diskImageAccess = c.diskImageId ? 'locked' : 'editable';
-        if (!c.diskImageId) c.diskImageAccess = 'editable';
-        const diskImages = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
-        if (c.diskImageId && !diskImages.some(d => d.id === c.diskImageId)) {
+        if (!c.diskImageAccess) c.diskImageAccess = 'editable';
+        const diskImages = filteredCatalogDiskImages('', c.diskImageFilter);
+        if (c.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(d => d.id === c.diskImageId)) {
           c.diskImageId = '';
-          c.diskImageAccess = 'editable';
         }
         const selectedDisk = getCatalogDiskImage(c.diskImageId);
+        if (selectedDisk) {
+          c.guestOsFamily = guestOsFamilyFromDiskImage(selectedDisk);
+        } else {
+          c.guestOsFamily = '';
+        }
         const diskToggleLabel = selectedDisk ? selectedDisk.title : 'Not set';
+        const derivedOsHtml = selectedDisk
+          ? `<p class="form-helper" id="ci-derived-os">Guest operating system: <strong>${String(c.guestOsFamily || 'Unspecified').replace(/</g, '&lt;')}</strong> (from disk image)</p>`
+          : '<p class="form-helper">Guest operating system is derived from the disk image when one is set.</p>';
         const diskOptionsHtml = `
                   <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.diskImageId ? 'pf-m-selected' : ''}" data-disk-image="" role="option">
                     <span class="pf-v6-c-menu__item-main">
@@ -17282,7 +17414,7 @@
                       <span class="pf-v6-c-menu__item-main">
                         <span class="rich-select__option-body">
                           <span class="rich-select__option-title">${d.title}</span>
-                          <span class="rich-select__option-desc">${d.family} · ${d.arch}</span>
+                          <span class="rich-select__option-desc">${d.guestOs || d.family} · ${d.arch}</span>
                         </span>
                       </span>
                     </button>
@@ -17308,15 +17440,6 @@
             <textarea id="ci-description" rows="3">${String(c.description || '').replace(/</g, '&lt;')}</textarea>
           </div>
           <hr class="form-section-divider" />
-          <div class="form-field" id="ci-guest-os-field">
-            <label id="ci-guest-os-label">Guest operating system <span class="req">*</span></label>
-            ${renderGuestOsSelectBoxes({
-              name: 'ciGuestOs',
-              selected: c.guestOsFamily || 'Linux',
-              labelledBy: 'ci-guest-os-label',
-            })}
-          </div>
-          <hr class="form-section-divider" />
           <div class="form-field ${state.fieldErrors.ciDiskImage ? 'pf-m-error' : ''}">
             <label id="ci-disk-image-label">Disk image</label>
             <div class="rich-select rich-select--typeahead ${c.diskImageMenuOpen ? 'pf-m-expanded' : ''}" id="ci-disk-image-select">
@@ -17337,7 +17460,7 @@
                 </div>
               </div>
             </div>
-            <p class="form-helper">Optional. Leave as Not set if tenants should choose an image when creating a VM.</p>
+            ${derivedOsHtml}
             ${providerFieldErrorHtml(state.fieldErrors.ciDiskImage, 'err-ciDiskImage')}
           </div>
           <div class="form-field" style="margin-top:16px;">
@@ -17347,7 +17470,6 @@
               selected: c.diskImageAccess || 'editable',
               labelledBy: 'ci-disk-access-label',
             })}
-            ${!c.diskImageId ? '<p class="form-helper">Locked is available after you select a disk image.</p>' : ''}
           </div>
         `;
         panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
@@ -17357,32 +17479,13 @@
           if (input) input.value = c.name;
           renderCreateCatalogItemWizard();
         });
-        panel.querySelectorAll('input[name="ciGuestOs"]').forEach(r => {
-          r.addEventListener('change', () => {
-            c.guestOsFamily = r.value;
-            const options = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
-            if (c.diskImageId && !options.some(d => d.id === c.diskImageId)) {
-              c.diskImageId = '';
-              c.diskImageAccess = 'editable';
-            }
-            c.initMethod = initMethodForGuestOs(c.guestOsFamily);
-            renderCreateCatalogItemWizard();
-          });
-        });
         panel.querySelectorAll('input[name="ciDiskImageAccess"]').forEach(r => {
           r.addEventListener('change', () => {
-            if (r.value === 'locked' && !c.diskImageId) {
-              toast('Select a disk image before locking it.');
-              c.diskImageAccess = 'editable';
-              renderCreateCatalogItemWizard();
-              return;
-            }
             c.diskImageAccess = r.value;
             renderCreateCatalogItemWizard();
           });
         });
-        const diskRoot = panel.querySelector('#ci-disk-image-select');
-        bindRichSelect(diskRoot, {
+        bindRichSelect(panel.querySelector('#ci-disk-image-select'), {
           toggleSel: '#ci-disk-image-toggle',
           menuSel: '#ci-disk-image-menu',
           optionSel: '[data-disk-image]',
@@ -17390,7 +17493,13 @@
           onClose: () => { c.diskImageMenuOpen = false; },
           onSelect: opt => {
             c.diskImageId = opt.dataset.diskImage || '';
-            if (!c.diskImageId) c.diskImageAccess = 'editable';
+            const disk = getCatalogDiskImage(c.diskImageId);
+            if (disk) {
+              c.guestOsFamily = guestOsFamilyFromDiskImage(disk);
+              c.initMethod = initMethodForGuestOs(c.guestOsFamily);
+            } else {
+              c.guestOsFamily = '';
+            }
             delete state.fieldErrors.ciDiskImage;
             renderCreateCatalogItemWizard();
           },
@@ -17404,24 +17513,32 @@
       }
 
       if (key === 'ci-access') {
-        if (!c.computeAccess) c.computeAccess = c.tenantAccess || 'locked';
+        if (!c.computeAccess) c.computeAccess = 'editable';
         c.tenantAccess = c.computeAccess;
-        const instanceTypeId = c.instanceTypeId || c.computeResourceId || 'medium';
+        if (!c.runStrategyAccess) c.runStrategyAccess = 'editable';
+        const instanceTypeId = c.instanceTypeId || c.computeResourceId || '';
         c.instanceTypeId = instanceTypeId;
         const computeToggle = catalogComputeToggleSummary(instanceTypeId);
         const computeOptions = CATALOG_INSTANCE_TYPE_OPTIONS.filter(opt => {
           const it = getCatalogInstanceType(opt.id);
+          if (!it) return false;
           const q = (c.computeFilter || '').toLowerCase();
           if (!q) return true;
           const hay = `${it.label} ${it.cpu} ${it.memoryGiB} ${it.gpuResource} ${opt.rateHour}`.toLowerCase();
           return hay.includes(q);
         });
+        const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
+        const runToggleTitle = runOpt ? runOpt.label : 'Not set';
+        const runToggleDesc = runOpt ? runOpt.desc : 'Tenants choose run strategy when creating a VM';
+        const runFiltered = CATALOG_RUN_STRATEGY_OPTIONS.filter(o => {
+          const q = (c.runStrategyFilter || '').toLowerCase();
+          if (!q) return true;
+          return `${o.label} ${o.desc}`.toLowerCase().includes(q);
+        });
         panel.innerHTML = `
           <h3>Compute resources</h3>
-          <p class="create-resource-wiz__help">Choose compute resources for this catalog item. GPU configuration is defined on the compute resource.</p>
-          <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">
-            Compute resource <span class="req">*</span>
-          </h4>
+          <p class="create-resource-wiz__help">Optionally set compute defaults for this catalog item. Leave fields Not set if tenants should choose when creating a VM.</p>
+          <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Compute resource</h4>
           <div class="form-field">
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               ${pfRichSelectToggle({
@@ -17441,6 +17558,14 @@
                 </div>
                 <hr class="rich-select__menu-divider" />
                 <div class="rich-select__menu-list">
+                  <button type="button" class="pf-v6-c-menu__item rich-select__option ${!instanceTypeId ? 'pf-m-selected' : ''}" data-compute="" role="option">
+                    <span class="pf-v6-c-menu__item-main">
+                      <span class="rich-select__option-body">
+                        <span class="rich-select__option-title">Not set</span>
+                        <span class="rich-select__option-desc">Tenants choose compute when creating a VM</span>
+                      </span>
+                    </span>
+                  </button>
                   ${computeOptions.length ? computeOptions.map(opt => {
                     const it = getCatalogInstanceType(opt.id);
                     return `
@@ -17457,13 +17582,63 @@
               </div>
             </div>
           </div>
-          <hr class="form-section-divider" />
-          <h4 class="config-section-title" id="ci-compute-access-label">Tenant access to compute resources</h4>
-          <div class="form-field">
+          <div class="form-field" style="margin-top:16px;">
+            <label id="ci-compute-access-label">Tenant access to compute resources</label>
             ${renderComputeAccessSelectBoxes({
               name: 'ciComputeAccess',
-              selected: c.computeAccess || 'locked',
+              selected: c.computeAccess || 'editable',
               labelledBy: 'ci-compute-access-label',
+            })}
+          </div>
+          <hr class="form-section-divider" />
+          <h4 class="config-section-title" id="ci-run-strategy-label">Run strategy</h4>
+          <div class="form-field">
+            <div class="rich-select rich-select--typeahead ${c.runStrategyMenuOpen ? 'pf-m-expanded' : ''}" id="ci-run-strategy-select">
+              ${pfRichSelectToggle({
+                id: 'ci-run-strategy-toggle',
+                ariaLabelledby: 'ci-run-strategy-label',
+                ariaExpanded: c.runStrategyMenuOpen,
+                stacked: true,
+                mainHtml: `
+                  <span class="rich-select__toggle-label">${runToggleTitle}</span>
+                  <span class="rich-select__toggle-desc">${runToggleDesc}</span>
+                `,
+              })}
+              <div class="pf-v6-c-menu rich-select__menu" id="ci-run-strategy-menu" role="listbox" ${c.runStrategyMenuOpen ? '' : 'hidden'}>
+                <div class="rich-select__search">
+                  <i class="fa-solid fa-search" aria-hidden="true"></i>
+                  <input type="search" id="ci-run-strategy-search" placeholder="Search run strategies" value="${String(c.runStrategyFilter || '').replace(/"/g, '&quot;')}" aria-label="Search run strategies" />
+                </div>
+                <hr class="rich-select__menu-divider" />
+                <div class="rich-select__menu-list">
+                  <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.runStrategy ? 'pf-m-selected' : ''}" data-run-strategy="" role="option">
+                    <span class="pf-v6-c-menu__item-main">
+                      <span class="rich-select__option-body">
+                        <span class="rich-select__option-title">Not set</span>
+                        <span class="rich-select__option-desc">Tenants choose run strategy when creating a VM</span>
+                      </span>
+                    </span>
+                  </button>
+                  ${runFiltered.map(o => `
+                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${o.id === c.runStrategy ? 'pf-m-selected' : ''}" data-run-strategy="${o.id}" role="option">
+                      <span class="pf-v6-c-menu__item-main">
+                        <span class="rich-select__option-body">
+                          <span class="rich-select__option-title">${o.label}</span>
+                          <span class="rich-select__option-desc">${o.desc}</span>
+                        </span>
+                      </span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-field" style="margin-top:16px;">
+            <label id="ci-run-strategy-access-label">Tenant access to run strategy</label>
+            ${renderRunStrategyAccessSelectBoxes({
+              name: 'ciRunStrategyAccess',
+              selected: c.runStrategyAccess || 'editable',
+              labelledBy: 'ci-run-strategy-access-label',
             })}
           </div>
         `;
@@ -17474,32 +17649,72 @@
             renderCreateCatalogItemWizard();
           });
         });
+        panel.querySelectorAll('input[name="ciRunStrategyAccess"]').forEach(r => {
+          r.addEventListener('change', () => {
+            c.runStrategyAccess = r.value;
+            renderCreateCatalogItemWizard();
+          });
+        });
         bindRichSelect(panel.querySelector('#ci-compute-select'), {
           toggleSel: '#ci-compute-toggle',
           menuSel: '#ci-compute-menu',
           optionSel: '[data-compute]',
           onOpen: () => { c.computeMenuOpen = true; },
           onClose: () => { c.computeMenuOpen = false; },
-          onSelect: opt => { c.instanceTypeId = opt.dataset.compute; renderCreateCatalogItemWizard(); },
+          onSelect: opt => { c.instanceTypeId = opt.dataset.compute || ''; renderCreateCatalogItemWizard(); },
         });
         panel.querySelector('#ci-compute-search')?.addEventListener('input', e => {
           c.computeFilter = e.target.value;
           renderCreateCatalogItemWizard();
           panel.querySelector('#ci-compute-search')?.focus();
         });
+        bindRichSelect(panel.querySelector('#ci-run-strategy-select'), {
+          toggleSel: '#ci-run-strategy-toggle',
+          menuSel: '#ci-run-strategy-menu',
+          optionSel: '[data-run-strategy]',
+          onOpen: () => { c.runStrategyMenuOpen = true; },
+          onClose: () => { c.runStrategyMenuOpen = false; },
+          onSelect: opt => { c.runStrategy = opt.dataset.runStrategy || ''; renderCreateCatalogItemWizard(); },
+        });
+        panel.querySelector('#ci-run-strategy-search')?.addEventListener('input', e => {
+          c.runStrategyFilter = e.target.value;
+          renderCreateCatalogItemWizard();
+          panel.querySelector('#ci-run-strategy-search')?.focus();
+        });
         return;
       }
+
 
       if (key === 'ci-storage') {
         const diskMin = 1;
         const diskMax = 16384;
-        const diskVal = Math.min(diskMax, Math.max(diskMin, Number(c.bootDiskGiB) || 30));
+        if (!c.bootDiskAccess) c.bootDiskAccess = 'editable';
+        if (!c.bootStorageTierAccess) c.bootStorageTierAccess = 'editable';
+        if (!c.extraDisksAccess) c.extraDisksAccess = 'editable';
         if (!Array.isArray(c.extraDisks)) c.extraDisks = [];
+        const tiers = getStorageTiers();
+        const bootSizeSet = c.bootDiskGiB != null && c.bootDiskGiB !== '';
+        const bootSizeVal = bootSizeSet ? Math.min(diskMax, Math.max(diskMin, Number(c.bootDiskGiB))) : '';
+        const selectedTier = tiers.find(t => t.id === c.bootStorageTierId);
+        const bootTierTitle = selectedTier ? selectedTier.name : 'Not set';
+        const bootTierDesc = selectedTier
+          ? (selectedTier.description || '')
+          : 'Tenants choose storage tier when creating a VM';
+        const tierFiltered = tiers.filter(t => {
+          const q = (c.bootTierFilter || '').toLowerCase();
+          if (!q) return true;
+          return `${t.name} ${t.description || ''}`.toLowerCase().includes(q);
+        });
         const extraDisks = c.extraDisks;
         const diskSetsHtml = extraDisks.length ? `
           <div class="inline-sets" aria-label="Additional disks">
             ${extraDisks.map((disk, idx) => {
               const sizeVal = Math.min(diskMax, Math.max(diskMin, Number(disk.size) || 30));
+              if (!disk.storageTierId || !tiers.some(t => t.id === disk.storageTierId)) {
+                disk.storageTierId = tiers[0]?.id || '';
+                disk.storageTierLabel = tiers[0]?.name || '';
+              }
+              const dTier = tiers.find(t => t.id === disk.storageTierId);
               return `
               <div class="inline-set" data-disk-set="${disk.id}">
                 <div class="inline-set__header">
@@ -17519,42 +17734,178 @@
                     min="${diskMin}" max="${diskMax}" step="1" required
                     aria-label="Disk set ${idx + 1} size in GiB" />
                 </div>
+                <div class="form-field">
+                  <label id="ci-disk-tier-label-${disk.id}">Storage tier <span class="req">*</span></label>
+                  ${renderTypeaheadRichSelectHtml({
+                    rootId: `ci-disk-tier-select-${disk.id}`,
+                    toggleId: `ci-disk-tier-toggle-${disk.id}`,
+                    menuId: `ci-disk-tier-menu-${disk.id}`,
+                    searchId: `ci-disk-tier-search-${disk.id}`,
+                    labelId: `ci-disk-tier-label-${disk.id}`,
+                    open: !!disk.tierMenuOpen,
+                    filter: disk.tierFilter || '',
+                    searchPlaceholder: 'Search storage tiers',
+                    selectedId: disk.storageTierId || '',
+                    placeholder: 'Select storage tier',
+                    stacked: true,
+                    optionAttr: 'data-ci-extra-tier',
+                    emptyNoun: 'storage tiers',
+                    options: tiers.map(t => ({
+                      id: t.id,
+                      title: t.name,
+                      desc: t.description || '',
+                    })),
+                  })}
+                </div>
               </div>`;
             }).join('')}
           </div>
-        ` : '';
+        ` : '<p class="form-helper">No additional disks. Add disks if this catalog item should include them by default.</p>';
         panel.innerHTML = `
           <h3>Storage</h3>
-          <p class="create-resource-wiz__help">Set the boot disk size. Add additional disks if you need more storage.</p>
+          <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields Not set if tenants should choose when creating a VM.</p>
           <div class="vm-config__fields">
             <div class="form-field">
-              <label for="ci-boot-disk">Boot disk size (GiB) <span class="req">*</span></label>
-              <input type="number" id="ci-boot-disk" class="unit-size-input" value="${diskVal}"
-                min="${diskMin}" max="${diskMax}" step="1" required aria-label="Boot disk size in GiB" />
+              <label for="ci-boot-disk">Boot disk size (GiB)</label>
+              <input type="number" id="ci-boot-disk" class="unit-size-input" value="${bootSizeVal}"
+                min="${diskMin}" max="${diskMax}" step="1" placeholder="Not set"
+                aria-label="Boot disk size in GiB" />
+              <p class="form-helper">Optional. Clear the field to leave as Not set.</p>
             </div>
+            <div class="form-field" style="margin-top:12px;">
+              <label id="ci-boot-size-access-label">Tenant access to boot disk size</label>
+              ${renderBootSizeAccessSelectBoxes({
+                name: 'ciBootDiskAccess',
+                selected: c.bootDiskAccess || 'editable',
+                labelledBy: 'ci-boot-size-access-label',
+              })}
+            </div>
+            <hr class="form-section-divider" />
+            <div class="form-field">
+              <label id="ci-boot-tier-label">Boot storage tier</label>
+              <div class="rich-select rich-select--typeahead ${c.bootTierMenuOpen ? 'pf-m-expanded' : ''}" id="ci-boot-tier-select">
+                ${pfRichSelectToggle({
+                  id: 'ci-boot-tier-toggle',
+                  ariaLabelledby: 'ci-boot-tier-label',
+                  ariaExpanded: c.bootTierMenuOpen,
+                  stacked: true,
+                  mainHtml: `
+                    <span class="rich-select__toggle-label">${bootTierTitle}</span>
+                    <span class="rich-select__toggle-desc">${bootTierDesc}</span>
+                  `,
+                })}
+                <div class="pf-v6-c-menu rich-select__menu" id="ci-boot-tier-menu" role="listbox" ${c.bootTierMenuOpen ? '' : 'hidden'}>
+                  <div class="rich-select__search">
+                    <i class="fa-solid fa-search" aria-hidden="true"></i>
+                    <input type="search" id="ci-boot-tier-search" placeholder="Search storage tiers" value="${String(c.bootTierFilter || '').replace(/"/g, '&quot;')}" aria-label="Search storage tiers" />
+                  </div>
+                  <hr class="rich-select__menu-divider" />
+                  <div class="rich-select__menu-list">
+                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.bootStorageTierId ? 'pf-m-selected' : ''}" data-boot-tier="" role="option">
+                      <span class="pf-v6-c-menu__item-main">
+                        <span class="rich-select__option-body">
+                          <span class="rich-select__option-title">Not set</span>
+                          <span class="rich-select__option-desc">Tenants choose storage tier when creating a VM</span>
+                        </span>
+                      </span>
+                    </button>
+                    ${tierFiltered.map(t => `
+                      <button type="button" class="pf-v6-c-menu__item rich-select__option ${t.id === c.bootStorageTierId ? 'pf-m-selected' : ''}" data-boot-tier="${t.id}" role="option">
+                        <span class="pf-v6-c-menu__item-main">
+                          <span class="rich-select__option-body">
+                            <span class="rich-select__option-title">${t.name}</span>
+                            <span class="rich-select__option-desc">${t.description || ''}</span>
+                          </span>
+                        </span>
+                      </button>
+                    `).join('') || emptyStateMenuSearchHtml('storage tiers')}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-field" style="margin-top:12px;">
+              <label id="ci-boot-tier-access-label">Tenant access to boot storage tier</label>
+              ${renderBootTierAccessSelectBoxes({
+                name: 'ciBootTierAccess',
+                selected: c.bootStorageTierAccess || 'editable',
+                labelledBy: 'ci-boot-tier-access-label',
+              })}
+            </div>
+            <hr class="form-section-divider" />
             <h3 class="config-sets-title">Additional disks</h3>
             ${diskSetsHtml}
             <div class="add-disk-action">
               ${pfInlineLinkButton({ id: 'ci-add-disk', label: 'Add disk', icon: 'plus' })}
             </div>
+            <div class="form-field" style="margin-top:16px;">
+              <label id="ci-extra-disks-access-label">Tenant access to additional disks</label>
+              ${renderExtraDisksAccessSelectBoxes({
+                name: 'ciExtraDisksAccess',
+                selected: c.extraDisksAccess || 'editable',
+                labelledBy: 'ci-extra-disks-access-label',
+              })}
+            </div>
           </div>
         `;
-        panel.querySelector('#ci-boot-disk')?.addEventListener('change', e => {
-          let n = Number(e.target.value);
-          if (Number.isNaN(n)) n = c.bootDiskGiB || 30;
+        const syncBootSize = () => {
+          const el = panel.querySelector('#ci-boot-disk');
+          if (!el) return;
+          const raw = el.value.trim();
+          if (raw === '') {
+            c.bootDiskGiB = null;
+            return;
+          }
+          let n = Number(raw);
+          if (Number.isNaN(n)) return;
           c.bootDiskGiB = Math.min(diskMax, Math.max(diskMin, n));
+        };
+        panel.querySelector('#ci-boot-disk')?.addEventListener('change', syncBootSize);
+        panel.querySelector('#ci-boot-disk')?.addEventListener('input', syncBootSize);
+        panel.querySelectorAll('input[name="ciBootDiskAccess"]').forEach(r => {
+          r.addEventListener('change', () => { c.bootDiskAccess = r.value; renderCreateCatalogItemWizard(); });
+        });
+        panel.querySelectorAll('input[name="ciBootTierAccess"]').forEach(r => {
+          r.addEventListener('change', () => { c.bootStorageTierAccess = r.value; renderCreateCatalogItemWizard(); });
+        });
+        panel.querySelectorAll('input[name="ciExtraDisksAccess"]').forEach(r => {
+          r.addEventListener('change', () => { c.extraDisksAccess = r.value; renderCreateCatalogItemWizard(); });
+        });
+        bindRichSelect(panel.querySelector('#ci-boot-tier-select'), {
+          toggleSel: '#ci-boot-tier-toggle',
+          menuSel: '#ci-boot-tier-menu',
+          optionSel: '[data-boot-tier]',
+          onOpen: () => { c.bootTierMenuOpen = true; },
+          onClose: () => { c.bootTierMenuOpen = false; },
+          onSelect: opt => {
+            c.bootStorageTierId = opt.dataset.bootTier || '';
+            renderCreateCatalogItemWizard();
+          },
+        });
+        panel.querySelector('#ci-boot-tier-search')?.addEventListener('input', e => {
+          c.bootTierFilter = e.target.value;
+          renderCreateCatalogItemWizard();
+          panel.querySelector('#ci-boot-tier-search')?.focus();
         });
         panel.querySelector('#ci-add-disk')?.addEventListener('click', e => {
           e.preventDefault();
           const id = `ci-disk-${Date.now()}`;
-          c.extraDisks.push({ id, name: `disk-${c.extraDisks.length + 1}`, size: 30, unit: 'GiB' });
+          const defaultTier = tiers[0];
+          c.extraDisks.push({
+            id,
+            name: `disk-${c.extraDisks.length + 1}`,
+            size: 30,
+            unit: 'GiB',
+            storageTierId: defaultTier?.id || '',
+            storageTierLabel: defaultTier?.name || '',
+            tierMenuOpen: false,
+            tierFilter: '',
+          });
           renderCreateCatalogItemWizard();
         });
         panel.querySelectorAll('[data-remove-ci-disk]').forEach(btn => {
           btn.addEventListener('click', e => {
             e.preventDefault();
-            const id = btn.dataset.removeCiDisk;
-            c.extraDisks = c.extraDisks.filter(d => d.id !== id);
+            c.extraDisks = c.extraDisks.filter(d => d.id !== btn.dataset.removeCiDisk);
             renderCreateCatalogItemWizard();
           });
         });
@@ -17564,8 +17915,32 @@
             if (disk) disk.size = Math.min(diskMax, Math.max(diskMin, Number(input.value) || 30));
           });
         });
+        extraDisks.forEach(disk => {
+          const root = panel.querySelector(`#ci-disk-tier-select-${disk.id}`);
+          if (!root) return;
+          bindRichSelect(root, {
+            toggleSel: `#ci-disk-tier-toggle-${disk.id}`,
+            menuSel: `#ci-disk-tier-menu-${disk.id}`,
+            optionSel: '[data-ci-extra-tier]',
+            onOpen: () => { disk.tierMenuOpen = true; },
+            onClose: () => { disk.tierMenuOpen = false; },
+            onSelect: opt => {
+              disk.storageTierId = opt.dataset.ciExtraTier || '';
+              disk.storageTierLabel = tiers.find(t => t.id === disk.storageTierId)?.name || '';
+              disk.tierMenuOpen = false;
+              renderCreateCatalogItemWizard();
+            },
+          });
+          panel.querySelector(`#ci-disk-tier-search-${disk.id}`)?.addEventListener('input', e => {
+            disk.tierFilter = e.target.value;
+            disk.tierMenuOpen = true;
+            renderCreateCatalogItemWizard();
+            panel.querySelector(`#ci-disk-tier-search-${disk.id}`)?.focus();
+          });
+        });
         return;
       }
+
 
       if (key === 'ci-visibility') {
         const tenants = typeof PROVIDER_TENANTS !== 'undefined' ? PROVIDER_TENANTS : [];
@@ -17722,7 +18097,12 @@
       if (key === 'ci-access-init') {
         if (c.cloudInit == null) c.cloudInit = '';
         if (c.sysprep == null) c.sysprep = '';
-        if (!c.initMethod) c.initMethod = initMethodForGuestOs(c.guestOsFamily || 'Linux');
+        if (!c.initAccess) c.initAccess = 'editable';
+        if (!c.initMethod) {
+          c.initMethod = c.guestOsFamily
+            ? initMethodForGuestOs(c.guestOsFamily)
+            : 'cloud-init';
+        }
         const initSelected = c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init';
         const initValue = initSelected === 'sysprep' ? (c.sysprep || '') : (c.cloudInit || '');
         const initExpanded = !!(initValue && String(initValue).trim());
@@ -17739,7 +18119,7 @@
               </span>
             </span>
           </h3>
-          <p class="create-resource-wiz__help">Configure the first-boot initialization script tenants receive with this catalog item. SSH keys are set when creating a Virtual machine.</p>
+          <p class="create-resource-wiz__help">Optionally set user data for first boot. SSH keys are set when creating a Virtual machine.</p>
           <div class="form-field">
             <label id="ci-init-method-label">Initialization</label>
             ${renderInitMethodSelectBoxes({
@@ -17755,10 +18135,24 @@
               placeholder="${initPlaceholder}"
               aria-label="${initLabel}">${String(initValue).replace(/</g, '&lt;')}</textarea>
           </div>
+          <div class="form-field" style="margin-top:16px;">
+            <label id="ci-init-access-label">Tenant access to user data</label>
+            ${renderInitAccessSelectBoxes({
+              name: 'ciInitAccess',
+              selected: c.initAccess || 'editable',
+              labelledBy: 'ci-init-access-label',
+            })}
+          </div>
         `;
         panel.querySelectorAll('input[name="ciInitMethod"]').forEach(r => {
           r.addEventListener('change', () => {
             c.initMethod = r.value === 'sysprep' ? 'sysprep' : 'cloud-init';
+            renderCreateCatalogItemWizard();
+          });
+        });
+        panel.querySelectorAll('input[name="ciInitAccess"]').forEach(r => {
+          r.addEventListener('change', () => {
+            c.initAccess = r.value;
             renderCreateCatalogItemWizard();
           });
         });
@@ -17795,25 +18189,15 @@
         return;
       }
 
-
       const disk = getCatalogDiskImage(c.diskImageId);
       const compute = resolveCatalogItemCompute({ instanceTypeId: c.instanceTypeId || c.computeResourceId });
-      const diskAccessLabel = !c.diskImageId
-        ? 'Editable at provisioning'
-        : ((c.diskImageAccess || 'editable') === 'editable' ? 'Editable at provisioning' : 'Locked');
-      const computeAccessLabel = (c.computeAccess || c.tenantAccess || 'locked') === 'editable'
-        ? 'Editable at provisioning' : 'Locked';
+      const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
+      const bootTier = (c.bootStorageTierId && getStorageTiers().find(t => t.id === c.bootStorageTierId)) || null;
       const initMethod = c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init';
       const initConfigured = initMethod === 'sysprep'
         ? !!(c.sysprep && String(c.sysprep).trim())
         : !!(c.cloudInit && String(c.cloudInit).trim());
       const initLabel = initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
-      const reviewRow = (label, value, { block = false } = {}) => `
-        <div class="review-nebius__row${block ? ' review-nebius__row--block' : ''}">
-          <span class="review-nebius__label">${label}</span>
-          <span class="review-nebius__value">${value}</span>
-        </div>
-      `;
       const esc = value => String(value ?? '—').replace(/</g, '&lt;');
       if (state.catalogEditId) {
         readCatalogCreateFields();
@@ -17845,10 +18229,16 @@
           ? `Tenant scoped (${(c.tenants || []).map(id => providerTenantById(id)?.name || id).join(', ') || '—'})`
           : 'Global public';
         const extraDisksValue = c.extraDisks?.length
-          ? c.extraDisks.map((d, i) => `Disk set ${i + 1}: ${d.size} GiB`).join('; ')
-          : 'None';
+          ? c.extraDisks.map((d, i) => {
+              const tier = d.storageTierLabel || getStorageTiers().find(t => t.id === d.storageTierId)?.name || '—';
+              return `Disk set ${i + 1}: ${d.size} GiB · ${tier}`;
+            }).join('; ')
+          : 'Not set';
         const diskValue = disk
           ? esc(`${disk.title} (${disk.family} · ${disk.arch})`)
+          : 'Not set';
+        const bootSizeValue = c.bootDiskGiB != null && c.bootDiskGiB !== ''
+          ? `${c.bootDiskGiB} GiB`
           : 'Not set';
         panel.innerHTML = `
           <h3>Review and create</h3>
@@ -17856,16 +18246,23 @@
           ${renderReviewRows([
             ['Name', esc(c.name)],
             ['Description', c.description ? esc(c.description) : '—'],
-            ['Guest operating system', esc(c.guestOsFamily)],
             ['Disk image', diskValue],
-            ['Disk image access', diskAccessLabel],
+            ['Disk image access', catalogAccessLabel(c.diskImageAccess)],
+            ['Guest operating system', c.guestOsFamily ? esc(c.guestOsFamily) : 'Not set'],
             ['Status', 'Unpublished'],
-            ['Compute resources', compute.summary.replace(/</g, '&lt;')],
-            ['Compute access', computeAccessLabel],
+            ['Compute resources', esc(compute.summary)],
+            ['Compute access', catalogAccessLabel(c.computeAccess || c.tenantAccess)],
+            ['Run strategy', runOpt ? esc(runOpt.label) : 'Not set'],
+            ['Run strategy access', catalogAccessLabel(c.runStrategyAccess)],
             ['Visibility', esc(visibilityValue)],
-            ['Boot disk', `${c.bootDiskGiB || 30} GiB`],
+            ['Boot disk size', bootSizeValue],
+            ['Boot disk size access', catalogAccessLabel(c.bootDiskAccess)],
+            ['Boot storage tier', bootTier ? esc(bootTier.name) : 'Not set'],
+            ['Boot storage tier access', catalogAccessLabel(c.bootStorageTierAccess)],
             ['Additional disks', esc(extraDisksValue)],
+            ['Additional disks access', catalogAccessLabel(c.extraDisksAccess)],
             [initLabel, initConfigured ? 'Configured' : 'Not configured'],
+            ['User data access', catalogAccessLabel(c.initAccess)],
           ])}`;
       }
       panel.querySelectorAll('[data-review-goto]').forEach(btn => {
@@ -17889,34 +18286,39 @@
       if (name) c.name = name.value.trim();
       const desc = document.getElementById('ci-desc') || document.getElementById('ci-description');
       if (desc) c.description = desc.value.trim();
-      const guestOs = document.querySelector('input[name="ciGuestOs"]:checked');
-      if (guestOs) c.guestOsFamily = guestOs.value;
       const diskAccess = document.querySelector('input[name="ciDiskImageAccess"]:checked');
-      if (diskAccess) {
-        c.diskImageAccess = (!c.diskImageId) ? 'editable' : diskAccess.value;
-      }
+      if (diskAccess) c.diskImageAccess = diskAccess.value;
       const computeAccess = document.querySelector('input[name="ciComputeAccess"]:checked');
       if (computeAccess) {
         c.computeAccess = computeAccess.value;
         c.tenantAccess = computeAccess.value;
       }
-      const tenantAccess = document.querySelector('input[name="ciTenantAccess"]:checked');
-      if (tenantAccess && !computeAccess) {
-        c.tenantAccess = tenantAccess.value;
-        c.computeAccess = tenantAccess.value;
-      }
+      const runStrategyAccess = document.querySelector('input[name="ciRunStrategyAccess"]:checked');
+      if (runStrategyAccess) c.runStrategyAccess = runStrategyAccess.value;
+      const bootDiskAccess = document.querySelector('input[name="ciBootDiskAccess"]:checked');
+      if (bootDiskAccess) c.bootDiskAccess = bootDiskAccess.value;
+      const bootTierAccess = document.querySelector('input[name="ciBootTierAccess"]:checked');
+      if (bootTierAccess) c.bootStorageTierAccess = bootTierAccess.value;
+      const extraDisksAccess = document.querySelector('input[name="ciExtraDisksAccess"]:checked');
+      if (extraDisksAccess) c.extraDisksAccess = extraDisksAccess.value;
       const initMethod = document.querySelector('input[name="ciInitMethod"]:checked');
       if (initMethod) c.initMethod = initMethod.value === 'sysprep' ? 'sysprep' : 'cloud-init';
+      const initAccess = document.querySelector('input[name="ciInitAccess"]:checked');
+      if (initAccess) c.initAccess = initAccess.value;
       const initConfig = document.getElementById('ci-init-config');
       if (initConfig) {
         if (c.initMethod === 'sysprep') c.sysprep = initConfig.value;
         else c.cloudInit = initConfig.value;
       }
       const boot = document.getElementById('ci-boot-disk');
-      if (boot) c.bootDiskGiB = Number(boot.value) || c.bootDiskGiB;
+      if (boot) {
+        const raw = boot.value.trim();
+        c.bootDiskGiB = raw === '' ? null : Number(raw);
+        if (c.bootDiskGiB != null && Number.isNaN(c.bootDiskGiB)) c.bootDiskGiB = null;
+      }
       const vis = document.querySelector('input[name="ciVisibility"]:checked');
       if (vis) c.visibility = vis.value;
-      // Tenants are maintained live by the searchable multi-select (no checkbox sync).
+      // Tenants / selects are maintained live by their controls.
     }
 
     function validateCatalogCreateStep(key) {
@@ -17927,13 +18329,6 @@
           state.fieldErrors = { ciName: 'Enter a valid DNS-style name (lowercase letters, numbers, hyphens).' };
           renderCreateCatalogItemWizard();
           toast('Enter a valid name to continue.');
-          return false;
-        }
-        if (!c.diskImageId) c.diskImageAccess = 'editable';
-        if (c.diskImageAccess === 'locked' && !c.diskImageId) {
-          state.fieldErrors = { ciDiskImage: 'Select a disk image before locking it.' };
-          renderCreateCatalogItemWizard();
-          toast('Select a disk image before locking it.');
           return false;
         }
       }
@@ -17950,12 +18345,15 @@
     function finishCatalogCreate() {
       const c = state.catalogCreate;
       if (!c) return;
-      const instanceTypeId = c.instanceTypeId || c.computeResourceId || 'medium';
+      const instanceTypeId = c.instanceTypeId || c.computeResourceId || '';
       const inst = getCatalogInstanceType(instanceTypeId);
       const disk = getCatalogDiskImage(c.diskImageId);
-      const diskImageAccess = (!c.diskImageId) ? 'editable' : (c.diskImageAccess || 'editable');
-      const computeAccess = c.computeAccess || c.tenantAccess || 'locked';
+      const diskImageAccess = c.diskImageAccess || 'editable';
+      const computeAccess = c.computeAccess || c.tenantAccess || 'editable';
       const initMethod = c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init';
+      const bootTier = c.bootStorageTierId
+        ? getStorageTiers().find(t => t.id === c.bootStorageTierId)
+        : null;
       const baseItem = {
         name: c.name.trim(),
         description: c.description || '',
@@ -17965,15 +18363,31 @@
         diskImageAccess,
         computeLocked: computeAccess === 'locked',
         computeAccess,
-        rateHour: inst.rateHour,
-        rateMonth: inst.rateMonth || '—',
-        guestOsFamily: c.guestOsFamily,
+        rateHour: inst?.rateHour || '—',
+        rateMonth: inst?.rateMonth || '—',
+        guestOsFamily: c.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : ''),
         tenantAccess: computeAccess,
-        bootDiskGiB: c.bootDiskGiB,
-        extraDisks: (c.extraDisks || []).map(d => ({ ...d })),
+        runStrategy: c.runStrategy || '',
+        runStrategyAccess: c.runStrategyAccess || 'editable',
+        bootDiskGiB: c.bootDiskGiB != null && c.bootDiskGiB !== '' ? Number(c.bootDiskGiB) : null,
+        bootDiskAccess: c.bootDiskAccess || 'editable',
+        bootStorageTierId: c.bootStorageTierId || '',
+        bootStorageTierLabel: bootTier?.name || '',
+        bootStorageTierAccess: c.bootStorageTierAccess || 'editable',
+        extraDisks: (c.extraDisks || []).map(d => ({
+          id: d.id,
+          name: d.name,
+          size: d.size,
+          unit: d.unit || 'GiB',
+          storageTierId: d.storageTierId || '',
+          storageTierLabel: d.storageTierLabel || '',
+        })),
+        extraDisksAccess: c.extraDisksAccess || 'editable',
         initMethod,
         cloudInit: initMethod === 'cloud-init' ? (c.cloudInit || '') : '',
         sysprep: initMethod === 'sysprep' ? (c.sysprep || '') : '',
+        initAccess: c.initAccess || 'editable',
+        initLocked: (c.initAccess || 'editable') === 'locked',
       };
       const scope = isProviderCatalogRole() ? catalogPublishScopeFields(c) : null;
       if (state.catalogEditId) {
