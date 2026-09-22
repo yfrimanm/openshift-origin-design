@@ -3666,38 +3666,96 @@
     .label-with-optional .pf-v6-c-label__text { font-weight: 600; }
 
 
-    /* Catalog create — access: gov badge + Change expands Felt cards */
-    .catalog-field-label-row {
+    /* Catalog create — Tenant access expandable field group (PF Form field group pattern) */
+    .ci-tenant-access {
+      margin-top: 28px;
+      max-width: 40rem;
+      border: 1px solid var(--vmaas-border, #d2d2d2);
+      border-radius: 8px;
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+    }
+    .ci-tenant-access__toggle {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 10px;
       width: 100%;
-      margin-bottom: 8px;
-    }
-    .catalog-field-label-row__label,
-    .form-field > .catalog-field-label-row > label {
       margin: 0;
-      flex: 1 1 auto;
-      min-width: 0;
+      padding: 14px 16px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: var(--vmaas-text, #151515);
     }
-    .catalog-field-label-row .config-section-title,
-    .catalog-field-label-row .config-sets-title {
-      margin: 0;
-    }
-    .catalog-field-access-meta {
+    .ci-tenant-access__toggle:hover { background: #f5f5f5; }
+    .ci-tenant-access__toggle-icon {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      flex: 0 0 auto;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-top: 2px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      transition: transform 0.15s ease;
     }
-    .catalog-field-access-panel {
-      margin: 0 0 12px;
+    .ci-tenant-access.pf-m-expanded .ci-tenant-access__toggle-icon {
+      transform: rotate(90deg);
     }
-    .catalog-field-access-panel .felt-select-boxes {
-      margin-top: 0;
+    .ci-tenant-access__toggle-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
     }
+    .ci-tenant-access__title {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .ci-tenant-access__summary {
+      font-size: 13px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      line-height: 1.4;
+    }
+    .ci-tenant-access__body {
+      padding: 0 16px 16px 42px;
+      border-top: 1px solid var(--vmaas-border-light, #f0f0f0);
+    }
+    .ci-tenant-access__body[hidden] { display: none !important; }
+    .ci-tenant-access__intro {
+      margin: 12px 0 16px;
+    }
+    .ci-tenant-access__row {
+      margin-bottom: 16px;
+    }
+    .ci-tenant-access__row:last-child { margin-bottom: 0; }
+    .ci-tenant-access__row label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .ci-tenant-access__row select {
+      display: block;
+      width: 100%;
+      max-width: 280px;
+      height: 36px;
+      padding: 0 32px 0 12px;
+      border: 1px solid var(--vmaas-border, #c7c7c7);
+      border-radius: 4px;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='%236a6e73' d='M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z'/%3E%3C/svg%3E") no-repeat right 12px center / 10px;
+      appearance: none;
+      font: inherit;
+      font-size: 14px;
+      color: var(--vmaas-text, #151515);
+    }
+    .ci-tenant-access__row select:focus {
+      outline: none;
+      border-color: var(--vmaas-blue, #0066cc);
+      box-shadow: 0 0 0 1px var(--vmaas-blue, #0066cc);
+    }
+    .ci-tenant-access__row .form-helper { margin-top: 6px; }
 
     .name-row { display: flex; gap: 8px; align-items: center; max-width: 560px; }
     .name-row input { flex: 1; }
@@ -5930,7 +5988,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · access badge+Felt</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · tenant access field group</span>
         </div>
       </div>
       <div class="console__body">
@@ -10601,85 +10659,82 @@
       }
     }
 
-    function renderTenantAccessSelectBoxes({ name, selected, labelledBy, lockedDesc, editableDesc }) {
-      return renderFeltSelectBoxes({
-        name,
-        selected: selected === 'locked' ? 'locked' : 'editable',
-        labelledBy,
-        options: [
-          {
-            value: 'locked',
-            title: 'Locked',
-            desc: lockedDesc || 'Tenants can’t change this setting when they create a virtual machine.',
-          },
-          {
-            value: 'editable',
-            title: 'Editable at provisioning',
-            desc: editableDesc || 'Tenants can change this setting when they create a virtual machine.',
-          },
-        ],
-      });
-    }
-
-    function renderCatalogFieldAccessChrome({
-      labelId,
-      labelHtml,
-      tag = 'label',
-      forId = '',
-      labelClass = '',
-      accessKey,
-      accessValue,
-      accessName,
-      lockedDesc,
-      editableDesc,
-      open = false,
-    }) {
-      const kind = accessValue === 'locked' ? 'locked' : 'editable';
-      const forAttr = (tag === 'label' && forId) ? ` for="${forId}"` : '';
-      const idAttr = labelId ? ` id="${labelId}"` : '';
-      const classes = ['catalog-field-label-row__label', labelClass].filter(Boolean).join(' ');
-      const panelId = `ci-access-panel-${accessKey}`;
+    function renderCatalogAccessSelect({ id, stateKey, selected, labelledBy }) {
+      const current = selected === 'locked' ? 'locked' : 'editable';
       return `
-        <div class="catalog-field-label-row">
-          <${tag}${idAttr}${forAttr} class="${classes}">${labelHtml}</${tag}>
-          <div class="catalog-field-access-meta">
-            ${catalogGovBadge(kind)}
-            <button type="button" class="config-access-toggle" data-ci-access-edit="${accessKey}"
-              aria-expanded="${open ? 'true' : 'false'}" aria-controls="${panelId}">
-              ${open ? 'Done' : 'Change'}
-            </button>
+        <select id="${id}" class="ci-tenant-access__select" data-ci-access-state="${stateKey}"
+          aria-labelledby="${labelledBy}">
+          <option value="editable" ${current === 'editable' ? 'selected' : ''}>Editable at provisioning</option>
+          <option value="locked" ${current === 'locked' ? 'selected' : ''}>Locked</option>
+        </select>`;
+    }
+
+    function catalogTenantAccessSummary(fields) {
+      if (!fields.length) return '';
+      const locked = fields.filter(f => f.value === 'locked').length;
+      if (locked === 0) return 'All fields editable at provisioning';
+      if (locked === fields.length) return locked === 1 ? '1 field locked' : `${locked} fields locked`;
+      return `${locked} of ${fields.length} fields locked`;
+    }
+
+    /** Expandable PF-style field group listing Locked/Editable for fields on this step. */
+    function renderCatalogTenantAccessGroup({ stepKey, expanded, fields }) {
+      if (!fields.length) return '';
+      const summary = catalogTenantAccessSummary(fields);
+      const bodyId = `ci-tenant-access-body-${stepKey}`;
+      const rows = fields.map(f => {
+        const labelId = `ci-access-label-${f.stateKey}`;
+        const help = f.value === 'locked'
+          ? (f.lockedHelp || 'Tenants can’t change this setting when they create a virtual machine.')
+          : (f.editableHelp || 'Tenants can change this setting when they create a virtual machine.');
+        return `
+          <div class="ci-tenant-access__row form-field">
+            <label id="${labelId}" for="ci-access-${f.stateKey}">${f.label}</label>
+            ${renderCatalogAccessSelect({
+              id: `ci-access-${f.stateKey}`,
+              stateKey: f.stateKey,
+              selected: f.value,
+              labelledBy: labelId,
+            })}
+            <p class="form-helper">${help}</p>
+          </div>`;
+      }).join('');
+      return `
+        <section class="ci-tenant-access${expanded ? ' pf-m-expanded' : ''}" aria-label="Tenant access">
+          <button type="button" class="ci-tenant-access__toggle" id="ci-tenant-access-toggle-${stepKey}"
+            aria-expanded="${expanded ? 'true' : 'false'}" aria-controls="${bodyId}">
+            <span class="ci-tenant-access__toggle-icon" aria-hidden="true"><i class="fa-solid fa-angle-right"></i></span>
+            <span class="ci-tenant-access__toggle-text">
+              <span class="ci-tenant-access__title">Tenant access</span>
+              <span class="ci-tenant-access__summary">${summary}</span>
+            </span>
+          </button>
+          <div class="ci-tenant-access__body" id="${bodyId}" ${expanded ? '' : 'hidden'}>
+            <p class="form-helper ci-tenant-access__intro">
+              Control whether tenants can change these defaults when they create a virtual machine.
+            </p>
+            ${rows}
           </div>
-        </div>
-        <div class="catalog-field-access-panel" id="${panelId}" ${open ? '' : 'hidden'}>
-          ${open ? renderTenantAccessSelectBoxes({
-            name: accessName,
-            selected: accessValue,
-            labelledBy: labelId,
-            lockedDesc,
-            editableDesc,
-          }) : ''}
-        </div>`;
+        </section>`;
     }
 
-    function bindCatalogFieldAccess(panel, c, { accessKey, accessName, stateKey }) {
-      panel.querySelectorAll(`[data-ci-access-edit="${accessKey}"]`).forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.preventDefault();
-          c.accessEditor = c.accessEditor === accessKey ? null : accessKey;
-          renderCreateCatalogItemWizard();
-        });
+    function bindCatalogTenantAccessGroup(panel, c, stepKey) {
+      panel.querySelector(`#ci-tenant-access-toggle-${stepKey}`)?.addEventListener('click', e => {
+        e.preventDefault();
+        c.tenantAccessExpanded = !c.tenantAccessExpanded;
+        renderCreateCatalogItemWizard();
       });
-      panel.querySelectorAll(`input[name="${accessName}"]`).forEach(r => {
-        r.addEventListener('change', () => {
-          c[stateKey] = r.value;
-          if (stateKey === 'computeAccess') c.tenantAccess = r.value;
-          c.accessEditor = null;
+      panel.querySelectorAll('[data-ci-access-state]').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const key = sel.dataset.ciAccessState;
+          c[key] = sel.value;
+          if (key === 'computeAccess') c.tenantAccess = sel.value;
           renderCreateCatalogItemWizard();
         });
       });
     }
 
-    const CATALOG_RUN_STRATEGY_OPTIONS = [
+        const CATALOG_RUN_STRATEGY_OPTIONS = [
       { id: 'Always', label: 'Always', desc: 'Keep the virtual machine running; restart if it stops.' },
       { id: 'RerunOnFailure', label: 'Rerun on failure', desc: 'Restart the virtual machine only if it fails.' },
       { id: 'Manual', label: 'Manual', desc: 'Do not start or restart automatically.' },
@@ -16970,7 +17025,7 @@
         cloudInit: '',
         sysprep: '',
         initAccess: 'editable',
-        accessEditor: null,
+        tenantAccessExpanded: false,
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
@@ -17272,7 +17327,7 @@
         cloudInit: item.cloudInit || '',
         sysprep: item.sysprep || '',
         initAccess: item.initAccess || (item.initLocked ? 'locked' : 'editable'),
-        accessEditor: null,
+        tenantAccessExpanded: false,
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
@@ -17476,16 +17531,7 @@
           </div>
           <hr class="form-section-divider" />
           <div class="form-field ${state.fieldErrors.ciDiskImage ? 'pf-m-error' : ''}">
-            ${renderCatalogFieldAccessChrome({
-              labelId: 'ci-disk-image-label',
-              labelHtml: 'Disk image',
-              accessKey: 'diskImage',
-              accessValue: c.diskImageAccess || 'editable',
-              accessName: 'ciDiskImageAccess',
-              lockedDesc: 'Tenants can’t change the disk image.',
-              editableDesc: 'Tenants can change the disk image when they create a virtual machine.',
-              open: c.accessEditor === 'diskImage',
-            })}
+            <label id="ci-disk-image-label">Disk image</label>
             <div class="rich-select rich-select--typeahead ${c.diskImageMenuOpen ? 'pf-m-expanded' : ''}" id="ci-disk-image-select">
               ${pfRichSelectToggle({
                 id: 'ci-disk-image-toggle',
@@ -17507,6 +17553,17 @@
             ${derivedOsHtml}
             ${providerFieldErrorHtml(state.fieldErrors.ciDiskImage, 'err-ciDiskImage')}
           </div>
+          ${renderCatalogTenantAccessGroup({
+            stepKey: 'ci-details',
+            expanded: !!c.tenantAccessExpanded,
+            fields: [{
+              stateKey: 'diskImageAccess',
+              label: 'Disk image',
+              value: c.diskImageAccess || 'editable',
+              lockedHelp: 'Tenants can’t change the disk image.',
+              editableHelp: 'Tenants can change the disk image when they create a virtual machine.',
+            }],
+          })}
         `;
         panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
           c.name = generateCatalogItemName();
@@ -17515,11 +17572,7 @@
           if (input) input.value = c.name;
           renderCreateCatalogItemWizard();
         });
-        bindCatalogFieldAccess(panel, c, {
-          accessKey: 'diskImage',
-          accessName: 'ciDiskImageAccess',
-          stateKey: 'diskImageAccess',
-        });
+        bindCatalogTenantAccessGroup(panel, c, 'ci-details');
         bindRichSelect(panel.querySelector('#ci-disk-image-select'), {
           toggleSel: '#ci-disk-image-toggle',
           menuSel: '#ci-disk-image-menu',
@@ -17574,18 +17627,7 @@
           <h3>Compute resources</h3>
           <p class="create-resource-wiz__help">Optionally set compute defaults for this catalog item. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
           <div class="form-field">
-            ${renderCatalogFieldAccessChrome({
-              labelId: 'ci-compute-section-label',
-              labelHtml: 'Compute resource',
-              tag: 'h4',
-              labelClass: 'config-section-title config-section-title--first',
-              accessKey: 'compute',
-              accessValue: c.computeAccess || 'editable',
-              accessName: 'ciComputeAccess',
-              lockedDesc: 'Tenants can’t change size or hardware.',
-              editableDesc: 'Tenants can change size or hardware when they create a virtual machine.',
-              open: c.accessEditor === 'compute',
-            })}
+            <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Compute resource</h4>
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               ${pfRichSelectToggle({
                 id: 'ci-compute-toggle',
@@ -17630,18 +17672,7 @@
           </div>
           <hr class="form-section-divider" />
           <div class="form-field">
-            ${renderCatalogFieldAccessChrome({
-              labelId: 'ci-run-strategy-label',
-              labelHtml: 'Run strategy',
-              tag: 'h4',
-              labelClass: 'config-section-title',
-              accessKey: 'runStrategy',
-              accessValue: c.runStrategyAccess || 'editable',
-              accessName: 'ciRunStrategyAccess',
-              lockedDesc: 'Tenants can’t change run strategy.',
-              editableDesc: 'Tenants can change run strategy when they create a virtual machine.',
-              open: c.accessEditor === 'runStrategy',
-            })}
+            <h4 class="config-section-title" id="ci-run-strategy-label">Run strategy</h4>
             <div class="rich-select rich-select--typeahead ${c.runStrategyMenuOpen ? 'pf-m-expanded' : ''}" id="ci-run-strategy-select">
               ${pfRichSelectToggle({
                 id: 'ci-run-strategy-toggle',
@@ -17682,17 +17713,28 @@
               </div>
             </div>
           </div>
+          ${renderCatalogTenantAccessGroup({
+            stepKey: 'ci-access',
+            expanded: !!c.tenantAccessExpanded,
+            fields: [
+              {
+                stateKey: 'computeAccess',
+                label: 'Compute resource',
+                value: c.computeAccess || 'editable',
+                lockedHelp: 'Tenants can’t change size or hardware.',
+                editableHelp: 'Tenants can change size or hardware when they create a virtual machine.',
+              },
+              {
+                stateKey: 'runStrategyAccess',
+                label: 'Run strategy',
+                value: c.runStrategyAccess || 'editable',
+                lockedHelp: 'Tenants can’t change run strategy.',
+                editableHelp: 'Tenants can change run strategy when they create a virtual machine.',
+              },
+            ],
+          })}
         `;
-        bindCatalogFieldAccess(panel, c, {
-          accessKey: 'compute',
-          accessName: 'ciComputeAccess',
-          stateKey: 'computeAccess',
-        });
-        bindCatalogFieldAccess(panel, c, {
-          accessKey: 'runStrategy',
-          accessName: 'ciRunStrategyAccess',
-          stateKey: 'runStrategyAccess',
-        });
+        bindCatalogTenantAccessGroup(panel, c, 'ci-access');
         bindRichSelect(panel.querySelector('#ci-compute-select'), {
           toggleSel: '#ci-compute-toggle',
           menuSel: '#ci-compute-menu',
@@ -17804,17 +17846,7 @@
           <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
           <div class="vm-config__fields">
             <div class="form-field">
-              ${renderCatalogFieldAccessChrome({
-                labelId: 'ci-boot-disk-label',
-                forId: 'ci-boot-disk',
-                labelHtml: 'Boot disk size (GiB)',
-                accessKey: 'bootDisk',
-                accessValue: c.bootDiskAccess || 'editable',
-                accessName: 'ciBootDiskAccess',
-                lockedDesc: 'Tenants can’t change boot disk size.',
-                editableDesc: 'Tenants can change boot disk size when they create a virtual machine.',
-                open: c.accessEditor === 'bootDisk',
-              })}
+              <label for="ci-boot-disk" id="ci-boot-disk-label">Boot disk size (GiB)</label>
               <input type="number" id="ci-boot-disk" class="unit-size-input" value="${bootSizeVal}"
                 min="${diskMin}" max="${diskMax}" step="1" placeholder="Not set"
                 aria-label="Boot disk size in GiB" />
@@ -17822,16 +17854,7 @@
             </div>
             <hr class="form-section-divider" />
             <div class="form-field">
-              ${renderCatalogFieldAccessChrome({
-                labelId: 'ci-boot-tier-label',
-                labelHtml: 'Boot storage tier',
-                accessKey: 'bootTier',
-                accessValue: c.bootStorageTierAccess || 'editable',
-                accessName: 'ciBootTierAccess',
-                lockedDesc: 'Tenants can’t change boot storage tier.',
-                editableDesc: 'Tenants can change boot storage tier when they create a virtual machine.',
-                open: c.accessEditor === 'bootTier',
-              })}
+              <label id="ci-boot-tier-label">Boot storage tier</label>
               <div class="rich-select rich-select--typeahead ${c.bootTierMenuOpen ? 'pf-m-expanded' : ''}" id="ci-boot-tier-select">
                 ${pfRichSelectToggle({
                   id: 'ci-boot-tier-toggle',
@@ -17873,22 +17896,38 @@
               </div>
             </div>
             <hr class="form-section-divider" />
-            ${extraDisks.length ? renderCatalogFieldAccessChrome({
-              labelId: 'ci-extra-disks-label',
-              labelHtml: 'Additional disks',
-              tag: 'h3',
-              labelClass: 'config-sets-title',
-              accessKey: 'extraDisks',
-              accessValue: c.extraDisksAccess || 'editable',
-              accessName: 'ciExtraDisksAccess',
-              lockedDesc: 'Tenants can’t add, remove, or change additional disks.',
-              editableDesc: 'Tenants can add, remove, or change additional disks when they create a virtual machine.',
-              open: c.accessEditor === 'extraDisks',
-            }) : '<h3 class="config-sets-title">Additional disks</h3>'}
+            <h3 class="config-sets-title">Additional disks</h3>
             ${diskSetsHtml}
             <div class="add-disk-action">
               ${pfInlineLinkButton({ id: 'ci-add-disk', label: 'Add disk', icon: 'plus' })}
             </div>
+            ${renderCatalogTenantAccessGroup({
+              stepKey: 'ci-storage',
+              expanded: !!c.tenantAccessExpanded,
+              fields: [
+                {
+                  stateKey: 'bootDiskAccess',
+                  label: 'Boot disk size',
+                  value: c.bootDiskAccess || 'editable',
+                  lockedHelp: 'Tenants can’t change boot disk size.',
+                  editableHelp: 'Tenants can change boot disk size when they create a virtual machine.',
+                },
+                {
+                  stateKey: 'bootStorageTierAccess',
+                  label: 'Boot storage tier',
+                  value: c.bootStorageTierAccess || 'editable',
+                  lockedHelp: 'Tenants can’t change boot storage tier.',
+                  editableHelp: 'Tenants can change boot storage tier when they create a virtual machine.',
+                },
+                ...((extraDisks.length) ? [{
+                  stateKey: 'extraDisksAccess',
+                  label: 'Additional disks',
+                  value: c.extraDisksAccess || 'editable',
+                  lockedHelp: 'Tenants can’t add, remove, or change additional disks.',
+                  editableHelp: 'Tenants can add, remove, or change additional disks when they create a virtual machine.',
+                }] : []),
+              ],
+            })}
           </div>
         `;
         const syncBootSize = () => {
@@ -17905,23 +17944,7 @@
         };
         panel.querySelector('#ci-boot-disk')?.addEventListener('change', syncBootSize);
         panel.querySelector('#ci-boot-disk')?.addEventListener('input', syncBootSize);
-        bindCatalogFieldAccess(panel, c, {
-          accessKey: 'bootDisk',
-          accessName: 'ciBootDiskAccess',
-          stateKey: 'bootDiskAccess',
-        });
-        bindCatalogFieldAccess(panel, c, {
-          accessKey: 'bootTier',
-          accessName: 'ciBootTierAccess',
-          stateKey: 'bootStorageTierAccess',
-        });
-        if (extraDisks.length) {
-          bindCatalogFieldAccess(panel, c, {
-            accessKey: 'extraDisks',
-            accessName: 'ciExtraDisksAccess',
-            stateKey: 'extraDisksAccess',
-          });
-        }
+        bindCatalogTenantAccessGroup(panel, c, 'ci-storage');
         bindRichSelect(panel.querySelector('#ci-boot-tier-select'), {
           toggleSel: '#ci-boot-tier-toggle',
           menuSel: '#ci-boot-tier-menu',
@@ -18182,22 +18205,23 @@
             })}
           </div>
           <div class="form-field" style="margin-top:16px;">
-            ${renderCatalogFieldAccessChrome({
-              labelId: 'ci-init-config-label',
-              forId: 'ci-init-config',
-              labelHtml: initLabel,
-              accessKey: 'init',
-              accessValue: c.initAccess || 'editable',
-              accessName: 'ciInitAccess',
-              lockedDesc: 'Tenants can’t change user data (Cloud-init / Sysprep).',
-              editableDesc: 'Tenants can change user data when they create a virtual machine.',
-              open: c.accessEditor === 'init',
-            })}
+            <label for="ci-init-config" id="ci-init-config-label">${initLabel}</label>
             <textarea id="ci-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
               rows="${initExpanded ? 8 : 1}"
               placeholder="${initPlaceholder}"
               aria-label="${initLabel}">${String(initValue).replace(/</g, '&lt;')}</textarea>
           </div>
+          ${renderCatalogTenantAccessGroup({
+            stepKey: 'ci-access-init',
+            expanded: !!c.tenantAccessExpanded,
+            fields: [{
+              stateKey: 'initAccess',
+              label: 'User data',
+              value: c.initAccess || 'editable',
+              lockedHelp: 'Tenants can’t change user data (Cloud-init / Sysprep).',
+              editableHelp: 'Tenants can change user data when they create a virtual machine.',
+            }],
+          })}
         `;
         panel.querySelectorAll('input[name="ciInitMethod"]').forEach(r => {
           r.addEventListener('change', () => {
@@ -18205,11 +18229,7 @@
             renderCreateCatalogItemWizard();
           });
         });
-        bindCatalogFieldAccess(panel, c, {
-          accessKey: 'init',
-          accessName: 'ciInitAccess',
-          stateKey: 'initAccess',
-        });
+        bindCatalogTenantAccessGroup(panel, c, 'ci-access-init');
         const initEl = panel.querySelector('#ci-init-config');
         if (initEl) {
           const syncInitHeight = () => {
@@ -18342,25 +18362,13 @@
       if (name) c.name = name.value.trim();
       const desc = document.getElementById('ci-desc') || document.getElementById('ci-description');
       if (desc) c.description = desc.value.trim();
-      const diskAccess = document.querySelector('input[name="ciDiskImageAccess"]:checked');
-      if (diskAccess) c.diskImageAccess = diskAccess.value;
-      const computeAccess = document.querySelector('input[name="ciComputeAccess"]:checked');
-      if (computeAccess) {
-        c.computeAccess = computeAccess.value;
-        c.tenantAccess = computeAccess.value;
-      }
-      const runStrategyAccess = document.querySelector('input[name="ciRunStrategyAccess"]:checked');
-      if (runStrategyAccess) c.runStrategyAccess = runStrategyAccess.value;
-      const bootDiskAccess = document.querySelector('input[name="ciBootDiskAccess"]:checked');
-      if (bootDiskAccess) c.bootDiskAccess = bootDiskAccess.value;
-      const bootTierAccess = document.querySelector('input[name="ciBootTierAccess"]:checked');
-      if (bootTierAccess) c.bootStorageTierAccess = bootTierAccess.value;
-      const extraDisksAccess = document.querySelector('input[name="ciExtraDisksAccess"]:checked');
-      if (extraDisksAccess) c.extraDisksAccess = extraDisksAccess.value;
+      document.querySelectorAll('[data-ci-access-state]').forEach(sel => {
+        const key = sel.dataset.ciAccessState;
+        c[key] = sel.value;
+        if (key === 'computeAccess') c.tenantAccess = sel.value;
+      });
       const initMethod = document.querySelector('input[name="ciInitMethod"]:checked');
       if (initMethod) c.initMethod = initMethod.value === 'sysprep' ? 'sysprep' : 'cloud-init';
-      const initAccess = document.querySelector('input[name="ciInitAccess"]:checked');
-      if (initAccess) c.initAccess = initAccess.value;
       const initConfig = document.getElementById('ci-init-config');
       if (initConfig) {
         if (c.initMethod === 'sysprep') c.sysprep = initConfig.value;
