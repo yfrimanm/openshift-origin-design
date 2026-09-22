@@ -5895,7 +5895,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · catalog init no lock</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · create VM no editable badges</span>
         </div>
       </div>
       <div class="console__body">
@@ -13837,10 +13837,7 @@
               })}
             </div>
             <div class="form-field ${state.fieldErrors.diskImage ? 'pf-m-error' : ''}" data-field="diskImage" style="margin-top:16px;">
-              <label id="vm-disk-image-label" class="label-with-optional">
-                <span>Select the image reference <span class="req">*</span></span>
-                ${fieldGovBadge('editable')}
-              </label>
+              <label id="vm-disk-image-label">Select the image reference <span class="req">*</span></label>
               ${renderTypeaheadRichSelectHtml({
                 rootId: 'vm-disk-image-select',
                 toggleId: 'vm-disk-image-toggle',
@@ -14919,10 +14916,7 @@
           const vmComputeToggleDesc = selectedCompute.desc || '';
           const computeFieldHtml = computeEditable ? `
               <div class="form-field">
-                <label id="f-compute-resource-label" class="label-with-optional">
-                  <span>Compute resource <span class="req">*</span></span>
-                  ${fieldGovBadge('editable')}
-                </label>
+                <label id="f-compute-resource-label">Compute resource <span class="req">*</span></label>
                 <div class="rich-select rich-select--typeahead ${state.vmComputeMenuOpen ? 'pf-m-expanded' : ''}" id="vm-compute-select">
                   ${pfRichSelectToggle({
                     id: 'f-compute-resource-toggle',
@@ -15081,10 +15075,7 @@
           }
           const bootSizeFieldHtml = bootEditable ? `
               <div class="form-field">
-                <label for="f-boot-disk" class="label-with-optional">
-                  <span>Boot disk size (GiB) <span class="req">*</span></span>
-                  ${fieldGovBadge('editable', 'size')}
-                </label>
+                <label for="f-boot-disk">Boot disk size (GiB) <span class="req">*</span></label>
                 <input type="number" id="f-boot-disk" class="unit-size-input" value="${diskVal}"
                   min="${diskMin}" max="${diskMax}" step="1" required
                   aria-label="Boot disk size in GiB" />
@@ -15104,10 +15095,7 @@
           `;
           const bootTierFieldHtml = bootEditable ? `
               <div class="form-field">
-                <label id="f-boot-tier-label" class="label-with-optional">
-                  <span>Storage tier <span class="req">*</span></span>
-                  ${fieldGovBadge('editable')}
-                </label>
+                <label id="f-boot-tier-label">Storage tier <span class="req">*</span></label>
                 ${renderTypeaheadRichSelectHtml({
                   rootId: 'vm-boot-tier-select',
                   toggleId: 'f-boot-tier-toggle',
