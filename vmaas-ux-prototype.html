@@ -5990,7 +5990,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · extra-disks-field 6959</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · extra-disks-in-group 7001</span>
         </div>
       </div>
       <div class="console__body">
@@ -17903,19 +17903,6 @@
             <div class="add-disk-action">
               ${pfInlineLinkButton({ id: 'ci-add-disk', label: 'Add disk', icon: 'plus' })}
             </div>
-            ${extraDisks.length ? `
-            <div class="form-field" style="margin-top:16px;max-width:280px;">
-              <label id="ci-access-label-extraDisksAccess" for="ci-access-extraDisksAccess">Tenant access to additional disks</label>
-              ${renderCatalogAccessSelect({
-                id: 'ci-access-extraDisksAccess',
-                stateKey: 'extraDisksAccess',
-                selected: c.extraDisksAccess || 'editable',
-                labelledBy: 'ci-access-label-extraDisksAccess',
-              })}
-              <p class="form-helper">${(c.extraDisksAccess || 'editable') === 'locked'
-                ? 'Tenants can’t add, remove, or change additional disks.'
-                : 'Tenants can add, remove, or change additional disks when they create a virtual machine.'}</p>
-            </div>` : ''}
             ${renderCatalogTenantAccessGroup({
               stepKey: 'ci-storage',
               expanded: !!c.tenantAccessExpanded,
@@ -17934,6 +17921,13 @@
                   lockedHelp: 'Tenants can’t change boot storage tier.',
                   editableHelp: 'Tenants can change boot storage tier when they create a virtual machine.',
                 },
+                ...((extraDisks.length) ? [{
+                  stateKey: 'extraDisksAccess',
+                  label: 'Additional disks',
+                  value: c.extraDisksAccess || 'editable',
+                  lockedHelp: 'Tenants can’t add, remove, or change additional disks.',
+                  editableHelp: 'Tenants can add, remove, or change additional disks when they create a virtual machine.',
+                }] : []),
               ],
             })}
           </div>
@@ -17971,6 +17965,7 @@
         });
         panel.querySelector('#ci-add-disk')?.addEventListener('click', e => {
           e.preventDefault();
+          const wasEmpty = !c.extraDisks.length;
           const id = `ci-disk-${Date.now()}`;
           const defaultTier = tiers[0];
           c.extraDisks.push({
@@ -17983,6 +17978,7 @@
             tierMenuOpen: false,
             tierFilter: '',
           });
+          if (wasEmpty) c.tenantAccessExpanded = true;
           renderCreateCatalogItemWizard();
         });
         panel.querySelectorAll('[data-remove-ci-disk]').forEach(btn => {
