@@ -5988,7 +5988,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · extra disks access progressive</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · catalog review goto</span>
         </div>
       </div>
       <div class="console__body">
@@ -18312,44 +18312,59 @@
         const visibilityValue = c.visibility === 'tenant'
           ? `Tenant scoped (${(c.tenants || []).map(id => providerTenantById(id)?.name || id).join(', ') || '—'})`
           : 'Global public';
-        const extraDisksValue = c.extraDisks?.length
-          ? c.extraDisks.map((d, i) => {
-              const tier = d.storageTierLabel || getStorageTiers().find(t => t.id === d.storageTierId)?.name || '—';
-              return `Disk set ${i + 1}: ${d.size} GiB · ${tier}`;
-            }).join('; ')
-          : 'Not set';
         const diskValue = disk
           ? esc(`${disk.title} (${disk.family} · ${disk.arch})`)
           : 'Not set';
         const bootSizeValue = c.bootDiskGiB != null && c.bootDiskGiB !== ''
           ? `${c.bootDiskGiB} GiB`
           : 'Not set';
+        const reviewRow = (label, value) => `
+          <div class="review-nebius__row">
+            <span class="review-nebius__label">${label}</span>
+            <span class="review-nebius__value">${value}</span>
+          </div>
+        `;
+        const extraDisksRows = (c.extraDisks || []).length
+          ? (c.extraDisks || []).map((d, i) => {
+              const tier = (d.storageTierLabel || getStorageTiers().find(t => t.id === d.storageTierId)?.name || '—')
+                .replace(/</g, '&lt;');
+              return reviewRow(`Disk set ${i + 1}`, `${d.size} GiB · ${tier}`);
+            }).join('') + reviewRow('Additional disks access', catalogAccessLabel(c.extraDisksAccess))
+          : reviewRow('Additional disks', 'Not set');
         panel.innerHTML = `
           <h3>Review and create</h3>
-          <p class="create-resource-wiz__help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it.</p>
-          ${renderReviewRows([
-            ['Name', esc(c.name)],
-            ['Description', c.description ? esc(c.description) : '—'],
-            ['Disk image', diskValue],
-            ['Disk image access', catalogAccessLabel(c.diskImageAccess)],
-            ['Guest operating system', c.guestOsFamily ? esc(c.guestOsFamily) : 'Not set'],
-            ['Status', 'Unpublished'],
-            ['Compute resources', esc(compute.summary)],
-            ['Compute access', catalogAccessLabel(c.computeAccess || c.tenantAccess)],
-            ['Run strategy', runOpt ? esc(runOpt.label) : 'Not set'],
-            ['Run strategy access', catalogAccessLabel(c.runStrategyAccess)],
-            ['Visibility', esc(visibilityValue)],
-            ['Boot disk size', bootSizeValue],
-            ['Boot disk size access', catalogAccessLabel(c.bootDiskAccess)],
-            ['Boot storage tier', bootTier ? esc(bootTier.name) : 'Not set'],
-            ['Boot storage tier access', catalogAccessLabel(c.bootStorageTierAccess)],
-            ['Additional disks', esc(extraDisksValue)],
-            ...((c.extraDisks || []).length
-              ? [['Additional disks access', catalogAccessLabel(c.extraDisksAccess)]]
-              : []),
-            [initLabel, initConfigured ? 'Configured' : 'Not configured'],
-            ['User data access', catalogAccessLabel(c.initAccess)],
-          ])}`;
+          <p class="create-resource-wiz__help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it. Click a section title to edit.</p>
+          <div class="review-nebius">
+            ${reviewNebiusSection('Details', 'ci-details', `
+              ${reviewRow('Name', esc(c.name))}
+              ${reviewRow('Description', c.description ? esc(c.description) : '—')}
+              ${reviewRow('Disk image', diskValue)}
+              ${reviewRow('Disk image access', catalogAccessLabel(c.diskImageAccess))}
+              ${reviewRow('Guest operating system', c.guestOsFamily ? esc(c.guestOsFamily) : 'Not set')}
+              ${reviewRow('Status', 'Unpublished')}
+            `, 'ci-review')}
+            ${reviewNebiusSection('Compute resources', 'ci-access', `
+              ${reviewRow('Compute resource', esc(compute.summary))}
+              ${reviewRow('Compute access', catalogAccessLabel(c.computeAccess || c.tenantAccess))}
+              ${reviewRow('Run strategy', runOpt ? esc(runOpt.label) : 'Not set')}
+              ${reviewRow('Run strategy access', catalogAccessLabel(c.runStrategyAccess))}
+            `, 'ci-review')}
+            ${reviewNebiusSection('Visibility', 'ci-visibility', `
+              ${reviewRow('Visibility', esc(visibilityValue))}
+            `, 'ci-review')}
+            ${reviewNebiusSection('Storage', 'ci-storage', `
+              ${reviewRow('Boot disk size', bootSizeValue)}
+              ${reviewRow('Boot disk size access', catalogAccessLabel(c.bootDiskAccess))}
+              ${reviewRow('Boot storage tier', bootTier ? esc(bootTier.name) : 'Not set')}
+              ${reviewRow('Boot storage tier access', catalogAccessLabel(c.bootStorageTierAccess))}
+              ${extraDisksRows}
+            `, 'ci-review')}
+            ${reviewNebiusSection('Access & Initial run', 'ci-access-init', `
+              ${reviewRow(initLabel, initConfigured ? 'Configured' : 'Not configured')}
+              ${reviewRow('User data access', catalogAccessLabel(c.initAccess))}
+            `, 'ci-review')}
+          </div>
+        `;
       }
       panel.querySelectorAll('[data-review-goto]').forEach(btn => {
         btn.addEventListener('click', () => {
