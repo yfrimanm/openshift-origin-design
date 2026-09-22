@@ -5895,7 +5895,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · catalog create access-init</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · catalog init no lock</span>
         </div>
       </div>
       <div class="console__body">
@@ -10608,15 +10608,6 @@
       });
     }
 
-    function renderInitAccessSelectBoxes({ name, selected, labelledBy }) {
-      return renderTenantAccessSelectBoxes({
-        name,
-        selected,
-        labelledBy,
-        lockedDesc: 'Tenants cannot change the initialization script.',
-        editableDesc: 'Tenants can change Cloud-init or Sysprep at provisioning.',
-      });
-    }
 
     function renderVisibilitySelectBoxes({ name, selected, labelledBy }) {
       return renderFeltSelectBoxes({
@@ -16897,7 +16888,6 @@
         initMethod: 'cloud-init',
         cloudInit: '',
         sysprep: '',
-        initAccess: 'editable',
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
@@ -16980,7 +16970,6 @@
         initMethod: c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init',
         cloudInit: (c.cloudInit || '').trim(),
         sysprep: (c.sysprep || '').trim(),
-        initAccess: c.initAccess || 'editable',
       };
     }
 
@@ -16998,7 +16987,6 @@
         case 'diskImageAccess':
         case 'computeAccess':
         case 'tenantAccess':
-        case 'initAccess':
           return snapshot[field] === 'editable' ? 'Editable at provisioning' : 'Locked';
         case 'instanceTypeId':
           return esc(resolveCatalogItemCompute({ instanceTypeId: snapshot.instanceTypeId }).summary);
@@ -17041,7 +17029,6 @@
       { key: 'initMethod', label: 'Initialization' },
       { key: 'cloudInit', label: 'Cloud-init' },
       { key: 'sysprep', label: 'Sysprep' },
-      { key: 'initAccess', label: 'Init access' },
     ];
 
     function getCatalogEditChanges() {
@@ -17143,7 +17130,6 @@
         initMethod: item.initMethod === 'sysprep' ? 'sysprep' : (item.initMethod || initMethodForGuestOs(item.guestOsFamily || 'Linux')),
         cloudInit: item.cloudInit || '',
         sysprep: item.sysprep || '',
-        initAccess: item.initAccess || (item.initLocked ? 'locked' : 'editable'),
         diskImageMenuOpen: false,
         diskImageFilter: '',
         computeMenuOpen: false,
@@ -17755,7 +17741,6 @@
         if (c.cloudInit == null) c.cloudInit = '';
         if (c.sysprep == null) c.sysprep = '';
         if (!c.initMethod) c.initMethod = initMethodForGuestOs(c.guestOsFamily || 'Linux');
-        if (!c.initAccess) c.initAccess = 'editable';
         const initSelected = c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init';
         const initValue = initSelected === 'sysprep' ? (c.sysprep || '') : (c.cloudInit || '');
         const initExpanded = !!(initValue && String(initValue).trim());
@@ -17782,34 +17767,16 @@
             })}
           </div>
           <div class="form-field" style="margin-top:16px;">
-            <label for="ci-init-config" class="label-with-optional">
-              <span>${initLabel}</span>
-              ${fieldGovBadge(c.initAccess === 'locked' ? 'locked' : 'editable')}
-            </label>
+            <label for="ci-init-config">${initLabel}</label>
             <textarea id="ci-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
               rows="${initExpanded ? 8 : 1}"
               placeholder="${initPlaceholder}"
               aria-label="${initLabel}">${String(initValue).replace(/</g, '&lt;')}</textarea>
           </div>
-          <hr class="form-section-divider" />
-          <h4 class="config-section-title" id="ci-init-access-label">Tenant access to initialization</h4>
-          <div class="form-field">
-            ${renderInitAccessSelectBoxes({
-              name: 'ciInitAccess',
-              selected: c.initAccess || 'editable',
-              labelledBy: 'ci-init-access-label',
-            })}
-          </div>
         `;
         panel.querySelectorAll('input[name="ciInitMethod"]').forEach(r => {
           r.addEventListener('change', () => {
             c.initMethod = r.value === 'sysprep' ? 'sysprep' : 'cloud-init';
-            renderCreateCatalogItemWizard();
-          });
-        });
-        panel.querySelectorAll('input[name="ciInitAccess"]').forEach(r => {
-          r.addEventListener('change', () => {
-            c.initAccess = r.value;
             renderCreateCatalogItemWizard();
           });
         });
@@ -17846,6 +17813,7 @@
         return;
       }
 
+
       const disk = getCatalogDiskImage(c.diskImageId);
       const compute = resolveCatalogItemCompute({ instanceTypeId: c.instanceTypeId || c.computeResourceId });
       const diskAccessLabel = !c.diskImageId
@@ -17858,8 +17826,6 @@
         ? !!(c.sysprep && String(c.sysprep).trim())
         : !!(c.cloudInit && String(c.cloudInit).trim());
       const initLabel = initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
-      const initAccessLabel = (c.initAccess || 'editable') === 'editable'
-        ? 'Editable at provisioning' : 'Locked';
       const reviewRow = (label, value, { block = false } = {}) => `
         <div class="review-nebius__row${block ? ' review-nebius__row--block' : ''}">
           <span class="review-nebius__label">${label}</span>
@@ -17918,7 +17884,6 @@
             ['Boot disk', `${c.bootDiskGiB || 30} GiB`],
             ['Additional disks', esc(extraDisksValue)],
             [initLabel, initConfigured ? 'Configured' : 'Not configured'],
-            ['Init access', initAccessLabel],
           ])}`;
       }
       panel.querySelectorAll('[data-review-goto]').forEach(btn => {
@@ -17960,8 +17925,6 @@
       }
       const initMethod = document.querySelector('input[name="ciInitMethod"]:checked');
       if (initMethod) c.initMethod = initMethod.value === 'sysprep' ? 'sysprep' : 'cloud-init';
-      const initAccess = document.querySelector('input[name="ciInitAccess"]:checked');
-      if (initAccess) c.initAccess = initAccess.value;
       const initConfig = document.getElementById('ci-init-config');
       if (initConfig) {
         if (c.initMethod === 'sysprep') c.sysprep = initConfig.value;
@@ -18029,8 +17992,6 @@
         initMethod,
         cloudInit: initMethod === 'cloud-init' ? (c.cloudInit || '') : '',
         sysprep: initMethod === 'sysprep' ? (c.sysprep || '') : '',
-        initAccess: c.initAccess || 'editable',
-        initLocked: (c.initAccess || 'editable') === 'locked',
       };
       const scope = isProviderCatalogRole() ? catalogPublishScopeFields(c) : null;
       if (state.catalogEditId) {
