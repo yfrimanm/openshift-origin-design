@@ -5895,7 +5895,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · virtual machine casing</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · extra disks access progressive</span>
         </div>
       </div>
       <div class="console__body">
@@ -17837,6 +17837,7 @@
             <div class="add-disk-action">
               ${pfInlineLinkButton({ id: 'ci-add-disk', label: 'Add disk', icon: 'plus' })}
             </div>
+            ${extraDisks.length ? `
             <div class="form-field" style="margin-top:16px;">
               <label id="ci-extra-disks-access-label">Tenant access to additional disks</label>
               ${renderExtraDisksAccessSelectBoxes({
@@ -17844,7 +17845,7 @@
                 selected: c.extraDisksAccess || 'editable',
                 labelledBy: 'ci-extra-disks-access-label',
               })}
-            </div>
+            </div>` : ''}
           </div>
         `;
         const syncBootSize = () => {
@@ -17906,6 +17907,7 @@
           btn.addEventListener('click', e => {
             e.preventDefault();
             c.extraDisks = c.extraDisks.filter(d => d.id !== btn.dataset.removeCiDisk);
+            if (!c.extraDisks.length) c.extraDisksAccess = 'editable';
             renderCreateCatalogItemWizard();
           });
         });
@@ -18260,7 +18262,9 @@
             ['Boot storage tier', bootTier ? esc(bootTier.name) : 'Not set'],
             ['Boot storage tier access', catalogAccessLabel(c.bootStorageTierAccess)],
             ['Additional disks', esc(extraDisksValue)],
-            ['Additional disks access', catalogAccessLabel(c.extraDisksAccess)],
+            ...((c.extraDisks || []).length
+              ? [['Additional disks access', catalogAccessLabel(c.extraDisksAccess)]]
+              : []),
             [initLabel, initConfigured ? 'Configured' : 'Not configured'],
             ['User data access', catalogAccessLabel(c.initAccess)],
           ])}`;
@@ -18382,7 +18386,7 @@
           storageTierId: d.storageTierId || '',
           storageTierLabel: d.storageTierLabel || '',
         })),
-        extraDisksAccess: c.extraDisksAccess || 'editable',
+        extraDisksAccess: (c.extraDisks || []).length ? (c.extraDisksAccess || 'editable') : 'editable',
         initMethod,
         cloudInit: initMethod === 'cloud-init' ? (c.cloudInit || '') : '',
         sysprep: initMethod === 'sysprep' ? (c.sysprep || '') : '',
