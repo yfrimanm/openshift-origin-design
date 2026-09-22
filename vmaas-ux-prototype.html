@@ -14222,7 +14222,7 @@
               <input type="radio" name="boot" value="source" ${d.bootMode === 'source' ? 'checked' : ''} />
               <span>
                 <p class="boot-option__title">Boot source</p>
-                <p class="boot-option__meta">Create your VM from an existing boot source or add a new one.</p>
+                <p class="boot-option__meta">Create your virtual machine from an existing boot source or add a new one.</p>
               </span>
             </label>
             ${d.bootMode === 'source' ? `
@@ -14276,7 +14276,7 @@
               <input type="radio" name="boot" value="none" ${d.bootMode === 'none' ? 'checked' : ''} />
               <span>
                 <p class="boot-option__title">No boot source</p>
-                <p class="boot-option__meta">Assign a boot source for your VM during the customization step.</p>
+                <p class="boot-option__meta">Assign a boot source for your virtual machine during the customization step.</p>
               </span>
             </label>
           </div>
@@ -16017,7 +16017,7 @@
         const source = VMS.find(v => v.name === d.cloneSourceName);
         panel.innerHTML = `
           <h3>Review and create</h3>
-          <p class="step-help">Before you clone your virtual machine, review its configuration. You can create your own unique VM name, or we can generate a name for you.</p>
+          <p class="step-help">Before you clone your virtual machine, review its configuration. You can create your own unique virtual machine name, or we can generate a name for you.</p>
           <div class="review-block">
             <details class="review-section" open>
               <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Details</summary>
