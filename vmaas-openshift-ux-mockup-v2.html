@@ -3327,39 +3327,39 @@
   </div>
 
   <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="wiz-title">
-    <div class="pf-v6-c-wizard">
-      <div class="pf-v6-c-wizard__header">
-        <div class="pf-v6-c-wizard__close">
-          <button type="button" class="pf-v6-c-button pf-m-plain" id="wiz-close" aria-label="Close">
-            <span class="pf-v6-c-button__icon">
-              <i class="fas fa-times" aria-hidden="true"></i>
+        <div class="pf-v6-c-wizard">
+          <div class="pf-v6-c-wizard__header">
+            <div class="pf-v6-c-wizard__close">
+              <button type="button" class="pf-v6-c-button pf-m-plain" id="wiz-close" aria-label="Close">
+                <span class="pf-v6-c-button__icon">
+                  <i class="fas fa-times" aria-hidden="true"></i>
+                </span>
+              </button>
+            </div>
+            <div class="pf-v6-c-wizard__title">
+          <h2 class="pf-v6-c-wizard__title-text" id="wiz-title">Create Virtual machine</h2>
+            </div>
+            <div class="pf-v6-c-wizard__description" id="wiz-desc" hidden></div>
+          </div>
+          <button type="button" class="pf-v6-c-wizard__toggle" id="wiz-toggle" aria-label="Wizard steps" aria-expanded="false">
+            <span class="pf-v6-c-wizard__toggle-list">
+              <span class="pf-v6-c-wizard__toggle-list-item">
+                <span class="pf-v6-c-wizard__toggle-num" id="wiz-toggle-num">1</span>
+                <span id="wiz-toggle-label">Deployment details</span>
+              </span>
+            </span>
+            <span class="pf-v6-c-wizard__toggle-icon">
+              <i class="fas fa-caret-down" aria-hidden="true"></i>
             </span>
           </button>
-        </div>
-        <div class="pf-v6-c-wizard__title">
-          <h2 class="pf-v6-c-wizard__title-text" id="wiz-title">Create Virtual machine</h2>
-        </div>
-        <div class="pf-v6-c-wizard__description" id="wiz-desc" hidden></div>
-      </div>
-      <button type="button" class="pf-v6-c-wizard__toggle" id="wiz-toggle" aria-label="Wizard steps" aria-expanded="false">
-        <span class="pf-v6-c-wizard__toggle-list">
-          <span class="pf-v6-c-wizard__toggle-list-item">
-            <span class="pf-v6-c-wizard__toggle-num" id="wiz-toggle-num">1</span>
-            <span id="wiz-toggle-label">Deployment details</span>
-          </span>
-        </span>
-        <span class="pf-v6-c-wizard__toggle-icon">
-          <i class="fas fa-caret-down" aria-hidden="true"></i>
-        </span>
-      </button>
-      <div class="pf-v6-c-wizard__outer-wrap">
-        <div class="pf-v6-c-wizard__inner-wrap">
-          <nav class="pf-v6-c-wizard__nav" id="wiz-nav" aria-label="Steps">
-            <ol class="pf-v6-c-wizard__nav-list" id="wiz-nav-list" role="list"></ol>
-          </nav>
-          <div class="pf-v6-c-wizard__main">
+          <div class="pf-v6-c-wizard__outer-wrap">
+            <div class="pf-v6-c-wizard__inner-wrap">
+              <nav class="pf-v6-c-wizard__nav" id="wiz-nav" aria-label="Steps">
+                <ol class="pf-v6-c-wizard__nav-list" id="wiz-nav-list" role="list"></ol>
+              </nav>
+              <div class="pf-v6-c-wizard__main">
             <div class="wiz-main-with-cost" id="wiz-main-with-cost">
-              <div class="pf-v6-c-wizard__main-body" id="wiz-panel" tabindex="-1"></div>
+                <div class="pf-v6-c-wizard__main-body" id="wiz-panel" tabindex="-1"></div>
               <aside class="cost-estimate" id="cost-estimate" hidden aria-label="Estimate cost">
                 <h3 class="cost-estimate__title">Estimate cost</h3>
                 <div class="cost-estimate__total">
@@ -3372,34 +3372,34 @@
                 <p class="cost-estimate__note" id="cost-estimate-network-note" hidden>Network settings don’t change this estimate.</p>
               </aside>
             </div>
+              </div>
+            </div>
+            <footer class="pf-v6-c-wizard__footer wiz-footer">
+              <div class="wiz-footer__start" id="wiz-start-bar" hidden>
+                <label class="form-check">
+                  <input type="checkbox" id="f-start" />
+              Start this Virtual machine after creation
+                </label>
+              </div>
+              <div class="pf-v6-c-action-list">
+                <div class="pf-v6-c-action-list__group">
+                  <div class="pf-v6-c-action-list__item">
+                    <button type="button" class="pf-v6-c-button pf-m-secondary" id="wiz-back" disabled>Back</button>
+                  </div>
+                  <div class="pf-v6-c-action-list__item">
+                    <button type="button" class="pf-v6-c-button pf-m-primary" id="wiz-next">Next</button>
+                  </div>
+                </div>
+                <div class="pf-v6-c-action-list__group">
+                  <div class="pf-v6-c-action-list__item">
+                    <button type="button" class="pf-v6-c-button pf-m-link" id="wiz-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </footer>
           </div>
         </div>
-        <footer class="pf-v6-c-wizard__footer wiz-footer">
-          <div class="wiz-footer__start" id="wiz-start-bar" hidden>
-            <label class="form-check">
-              <input type="checkbox" id="f-start" />
-              Start this Virtual machine after creation
-            </label>
-          </div>
-          <div class="pf-v6-c-action-list">
-            <div class="pf-v6-c-action-list__group">
-              <div class="pf-v6-c-action-list__item">
-                <button type="button" class="pf-v6-c-button pf-m-secondary" id="wiz-back" disabled>Back</button>
-              </div>
-              <div class="pf-v6-c-action-list__item">
-                <button type="button" class="pf-v6-c-button pf-m-primary" id="wiz-next">Next</button>
-              </div>
-            </div>
-            <div class="pf-v6-c-action-list__group">
-              <div class="pf-v6-c-action-list__item">
-                <button type="button" class="pf-v6-c-button pf-m-link" id="wiz-cancel">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
-    </div>
-  </div>
 
   <div class="toast" id="toast" role="status"></div>
 
@@ -3564,7 +3564,7 @@
         ip: '10.130.1.191',
         created: 'Aug 2, 2026, 10:01 AM',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '4 GiB',
         instanceType: 'u1.medium',
         preference: 'rhel.10',
@@ -3609,43 +3609,43 @@
     const SERIES = [
       { id: 'exclusive', title: 'Compute Exclusive', meta: 'CX series', icon: 'fa-desktop', defaultSize: 'cx1.medium',
         sizes: [
-          { value: 'cx1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'cx1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'cx1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
+          { value: 'cx1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'cx1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'cx1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
         ]},
       { id: 'general', title: 'General Purpose', meta: 'U series', icon: 'fa-server', defaultSize: 'u1.medium',
         sizes: [
-          { value: 'u1.nano', label: 'nano: 1 CPU, 512 MiB Memory' },
-          { value: 'u1.micro', label: 'micro: 1 CPU, 1 GiB Memory' },
-          { value: 'u1.small', label: 'small: 1 CPU, 2 GiB Memory' },
-          { value: 'u1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'u1.2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory' },
-          { value: 'u1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'u1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
-          { value: 'u1.2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory' },
-          { value: 'u1.4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory' },
-          { value: 'u1.8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory' },
+          { value: 'u1.nano', label: 'nano: 1 vCPU, 512 MiB Memory' },
+          { value: 'u1.micro', label: 'micro: 1 vCPU, 1 GiB Memory' },
+          { value: 'u1.small', label: 'small: 1 vCPU, 2 GiB Memory' },
+          { value: 'u1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'u1.2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory' },
+          { value: 'u1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'u1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
+          { value: 'u1.2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory' },
+          { value: 'u1.4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory' },
+          { value: 'u1.8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory' },
         ]},
       { id: 'memory', title: 'Memory Intensive', meta: 'M series', icon: 'fa-memory', defaultSize: 'm1.medium',
         sizes: [
-          { value: 'm1.medium', label: 'medium: 1 CPU, 8 GiB Memory' },
-          { value: 'm1.large', label: 'large: 2 CPUs, 16 GiB Memory' },
-          { value: 'm1.xlarge', label: 'xlarge: 4 CPUs, 32 GiB Memory' },
+          { value: 'm1.medium', label: 'medium: 1 vCPU, 8 GiB Memory' },
+          { value: 'm1.large', label: 'large: 2 vCPUs, 16 GiB Memory' },
+          { value: 'm1.xlarge', label: 'xlarge: 4 vCPUs, 32 GiB Memory' },
         ]},
       { id: 'network', title: 'Network', meta: 'N series', icon: 'fa-network-wired', defaultSize: 'n1.medium',
         sizes: [
-          { value: 'n1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'n1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'n1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'n1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
       { id: 'overcommitted', title: 'Overcommitted', meta: 'O series', icon: 'fa-cubes', defaultSize: 'o1.medium',
         sizes: [
-          { value: 'o1.medium', label: 'medium: 1 CPU, 2 GiB Memory' },
-          { value: 'o1.large', label: 'large: 2 CPUs, 4 GiB Memory' },
+          { value: 'o1.medium', label: 'medium: 1 vCPU, 2 GiB Memory' },
+          { value: 'o1.large', label: 'large: 2 vCPUs, 4 GiB Memory' },
         ]},
       { id: 'realtime', title: 'Realtime', meta: 'RT series', icon: 'fa-clock', defaultSize: 'rt1.medium',
         sizes: [
-          { value: 'rt1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'rt1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'rt1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'rt1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
     ];
 
@@ -3706,7 +3706,7 @@
         computeResource: 'large',
         bootDiskGiB: 20,
         arch: 'amd64',
-        cpu: '2 vCPU',
+        cpu: '2 vCPUs',
         mem: '8 GiB',
         storage: '20 GiB',
         workload: 'Server',
@@ -3772,7 +3772,7 @@
         computeResource: 'xlarge',
         bootDiskGiB: 40,
         arch: 'amd64',
-        cpu: '4 vCPU',
+        cpu: '4 vCPUs',
         mem: '16 GiB',
         storage: '40 GiB',
         workload: 'Server',
@@ -3818,16 +3818,16 @@
 
     const CATALOG_OS_IMAGES = ['rhel.10', 'rhel.9', 'Windows.2k25', 'fedora'];
     const COMPUTE_RESOURCES = [
-      { id: 'nano', label: 'nano: 1 CPU, 512 MiB Memory', hourly: 0.05 },
-      { id: 'micro', label: 'micro: 1 CPU, 1 GiB Memory', hourly: 0.12 },
-      { id: 'small', label: 'small: 1 CPU, 2 GiB Memory', hourly: 0.80 },
-      { id: 'medium', label: 'medium: 1 CPU, 4 GiB Memory', hourly: 1.60 },
-      { id: '2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory', hourly: 2.40 },
-      { id: 'large', label: 'large: 2 CPUs, 8 GiB Memory', hourly: 4.70 },
-      { id: 'xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory', hourly: 9.40 },
-      { id: '2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory', hourly: 18.80 },
-      { id: '4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory', hourly: 37.60 },
-      { id: '8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory', hourly: 75.20 },
+      { id: 'nano', label: 'nano: 1 vCPU, 512 MiB Memory', hourly: 0.05 },
+      { id: 'micro', label: 'micro: 1 vCPU, 1 GiB Memory', hourly: 0.12 },
+      { id: 'small', label: 'small: 1 vCPU, 2 GiB Memory', hourly: 0.80 },
+      { id: 'medium', label: 'medium: 1 vCPU, 4 GiB Memory', hourly: 1.60 },
+      { id: '2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory', hourly: 2.40 },
+      { id: 'large', label: 'large: 2 vCPUs, 8 GiB Memory', hourly: 4.70 },
+      { id: 'xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory', hourly: 9.40 },
+      { id: '2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory', hourly: 18.80 },
+      { id: '4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory', hourly: 37.60 },
+      { id: '8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory', hourly: 75.20 },
     ];
     const CATALOG_BOOT_DISK_GIB = [5, 10, 20];
     /** Storage estimate rate (~$0.10 / GiB / month) */
@@ -3841,10 +3841,10 @@
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
       if (!c) return { cpu: '—', mem: '—' };
-      const m = String(c.label).match(/:\s*(\d+)\s*CPUs?,\s*(.+?)\s*Memory/i);
+      const m = String(c.label).match(/:\s*(\d+)\s*vCPUs?,\s*(.+?)\s*Memory/i);
       if (!m) return { cpu: '—', mem: '—' };
       return {
-        cpu: `${m[1]} vCPU`,
+        cpu: Number(m[1]) === 1 ? '1 vCPU' : `${m[1]} vCPUs`,
         mem: m[2].trim(),
       };
     }
@@ -4275,7 +4275,7 @@
         { id: 'node', label: 'Node', sortable: true },
         { id: 'created', label: 'Created', sortable: true },
         { id: 'memory', label: 'Memory', sortable: false },
-        { id: 'cpu', label: 'CPU', sortable: false },
+        { id: 'cpu', label: 'vCPUs', sortable: false },
         { id: 'network', label: 'Network', sortable: false },
         { id: 'deletionProtection', label: 'Deletion protection', sortable: false },
         { id: 'storageClass', label: 'Storage class', sortable: false },
@@ -5515,7 +5515,7 @@
       const osFullMap = { RHEL: 'Red Hat Enterprise Linux', Fedora: 'Fedora Linux', Windows: 'Microsoft Windows', Other: 'Other Linux', CentOS: 'CentOS Stream' };
       return {
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         instanceType: 'u1.small',
         preference: (v.os || 'fedora').toLowerCase(),
@@ -5527,7 +5527,7 @@
           cpu: '0.14%', memory: '16.55%', storage: null, network: '0 Bps',
           cpuAbs: '1.39 m', cpuOf: '1', memAbs: '21 MiB', memOf: '128 MiB',
         },
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '128 MiB',
         guestAgent: false,
         ...v,
@@ -6228,7 +6228,7 @@
                         <span class="vm-dl__name">
                           ${v.name}
                           <span class="vm-arch-badge">${v.arch || 'amd64'}</span>
-                        </span>
+            </span>
                       </dd>
                       <dt>Project</dt><dd>${projectDisplay}</dd>
                       <dt>Status</dt><dd>${statusCell(v.status, v.name)}</dd>
@@ -6237,7 +6237,7 @@
                       <dt>Compute resources</dt>
                       <dd>
                         <span class="vm-compute-row">
-                          ${v.cpu || '1 CPU'} | ${v.mem || '128 MiB'} Memory
+                          ${v.cpu || '1 vCPU'} | ${v.mem || '128 MiB'} Memory
                           <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources" title="Edit">
                             <i class="fa-solid fa-pen" aria-hidden="true"></i>
                           </button>
@@ -6265,11 +6265,11 @@
                   </div>
                   <div class="util-grid">
                     <div class="util-tile">
-                      <div class="util-tile__label">CPU</div>
+                      <div class="util-tile__label">vCPUs</div>
                       <div class="util-tile__abs">${cpuAbs}</div>
                       <div class="util-tile__abs-sub">Requested of ${cpuOf}</div>
                       <div class="util-donut-wrap">
-                        <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% CPU used">
+                        <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% vCPU used">
                           <svg viewBox="0 0 100 100" aria-hidden="true">
                             <circle class="util-donut__track" cx="50" cy="50" r="40" />
                             <circle class="util-donut__arc" cx="50" cy="50" r="40" />
@@ -6467,14 +6467,14 @@
               <td class="pf-v6-c-table__td">${n.name}</td>
               <td class="pf-v6-c-table__td">${n.model || 'virtio'}</td>
               <td class="pf-v6-c-table__td">${n.network}</td>
-              <td class="pf-v6-c-table__td">
+          <td class="pf-v6-c-table__td">
                 <span class="nic-state" title="Plugged" aria-label="Plugged">
                   <i class="fa-solid fa-plug-circle-plus" aria-hidden="true"></i>
-                </span>
-              </td>
+            </span>
+          </td>
               <td class="pf-v6-c-table__td">${n.type || 'Masquerade'}</td>
               <td class="pf-v6-c-table__td">${n.mac || '—'}</td>
-              <td class="pf-v6-c-table__td">
+          <td class="pf-v6-c-table__td">
                 <div class="nic-actions-wrap">
                   <button type="button" class="kebab" data-nic-menu="${n.name}" aria-label="Actions for ${n.name}" aria-expanded="${state.nicMenuOpen === n.name}">
                     <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
@@ -6487,9 +6487,9 @@
                     </div>
                   ` : ''}
                 </div>
-              </td>
-            </tr>
-          `).join('');
+          </td>
+        </tr>
+      `).join('');
           panel = `
             <div class="storage-section">
               <h3 class="storage-section__title">Network interfaces</h3>
@@ -6874,16 +6874,16 @@
           const subHtml = item.children.map(c => {
             const isCurrent = c.index === state.step;
             const isDisabled = c.index > state.maxVisited;
-            const linkClass = [
-              'pf-v6-c-wizard__nav-link',
-              isCurrent ? 'pf-m-current' : '',
-            ].filter(Boolean).join(' ');
-            return `
-              <li class="pf-v6-c-wizard__nav-item">
+        const linkClass = [
+          'pf-v6-c-wizard__nav-link',
+          isCurrent ? 'pf-m-current' : '',
+        ].filter(Boolean).join(' ');
+        return `
+          <li class="pf-v6-c-wizard__nav-item">
                 <button type="button" class="${linkClass}" data-step="${c.index}"
-                  ${isCurrent ? 'aria-current="page"' : ''}
-                  ${isDisabled ? 'disabled' : ''}>
-                  <span class="pf-v6-c-wizard__nav-link-main">
+              ${isCurrent ? 'aria-current="page"' : ''}
+              ${isDisabled ? 'disabled' : ''}>
+              <span class="pf-v6-c-wizard__nav-link-main">
                     <span class="pf-v6-c-wizard__nav-link-text">${c.label}</span>
                   </span>
                 </button>
@@ -7272,23 +7272,23 @@
         });
         panel.querySelector('#f-desc')?.addEventListener('input', e => { d.description = e.target.value; });
         if (!isCatalogFlow && document.getElementById('f-project')) {
-          wireCreatableSearch({
-            id: 'f-project',
-            options: PROJECTS,
-            noun: 'project',
+        wireCreatableSearch({
+          id: 'f-project',
+          options: PROJECTS,
+          noun: 'project',
             onChange: () => {
               syncLocation();
             },
-          });
+        });
         }
         if (!isCatalogFlow) {
-          wireCreatableSearch({
+        wireCreatableSearch({
             id: 'f-group',
             options: GROUPS,
             noun: 'group',
-            allowEmpty: true,
+          allowEmpty: true,
             onChange: syncLocation,
-          });
+        });
         }
         panel.querySelectorAll('[data-method]').forEach(btn => {
           btn.onclick = () => {
@@ -7623,26 +7623,26 @@
             data-tpl="${t.id}" role="option" aria-selected="${t.id === d.templateId}" tabindex="0">
             <span class="tpl-card__icon tpl-card__icon--${t.osKey}" aria-hidden="true">
               <i class="${cardIcon(t)}"></i>
-            </span>
+                  </span>
             <div class="tpl-card__title-row">
               <span class="tpl-card__title" title="${cardName(t)}">${cardName(t)}</span>
               ${sizeEditable ? fieldGovLabel('editable') : fieldGovLabel('locked')}
             </div>
             <p class="tpl-card__desc">${t.description || ''}</p>
             <div class="tpl-card__specs">
-              <div>
-                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting CPU' : 'CPU'}</span>
+                  <div>
+                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting vCPUs' : 'vCPUs'}</span>
                 <span class="tpl-card__spec-value">${specs.cpu}</span>
-              </div>
+                  </div>
               <div>
                 <span class="tpl-card__spec-label">${sizeEditable ? 'Starting memory' : 'Memory'}</span>
                 <span class="tpl-card__spec-value">${specs.mem}</span>
-              </div>
+                </div>
               <div>
                 <span class="tpl-card__spec-label">${sizeEditable ? 'Starting storage' : 'Storage'}</span>
                 <span class="tpl-card__spec-value">${cardStorage(t)}</span>
               </div>
-            </div>
+              </div>
             <div class="tpl-card__footer">
               <span class="tpl-card__cost-label">Estimate cost</span>
               <span class="tpl-card__cost-values">
@@ -7744,14 +7744,14 @@
                 </div>
                 <div class="tpl-drawer__field">
                   <div class="tpl-drawer__section-title">Disks (${(selected.disks || []).length})</div>
-                  <table class="tpl-drawer__table">
-                    <thead><tr><th>Name</th><th>Drive</th><th>Size</th></tr></thead>
-                    <tbody>
+                    <table class="tpl-drawer__table">
+                      <thead><tr><th>Name</th><th>Drive</th><th>Size</th></tr></thead>
+                      <tbody>
                       ${(selected.disks || []).map(disk =>
                         `<tr><td>${disk.name}</td><td>${disk.drive}</td><td>${disk.size}</td></tr>`
                       ).join('')}
-                    </tbody>
-                  </table>
+                      </tbody>
+                    </table>
                 </div>
           `;
           const costPanel = `
@@ -7854,7 +7854,7 @@
                     <thead>
                       <tr>
                         <th>Name</th>
-                        <th>CPU</th>
+                        <th>vCPUs</th>
                         <th>Memory</th>
                         <th>Storage</th>
                         <th>Estimate cost</th>
@@ -8065,12 +8065,12 @@
                     <span class="disk-list__size">
                       ${disk.size} ${disk.unit || 'GiB'}
                       ${disk.storageTierLabel || disk.storageTierId ? ` · ${disk.storageTierLabel || disk.storageTierId}` : ''}
-                    </span>
+                </span>
                   </div>
                   <button type="button" class="pf-v6-c-button pf-m-plain pf-m-small" data-remove-disk="${disk.id}"
                     aria-label="Remove disk ${disk.name}">
                     <span class="pf-v6-c-button__icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
-                  </button>
+                </button>
                 </li>
               `).join('')}
             </ul>
@@ -8121,15 +8121,15 @@
                           aria-label="Drag a file here or browse to upload"
                           aria-describedby="f-ssh-browse" />
                       </span>
-                    </div>
+                </div>
                     <div class="pf-v6-c-input-group__item">
                       <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-browse">Upload</button>
-                    </div>
+                </div>
                     <div class="pf-v6-c-input-group__item">
                       <button type="button" class="pf-v6-c-button pf-m-control" id="f-ssh-clear"
                         ${hasKey || fileName ? '' : 'disabled'}>Clear</button>
-                    </div>
-                  </div>
+                </div>
+                </div>
                   <input type="file" id="f-ssh-file" accept=".pub,text/plain,.txt" hidden
                     aria-hidden="true" tabindex="-1" />
                 </div>
@@ -8144,8 +8144,8 @@
               </div>
               <p class="form-helper" id="f-ssh-help">
                 Paste a public SSH key or upload a file. Supported types: ssh-rsa, ssh-ed25519, and ecdsa-sha2-nistp256/384/521.
-              </p>
-            </div>
+                </p>
+              </div>
             ${cloudInitField}
           `;
 
@@ -8171,7 +8171,7 @@
                   ).join(''),
                 })}
                 <p class="form-helper">Starting default from the template. Change if this Virtual machine needs a different size.</p>
-              </div>
+                </div>
           ` : `
               <div class="form-field">
                 <label for="f-compute-resource" class="label-with-optional">
@@ -8181,7 +8181,7 @@
                 <input type="text" id="f-compute-resource" class="unit-size-input"
                   value="${(computeLabel || '—').replace(/"/g, '&quot;')}"
                   disabled aria-disabled="true" aria-label="Compute resource" />
-              </div>
+            </div>
           `;
           const bootFieldHtml = bootEditable ? `
               <div class="form-field">
@@ -8193,18 +8193,18 @@
                   min="${diskMin}" max="${diskMax}" step="1" required
                   aria-label="Boot disk size in GiB" />
                 <p class="form-helper">Starting default from the template.</p>
-              </div>
+                  </div>
           ` : `
               <div class="form-field">
                 <label for="f-boot-disk">Boot disk size (GiB)</label>
                 <input type="number" id="f-boot-disk" class="unit-size-input" value="${diskVal}"
                   disabled aria-disabled="true" aria-label="Boot disk size in GiB" />
-              </div>
+            </div>
           `;
           const addDiskHtml = `
               <div class="add-disk-action">
                 <button type="button" class="pf-v6-c-button pf-m-secondary" id="f-add-disk">Add disk</button>
-              </div>
+            </div>
           `;
           const sizeSectionHtml = `
               <h4 class="config-section-title config-section-title--first">Size</h4>
@@ -8413,7 +8413,7 @@
               </button>
             </span>
           `).join('');
-          panel.innerHTML = `
+        panel.innerHTML = `
             <h3>Network</h3>
             <p class="step-help">Defaults are preselected. Change them if this Virtual machine needs different network settings.</p>
             <div class="vm-config__fields">
@@ -8434,7 +8434,7 @@
                   `,
                 })}
                 ${fieldErrorHtml('virtualNetwork')}
-              </div>
+          </div>
               <div class="form-field ${state.fieldErrors.subnet ? 'pf-m-error' : ''}" data-field="subnet">
                 <label for="f-subnet">Subnet <span class="req">*</span></label>
                 ${pfSelect({
@@ -8449,11 +8449,11 @@
                     <option value="" ${!d.subnet ? 'selected' : ''} disabled hidden>Select a subnet</option>
                     ${subnetOptsLive.map(s =>
                       `<option value="${s}" ${d.subnet === s ? 'selected' : ''}>${s}</option>`
-                    ).join('')}
+            ).join('')}
                   `,
                 })}
                 ${fieldErrorHtml('subnet')}
-              </div>
+          </div>
               <div class="form-field ${state.fieldErrors.securityGroups ? 'pf-m-error' : ''}" data-field="securityGroups">
                 <label id="f-sg-label">Security groups <span class="req">*</span></label>
                 <div class="sg-select ${sgEnabledLive ? '' : 'pf-m-disabled'} ${sgOpenLive ? 'pf-m-focus' : ''}"
@@ -8520,8 +8520,8 @@
           if (sgRoot && sgEnabledLive) {
             const openMenu = (open) => {
               state.sgMenuOpen = open;
-              renderWizard();
-            };
+            renderWizard();
+          };
             panel.querySelector('#f-sg-toggle')?.addEventListener('click', e => {
               e.stopPropagation();
               openMenu(!state.sgMenuOpen);
@@ -8533,8 +8533,8 @@
             panel.querySelector('#f-sg-clear')?.addEventListener('click', e => {
               e.stopPropagation();
               d.securityGroups = [];
-              renderWizard();
-            });
+          renderWizard();
+        });
             panel.querySelectorAll('[data-sg-remove]').forEach(btn => {
               btn.addEventListener('click', e => {
                 e.stopPropagation();
@@ -8814,20 +8814,20 @@
         clearFieldErrors();
       } else {
         if ((key === 'deploy' || key === 'details') && state.createType !== 'clone' && !state.data.name) {
-          toast('Enter a name or generate one to continue.');
-          return;
-        }
-        if (key === 'review' && state.createType === 'clone' && !state.data.name) {
-          toast('Enter a name or generate one to continue.');
-          return;
-        }
+        toast('Enter a name or generate one to continue.');
+        return;
+      }
+      if (key === 'review' && state.createType === 'clone' && !state.data.name) {
+        toast('Enter a name or generate one to continue.');
+        return;
+      }
         if ((key === 'catalog' || key === 'template') && !state.data.templateId) {
-          toast('Select a template to continue.');
-          return;
-        }
-        if (key === 'clone-source' && !state.data.cloneSourceName) {
+        toast('Select a template to continue.');
+        return;
+      }
+      if (key === 'clone-source' && !state.data.cloneSourceName) {
           toast('Select a Virtual machine to clone.');
-          return;
+        return;
         }
         if (key === 'networking' && !isNetworkingComplete(state.data)) {
           toast('Select a virtual network, subnet, and at least one security group to continue.');

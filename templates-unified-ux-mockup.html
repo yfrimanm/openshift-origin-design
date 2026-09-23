@@ -1092,18 +1092,18 @@
 
   /* Create VM → Template step */
   const WIZARD_CARDS = [
-    { id: 'w1', type: 'openshift', name: 'CentOS Stream 9 for OpenShift', project: 'openshift', category: 'CentOS Stream 9', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'centos', provider: 'redhat', os: 'centos', osCategory: 'default' },
-    { id: 'w2', type: 'openshift', name: 'Fedora VM', project: 'openshift', category: 'Fedora 39', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'fedora', provider: 'redhat', os: 'fedora', osCategory: 'default' },
-    { id: 'w3', type: 'openshift', name: 'Red Hat Enterprise Linux 8 VM', project: 'openshift', category: 'RHEL 8.10', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
-    { id: 'w4', type: 'openshift', name: 'Red Hat Enterprise Linux 9 VM', project: 'openshift', category: 'RHEL 9.4', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
-    { id: 'w5', type: 'openshift', name: 'Red Hat Enterprise Linux 9 VM (ARM64)', project: 'openshift', category: 'RHEL 9.4', size: '1 CPU | 1 GiB Memory', arch: 'arm64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
-    { id: 'w6', type: 'openshift', name: 'Windows 11 VM', project: 'openshift', category: 'Windows 11', size: '1 CPU | 1 GiB Memory', arch: 'amd64', icon: 'windows', provider: 'other', os: 'windows', osCategory: 'default' },
-    { id: 'w7', type: 'openshift', name: 'custom-app-template', project: 'my-project', category: 'RHEL 9', size: '2 CPU | 4 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'other', os: 'rhel', osCategory: 'user' },
-    { id: 'w8', type: 'vm', name: 'Approved-Win-Server-2026', project: 'openshift', category: 'Operating system', size: '8 CPU | 16 GiB Memory', arch: 'amd64', icon: 'windows', vmCategory: 'operating-systems' },
-    { id: 'w9', type: 'vm', name: 'CentOS-Base', project: 'openshift', category: 'Operating system', size: '2 CPU | 4 GiB Memory', arch: 'amd64', icon: 'centos', vmCategory: 'operating-systems' },
-    { id: 'w10', type: 'vm', name: 'Redis-Cache-Prod', project: 'openshift', category: 'Database', size: '4 CPU | 8 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'databases' },
-    { id: 'w11', type: 'vm', name: 'MySQL-Primary', project: 'openshift', category: 'Database', size: '4 CPU | 16 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'databases' },
-    { id: 'w12', type: 'vm', name: 'Prometheus-Monitor', project: 'openshift', category: 'Monitoring', size: '2 CPU | 8 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'monitoring' },
+    { id: 'w1', type: 'openshift', name: 'CentOS Stream 9 for OpenShift', project: 'openshift', category: 'CentOS Stream 9', size: '1 vCPU | 1 GiB Memory', arch: 'amd64', icon: 'centos', provider: 'redhat', os: 'centos', osCategory: 'default' },
+    { id: 'w2', type: 'openshift', name: 'Fedora VM', project: 'openshift', category: 'Fedora 39', size: '1 vCPU | 1 GiB Memory', arch: 'amd64', icon: 'fedora', provider: 'redhat', os: 'fedora', osCategory: 'default' },
+    { id: 'w3', type: 'openshift', name: 'Red Hat Enterprise Linux 8 VM', project: 'openshift', category: 'RHEL 8.10', size: '1 vCPU | 1 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 'w4', type: 'openshift', name: 'Red Hat Enterprise Linux 9 VM', project: 'openshift', category: 'RHEL 9.4', size: '1 vCPU | 1 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 'w5', type: 'openshift', name: 'Red Hat Enterprise Linux 9 VM (ARM64)', project: 'openshift', category: 'RHEL 9.4', size: '1 vCPU | 1 GiB Memory', arch: 'arm64', icon: 'rhel', provider: 'redhat', os: 'rhel', osCategory: 'default' },
+    { id: 'w6', type: 'openshift', name: 'Windows 11 VM', project: 'openshift', category: 'Windows 11', size: '1 vCPU | 1 GiB Memory', arch: 'amd64', icon: 'windows', provider: 'other', os: 'windows', osCategory: 'default' },
+    { id: 'w7', type: 'openshift', name: 'custom-app-template', project: 'my-project', category: 'RHEL 9', size: '2 vCPUs | 4 GiB Memory', arch: 'amd64', icon: 'rhel', provider: 'other', os: 'rhel', osCategory: 'user' },
+    { id: 'w8', type: 'vm', name: 'Approved-Win-Server-2026', project: 'openshift', category: 'Operating system', size: '8 vCPUs | 16 GiB Memory', arch: 'amd64', icon: 'windows', vmCategory: 'operating-systems' },
+    { id: 'w9', type: 'vm', name: 'CentOS-Base', project: 'openshift', category: 'Operating system', size: '2 vCPUs | 4 GiB Memory', arch: 'amd64', icon: 'centos', vmCategory: 'operating-systems' },
+    { id: 'w10', type: 'vm', name: 'Redis-Cache-Prod', project: 'openshift', category: 'Database', size: '4 vCPUs | 8 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'databases' },
+    { id: 'w11', type: 'vm', name: 'MySQL-Primary', project: 'openshift', category: 'Database', size: '4 vCPUs | 16 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'databases' },
+    { id: 'w12', type: 'vm', name: 'Prometheus-Monitor', project: 'openshift', category: 'Monitoring', size: '2 vCPUs | 8 GiB Memory', arch: 'amd64', icon: 'db', vmCategory: 'monitoring' },
   ];
 
   const wState = {

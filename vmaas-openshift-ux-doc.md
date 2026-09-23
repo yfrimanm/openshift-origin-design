@@ -45,7 +45,7 @@ From PM comparison matrix (vApp Author / User / Console Access Only):
 | Bulk / row: Start, Stop, Restart | Yes | Yes (shared/assigned) | **Hidden** |
 | Row: Delete, Clone, Edit hardware | Yes (own) | **Hidden** | **Hidden** |
 | Row: Open console | Yes | Yes | Yes (primary / only management action) |
-| Details: edit CPU/RAM/disk/NIC | Editable | Read-only | Read-only basics |
+| Details: edit vCPU/Memory/disk/NIC | Editable | Read-only | Read-only basics |
 | ISO mount | Yes | Yes (if shared allows) | No |
 | Networks list | View + Create isolated/app | View only | Hidden or view-only |
 | Create org / shared network | No (Org Admin) | No | No |
@@ -135,7 +135,7 @@ Nav → **Virtual machines** (default landing).
 | 1 | **Deployment details** | Creation method = Custom · Name · Description · Location |
 | 2 | **Guest OS** | “Guest operating system” — tiles **RHEL** · **Microsoft Windows** · **Other Linux** + **Guest operating system type** dropdown (e.g. `rhel.10`, preselected for family) |
 | 3 | **Boot source** | “Select a boot source (volume or ISO) now or configure it later.” — Boot source (volume table + Add boot source) **or** No boot source |
-| 4 | **Compute resources** | “Define resources by selecting series and size.” — Red Hat provided / User provided · series cards (default **General Purpose**) · Size dropdown **preselected** to `medium: 1 CPUs, 4 GiB Memory` (user can change) |
+| 4 | **Compute resources** | “Define resources by selecting series and size.” — Red Hat provided / User provided · series cards (default **General Purpose**) · Size dropdown **preselected** to `medium: 1 vCPU, 4 GiB Memory` (user can change) |
 | 5 | **Customization** | “Optionally, explore the tabs…” — **Find settings** · Details / Storage / **Network** / Scheduling / **SSH** / Initial run / Metadata |
 
 #### Customization → SSH
@@ -162,7 +162,7 @@ Nav → **Virtual machines** (default landing).
 | # | Step (nav) | Content |
 |---|---|---|
 | 1 | **Deployment details** | Creation method = Create from template · Name · Description · Location |
-| 2 | **Template** | Title **Templates** · “Select a Template…” · All projects + keyword filter · **list/card view toggle** · left filter panel (Type / OpenShift scope / Provider / OS) · **3-column card grid** (OS icon, name, blue `amd64` badge, Project / OS / vCPU \| Memory \| Storage) · click selects + opens **side drawer** (Details / Parameters) · **Next disabled** until a template is selected |
+| 2 | **Template** | Title **Templates** · “Select a Template…” · All projects + keyword filter · **list/card view toggle** · left filter panel (Type / OpenShift scope / Provider / OS) · **3-column card grid** (OS icon, name, blue `amd64` badge, Project / OS / vCPUs \| Memory \| Storage) · click selects + opens **side drawer** (Details / Parameters) · **Next disabled** until a template is selected |
 | 3 | **Customization** | Same tab model as custom path |
 | 4 | **Review and create** | Same review + start checkbox → **Create Virtual machine** |
 

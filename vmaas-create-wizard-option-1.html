@@ -4202,7 +4202,7 @@
         ip: '10.130.1.191',
         created: 'Aug 2, 2026, 10:01 AM',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '4 GiB',
         instanceType: 'u1.medium',
         preference: 'rhel.10',
@@ -4249,43 +4249,43 @@
     const SERIES = [
       { id: 'exclusive', title: 'Compute Exclusive', meta: 'CX series', icon: 'fa-desktop', defaultSize: 'cx1.medium',
         sizes: [
-          { value: 'cx1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'cx1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'cx1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
+          { value: 'cx1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'cx1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'cx1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
         ]},
       { id: 'general', title: 'General Purpose', meta: 'U series', icon: 'fa-server', defaultSize: 'u1.medium',
         sizes: [
-          { value: 'u1.nano', label: 'nano: 1 CPU, 512 MiB Memory' },
-          { value: 'u1.micro', label: 'micro: 1 CPU, 1 GiB Memory' },
-          { value: 'u1.small', label: 'small: 1 CPU, 2 GiB Memory' },
-          { value: 'u1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'u1.2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory' },
-          { value: 'u1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'u1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
-          { value: 'u1.2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory' },
-          { value: 'u1.4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory' },
-          { value: 'u1.8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory' },
+          { value: 'u1.nano', label: 'nano: 1 vCPU, 512 MiB Memory' },
+          { value: 'u1.micro', label: 'micro: 1 vCPU, 1 GiB Memory' },
+          { value: 'u1.small', label: 'small: 1 vCPU, 2 GiB Memory' },
+          { value: 'u1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'u1.2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory' },
+          { value: 'u1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'u1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
+          { value: 'u1.2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory' },
+          { value: 'u1.4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory' },
+          { value: 'u1.8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory' },
         ]},
       { id: 'memory', title: 'Memory Intensive', meta: 'M series', icon: 'fa-memory', defaultSize: 'm1.medium',
         sizes: [
-          { value: 'm1.medium', label: 'medium: 1 CPU, 8 GiB Memory' },
-          { value: 'm1.large', label: 'large: 2 CPUs, 16 GiB Memory' },
-          { value: 'm1.xlarge', label: 'xlarge: 4 CPUs, 32 GiB Memory' },
+          { value: 'm1.medium', label: 'medium: 1 vCPU, 8 GiB Memory' },
+          { value: 'm1.large', label: 'large: 2 vCPUs, 16 GiB Memory' },
+          { value: 'm1.xlarge', label: 'xlarge: 4 vCPUs, 32 GiB Memory' },
         ]},
       { id: 'network', title: 'Network', meta: 'N series', icon: 'fa-network-wired', defaultSize: 'n1.medium',
         sizes: [
-          { value: 'n1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'n1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'n1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'n1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
       { id: 'overcommitted', title: 'Overcommitted', meta: 'O series', icon: 'fa-cubes', defaultSize: 'o1.medium',
         sizes: [
-          { value: 'o1.medium', label: 'medium: 1 CPU, 2 GiB Memory' },
-          { value: 'o1.large', label: 'large: 2 CPUs, 4 GiB Memory' },
+          { value: 'o1.medium', label: 'medium: 1 vCPU, 2 GiB Memory' },
+          { value: 'o1.large', label: 'large: 2 vCPUs, 4 GiB Memory' },
         ]},
       { id: 'realtime', title: 'Realtime', meta: 'RT series', icon: 'fa-clock', defaultSize: 'rt1.medium',
         sizes: [
-          { value: 'rt1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'rt1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'rt1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'rt1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
     ];
 
@@ -4346,7 +4346,7 @@
         computeResource: 'large',
         bootDiskGiB: 20,
         arch: 'amd64',
-        cpu: '2 vCPU',
+        cpu: '2 vCPUs',
         mem: '8 GiB',
         storage: '20 GiB',
         workload: 'Server',
@@ -4412,7 +4412,7 @@
         computeResource: 'xlarge',
         bootDiskGiB: 40,
         arch: 'amd64',
-        cpu: '4 vCPU',
+        cpu: '4 vCPUs',
         mem: '16 GiB',
         storage: '40 GiB',
         workload: 'Server',
@@ -4461,16 +4461,16 @@
 
     const CATALOG_OS_IMAGES = ['rhel.10', 'rhel.9', 'Windows.2k25', 'fedora'];
     const COMPUTE_RESOURCES = [
-      { id: 'nano', label: 'nano: 1 CPU, 512 MiB Memory', hourly: 0.05 },
-      { id: 'micro', label: 'micro: 1 CPU, 1 GiB Memory', hourly: 0.12 },
-      { id: 'small', label: 'small: 1 CPU, 2 GiB Memory', hourly: 0.80 },
-      { id: 'medium', label: 'medium: 1 CPU, 4 GiB Memory', hourly: 1.60 },
-      { id: '2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory', hourly: 2.40 },
-      { id: 'large', label: 'large: 2 CPUs, 8 GiB Memory', hourly: 4.70 },
-      { id: 'xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory', hourly: 9.40 },
-      { id: '2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory', hourly: 18.80 },
-      { id: '4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory', hourly: 37.60 },
-      { id: '8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory', hourly: 75.20 },
+      { id: 'nano', label: 'nano: 1 vCPU, 512 MiB Memory', hourly: 0.05 },
+      { id: 'micro', label: 'micro: 1 vCPU, 1 GiB Memory', hourly: 0.12 },
+      { id: 'small', label: 'small: 1 vCPU, 2 GiB Memory', hourly: 0.80 },
+      { id: 'medium', label: 'medium: 1 vCPU, 4 GiB Memory', hourly: 1.60 },
+      { id: '2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory', hourly: 2.40 },
+      { id: 'large', label: 'large: 2 vCPUs, 8 GiB Memory', hourly: 4.70 },
+      { id: 'xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory', hourly: 9.40 },
+      { id: '2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory', hourly: 18.80 },
+      { id: '4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory', hourly: 37.60 },
+      { id: '8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory', hourly: 75.20 },
     ];
     const CATALOG_BOOT_DISK_GIB = [5, 10, 20];
     /** Storage estimate rate (~$0.10 / GiB / month) */
@@ -4484,10 +4484,10 @@
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
       if (!c) return { cpu: '—', mem: '—' };
-      const m = String(c.label).match(/:\s*(\d+)\s*CPUs?,\s*(.+?)\s*Memory/i);
+      const m = String(c.label).match(/:\s*(\d+)\s*vCPUs?,\s*(.+?)\s*Memory/i);
       if (!m) return { cpu: '—', mem: '—' };
       return {
-        cpu: `${m[1]} vCPU`,
+        cpu: Number(m[1]) === 1 ? '1 vCPU' : `${m[1]} vCPUs`,
         mem: m[2].trim(),
       };
     }
@@ -4496,8 +4496,7 @@
     function formatComputeDisplay(id) {
       const specs = computeResourceSpecs(id);
       if (!specs || specs.cpu === '—') return '—';
-      const cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
-      return `${cpu} | ${specs.mem} Memory`;
+      return `${specs.cpu} | ${specs.mem} Memory`;
     }
 
     function resolveVmComputeId(vm) {
@@ -4703,7 +4702,7 @@
       if (!vm || !id) return;
       const specs = computeResourceSpecs(id);
       vm.computeResource = id;
-      vm.cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      vm.cpu = String(specs.cpu);
       vm.mem = specs.mem;
       closeEditComputeModal();
       renderVmDetail();
@@ -5309,7 +5308,7 @@
         { id: 'node', label: 'Node', sortable: true },
         { id: 'created', label: 'Created', sortable: true },
         { id: 'memory', label: 'Memory', sortable: false },
-        { id: 'cpu', label: 'CPU', sortable: false },
+        { id: 'cpu', label: 'vCPUs', sortable: false },
         { id: 'network', label: 'Network', sortable: false },
         { id: 'deletionProtection', label: 'Deletion protection', sortable: false },
         { id: 'storageClass', label: 'Storage class', sortable: false },
@@ -6900,7 +6899,7 @@
       const computeId = resolveVmComputeId(enriched);
       const specs = computeResourceSpecs(computeId);
       enriched.computeResource = computeId;
-      if (specs.cpu !== '—') enriched.cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      if (specs.cpu !== '—') enriched.cpu = String(specs.cpu);
       if (specs.mem !== '—') enriched.mem = specs.mem;
       enriched.utilization = getVmUtilization(enriched);
       return enriched;
@@ -8022,7 +8021,7 @@
                       <dt>Compute resources</dt>
                       <dd>
                         <span class="vm-compute-row">
-                          ${v.computeResource ? formatComputeDisplay(v.computeResource) : `${v.cpu || '1 CPU'} | ${v.mem || '128 MiB'} Memory`}
+                          ${v.computeResource ? formatComputeDisplay(v.computeResource) : `${v.cpu || '1 vCPU'} | ${v.mem || '128 MiB'} Memory`}
                           <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources" title="Edit">
                             <i class="fa-solid fa-pen" aria-hidden="true"></i>
                           </button>
@@ -8061,11 +8060,11 @@
                   </div>
                   <div class="util-grid">
                     <div class="util-tile">
-                      <div class="util-tile__label">CPU</div>
+                      <div class="util-tile__label">vCPUs</div>
                       <div class="util-tile__abs">${cpuAbs}</div>
                       <div class="util-tile__abs-sub">Requested of ${cpuOf}</div>
                       <div class="util-donut-wrap">
-                        <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% CPU used">
+                        <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% vCPU used">
                           <svg viewBox="0 0 100 100" aria-hidden="true">
                             <circle class="util-donut__track" cx="50" cy="50" r="40" />
                             <circle class="util-donut__arc" cx="50" cy="50" r="40" />
@@ -9551,7 +9550,7 @@
             <p class="tpl-card__desc">${t.description || ''}</p>
             <div class="tpl-card__specs">
               <div>
-                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting CPU' : 'CPU'}</span>
+                <span class="tpl-card__spec-label">${sizeEditable ? 'Starting vCPUs' : 'vCPUs'}</span>
                 <span class="tpl-card__spec-value">${specs.cpu}</span>
               </div>
               <div>
@@ -9791,7 +9790,7 @@
                     <thead>
                       <tr>
                         <th>Name</th>
-                        <th>CPU</th>
+                        <th>vCPUs</th>
                         <th>Memory</th>
                         <th>Storage</th>
                         <th>Estimate cost</th>

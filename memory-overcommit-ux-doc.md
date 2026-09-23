@@ -113,7 +113,7 @@ When the value has been edited, **Restore default** (link button) appears to the
 
 - **“Reservation ratio” → “Memory request ratio”.** Review first suggested **reservation ratio** (reserved ÷ configured), which aligns with VMware's configured vs **reservation** vocabulary. We renamed to **memory request ratio** to avoid VMware-specific **reservation** language in the OpenShift console and to align with KubeVirt/Kubernetes **request** and **limit** terms used elsewhere in OCP. Engineering still needs to confirm which backend field this maps to.
 
-- **Avoid legacy “memory density”.** The old control allowed values above 100% (e.g. 125% applied / 250% target) without explaining configured vs requested. **“Density” sounds like a 0–100% fraction of VM memory**, so values like 120% or 250% leave admins guessing the denominator (configured memory? host RAM? an internal target?). Admins had to decode backend overcommit math. Bounding the UI at **0–100%** and naming **requested ÷ configured** keeps the control tied to one relationship admins can reason about without admin-doc context.
+- **Avoid legacy “memory density”.** The old control allowed values above 100% (e.g. 125% applied / 250% target) without explaining configured vs requested. **“Density” sounds like a 0–100% fraction of VM memory**, so values like 120% or 250% leave admins guessing the denominator (configured memory? host Memory? an internal target?). Admins had to decode backend overcommit math. Bounding the UI at **0–100%** and naming **requested ÷ configured** keeps the control tied to one relationship admins can reason about without admin-doc context.
 
 ## Design principles
 

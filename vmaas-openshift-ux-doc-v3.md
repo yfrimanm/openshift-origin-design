@@ -52,7 +52,7 @@ VM Overview is split into smaller cards that each own a specific domain:
 ### Utilization
 
 - Header: **Utilization** + help · time range **Last 5 minutes**.
-- Four columns: **CPU** · **Memory** · **Storage** · **Network transfer**.
+- Four columns: **vCPUs** · **Memory** · **Storage** · **Network transfer**.
 - Storage may show **No data available** when metrics are missing.
 
 ### VM detail header actions (CNV)

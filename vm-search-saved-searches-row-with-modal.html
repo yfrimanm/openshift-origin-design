@@ -1089,7 +1089,7 @@
           <div class="filter-dd-wrap pf-m-hidden" id="vcpuWrap">
             <button class="pf-v6-c-menu-toggle pf-m-small filter-dd-btn" type="button"
               id="btnVcpuFilter" aria-expanded="false" aria-haspopup="listbox">
-              <span class="pf-v6-c-menu-toggle__text">vCPU</span>
+              <span class="pf-v6-c-menu-toggle__text">vCPUs</span>
               <span class="pf-v6-c-badge pf-m-read filter-dd-badge" id="vcpuBadge">All</span>
               <span class="pf-v6-c-menu-toggle__controls">
                 <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
@@ -1659,7 +1659,7 @@
             </div>
 
             <div class="pf-v6-c-form__group">
-              <div class="pf-v6-c-form__group-label"><label class="pf-v6-c-form__label" for="adv-vcpu-val"><span class="pf-v6-c-form__label-text">vCPU</span></label></div>
+              <div class="pf-v6-c-form__group-label"><label class="pf-v6-c-form__label" for="adv-vcpu-val"><span class="pf-v6-c-form__label-text">vCPUs</span></label></div>
               <div class="pf-v6-c-form__group-control">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div class="pf-v6-c-form-control pf-m-select" style="width:160px;"><select class="pf-v6-c-form-control__input" id="adv-vcpu-op"><option value=">">Greater than</option><option value=">=">At least</option><option value="<">Less than</option><option value="<=">At most</option><option value=":">Exactly</option></select></div>
@@ -1890,14 +1890,14 @@ const PARAM_CATALOG = [
     aliases:['os','operating system','operatingsystem'] },
 
   { key:'vcpu',
-    label:'vCPU',
+    label:'vCPUs',
     desc:'vCPU count  e.g. vcpu>2  vcpu>4  (also supports >=)',
     color:'blue',
     values:[] },
 
   { key:'memory',
     label:'Memory',
-    desc:'RAM  e.g. memory>4GiB  memory>8GiB  (also supports >=)',
+    desc:'Memory  e.g. memory>4GiB  memory>8GiB  (also supports >=)',
     color:'blue',
     values:[] },
 

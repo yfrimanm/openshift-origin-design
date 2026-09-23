@@ -46,7 +46,7 @@ From PM comparison matrix (vApp Author / User / Console Access Only):
 | Bulk / row: Start, Stop, Restart | Yes | Yes (shared/assigned) | **Hidden** |
 | Row: Delete, Clone, Edit hardware | Yes (own) | **Hidden** | **Hidden** |
 | Row: Open console | Yes | Yes | Yes (primary / only management action) |
-| Details: edit CPU/RAM/disk/NIC | Editable | Read-only | Read-only basics |
+| Details: edit vCPU/Memory/disk/NIC | Editable | Read-only | Read-only basics |
 | ISO mount | Yes | Yes (if shared allows) | No |
 | Networks list | View + Create isolated/app | View only | Hidden or view-only |
 | Create org / shared network | No (Org Admin) | No | No |
@@ -118,7 +118,7 @@ Clicking a VM name opens **VM Overview** (CNV-aligned). Tabs: Overview · Metric
 
 | Surface | Content |
 |---|---|
-| **Overview** | Top: Details + VNC · Utilization (CPU/Memory/Storage donuts + Network transfer In/Out — no pie) · side cards Alerts / General / Snapshots / Network / Storage. Bottom (full width): **Hardware devices (0)** · **File systems** · **Services** · **Active users (0)** |
+| **Overview** | Top: Details + VNC · Utilization (vCPUs/Memory/Storage donuts + Network transfer In/Out — no pie) · side cards Alerts / General / Snapshots / Network / Storage. Bottom (full width): **Hardware devices (0)** · **File systems** · **Services** · **Active users (0)** |
 | **Configuration → Network** | **Attach NIC** here — title **Network interfaces** · **Add network interface** opens modal (does not insert a row immediately) · Filter / search · table (Name, Model, Network, State, Type, MAC) · kebab: Set link down / Edit / Delete · helper links to **Networks** page for creating infrastructure (do not create org networks here) |
 
 **Add network interface modal (CNV):** Name * · Model (virtio) · Network * (searchable NAD / existing network; error if none available) · Use as boot source · **Advanced settings** (MAC address, Link state Up/Down) · **Save** disabled until Network selected · Cancel.
@@ -161,7 +161,7 @@ If the wizard is still pristine (step 1, no edits), Cancel / Close dismisses imm
 | 1 | **Deployment details** | Creation method = Custom · Name · Description · Location |
 | 2 | **Guest OS** | “Guest operating system” — tiles **RHEL** · **Microsoft Windows** · **Other Linux** + **Guest operating system type** dropdown (e.g. `rhel.10`, preselected for family) |
 | 3 | **Boot source** | “Select a boot source (volume or ISO) now or configure it later.” — Boot source (volume table + Add boot source) **or** No boot source |
-| 4 | **Compute resources** | “Define resources by selecting series and size.” — Red Hat provided / User provided · series cards (default **General Purpose**) · Size dropdown **preselected** to `medium: 1 CPUs, 4 GiB Memory` (user can change) |
+| 4 | **Compute resources** | “Define resources by selecting series and size.” — Red Hat provided / User provided · series cards (default **General Purpose**) · Size dropdown **preselected** to `medium: 1 vCPU, 4 GiB Memory` (user can change) |
 | 5 | **Customization** | “Optionally, explore the tabs…” — **Find settings** · Details / Storage / **Network** / Scheduling / **SSH** / Initial run / Metadata |
 
 #### Customization → SSH
@@ -194,7 +194,7 @@ If the wizard is still pristine (step 1, no edits), Cancel / Close dismisses imm
 
 | Type selection | Secondary filters shown | Card fields |
 |---|---|---|
-| **OpenShift templates** (T) checked | **Architecture** (amd64 / arm64) · **OpenShift templates** radios: All / Default / User · **Provider** (Red Hat / Other) · **Operating system** (RHEL / Fedora / CentOS / Windows / Other) | Project · **OS** · vCPU \| Memory |
+| **OpenShift templates** (T) checked | **Architecture** (amd64 / arm64) · **OpenShift templates** radios: All / Default / User · **Provider** (Red Hat / Other) · **Operating system** (RHEL / Fedora / CentOS / Windows / Other) | Project · **OS** · vCPUs \| Memory |
 | **Virtual machine templates** (VMT) only | **Architecture** · **Virtual machines templates** radios: All templates · Databases · Operating systems · Monitoring · Networking · Observability · Security · Storage | Project · **Category** · Size |
 | Both T + VMT | Same secondary panel as OpenShift (while T is checked); grid includes both kinds | Mixed — OS for OpenShift cards, Category for VMT cards |
 

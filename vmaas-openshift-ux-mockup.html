@@ -1625,43 +1625,43 @@
     const SERIES = [
       { id: 'exclusive', title: 'Compute Exclusive', meta: 'CX series', icon: 'fa-desktop', defaultSize: 'cx1.medium',
         sizes: [
-          { value: 'cx1.medium', label: 'medium: 1 CPUs, 4 GiB Memory' },
-          { value: 'cx1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'cx1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
+          { value: 'cx1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'cx1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'cx1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
         ]},
       { id: 'general', title: 'General Purpose', meta: 'U series', icon: 'fa-server', defaultSize: 'u1.medium',
         sizes: [
-          { value: 'u1.nano', label: 'nano: 1 CPUs, 512 MiB Memory' },
-          { value: 'u1.micro', label: 'micro: 1 CPUs, 1 GiB Memory' },
-          { value: 'u1.small', label: 'small: 1 CPUs, 2 GiB Memory' },
-          { value: 'u1.medium', label: 'medium: 1 CPUs, 4 GiB Memory' },
-          { value: 'u1.2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory' },
-          { value: 'u1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'u1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
-          { value: 'u1.2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory' },
-          { value: 'u1.4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory' },
-          { value: 'u1.8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory' },
+          { value: 'u1.nano', label: 'nano: 1 vCPU, 512 MiB Memory' },
+          { value: 'u1.micro', label: 'micro: 1 vCPU, 1 GiB Memory' },
+          { value: 'u1.small', label: 'small: 1 vCPU, 2 GiB Memory' },
+          { value: 'u1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'u1.2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory' },
+          { value: 'u1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'u1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
+          { value: 'u1.2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory' },
+          { value: 'u1.4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory' },
+          { value: 'u1.8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory' },
         ]},
       { id: 'memory', title: 'Memory Intensive', meta: 'M series', icon: 'fa-memory', defaultSize: 'm1.medium',
         sizes: [
-          { value: 'm1.medium', label: 'medium: 1 CPUs, 8 GiB Memory' },
-          { value: 'm1.large', label: 'large: 2 CPUs, 16 GiB Memory' },
-          { value: 'm1.xlarge', label: 'xlarge: 4 CPUs, 32 GiB Memory' },
+          { value: 'm1.medium', label: 'medium: 1 vCPU, 8 GiB Memory' },
+          { value: 'm1.large', label: 'large: 2 vCPUs, 16 GiB Memory' },
+          { value: 'm1.xlarge', label: 'xlarge: 4 vCPUs, 32 GiB Memory' },
         ]},
       { id: 'network', title: 'Network', meta: 'N series', icon: 'fa-network-wired', defaultSize: 'n1.medium',
         sizes: [
-          { value: 'n1.medium', label: 'medium: 1 CPUs, 4 GiB Memory' },
-          { value: 'n1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'n1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'n1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
       { id: 'overcommitted', title: 'Overcommitted', meta: 'O series', icon: 'fa-cubes', defaultSize: 'o1.medium',
         sizes: [
-          { value: 'o1.medium', label: 'medium: 1 CPUs, 2 GiB Memory' },
-          { value: 'o1.large', label: 'large: 2 CPUs, 4 GiB Memory' },
+          { value: 'o1.medium', label: 'medium: 1 vCPU, 2 GiB Memory' },
+          { value: 'o1.large', label: 'large: 2 vCPUs, 4 GiB Memory' },
         ]},
       { id: 'realtime', title: 'Realtime', meta: 'RT series', icon: 'fa-clock', defaultSize: 'rt1.medium',
         sizes: [
-          { value: 'rt1.medium', label: 'medium: 1 CPUs, 4 GiB Memory' },
-          { value: 'rt1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'rt1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'rt1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
     ];
 
@@ -1675,7 +1675,7 @@
         os: 'Red Hat Enterprise Linux 7.0 or higher',
         osKey: 'rhel',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         storage: '30 GiB',
         workload: 'Server (default)',
@@ -1694,7 +1694,7 @@
         os: 'CentOS Stream 9 or higher',
         osKey: 'centos',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         storage: '20 GiB',
         workload: 'Server (default)',
@@ -1710,7 +1710,7 @@
         os: 'Red Hat Enterprise Linux 8.0 or higher',
         osKey: 'rhel',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         storage: '30 GiB',
         workload: 'Server (default)',
@@ -1729,7 +1729,7 @@
         os: 'Microsoft Windows 10 or higher',
         osKey: 'windows',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '4 GiB',
         storage: '60 GiB',
         workload: 'Desktop (default)',
@@ -1745,7 +1745,7 @@
         os: 'Red Hat Enterprise Linux 9.0 or higher',
         osKey: 'rhel',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         storage: '30 GiB',
         workload: 'Server (default)',
@@ -1761,7 +1761,7 @@
         os: 'Fedora 41 or higher',
         osKey: 'fedora',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '1 GiB',
         storage: '20 GiB',
         workload: 'Server (default)',
@@ -1777,7 +1777,7 @@
         os: 'CentOS Stream 9 or higher',
         osKey: 'centos',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '1 GiB',
         storage: '30 GiB',
         workload: 'Server (default)',
@@ -1793,7 +1793,7 @@
         os: 'Red Hat Enterprise Linux 10.0 or higher',
         osKey: 'rhel',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         storage: '30 GiB',
         workload: 'Server (default)',
@@ -1809,7 +1809,7 @@
         os: 'Microsoft Windows Server 2022 or higher',
         osKey: 'windows',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '4 GiB',
         storage: '60 GiB',
         workload: 'Server (default)',
@@ -1825,7 +1825,7 @@
         os: 'CentOS Stream 9 or higher',
         osKey: 'centos',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '4 GiB',
         storage: '30 GiB',
         workload: 'Server (default)',
@@ -3318,7 +3318,7 @@
             </div>
             <div class="tpl-card__meta"><strong>Project</strong> ${t.project}</div>
             <div class="tpl-card__meta"><strong>OS</strong> ${t.os}</div>
-            <div class="tpl-card__meta"><strong>vCPU | Memory</strong> ${String(t.cpu).replace(/\s*CPU$/i, '')} | ${t.mem}</div>
+            <div class="tpl-card__meta"><strong>vCPUs | Memory</strong> ${String(t.cpu).replace(/\s*vCPUs?$/i, '')} | ${t.mem}</div>
           </button>
         `).join('');
         const listRows = list.map(t => `
@@ -3326,7 +3326,7 @@
             <td>${t.name}</td>
             <td>${t.project}</td>
             <td>${t.os}</td>
-            <td>${String(t.cpu).replace(/\s*CPU$/i, '')} | ${t.mem}</td>
+            <td>${String(t.cpu).replace(/\s*vCPUs?$/i, '')} | ${t.mem}</td>
             <td><span class="tpl-card__arch">${t.arch}</span></td>
           </tr>
         `).join('');
@@ -3356,7 +3356,7 @@
                 <dl class="tpl-drawer__field"><dt>Workload type</dt><dd>${selected.workload}</dd></dl>
                 <dl class="tpl-drawer__field"><dt>Description</dt><dd>${selected.description}</dd></dl>
                 <dl class="tpl-drawer__field">
-                  <dt style="border-bottom:1px dotted #8a8d90;width:fit-content;">CPU | Memory</dt>
+                  <dt style="border-bottom:1px dotted #8a8d90;width:fit-content;">vCPUs | Memory</dt>
                   <dd>${selected.cpu} | ${selected.mem} Memory</dd>
                 </dl>
                 <div class="tpl-drawer__field">
@@ -3437,7 +3437,7 @@
                 <div class="tpl-list">
                   <table>
                     <thead>
-                      <tr><th>Name</th><th>Project</th><th>OS</th><th>vCPU | Memory | Storage</th><th>Arch</th></tr>
+                      <tr><th>Name</th><th>Project</th><th>OS</th><th>vCPUs | Memory | Storage</th><th>Arch</th></tr>
                     </thead>
                     <tbody>
                       ${listRows || '<tr><td colspan="5" class="muted">No templates match your filter.</td></tr>'}

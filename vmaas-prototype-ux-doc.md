@@ -16,14 +16,14 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 | | |
 |---|---|
 | **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, provider **Catalog**, plus **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814&create=1) · [Overview (azure-baboon-27)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814&vm=azure-baboon-27) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814&role=provider) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant) |
+| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant&create=1) · [Overview (indigo-quokka-89)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant&vm=indigo-quokka-89) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant&role=provider) |
 | **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
 | **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
 
-**Source snapshot:** Pages build `?v=20260914-183814` (screenshots refreshed 2026-09-14 — Create wizard typeahead rich-selects).
+**Source snapshot:** Pages build `?v=20260916-tenant` (screenshots refreshed 2026-09-16 — VM Overview v2, provider create Tenant-before-Name).
 
 ---
 
@@ -50,9 +50,9 @@ Document the current OSAC VMaaS HTML prototype so engineering and stakeholders c
 | **IA (Create)** | Select template → Details → Compute resource → Storage → Network → Review and create |
 | **Create dropdowns** | Shared **typeahead rich-select** (FormControl toggle + search menu), matching **Compute resource**: Project, Storage tier (boot + extra disks), Virtual network, Subnet. Security groups stay multi-select chips. |
 | **After create** | Lands on new VM Overview + success toast |
-| **Overview Details** | Stacked label-above-value in **Overview** \| **Configuration** columns; VNC stays in the same card |
-| **Instance types** | Provider list + create form + 3-column detail (Overview / Compute / GPU); lifecycle Actions |
-| **Disk images** | Provider list + create form + 2-column detail; show-obsolete; lifecycle Actions |
+| **Overview** | 2/3 main + 1/3 sidebar; stacked fields in **Overview** \| **Configuration** \| **SSH**; Network / Storage tables + Utilization; header PF actions + Delete |
+| **Instance types** | Provider list + create (Tenant before Name) + 3-column detail; lifecycle Actions |
+| **Disk images** | Provider list + create (Tenant before Name) + 2-column detail; show-obsolete; lifecycle Actions |
 | **Shell** | PatternFly Felt + Glass; soft floating nav/content |
 
 ---
@@ -165,37 +165,37 @@ Figure: Exit confirmation
 
 ### Layout
 
-| Column | Cards |
+| Area | Contents |
 |---|---|
-| **Main** | Details (incl. VNC) · Utilization |
-| **Side** | Alerts · Network · Storage |
-| **Full width** | Hardware devices · File systems |
+| **Header** | Breadcrumb (`Virtual machines > {name}`) · title + subtitle · **Open console** (primary) · divider · Start / Restart / Stop / Pause · **Delete** (danger) |
+| **Main (2/3)** | Overview / Configuration / SSH columns · Network table · Storage table · Utilization |
+| **Sidebar (1/3)** | Alerts · Recent activity (gray specification-style cards) |
 
-### Details card (stacked fields)
+### Details (stacked fields)
 
 | Column | Fields |
 |---|---|
-| **Overview** | Project · Status (link → popover) · Created |
-| **Configuration** | Operating system · Compute resource (+ edit) · SSH public key (+ edit) |
-| **VNC console** | Open web console + preview (same card, vertical divider) |
+| **Overview** | Project · Status (link → popover) · Created · Catalog item |
+| **Configuration** | Operating system · Compute resource · Image · vCPUs · Memory |
+| **SSH** | SSH public key |
 
-Header: breadcrumb · name + arch badge · status · power icons · Actions.
+### Network / Storage tables
+
+Section titles match Utilization styling. Tables share a **5-column grid** so Storage columns align under Network (Name spans 2 cols · Size · Storage tier spans 2 cols).
+
+**Utilization:** Metrics when Running; time range filter on the right; otherwise *Virtual machine is not running*.
 
 ![Figure: VM Overview](videos/vmaas-prototype-ux-doc/10-vm-overview.png)
 
-Figure: Overview — running
+Figure: Overview — running (v2 layout)
 
-![Figure: Details card](videos/vmaas-prototype-ux-doc/10b-vm-details-card.png)
+![Figure: Details columns](videos/vmaas-prototype-ux-doc/10b-vm-details-card.png)
 
-Figure: Details card — stacked Overview / Configuration + VNC
+Figure: Overview / Configuration / SSH columns
 
 ![Figure: Status popover](videos/vmaas-prototype-ux-doc/10c-status-popover.png)
 
 Figure: Status popover (Ask AI placeholder + Learn more)
-
-**Network / Storage cards:** Add in header; row kebab Edit / Delete (disabled reasons for last network / boot disk).
-
-**Utilization:** Metrics when Running; otherwise *Virtual machine is not running*.
 
 ---
 
@@ -241,7 +241,7 @@ Figure: Create catalog item — Visibility step
 |---|---|
 | **Overview** | Service · Status (Live / Unpublished) · Rate |
 | **Publishing** | Visibility (Global public) · Created |
-| **Hardware specifications** | Size (+ Locked) · CPU · RAM · GPU · Disk image (+ Locked) |
+| **Hardware specifications** | Size (+ Locked) · vCPUs · Memory · GPU · Disk image (+ Locked) |
 
 Header actions: **Launch instance** · **Actions** (Edit / Duplicate / Publish or Unpublish / Delete).
 
@@ -294,7 +294,7 @@ From **Infrastructure** in the left nav: Instance types, Disk images.
 |---|---|
 | Name | Link → detail |
 | Lifecycle state | Active / Deprecated / Obsolete badges |
-| CPU cores · Memory (GiB) · GPUs · Created | |
+| vCPUs · Memory (GiB) · GPUs · Created | |
 | Actions | Kebab — lifecycle + Delete (danger) |
 
 Primary CTA: **Create instance type**.
@@ -311,9 +311,10 @@ Breadcrumb: Instance types › Create.
 
 | Field | Required | Notes |
 |---|---|---|
-| Name | Yes | DNS label (RFC 1035) helper |
+| Tenant | Yes* | Before Name; assign tenant or check **Make this resource global** |
+| Name | Yes | DNS label (RFC 1035); unique per tenant |
 | Description | No | |
-| CPU cores | Yes | |
+| vCPUs | Yes | |
 | Memory (GiB) | Yes | |
 | GPU count / Resource name / PCI device selector | No | GPU section |
 
@@ -332,10 +333,10 @@ Single panel, three columns:
 | Column | Fields |
 |---|---|
 | **Overview** | Lifecycle state · Name · Created |
-| **Compute** | CPU cores · Memory (GiB) |
+| **Compute** | vCPUs · Memory (GiB) |
 | **GPU** | Count · PCI device selector · Resource name |
 
-Header: name + subtitle (`N CPU cores · M GiB`) · secondary **Actions** (Set Active / Deprecate / Mark Obsolete / Delete).
+Header: name + subtitle (`N vCPUs · M GiB`) · secondary **Actions** (Set Active / Deprecate / Mark Obsolete / Delete).
 
 ![Figure: Instance type detail](videos/vmaas-prototype-ux-doc/13-instance-type-detail.png)
 
@@ -379,7 +380,8 @@ Breadcrumb: Disk images › Create.
 
 | Field | Required | Notes |
 |---|---|---|
-| Name | Yes | DNS label helper |
+| Tenant | Yes* | Before Name; assign tenant or check **Make this resource global** |
+| Name | Yes | DNS label; unique per tenant |
 | Image | Yes | Example: `quay.io/containerdisks/fedora:latest` |
 | Guest operating system | Yes | Radio: Linux / Microsoft Windows (default Linux) |
 | Architecture | Yes | Multi-select (amd64 / arm64 / s390x); helper: you may select multiple types; placeholder *Select options* |
@@ -424,7 +426,7 @@ Figure: Disk image detail
 
 - Detailed Create-only write-up: `vmaas-create-vm-only-ux-doc.md`
 - Detailed Overview write-up: `vmaas-vm-details-overview-ux-doc.md`
-- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260910-1533
+- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant
 
 ---
 

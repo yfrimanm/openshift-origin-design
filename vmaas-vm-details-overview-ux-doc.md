@@ -202,7 +202,7 @@ Figure: Edit disk
 
 ## Utilization card
 
-- When **Running**: CPU · Memory · Storage · Network transfer tiles
+- When **Running**: vCPUs · Memory · Storage · Network transfer tiles
 - When not running: centered empty state — *Virtual machine is not running*
 - Help icon on title; time range is non-interactive in the mock
 

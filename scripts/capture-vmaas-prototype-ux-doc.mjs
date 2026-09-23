@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, '..');
 const outDir = path.join(root, 'videos', 'vmaas-prototype-ux-doc');
 const BASE =
   process.env.VMAAS_MOCK_URL ||
-  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260914-183814';
+  'https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant';
 
 async function shot(page, name) {
   const file = path.join(outDir, `${name}.png`);
@@ -33,8 +33,17 @@ async function clickNext(page) {
   await page.waitForTimeout(500);
 }
 
+async function clickCatalogNext(page) {
+  await page.locator('#create-ci-next').click();
+  await page.waitForTimeout(500);
+}
+
 async function waitStep(page, title) {
   await page.locator('#wiz-panel h3').filter({ hasText: new RegExp(`^${title}$`) }).first().waitFor({ timeout: 10000 });
+}
+
+async function waitCatalogStep(page, title) {
+  await page.locator('#create-ci-panel h3').filter({ hasText: new RegExp(`^${title}$`) }).first().waitFor({ timeout: 10000 });
 }
 
 async function setRole(page, value) {
@@ -66,8 +75,19 @@ async function main() {
   await page.waitForTimeout(500);
   await shot(page, '02-select-template');
 
-  const tplCard = page.locator('.tpl-card').first();
-  await tplCard.click();
+  // Prefer an editable template so Storage tier shows typeahead rich-select chrome
+  const tplCards = page.locator('.tpl-card');
+  const tplCount = await tplCards.count();
+  let picked = false;
+  for (let i = 0; i < tplCount; i++) {
+    const label = ((await tplCards.nth(i).innerText()) || '');
+    if (/editable/i.test(label) && !/\bxl\b/i.test(label)) {
+      await tplCards.nth(i).click();
+      picked = true;
+      break;
+    }
+  }
+  if (!picked) await tplCards.first().click();
   await page.waitForTimeout(600);
   await shot(page, '03-template-drawer');
 
@@ -170,25 +190,23 @@ async function main() {
   }
   await page.waitForTimeout(400);
 
-  // —— VM Overview ——
-  const vmUrl = BASE.includes('?') ? `${BASE}&vm=azure-baboon-27` : `${BASE}?vm=azure-baboon-27`;
-  await page.goto(vmUrl, {
-    waitUntil: 'networkidle',
-  });
+  // —— VM Overview (v2) ——
+  const vmUrl = BASE.includes('?') ? `${BASE}&vm=indigo-quokka-89` : `${BASE}?vm=indigo-quokka-89`;
+  await page.goto(vmUrl, { waitUntil: 'networkidle' });
   await setRole(page, 'admin');
   await page.waitForTimeout(600);
   await shot(page, '10-vm-overview');
 
-  // Details card crop-ish: scroll to details
-  const detailsTitle = page.locator('.vm-card__title', { hasText: 'Details' }).first();
-  if (await detailsTitle.count()) {
-    await detailsTitle.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(200);
+  const detailCols = page.locator('.vm-overview-v2__detail-cols').first();
+  if (await detailCols.count()) {
+    const file = path.join(outDir, '10b-vm-details-card.png');
+    await detailCols.screenshot({ path: file });
+    console.log('wrote', path.relative(root, file), '(el .vm-overview-v2__detail-cols)');
+  } else {
+    await shot(page, '10b-vm-details-card');
   }
-  await shot(page, '10b-vm-details-card');
 
-  // Status popover
-  const statusLink = page.locator('#view-vm .vm-detail__status button, #view-vm button').filter({ hasText: 'Running' }).first();
+  const statusLink = page.locator('#view-vm .status-link').filter({ hasText: 'Running' }).first();
   if (await statusLink.count()) {
     await statusLink.click();
     await page.waitForTimeout(400);
@@ -202,19 +220,18 @@ async function main() {
   await page.waitForTimeout(600);
   await shot(page, '17-catalog-list');
 
-  await page.locator('#btn-create-catalog-item').click();
-  await page.waitForSelector('#overlay.pf-m-open', { timeout: 8000 });
-  await page.waitForTimeout(500);
-  await clickNext(page);
-  await waitStep(page, 'Instance type & Access');
-  await clickNext(page);
-  await waitStep(page, 'Visibility');
-  await shot(page, '18-catalog-create-visibility');
-  await page.locator('#wiz-close').click();
+  await page.locator('[data-nav="templates"]').click();
   await page.waitForTimeout(400);
-  if (await page.locator('#cancel-confirm').isVisible().catch(() => false)) {
-    await page.locator('#cancel-confirm').click();
-  }
+  await page.locator('#btn-create-catalog-item').waitFor({ state: 'visible', timeout: 8000 });
+  await page.locator('#btn-create-catalog-item').click();
+  await page.waitForSelector('#create-ci-panel', { timeout: 8000 });
+  await page.waitForTimeout(500);
+  await clickCatalogNext(page);
+  await waitCatalogStep(page, 'Instance type & Access');
+  await clickCatalogNext(page);
+  await waitCatalogStep(page, 'Visibility');
+  await shot(page, '18-catalog-create-visibility');
+  await page.locator('#create-ci-cancel').click();
   await page.waitForTimeout(400);
 
   await page.locator('[data-catalog-card]').first().click();
@@ -235,21 +252,21 @@ async function main() {
   await page.locator('#ci-detail-actions-btn').click();
   await page.waitForTimeout(300);
   await page.locator('[data-ci-action="edit"]').click();
-  await page.waitForSelector('#overlay.pf-m-open', { timeout: 8000 });
+  await page.waitForSelector('#create-ci-panel', { timeout: 8000 });
   await page.waitForTimeout(400);
   for (const title of ['Instance type & Access', 'Visibility', 'Storage', 'Review']) {
-    await clickNext(page);
+    await clickCatalogNext(page);
     if (title === 'Review') {
-      await page.locator('#wiz-panel h3').filter({ hasText: /Review/ }).first().waitFor({ timeout: 10000 });
+      await page.locator('#create-ci-panel h3').filter({ hasText: /Review/ }).first().waitFor({ timeout: 10000 });
     } else {
-      await waitStep(page, title);
+      await waitCatalogStep(page, title);
     }
   }
   await shot(page, '20-catalog-edit-review-empty');
 
   // Back to Details via wizard nav, change description, return to Review with changes
-  await page.locator('#wiz-nav-list [data-step="0"]').click();
-  await waitStep(page, 'Details');
+  await page.locator('#create-ci-nav [data-catalog-step="0"]').click();
+  await waitCatalogStep(page, 'Details');
   await page.waitForTimeout(300);
   const desc = page.locator('#ci-description');
   await desc.waitFor({ state: 'visible', timeout: 8000 });
@@ -257,21 +274,17 @@ async function main() {
   await desc.fill(`${prev || 'Catalog item'} (updated for review)`);
   await page.waitForTimeout(200);
   for (const title of ['Instance type & Access', 'Visibility', 'Storage', 'Review']) {
-    await clickNext(page);
+    await clickCatalogNext(page);
     if (title === 'Review') {
-      await page.locator('#wiz-panel h3').filter({ hasText: /Review/ }).first().waitFor({ timeout: 10000 });
+      await page.locator('#create-ci-panel h3').filter({ hasText: /Review/ }).first().waitFor({ timeout: 10000 });
     } else {
-      await waitStep(page, title);
+      await waitCatalogStep(page, title);
     }
   }
   await shot(page, '21-catalog-edit-review-changes');
 
   // Exit edit wizard
-  await page.locator('#wiz-close').click();
-  await page.waitForTimeout(400);
-  if (await page.locator('#cancel-confirm').isVisible().catch(() => false)) {
-    await page.locator('#cancel-confirm').click();
-  }
+  await page.locator('#create-ci-cancel').click();
   await page.waitForTimeout(400);
 
   // Delete catalog item confirmation modal
