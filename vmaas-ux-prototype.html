@@ -3695,18 +3695,23 @@
     }
     .ci-access-switch__locked {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 400;
       color: var(--vmaas-text-subtle, #6a6e73);
       line-height: 1;
     }
     .ci-access-switch .pf-v6-c-switch {
       --pf-v6-c-switch--FontSize: 13px;
+      font-weight: 400;
+    }
+    /* Don't inherit form-field label bold onto the switch */
+    .create-resource-wiz .form-field .ci-access-switch .pf-v6-c-switch,
+    .create-resource-wiz .form-field .ci-access-switch .pf-v6-c-switch__label {
+      font-weight: 400;
     }
     .ci-access-help {
       margin: 0 0 8px;
       max-width: 40rem;
     }
-    .form-field:has(> .ci-field-label-row) > label:first-child { display: none; }
 
     .name-row { display: flex; gap: 8px; align-items: center; max-width: 560px; }
     .name-row input { flex: 1; }
