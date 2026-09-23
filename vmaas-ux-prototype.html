@@ -3666,98 +3666,47 @@
     .label-with-optional .pf-v6-c-label__text { font-weight: 600; }
 
 
-    /* Catalog create — Tenant access expandable field group (PF Form field group pattern) */
-    .ci-tenant-access {
-      margin-top: 28px;
-      max-width: 40rem;
-      border: 1px solid var(--vmaas-border, #d2d2d2);
-      border-radius: 8px;
-      background: var(--pf-t--global--background--color--primary--default, #fff);
-    }
-    .ci-tenant-access__toggle {
+    /* Catalog create — tenant access switch on field label row */
+    .ci-field-label-row {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      width: 100%;
-      margin: 0;
-      padding: 14px 16px;
-      border: none;
-      background: transparent;
-      text-align: left;
-      cursor: pointer;
-      font: inherit;
-      color: var(--vmaas-text, #151515);
-    }
-    .ci-tenant-access__toggle:hover { background: #f5f5f5; }
-    .ci-tenant-access__toggle-icon {
-      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 1.25rem;
-      height: 1.25rem;
-      margin-top: 2px;
-      color: var(--vmaas-text-subtle, #6a6e73);
-      transition: transform 0.15s ease;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
     }
-    .ci-tenant-access.pf-m-expanded .ci-tenant-access__toggle-icon {
-      transform: rotate(90deg);
-    }
-    .ci-tenant-access__toggle-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .ci-field-label-row > label,
+    .ci-field-label-row > .config-section-title,
+    .ci-field-label-row > .config-sets-title {
+      margin: 0;
+      flex: 1 1 auto;
       min-width: 0;
     }
-    .ci-tenant-access__title {
-      font-size: 16px;
+    .ci-field-label-row .config-section-title,
+    .ci-field-label-row .config-sets-title {
+      font-size: 14px;
       font-weight: 600;
-      line-height: 1.3;
     }
-    .ci-tenant-access__summary {
+    .ci-access-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .ci-access-switch__locked {
       font-size: 13px;
+      font-weight: 500;
       color: var(--vmaas-text-subtle, #6a6e73);
-      line-height: 1.4;
+      line-height: 1;
     }
-    .ci-tenant-access__body {
-      padding: 0 16px 16px 42px;
-      border-top: 1px solid var(--vmaas-border-light, #f0f0f0);
+    .ci-access-switch .pf-v6-c-switch {
+      --pf-v6-c-switch--FontSize: 13px;
     }
-    .ci-tenant-access__body[hidden] { display: none !important; }
-    .ci-tenant-access__intro {
-      margin: 12px 0 16px;
+    .ci-access-help {
+      margin: 0 0 8px;
+      max-width: 40rem;
     }
-    .ci-tenant-access__row {
-      margin-bottom: 16px;
-    }
-    .ci-tenant-access__row:last-child { margin-bottom: 0; }
-    .ci-tenant-access__row label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .ci-tenant-access__row select,
-    select.ci-tenant-access__select {
-      display: block;
-      width: 100%;
-      max-width: 280px;
-      height: 36px;
-      padding: 0 32px 0 12px;
-      border: 1px solid var(--vmaas-border, #c7c7c7);
-      border-radius: 4px;
-      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3Cpath fill='%236a6e73' d='M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z'/%3E%3C/svg%3E") no-repeat right 12px center / 10px;
-      appearance: none;
-      font: inherit;
-      font-size: 14px;
-      color: var(--vmaas-text, #151515);
-    }
-    .ci-tenant-access__row select:focus,
-    select.ci-tenant-access__select:focus {
-      outline: none;
-      border-color: var(--vmaas-blue, #0066cc);
-      box-shadow: 0 0 0 1px var(--vmaas-blue, #0066cc);
-    }
-    .ci-tenant-access__row .form-helper { margin-top: 6px; }
+    .form-field:has(> .ci-field-label-row) > label:first-child { display: none; }
 
     .name-row { display: flex; gap: 8px; align-items: center; max-width: 560px; }
     .name-row input { flex: 1; }
@@ -5990,7 +5939,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 22 · extra-disks-in-group 7002</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 23 · access-switch-inline 7101</span>
         </div>
       </div>
       <div class="console__body">
@@ -6398,7 +6347,7 @@
                   <tr class="pf-v6-c-table__tr">
                     <th class="pf-v6-c-table__th" scope="col">Name</th>
                     <th class="pf-v6-c-table__th" scope="col">Lifecycle state</th>
-                    <th class="pf-v6-c-table__th" scope="col">CPU cores</th>
+                    <th class="pf-v6-c-table__th" scope="col">vCPUs</th>
                     <th class="pf-v6-c-table__th" scope="col">Memory (GiB)</th>
                     <th class="pf-v6-c-table__th" scope="col">GPUs</th>
                     <th class="pf-v6-c-table__th" scope="col">Created</th>
@@ -6931,7 +6880,7 @@
         ip: '10.130.1.191',
         created: 'Aug 2, 2026, 10:01 AM',
         arch: 'amd64',
-        cpu: '1 CPU',
+        cpu: '1 vCPU',
         mem: '2 GiB',
         instanceType: 'u1.small',
         preference: 'rhel.10',
@@ -6995,43 +6944,43 @@
     const SERIES = [
       { id: 'exclusive', title: 'Compute Exclusive', meta: 'CX series', icon: 'fa-desktop', defaultSize: 'cx1.medium',
         sizes: [
-          { value: 'cx1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'cx1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'cx1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
+          { value: 'cx1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'cx1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'cx1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
         ]},
       { id: 'general', title: 'General Purpose', meta: 'U series', icon: 'fa-server', defaultSize: 'u1.medium',
         sizes: [
-          { value: 'u1.nano', label: 'nano: 1 CPU, 512 MiB Memory' },
-          { value: 'u1.micro', label: 'micro: 1 CPU, 1 GiB Memory' },
-          { value: 'u1.small', label: 'small: 1 CPU, 2 GiB Memory' },
-          { value: 'u1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'u1.2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory' },
-          { value: 'u1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
-          { value: 'u1.xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory' },
-          { value: 'u1.2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory' },
-          { value: 'u1.4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory' },
-          { value: 'u1.8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory' },
+          { value: 'u1.nano', label: 'nano: 1 vCPU, 512 MiB Memory' },
+          { value: 'u1.micro', label: 'micro: 1 vCPU, 1 GiB Memory' },
+          { value: 'u1.small', label: 'small: 1 vCPU, 2 GiB Memory' },
+          { value: 'u1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'u1.2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory' },
+          { value: 'u1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
+          { value: 'u1.xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory' },
+          { value: 'u1.2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory' },
+          { value: 'u1.4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory' },
+          { value: 'u1.8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory' },
         ]},
       { id: 'memory', title: 'Memory Intensive', meta: 'M series', icon: 'fa-memory', defaultSize: 'm1.medium',
         sizes: [
-          { value: 'm1.medium', label: 'medium: 1 CPU, 8 GiB Memory' },
-          { value: 'm1.large', label: 'large: 2 CPUs, 16 GiB Memory' },
-          { value: 'm1.xlarge', label: 'xlarge: 4 CPUs, 32 GiB Memory' },
+          { value: 'm1.medium', label: 'medium: 1 vCPU, 8 GiB Memory' },
+          { value: 'm1.large', label: 'large: 2 vCPUs, 16 GiB Memory' },
+          { value: 'm1.xlarge', label: 'xlarge: 4 vCPUs, 32 GiB Memory' },
         ]},
       { id: 'network', title: 'Network', meta: 'N series', icon: 'fa-network-wired', defaultSize: 'n1.medium',
         sizes: [
-          { value: 'n1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'n1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'n1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'n1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
       { id: 'overcommitted', title: 'Overcommitted', meta: 'O series', icon: 'fa-cubes', defaultSize: 'o1.medium',
         sizes: [
-          { value: 'o1.medium', label: 'medium: 1 CPU, 2 GiB Memory' },
-          { value: 'o1.large', label: 'large: 2 CPUs, 4 GiB Memory' },
+          { value: 'o1.medium', label: 'medium: 1 vCPU, 2 GiB Memory' },
+          { value: 'o1.large', label: 'large: 2 vCPUs, 4 GiB Memory' },
         ]},
       { id: 'realtime', title: 'Realtime', meta: 'RT series', icon: 'fa-clock', defaultSize: 'rt1.medium',
         sizes: [
-          { value: 'rt1.medium', label: 'medium: 1 CPU, 4 GiB Memory' },
-          { value: 'rt1.large', label: 'large: 2 CPUs, 8 GiB Memory' },
+          { value: 'rt1.medium', label: 'medium: 1 vCPU, 4 GiB Memory' },
+          { value: 'rt1.large', label: 'large: 2 vCPUs, 8 GiB Memory' },
         ]},
     ];
 
@@ -7049,7 +6998,7 @@
         computeResource: 'large',
         bootDiskGiB: 40,
         arch: 'amd64',
-        cpu: '2 vCPU',
+        cpu: '2 vCPUs',
         mem: '8 GiB',
         storage: '40 GiB',
         workload: 'Server',
@@ -7164,7 +7113,7 @@
         computeResource: 'xlarge',
         bootDiskGiB: 40,
         arch: 'amd64',
-        cpu: '4 vCPU',
+        cpu: '4 vCPUs',
         mem: '16 GiB',
         storage: '40 GiB',
         workload: 'Server',
@@ -7211,7 +7160,7 @@
     }
     function templateCardSpecsHtml(specs, storage, diskImageHtml) {
       const rows = [
-        { label: 'vCPU', value: specs.cpu },
+        { label: 'vCPUs', value: specs.cpu },
         { label: 'Memory', value: specs.mem },
         { label: 'Storage', value: storage },
         { label: 'Disk image', value: diskImageHtml },
@@ -7239,16 +7188,16 @@
 
     const CATALOG_OS_IMAGES = ['rhel.10', 'rhel.9', 'Windows.2k25', 'fedora'];
     const COMPUTE_RESOURCES = [
-      { id: 'nano', label: 'nano: 1 CPU, 512 MiB Memory', hourly: 0.05 },
-      { id: 'micro', label: 'micro: 1 CPU, 1 GiB Memory', hourly: 0.12 },
-      { id: 'small', label: 'small: 1 CPU, 2 GiB Memory', hourly: 0.80 },
-      { id: 'medium', label: 'medium: 1 CPU, 4 GiB Memory', hourly: 1.60 },
-      { id: '2xmedium', label: '2xmedium: 2 CPUs, 4 GiB Memory', hourly: 2.40 },
-      { id: 'large', label: 'large: 2 CPUs, 8 GiB Memory', hourly: 4.70 },
-      { id: 'xlarge', label: 'xlarge: 4 CPUs, 16 GiB Memory', hourly: 9.40 },
-      { id: '2xlarge', label: '2xlarge: 8 CPUs, 32 GiB Memory', hourly: 18.80 },
-      { id: '4xlarge', label: '4xlarge: 16 CPUs, 64 GiB Memory', hourly: 37.60 },
-      { id: '8xlarge', label: '8xlarge: 32 CPUs, 128 GiB Memory', hourly: 75.20 },
+      { id: 'nano', label: 'nano: 1 vCPU, 512 MiB Memory', hourly: 0.05 },
+      { id: 'micro', label: 'micro: 1 vCPU, 1 GiB Memory', hourly: 0.12 },
+      { id: 'small', label: 'small: 1 vCPU, 2 GiB Memory', hourly: 0.80 },
+      { id: 'medium', label: 'medium: 1 vCPU, 4 GiB Memory', hourly: 1.60 },
+      { id: '2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory', hourly: 2.40 },
+      { id: 'large', label: 'large: 2 vCPUs, 8 GiB Memory', hourly: 4.70 },
+      { id: 'xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory', hourly: 9.40 },
+      { id: '2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory', hourly: 18.80 },
+      { id: '4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory', hourly: 37.60 },
+      { id: '8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory', hourly: 75.20 },
     ];
     const CATALOG_BOOT_DISK_GIB = [5, 10, 20];
     /** Storage estimate rate (~$0.10 / GiB / month) */
@@ -7283,10 +7232,10 @@
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
       if (!c) return { cpu: '—', mem: '—' };
-      const m = String(c.label).match(/:\s*(\d+)\s*CPUs?,\s*(.+?)\s*Memory/i);
+      const m = String(c.label).match(/:\s*(\d+)\s*vCPUs?,\s*(.+?)\s*Memory/i);
       if (!m) return { cpu: '—', mem: '—' };
       return {
-        cpu: `${m[1]} vCPU`,
+        cpu: Number(m[1]) === 1 ? '1 vCPU' : `${m[1]} vCPUs`,
         mem: m[2].trim(),
       };
     }
@@ -7295,8 +7244,7 @@
     function formatComputeDisplay(id) {
       const specs = computeResourceSpecs(id);
       if (!specs || specs.cpu === '—') return '—';
-      const cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
-      return `${cpu} | ${specs.mem} Memory`;
+      return `${specs.cpu} | ${specs.mem} Memory`;
     }
 
     /** Overview Configuration: derive Compute resource, vCPU, and Memory from the same compute id. */
@@ -7307,7 +7255,7 @@
       const memory = specs.mem && specs.mem !== '—' ? specs.mem : (vm.mem || '—');
       return {
         computeResource: formatComputeDisplay(computeId),
-        vcpu: cpuCount === 1 ? '1 core' : `${cpuCount} cores`,
+        vcpu: cpuCount === 1 ? '1 vCPU' : `${cpuCount} vCPUs`,
         memory,
       };
     }
@@ -7588,7 +7536,7 @@
       if (!vm || !id) return;
       const specs = computeResourceSpecs(id);
       vm.computeResource = id;
-      vm.cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      vm.cpu = String(specs.cpu);
       vm.mem = specs.mem;
       closeEditComputeModal();
       renderVmDetail();
@@ -8253,7 +8201,7 @@
       additional: [
         { id: 'created', label: 'Created', sortable: true },
         { id: 'memory', label: 'Memory', sortable: false },
-        { id: 'cpu', label: 'CPU', sortable: false },
+        { id: 'cpu', label: 'vCPUs', sortable: false },
         { id: 'network', label: 'Network', sortable: false },
         { id: 'deletionProtection', label: 'Deletion protection', sortable: false },
         { id: 'storageClass', label: 'Storage tier', sortable: false },
@@ -10661,82 +10609,84 @@
       }
     }
 
-    function renderCatalogAccessSelect({ id, stateKey, selected, labelledBy }) {
-      const current = selected === 'locked' ? 'locked' : 'editable';
-      return `
-        <select id="${id}" class="ci-tenant-access__select" data-ci-access-state="${stateKey}"
-          aria-labelledby="${labelledBy}">
-          <option value="editable" ${current === 'editable' ? 'selected' : ''}>Editable at provisioning</option>
-          <option value="locked" ${current === 'locked' ? 'selected' : ''}>Locked</option>
-        </select>`;
+    const CATALOG_ACCESS_HELP_LS = 'vmaas.prototype.catalogAccessHelpSeen';
+    const CATALOG_ACCESS_HELP_TEXT =
+      'Editable lets tenants change this when creating a VM; Locked keeps your default.';
+
+    function catalogAccessHelpSeen() {
+      try { return localStorage.getItem(CATALOG_ACCESS_HELP_LS) === '1'; }
+      catch (_) { return false; }
     }
 
-    function catalogTenantAccessSummary(fields) {
-      if (!fields.length) return '';
-      const locked = fields.filter(f => f.value === 'locked').length;
-      if (locked === 0) return 'All fields editable at provisioning';
-      if (locked === fields.length) return locked === 1 ? '1 field locked' : `${locked} fields locked`;
-      return `${locked} of ${fields.length} fields locked`;
+    function markCatalogAccessHelpSeen() {
+      try { localStorage.setItem(CATALOG_ACCESS_HELP_LS, '1'); }
+      catch (_) { /* ignore */ }
     }
 
-    /** Expandable PF-style field group listing Locked/Editable for fields on this step. */
-    function renderCatalogTenantAccessGroup({ stepKey, expanded, fields }) {
-      if (!fields.length) return '';
-      const summary = catalogTenantAccessSummary(fields);
-      const bodyId = `ci-tenant-access-body-${stepKey}`;
-      const rows = fields.map(f => {
-        const labelId = `ci-access-label-${f.stateKey}`;
-        const help = f.value === 'locked'
-          ? (f.lockedHelp || 'Tenants can’t change this setting when they create a virtual machine.')
-          : (f.editableHelp || 'Tenants can change this setting when they create a virtual machine.');
-        return `
-          <div class="ci-tenant-access__row form-field">
-            <label id="${labelId}" for="ci-access-${f.stateKey}">${f.label}</label>
-            ${renderCatalogAccessSelect({
-              id: `ci-access-${f.stateKey}`,
-              stateKey: f.stateKey,
-              selected: f.value,
-              labelledBy: labelId,
-            })}
-            <p class="form-helper">${help}</p>
-          </div>`;
-      }).join('');
+    /** Reset per catalog-create panel render so help attaches to the first switch only. */
+    let _ciAccessHelpSlotOpen = false;
+    function beginCatalogAccessSwitchRender() {
+      _ciAccessHelpSlotOpen = !catalogAccessHelpSeen();
+    }
+
+    function takeCatalogAccessHelpHtml() {
+      if (!_ciAccessHelpSlotOpen) return '';
+      _ciAccessHelpSlotOpen = false;
+      markCatalogAccessHelpSeen();
+      return `<p class="form-helper ci-access-help" id="ci-access-help">${CATALOG_ACCESS_HELP_TEXT}</p>`;
+    }
+
+    /**
+     * PF Switch for tenant access. ON = Editable (static label per a11y).
+     * Optional muted "Locked" cue when off (aria-hidden; AT uses switch state).
+     */
+    function renderCatalogAccessSwitch({ stateKey, value }) {
+      const editable = value !== 'locked';
+      const id = `ci-access-${stateKey}`;
+      const labelId = `${id}-label`;
       return `
-        <section class="ci-tenant-access${expanded ? ' pf-m-expanded' : ''}" aria-label="Tenant access">
-          <button type="button" class="ci-tenant-access__toggle" id="ci-tenant-access-toggle-${stepKey}"
-            aria-expanded="${expanded ? 'true' : 'false'}" aria-controls="${bodyId}">
-            <span class="ci-tenant-access__toggle-icon" aria-hidden="true"><i class="fa-solid fa-angle-right"></i></span>
-            <span class="ci-tenant-access__toggle-text">
-              <span class="ci-tenant-access__title">Tenant access</span>
-              <span class="ci-tenant-access__summary">${summary}</span>
+        <div class="ci-access-switch">
+          <span class="ci-access-switch__locked" aria-hidden="true"${editable ? ' hidden' : ''}>Locked</span>
+          <label class="pf-v6-c-switch" for="${id}">
+            <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="${id}"
+              data-ci-access-state="${stateKey}"
+              aria-labelledby="${labelId}"
+              ${editable ? 'checked' : ''} />
+            <span class="pf-v6-c-switch__toggle" aria-hidden="true">
+              <span class="pf-v6-c-switch__toggle-icon">
+                <i class="fas fa-check" aria-hidden="true"></i>
+              </span>
             </span>
-          </button>
-          <div class="ci-tenant-access__body" id="${bodyId}" ${expanded ? '' : 'hidden'}>
-            <p class="form-helper ci-tenant-access__intro">
-              Control whether tenants can change these defaults when they create a virtual machine.
-            </p>
-            ${rows}
-          </div>
-        </section>`;
+            <span class="pf-v6-c-switch__label" id="${labelId}" aria-hidden="true">Editable</span>
+          </label>
+        </div>`;
     }
 
-    function bindCatalogTenantAccessGroup(panel, c, stepKey) {
-      panel.querySelector(`#ci-tenant-access-toggle-${stepKey}`)?.addEventListener('click', e => {
-        e.preventDefault();
-        c.tenantAccessExpanded = !c.tenantAccessExpanded;
-        renderCreateCatalogItemWizard();
-      });
-      panel.querySelectorAll('[data-ci-access-state]').forEach(sel => {
-        sel.addEventListener('change', () => {
-          const key = sel.dataset.ciAccessState;
-          c[key] = sel.value;
-          if (key === 'computeAccess') c.tenantAccess = sel.value;
+    /** Field / section title row with access switch on the right. */
+    function renderCatalogFieldLabelRow({ labelHtml, labelId, forId, tag = 'label', labelClass = '', stateKey, value }) {
+      const cls = labelClass ? ` class="${labelClass}"` : '';
+      const idAttr = labelId ? ` id="${labelId}"` : '';
+      const forAttr = (forId && tag === 'label') ? ` for="${forId}"` : '';
+      const helpHtml = takeCatalogAccessHelpHtml();
+      return `
+        <div class="ci-field-label-row">
+          <${tag}${cls}${idAttr}${forAttr}>${labelHtml}</${tag}>
+          ${renderCatalogAccessSwitch({ stateKey, value })}
+        </div>${helpHtml}`;
+    }
+
+    function bindCatalogAccessSwitches(panel, c) {
+      panel.querySelectorAll('input[data-ci-access-state]').forEach(input => {
+        input.addEventListener('change', () => {
+          const key = input.dataset.ciAccessState;
+          c[key] = input.checked ? 'editable' : 'locked';
+          if (key === 'computeAccess') c.tenantAccess = c[key];
           renderCreateCatalogItemWizard();
         });
       });
     }
 
-        const CATALOG_RUN_STRATEGY_OPTIONS = [
+    const CATALOG_RUN_STRATEGY_OPTIONS = [
       { id: 'Always', label: 'Always', desc: 'Keep the virtual machine running; restart if it stops.' },
       { id: 'RerunOnFailure', label: 'Rerun on failure', desc: 'Restart the virtual machine only if it fails.' },
       { id: 'Manual', label: 'Manual', desc: 'Do not start or restart automatically.' },
@@ -10744,7 +10694,7 @@
     ];
 
     function catalogAccessLabel(value) {
-      return value === 'locked' ? 'Locked' : 'Editable at provisioning';
+      return value === 'locked' ? 'Locked' : 'Editable';
     }
 
     function catalogOptionalValueLabel(value, formatter) {
@@ -10845,7 +10795,7 @@
       if (draft.step === 0) return validateGeneralStep(draft, INSTANCE_TYPES.map(it => it.name));
       if (draft.step === 1) {
         const errors = {};
-        if (!Number.isFinite(draft.cpu) || draft.cpu < 1) errors.cpu = 'Enter CPU cores.';
+        if (!Number.isFinite(draft.cpu) || draft.cpu < 1) errors.cpu = 'Enter vCPUs.';
         if (!Number.isFinite(draft.memoryGiB) || draft.memoryGiB < 1) errors.memory = 'Enter memory in GiB.';
         draft.fieldErrors = errors;
         return Object.keys(errors).length === 0;
@@ -10878,7 +10828,7 @@
           <h3>Configuration</h3>
           <p class="create-resource-wiz__help">Define compute resources for this instance type.</p>
           <div class="form-field${cpuErr ? ' pf-m-error' : ''}">
-            <label for="create-it-cpu">CPU cores <span class="req">*</span></label>
+            <label for="create-it-cpu">vCPUs <span class="req">*</span></label>
             <input type="number" id="create-it-cpu" class="unit-size-input" min="1" step="1" value="${escAttr(draft.cpu)}" required
               ${cpuErr ? 'aria-describedby="create-it-cpu-error" aria-invalid="true"' : ''} />
             ${providerFieldErrorHtml(cpuErr, 'create-it-cpu-error')}
@@ -10919,7 +10869,7 @@
             ['Description', escAttr(draft.description || '—')],
             ['Scope', escAttr(providerScopeLabel(draft))],
             ['Labels', labels],
-            ['CPU cores', escAttr(draft.cpu)],
+            ['vCPUs', escAttr(draft.cpu)],
             ['Memory (GiB)', escAttr(draft.memoryGiB)],
             ['GPU count', escAttr(draft.gpuCount || 0)],
             ['Resource name', escAttr(draft.gpuResource || '—')],
@@ -10969,7 +10919,7 @@
         draft.step = 1;
         validateCreateInstanceTypeStep();
         renderCreateInstanceTypeWizard();
-        toast('CPU cores and Memory (GiB) are required.');
+        toast('vCPUs and Memory (GiB) are required.');
         return;
       }
       INSTANCE_TYPES.unshift({
@@ -11616,7 +11566,7 @@
       const computeId = resolveVmComputeId(enriched);
       const specs = computeResourceSpecs(computeId);
       enriched.computeResource = computeId;
-      if (specs.cpu !== '—') enriched.cpu = String(specs.cpu).replace(/\bvCPU\b/g, 'CPU');
+      if (specs.cpu !== '—') enriched.cpu = String(specs.cpu);
       if (specs.mem !== '—') enriched.mem = specs.mem;
       enriched.utilization = getVmUtilization(enriched);
       return enriched;
@@ -12873,11 +12823,11 @@
       return `
         <div class="util-grid">
           <div class="util-tile">
-            <div class="util-tile__label">CPU</div>
+            <div class="util-tile__label">vCPUs</div>
             <div class="util-tile__abs">${u.cpuAbs || '—'}</div>
             <div class="util-tile__abs-sub">Requested of ${u.cpuOf || '1'}</div>
             <div class="util-donut-wrap">
-              <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% CPU used">
+              <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% vCPU used">
                 <svg viewBox="0 0 100 100" aria-hidden="true">
                   <circle class="util-donut__track" cx="50" cy="50" r="40" />
                   <circle class="util-donut__arc" cx="50" cy="50" r="40" />
@@ -14763,7 +14713,7 @@
                     <thead>
                       <tr>
                         <th>Name</th>
-                        <th>CPU</th>
+                        <th>vCPUs</th>
                         <th>Memory</th>
                         <th>Storage</th>
                         <th>Estimate cost</th>
@@ -16758,7 +16708,7 @@
       const gpuCount = it.gpus == null ? '—' : String(it.gpus);
       const gpuPci = it.gpuPci ? String(it.gpuPci).replace(/</g, '&lt;') : '—';
       const gpuResource = it.gpuResource ? String(it.gpuResource).replace(/</g, '&lt;') : '—';
-      const subtitle = `${it.cpu} CPU cores · ${it.memoryGiB} GiB`;
+      const subtitle = `${it.cpu === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GiB`;
 
       root.innerHTML = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
@@ -16801,7 +16751,7 @@
             </section>
             <section class="ethan-detail-col" aria-labelledby="it-compute-title">
               <h3 class="ethan-detail-col__title" id="it-compute-title">Compute</h3>
-              ${itField('CPU cores', String(it.cpu))}
+              ${itField('vCPUs', String(it.cpu))}
               ${itField('Memory (GiB)', String(it.memoryGiB))}
             </section>
             <section class="ethan-detail-col" aria-labelledby="it-gpu-title">
@@ -17084,12 +17034,12 @@
         id,
         label: it.label || it.name,
         instanceTypeName: it.instanceTypeName || it.name,
-        cpu: `${it.cpu} vCPU`,
+        cpu: Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`,
         memory: `${it.memoryGiB} GB`,
         gpu: formatCatalogInstanceTypeGpu(it),
         rateHour: item.rateHour || it.rateHour,
         rateMonth: item.rateMonth || it.rateMonth,
-        summary: `${it.label || it.name} · ${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
+        summary: `${it.label || it.name} · ${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
       };
     }
 
@@ -17259,7 +17209,7 @@
       if (!it) return { title: 'Not set', desc: 'Tenants choose compute when creating a virtual machine' };
       return {
         title: it.label || it.name,
-        desc: `${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
+        desc: `${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
       };
     }
 
@@ -17477,6 +17427,7 @@
       if (!c) return;
 
       if (key === 'ci-details') {
+        beginCatalogAccessSwitchRender();
         if (!c.diskImageAccess) c.diskImageAccess = 'editable';
         const diskImages = filteredCatalogDiskImages('', c.diskImageFilter);
         if (c.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(d => d.id === c.diskImageId)) {
@@ -17533,7 +17484,13 @@
           </div>
           <hr class="form-section-divider" />
           <div class="form-field ${state.fieldErrors.ciDiskImage ? 'pf-m-error' : ''}">
-            <label id="ci-disk-image-label">Disk image</label>
+            ${renderCatalogFieldLabelRow({
+              labelHtml: 'Disk image',
+              labelId: 'ci-disk-image-label',
+              tag: 'label',
+              stateKey: 'diskImageAccess',
+              value: c.diskImageAccess || 'editable',
+            })}
             <div class="rich-select rich-select--typeahead ${c.diskImageMenuOpen ? 'pf-m-expanded' : ''}" id="ci-disk-image-select">
               ${pfRichSelectToggle({
                 id: 'ci-disk-image-toggle',
@@ -17555,17 +17512,6 @@
             ${derivedOsHtml}
             ${providerFieldErrorHtml(state.fieldErrors.ciDiskImage, 'err-ciDiskImage')}
           </div>
-          ${renderCatalogTenantAccessGroup({
-            stepKey: 'ci-details',
-            expanded: !!c.tenantAccessExpanded,
-            fields: [{
-              stateKey: 'diskImageAccess',
-              label: 'Disk image',
-              value: c.diskImageAccess || 'editable',
-              lockedHelp: 'Tenants can’t change the disk image.',
-              editableHelp: 'Tenants can change the disk image when they create a virtual machine.',
-            }],
-          })}
         `;
         panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
           c.name = generateCatalogItemName();
@@ -17574,7 +17520,7 @@
           if (input) input.value = c.name;
           renderCreateCatalogItemWizard();
         });
-        bindCatalogTenantAccessGroup(panel, c, 'ci-details');
+        bindCatalogAccessSwitches(panel, c);
         bindRichSelect(panel.querySelector('#ci-disk-image-select'), {
           toggleSel: '#ci-disk-image-toggle',
           menuSel: '#ci-disk-image-menu',
@@ -17603,6 +17549,7 @@
       }
 
       if (key === 'ci-access') {
+        beginCatalogAccessSwitchRender();
         if (!c.computeAccess) c.computeAccess = 'editable';
         c.tenantAccess = c.computeAccess;
         if (!c.runStrategyAccess) c.runStrategyAccess = 'editable';
@@ -17629,7 +17576,14 @@
           <h3>Compute resources</h3>
           <p class="create-resource-wiz__help">Optionally set compute defaults for this catalog item. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
           <div class="form-field">
-            <h4 class="config-section-title config-section-title--first" id="ci-compute-section-label">Compute resource</h4>
+            ${renderCatalogFieldLabelRow({
+              labelHtml: 'Compute resource',
+              labelId: 'ci-compute-section-label',
+              tag: 'h4',
+              labelClass: 'config-section-title config-section-title--first',
+              stateKey: 'computeAccess',
+              value: c.computeAccess || 'editable',
+            })}
             <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
               ${pfRichSelectToggle({
                 id: 'ci-compute-toggle',
@@ -17663,7 +17617,7 @@
                       <span class="pf-v6-c-menu__item-main">
                         <span class="rich-select__option-body">
                           <span class="rich-select__option-title">${it.label}</span>
-                          <span class="rich-select__option-desc">${it.cpu} vCPU · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)} · ${opt.rateHour}</span>
+                          <span class="rich-select__option-desc">${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)} · ${opt.rateHour}</span>
                         </span>
                       </span>
                     </button>`;
@@ -17674,7 +17628,14 @@
           </div>
           <hr class="form-section-divider" />
           <div class="form-field">
-            <h4 class="config-section-title" id="ci-run-strategy-label">Run strategy</h4>
+            ${renderCatalogFieldLabelRow({
+              labelHtml: 'Run strategy',
+              labelId: 'ci-run-strategy-label',
+              tag: 'h4',
+              labelClass: 'config-section-title',
+              stateKey: 'runStrategyAccess',
+              value: c.runStrategyAccess || 'editable',
+            })}
             <div class="rich-select rich-select--typeahead ${c.runStrategyMenuOpen ? 'pf-m-expanded' : ''}" id="ci-run-strategy-select">
               ${pfRichSelectToggle({
                 id: 'ci-run-strategy-toggle',
@@ -17715,28 +17676,8 @@
               </div>
             </div>
           </div>
-          ${renderCatalogTenantAccessGroup({
-            stepKey: 'ci-access',
-            expanded: !!c.tenantAccessExpanded,
-            fields: [
-              {
-                stateKey: 'computeAccess',
-                label: 'Compute resource',
-                value: c.computeAccess || 'editable',
-                lockedHelp: 'Tenants can’t change size or hardware.',
-                editableHelp: 'Tenants can change size or hardware when they create a virtual machine.',
-              },
-              {
-                stateKey: 'runStrategyAccess',
-                label: 'Run strategy',
-                value: c.runStrategyAccess || 'editable',
-                lockedHelp: 'Tenants can’t change run strategy.',
-                editableHelp: 'Tenants can change run strategy when they create a virtual machine.',
-              },
-            ],
-          })}
         `;
-        bindCatalogTenantAccessGroup(panel, c, 'ci-access');
+        bindCatalogAccessSwitches(panel, c);
         bindRichSelect(panel.querySelector('#ci-compute-select'), {
           toggleSel: '#ci-compute-toggle',
           menuSel: '#ci-compute-menu',
@@ -17768,6 +17709,7 @@
 
 
       if (key === 'ci-storage') {
+        beginCatalogAccessSwitchRender();
         const diskMin = 1;
         const diskMax = 16384;
         if (!c.bootDiskAccess) c.bootDiskAccess = 'editable';
@@ -17848,7 +17790,13 @@
           <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
           <div class="vm-config__fields">
             <div class="form-field">
-              <label for="ci-boot-disk" id="ci-boot-disk-label">Boot disk size (GiB)</label>
+              ${renderCatalogFieldLabelRow({
+                labelHtml: 'Boot disk size (GiB)',
+                labelId: 'ci-boot-disk-label',
+                forId: 'ci-boot-disk',
+                stateKey: 'bootDiskAccess',
+                value: c.bootDiskAccess || 'editable',
+              })}
               <input type="number" id="ci-boot-disk" class="unit-size-input" value="${bootSizeVal}"
                 min="${diskMin}" max="${diskMax}" step="1" placeholder="Not set"
                 aria-label="Boot disk size in GiB" />
@@ -17856,7 +17804,12 @@
             </div>
             <hr class="form-section-divider" />
             <div class="form-field">
-              <label id="ci-boot-tier-label">Boot storage tier</label>
+              ${renderCatalogFieldLabelRow({
+                labelHtml: 'Boot storage tier',
+                labelId: 'ci-boot-tier-label',
+                stateKey: 'bootStorageTierAccess',
+                value: c.bootStorageTierAccess || 'editable',
+              })}
               <div class="rich-select rich-select--typeahead ${c.bootTierMenuOpen ? 'pf-m-expanded' : ''}" id="ci-boot-tier-select">
                 ${pfRichSelectToggle({
                   id: 'ci-boot-tier-toggle',
@@ -17898,38 +17851,18 @@
               </div>
             </div>
             <hr class="form-section-divider" />
-            <h3 class="config-sets-title">Additional disks</h3>
+            ${extraDisks.length ? renderCatalogFieldLabelRow({
+              labelHtml: 'Additional disks',
+              labelId: 'ci-extra-disks-label',
+              tag: 'h3',
+              labelClass: 'config-sets-title',
+              stateKey: 'extraDisksAccess',
+              value: c.extraDisksAccess || 'editable',
+            }) : '<h3 class="config-sets-title">Additional disks</h3>'}
             ${diskSetsHtml}
             <div class="add-disk-action">
               ${pfInlineLinkButton({ id: 'ci-add-disk', label: 'Add disk', icon: 'plus' })}
             </div>
-            ${renderCatalogTenantAccessGroup({
-              stepKey: 'ci-storage',
-              expanded: !!c.tenantAccessExpanded,
-              fields: [
-                {
-                  stateKey: 'bootDiskAccess',
-                  label: 'Boot disk size',
-                  value: c.bootDiskAccess || 'editable',
-                  lockedHelp: 'Tenants can’t change boot disk size.',
-                  editableHelp: 'Tenants can change boot disk size when they create a virtual machine.',
-                },
-                {
-                  stateKey: 'bootStorageTierAccess',
-                  label: 'Boot storage tier',
-                  value: c.bootStorageTierAccess || 'editable',
-                  lockedHelp: 'Tenants can’t change boot storage tier.',
-                  editableHelp: 'Tenants can change boot storage tier when they create a virtual machine.',
-                },
-                ...((extraDisks.length) ? [{
-                  stateKey: 'extraDisksAccess',
-                  label: 'Additional disks',
-                  value: c.extraDisksAccess || 'editable',
-                  lockedHelp: 'Tenants can’t add, remove, or change additional disks.',
-                  editableHelp: 'Tenants can add, remove, or change additional disks when they create a virtual machine.',
-                }] : []),
-              ],
-            })}
           </div>
         `;
         const syncBootSize = () => {
@@ -17946,7 +17879,7 @@
         };
         panel.querySelector('#ci-boot-disk')?.addEventListener('change', syncBootSize);
         panel.querySelector('#ci-boot-disk')?.addEventListener('input', syncBootSize);
-        bindCatalogTenantAccessGroup(panel, c, 'ci-storage');
+        bindCatalogAccessSwitches(panel, c);
         bindRichSelect(panel.querySelector('#ci-boot-tier-select'), {
           toggleSel: '#ci-boot-tier-toggle',
           menuSel: '#ci-boot-tier-menu',
@@ -17978,7 +17911,6 @@
             tierMenuOpen: false,
             tierFilter: '',
           });
-          if (wasEmpty) c.tenantAccessExpanded = true;
           renderCreateCatalogItemWizard();
         });
         panel.querySelectorAll('[data-remove-ci-disk]').forEach(btn => {
@@ -18175,6 +18107,7 @@
       }
 
       if (key === 'ci-access-init') {
+        beginCatalogAccessSwitchRender();
         if (c.cloudInit == null) c.cloudInit = '';
         if (c.sysprep == null) c.sysprep = '';
         if (!c.initAccess) c.initAccess = 'editable';
@@ -18209,23 +18142,18 @@
             })}
           </div>
           <div class="form-field" style="margin-top:16px;">
-            <label for="ci-init-config" id="ci-init-config-label">${initLabel}</label>
+            ${renderCatalogFieldLabelRow({
+              labelHtml: initLabel,
+              labelId: 'ci-init-config-label',
+              forId: 'ci-init-config',
+              stateKey: 'initAccess',
+              value: c.initAccess || 'editable',
+            })}
             <textarea id="ci-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
               rows="${initExpanded ? 8 : 1}"
               placeholder="${initPlaceholder}"
               aria-label="${initLabel}">${String(initValue).replace(/</g, '&lt;')}</textarea>
           </div>
-          ${renderCatalogTenantAccessGroup({
-            stepKey: 'ci-access-init',
-            expanded: !!c.tenantAccessExpanded,
-            fields: [{
-              stateKey: 'initAccess',
-              label: 'User data',
-              value: c.initAccess || 'editable',
-              lockedHelp: 'Tenants can’t change user data (Cloud-init / Sysprep).',
-              editableHelp: 'Tenants can change user data when they create a virtual machine.',
-            }],
-          })}
         `;
         panel.querySelectorAll('input[name="ciInitMethod"]').forEach(r => {
           r.addEventListener('change', () => {
@@ -18233,7 +18161,7 @@
             renderCreateCatalogItemWizard();
           });
         });
-        bindCatalogTenantAccessGroup(panel, c, 'ci-access-init');
+        bindCatalogAccessSwitches(panel, c);
         const initEl = panel.querySelector('#ci-init-config');
         if (initEl) {
           const syncInitHeight = () => {
@@ -18560,8 +18488,8 @@
         </div>`;
       return `
         ${field('Size', `<span>${sizeLabel}</span>${computeBadge}`)}
-        ${field('CPU', esc(compute.cpu))}
-        ${field('RAM', esc(compute.memory))}
+        ${field('vCPUs', esc(compute.cpu))}
+        ${field('Memory', esc(compute.memory))}
         ${field('GPU', esc(compute.gpu))}
         ${field('Disk image', `${diskIcon}<span>${diskImage}</span>${diskBadge}`)}`;
     }
@@ -18575,8 +18503,8 @@
       const govBadge = catalogGovBadge(diskLocked ? 'locked' : 'editable');
       const diskIcon = catalogDiskImageIconHtml(item.diskImage);
       const rows = [
-        { label: 'CPU', value: compute.cpu },
-        { label: 'RAM', value: compute.memory },
+        { label: 'vCPUs', value: compute.cpu },
+        { label: 'Memory', value: compute.memory },
         { label: 'GPU', value: compute.gpu },
       ];
       return `${rows.map(row => `
