@@ -6149,7 +6149,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · it-gpu-filter 7111</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · it-gpu-filter 7112</span>
         </div>
       </div>
       <div class="console__body">
@@ -7023,7 +7023,7 @@
             <span class="pf-v6-c-modal-box__title-text">Edit instance type</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="compute-modal-desc">
-            Only instance types that match this virtual machine’s GPU configuration are available.
+            This virtual machine configuration allows instance types without a GPU.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
@@ -7506,8 +7506,8 @@
 
     function editComputeModalDescription(requireGpu) {
       return requireGpu
-        ? 'Only GPU instance types are available.'
-        : 'Only non-GPU instance types are available.';
+        ? 'This virtual machine configuration allows instance types with a GPU.'
+        : 'This virtual machine configuration allows instance types without a GPU.';
     }
 
 
@@ -7765,7 +7765,6 @@
             </div>
             <input type="hidden" id="f-edit-compute-resource" value="${richSelectEsc(m.selectedId)}" />
           </div>
-          <p class="form-helper" id="f-edit-compute-gpu-help">${editComputeModalDescription(requireGpu)}</p>
         </div>
       `;
 
