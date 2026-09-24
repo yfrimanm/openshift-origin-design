@@ -7023,7 +7023,7 @@
             <span class="pf-v6-c-modal-box__title-text">Edit instance type</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="compute-modal-desc">
-            Choose an instance type for this virtual machine. You can only switch to another instance type that matches this virtual machine’s current GPU configuration.
+            Only instance types that match this virtual machine’s GPU configuration are available.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
@@ -7506,8 +7506,8 @@
 
     function editComputeModalDescription(requireGpu) {
       return requireGpu
-        ? 'You can only switch to another instance type that includes a GPU. Changing to an instance type without a GPU is not supported after the virtual machine is created.'
-        : 'You can only switch to another instance type without a GPU. Changing to an instance type with a GPU is not supported after the virtual machine is created.';
+        ? 'Only GPU instance types are available.'
+        : 'Only non-GPU instance types are available.';
     }
 
 
