@@ -1159,7 +1159,7 @@
     .vm-dl .res-icon {
       width: 18px; height: 18px; font-size: 8px;
     }
-    .vm-arch-badge.pf-v6-c-badge {
+    .vm-arch-label.pf-v6-c-label {
       flex-shrink: 0;
       vertical-align: middle;
     }
@@ -1253,6 +1253,46 @@
       margin: 16px 0 0;
       min-height: 48px;
     }
+    .vm-overview-v2__aside-empty.muted {
+      min-height: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .vm-ip-card__row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .vm-ip-card__row + .vm-ip-card__row {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .vm-ip-card__meta { min-width: 0; }
+    .vm-ip-card__label {
+      margin: 0 0 6px;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.3;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .vm-ip-card__value {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--vmaas-text, #151515);
+      word-break: break-word;
+    }
+    .vm-overview-v2 .overview-table--network col.overview-col { width: 28%; }
+    .vm-overview-v2 .overview-table--network col.overview-col--actions { width: 3rem; }
+    .overview-sg-list {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: center;
+    }
     .vm-overview-v2 .overview-table {
       width: 100%;
       table-layout: fixed;
@@ -1340,9 +1380,102 @@
     .ethan-detail-cols--2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .ethan-detail-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+      gap: 24px 32px;
+      align-items: start;
+    }
+    .ethan-detail-top__cols {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 48px;
+    }
     @media (max-width: 900px) {
       .ethan-detail-cols,
       .ethan-detail-cols--2 { grid-template-columns: 1fr; gap: 28px; }
+      .ethan-detail-top { grid-template-columns: 1fr; }
+      .ethan-detail-top__cols { grid-template-columns: 1fr; }
+    }
+    .ethan-aside-card {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 7rem;
+    }
+    .ethan-aside-card__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .ethan-aside-card__title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--vmaas-text, #151515);
+    }
+    .ethan-aside-card__body {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .ethan-resource-section {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .ethan-resource-section:first-of-type { margin-top: 24px; }
+    .ethan-resource-section__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .ethan-resource-section__head .ethan-detail-col__title { margin-bottom: 0; }
+    .ethan-resource-list { list-style: none; margin: 0; padding: 0; }
+    .ethan-resource-list__item {
+      display: grid;
+      grid-template-columns: minmax(10rem, 14rem) auto minmax(0, 1fr) auto;
+      gap: 12px 20px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .ethan-resource-list__item:last-child { border-bottom: none; }
+    .ethan-resource-list__meta {
+      font-size: 14px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .ethan-resource-list__actions { justify-self: end; }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .status-badge.pf-m-ready { color: #1e4f18; background: #c7f0c0; }
+    .status-badge.pf-m-provisioning { color: #002952; background: #c8ebfa; }
+    .status-badge.pf-m-other { color: #4d4d4d; background: #e0e0e0; }
+    @media (max-width: 700px) {
+      .ethan-resource-list__item {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "name actions"
+          "status status"
+          "meta meta";
+      }
+      .ethan-resource-list__item > :nth-child(1) { grid-area: name; }
+      .ethan-resource-list__item > :nth-child(2) { grid-area: status; }
+      .ethan-resource-list__item > :nth-child(3) { grid-area: meta; }
+      .ethan-resource-list__item > :nth-child(4) { grid-area: actions; }
     }
     .ethan-detail-col__title {
       /* Ethan section title (Overview / Configuration): ~32px to first label */
@@ -1569,6 +1702,75 @@
       text-decoration: underline dotted;
       text-underline-offset: 3px;
     }
+    /* Overview status opens a popover — same dotted cue as other popover values. */
+    .vm-overview-v2 .status-link__label,
+    .vm-overview-v2 .status-link:hover .status-link__label {
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
+    .ethan-detail-col__subtitle {
+      margin: 8px 0 16px;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--vmaas-text, #151515);
+    }
+    .ethan-detail-col__subtitle:first-child { margin-top: 0; }
+    /* Instance type heading + Edit — same modal class as Add network / Add disk */
+    .ethan-detail-col__subtitle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0 16px;
+    }
+    .ethan-detail-col__subtitle-row .ethan-detail-col__subtitle {
+      margin: 0;
+    }
+    .ethan-detail-col__subtitle-row:first-child { margin-top: 0; }
+    /* Annotation tags use Label (not Badge); keep text regular weight */
+    .pf-v6-c-label.pf-m-compact .pf-v6-c-label__text {
+      font-weight: 400;
+    }
+    .bootable-label.pf-v6-c-label,
+    .arch-label.pf-v6-c-label {
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+    #disk-image-popover,
+    #it-pci-popover,
+    #storage-tier-popover {
+      display: none;
+      position: fixed;
+      z-index: 500;
+      max-width: 22rem;
+    }
+    #disk-image-popover.pf-m-open,
+    #it-pci-popover.pf-m-open,
+    #storage-tier-popover.pf-m-open { display: block; }
+    #disk-image-popover .nic-detail-dl,
+    #it-pci-popover .nic-detail-dl,
+    #storage-tier-popover .nic-detail-dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 8px 16px;
+      margin: 0;
+    }
+    #disk-image-popover .nic-detail-dl dt,
+    #it-pci-popover .nic-detail-dl dt,
+    #storage-tier-popover .nic-detail-dl dt {
+      margin: 0;
+      font-size: 12px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-weight: 400;
+    }
+    #disk-image-popover .nic-detail-dl dd,
+    #it-pci-popover .nic-detail-dl dd,
+    #storage-tier-popover .nic-detail-dl dd {
+      margin: 0;
+      font-size: 14px;
+      color: var(--vmaas-text, #151515);
+      word-break: break-word;
+    }
 
     #nic-detail-popover {
       position: fixed;
@@ -1625,7 +1827,7 @@
     .pf-v6-c-button.pf-m-small {
       font-size: 13px; padding: 4px 12px; min-height: 28px;
     }
-    .vm-detail__title .vm-arch-badge { margin-left: 4px; vertical-align: middle; }
+    .vm-detail__title .vm-arch-label { margin-left: 4px; vertical-align: middle; }
     .vm-vnc {
       display: flex; flex-direction: column; align-items: stretch; text-align: left; min-width: 0;
     }
@@ -4604,7 +4806,7 @@
     .boot-table .toolbar .pf-v6-c-button { margin-inline-start: auto; }
     .boot-table table { width: 100%; }
     .boot-table th, .boot-table td { font-size: 13px; padding: 8px 10px; }
-    .arch-badge.pf-v6-c-badge {
+    .arch-label.pf-v6-c-label {
       flex-shrink: 0;
     }
 
@@ -4752,7 +4954,7 @@
     }
     .storage-toolbar .filter-name-search { flex: 1; min-width: 180px; max-width: 280px; height: 36px; }
     .storage-toolbar .form-check { margin: 0 0 0 4px; }
-    .bootable-badge.pf-v6-c-badge {
+    .bootable-label.pf-v6-c-label {
       flex-shrink: 0;
     }
     .side-table__name-cell {
@@ -5944,7 +6146,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 23 · access-switch-inline 7102</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · overview-labels 7110</span>
         </div>
       </div>
       <div class="console__body">
@@ -6283,6 +6485,23 @@
               </div>
             </div>
           </section>
+
+          <section class="view" id="view-network">
+            <div id="network-detail-root"></div>
+          </section>
+
+          <section class="view" id="view-project">
+            <div id="project-detail-root"></div>
+          </section>
+
+          <section class="view" id="view-subnet">
+            <div id="subnet-detail-root"></div>
+          </section>
+
+          <section class="view" id="view-security-group">
+            <div id="security-group-detail-root"></div>
+          </section>
+
           <section class="view" id="view-templates">
             <div class="page-header page-header--with-desc">
               <div class="page-header__text">
@@ -6798,15 +7017,15 @@
             </button>
           </div>
           <h1 class="pf-v6-c-modal-box__title" id="compute-modal-title">
-            <span class="pf-v6-c-modal-box__title-text">Edit compute resources</span>
+            <span class="pf-v6-c-modal-box__title-text">Edit instance type</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="compute-modal-desc">
-            Choose a compute size for this virtual machine.
+            Choose an instance type for this virtual machine.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
           <div class="form-field">
-            <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
+            <label for="f-edit-compute-resource">Instance type <span class="req">*</span></label>
             <span class="pf-v6-c-form-control" id="compute-modal-select-wrap"></span>
           </div>
         </div>
@@ -6903,14 +7122,14 @@
         nics: [{
           name: 'tenant-workload',
           virtualNetwork: 'tenant-workload',
-          subnet: 'subnet-name',
+          subnet: 'bm-compute-a',
           securityGroups: ['allow-ssh-https'],
           ip: '10.130.1.191',
           status: 'Active',
         }],
         disks: [
-          { name: 'Boot disk', size: 30, unit: 'GiB', bootable: true, storageTierLabel: 'Balanced' },
-          { name: 'cloud-init-disk', size: 'Dynamic', storageTierLabel: 'Balanced' },
+          { name: 'Boot disk', size: 30, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
+          { name: 'cloud-init-disk', size: 'Dynamic', storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
         ],
         utilizationDisplay: {
           cpuAbs: '92 m', cpuOf: '1', cpuPct: 9.2,
@@ -7233,7 +7452,7 @@
       return `$${hourly.toFixed(2)}/hr`;
     }
 
-    /** Derive card CPU/Mem from compute resource so Catalog stays aligned with Compute. */
+    /** Derive card CPU/Mem from instance type so Catalog stays aligned with Compute. */
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
       if (!c) return { cpu: '—', mem: '—' };
@@ -7252,16 +7471,34 @@
       return `${specs.cpu} | ${specs.mem} Memory`;
     }
 
-    /** Overview Configuration: derive Compute resource, vCPU, and Memory from the same compute id. */
+    /** Guest OS family for overview — Linux / Microsoft Windows (not full OS string). */
+    function vmGuestOsFamilyDisplay(vm) {
+      const raw = String(vm?.osFull || vm?.os || vm?.guestOsFamily || '').trim();
+      if (!raw) {
+        return '<span class="muted">—</span><span class="form-helper" style="display:block;margin-top:2px;">Guest agent not reporting</span>';
+      }
+      if (/win/i.test(raw)) return 'Microsoft Windows';
+      return 'Linux';
+    }
+
+    /** Overview Configuration: Instance type name + specs for nested fields. */
     function vmComputeOverviewFields(vm) {
       const computeId = resolveVmComputeId(vm);
+      const parts = computeResourceParts(computeId);
       const specs = computeResourceSpecs(computeId);
       const cpuCount = parseInt(String(specs.cpu).match(/\d+/)?.[0] || '1', 10) || 1;
       const memory = specs.mem && specs.mem !== '—' ? specs.mem : (vm.mem || '—');
+      const gpuDevices = Array.isArray(vm?.gpuDevices) ? vm.gpuDevices : [];
+      const gpuCount = gpuDevices.length;
       return {
+        computeId,
+        name: parts.title || computeId || '—',
         computeResource: formatComputeDisplay(computeId),
-        vcpu: cpuCount === 1 ? '1 vCPU' : `${cpuCount} vCPUs`,
+        vcpu: String(cpuCount),
         memory,
+        gpuCount: String(gpuCount),
+        gpuPci: gpuCount > 0 ? (vm.gpuPci || '2080') : '—',
+        gpuResource: gpuDevices[0]?.name || '—',
       };
     }
 
@@ -7439,7 +7676,7 @@
       const vmComputeOptions = filteredVmComputeResources(m.filter);
       body.innerHTML = `
         <div class="form-field">
-          <label id="f-edit-compute-resource-label">Compute resource <span class="req">*</span></label>
+          <label id="f-edit-compute-resource-label">Instance type <span class="req">*</span></label>
           <div class="rich-select rich-select--typeahead ${m.menuOpen ? 'pf-m-expanded' : ''}" id="edit-compute-select">
             ${pfRichSelectToggle({
               id: 'edit-compute-toggle',
@@ -7455,8 +7692,8 @@
             <div class="pf-v6-c-menu rich-select__menu" id="edit-compute-menu" role="listbox" ${m.menuOpen ? '' : 'hidden'}>
               <div class="rich-select__search">
                 <i class="fa-solid fa-search" aria-hidden="true"></i>
-                <input type="search" id="edit-compute-search" placeholder="Search compute resources"
-                  value="${richSelectEsc(m.filter)}" aria-label="Search compute resources" />
+                <input type="search" id="edit-compute-search" placeholder="Search instance types"
+                  value="${richSelectEsc(m.filter)}" aria-label="Search instance types" />
               </div>
               <hr class="rich-select__menu-divider" />
               <div class="rich-select__menu-list">
@@ -7474,7 +7711,7 @@
                       </span>
                     </span>
                   </button>`;
-                }).join('') || emptyStateMenuSearchHtml('compute resources')}
+                }).join('') || emptyStateMenuSearchHtml('instance types')}
               </div>
             </div>
             <input type="hidden" id="f-edit-compute-resource" value="${richSelectEsc(m.selectedId)}" />
@@ -7545,7 +7782,7 @@
       vm.mem = specs.mem;
       closeEditComputeModal();
       renderVmDetail();
-      toast(`Compute resources updated to ${computeResourceLabel(id)}.`, 'success');
+      toast(`Instance type updated to ${computeResourceLabel(id)}.`, 'success');
     }
 
     function wireEditComputeModal() {
@@ -8036,10 +8273,81 @@
     }
 
     let NETWORKS = [
-      { id: 'net-workload', name: 'tenant-workload', type: 'Isolated', project: 'project-a', cidr: '10.130.0.0/16', status: 'Ready', vms: 5 },
-      { id: 'net-default', name: 'default', type: 'Provider', project: 'project-a', cidr: '10.128.0.0/14', status: 'Ready', vms: 3 },
-      { id: 'net-app', name: 'app-tier', type: 'Isolated', project: 'yifat', cidr: '192.168.10.0/24', status: 'Ready', vms: 1 },
-      { id: 'net-shared', name: 'org-shared', type: 'Shared', project: 'vmaas', cidr: '10.40.0.0/22', status: 'Ready', vms: 0 },
+      {
+        id: 'net-workload',
+        name: 'tenant-workload',
+        type: 'Isolated',
+        project: 'project-a',
+        cidr: '10.42.0.0/16',
+        ipv6Cidr: '2001:db8:42::/48',
+        status: 'Ready',
+        vms: 5,
+        description: 'Primary tenant compute network',
+        created: 'Jul 1, 2026, 11:00 AM',
+        subnets: [
+          { name: 'bm-compute-a', status: 'Ready', cidr: '10.42.0.0/24', vlan: 200 },
+          { name: 'bm-compute-b', status: 'Provisioning', cidr: '10.42.1.0/24', vlan: 201 },
+          { name: 'bm-compute-c', status: 'Ready', cidr: '10.42.2.0/24', vlan: 202 },
+        ],
+        securityGroups: [
+          { name: 'allow-ssh-https', status: 'Ready', summary: 'In: SSH (22), HTTPS (443) · Out: Allow all' },
+          { name: 'allow-internal', status: 'Ready', summary: 'In: All from 10.42.0.0/16 · Out: All to 10.42.0.0/16' },
+        ],
+      },
+      {
+        id: 'net-default',
+        name: 'default',
+        type: 'Provider',
+        project: 'project-a',
+        cidr: '10.128.0.0/14',
+        ipv6Cidr: '',
+        status: 'Ready',
+        vms: 3,
+        description: 'Default provider network',
+        created: 'Jan 12, 2026, 9:00 AM',
+        subnets: [
+          { name: 'default-a', status: 'Ready', cidr: '10.128.0.0/24', vlan: 100 },
+        ],
+        securityGroups: [
+          { name: 'allow-ssh-https', status: 'Ready', summary: 'In: SSH (22), HTTPS (443) · Out: Allow all' },
+        ],
+      },
+      {
+        id: 'net-app',
+        name: 'app-tier',
+        type: 'Isolated',
+        project: 'yifat',
+        cidr: '192.168.10.0/24',
+        ipv6Cidr: '',
+        status: 'Ready',
+        vms: 1,
+        description: 'Application tier network',
+        created: 'Mar 4, 2026, 2:15 PM',
+        subnets: [
+          { name: 'app-subnet-a', status: 'Ready', cidr: '192.168.10.0/24', vlan: 310 },
+        ],
+        securityGroups: [
+          { name: 'web-sg', status: 'Ready', summary: 'In: HTTP/HTTPS · Out: Allow all' },
+        ],
+      },
+      {
+        id: 'net-shared',
+        name: 'org-shared',
+        type: 'Shared',
+        project: 'vmaas',
+        cidr: '10.40.0.0/22',
+        ipv6Cidr: '',
+        status: 'Ready',
+        vms: 0,
+        description: 'Organization shared services network',
+        created: 'Feb 18, 2026, 10:30 AM',
+        subnets: [
+          { name: 'shared-a', status: 'Ready', cidr: '10.40.0.0/24', vlan: 400 },
+        ],
+        securityGroups: [
+          { name: 'restricted-egress', status: 'Ready', summary: 'In: Deny all · Out: DNS + HTTPS' },
+        ],
+      },
     ];
 
     /** Mutable catalogs for creatable Project / Group selects in Create VM / Create network */
@@ -8173,6 +8481,10 @@
       vmColumnsDraft: null,
       selectedVmName: null,
       selectedInstanceTypeName: null,
+      selectedNetworkId: null,
+      selectedProjectName: null,
+      selectedSubnetName: null,
+      selectedSecurityGroupName: null,
       itActionsOpen: false,
       itActionsName: null, // instance type targeted by #it-actions-menu (detail Actions or list kebab)
       selectedDiskImageName: null,
@@ -8829,7 +9141,7 @@
     }
 
     /**
-     * Typeahead rich-select matching Compute resource (FormControl toggle + search menu).
+     * Typeahead rich-select matching Instance type (FormControl toggle + search menu).
      * options: [{ id, title, desc? }]
      */
     function renderTypeaheadRichSelectHtml({
@@ -10081,6 +10393,10 @@
         : (id === 'create-instance-type' || id === 'instance-type') ? 'instance-types'
         : (id === 'create-disk-image' || id === 'disk-image') ? 'disk-images'
         : (id === 'create-catalog-item' || id === 'catalog-item') ? 'templates'
+        : (id === 'network') ? 'networks'
+        : (id === 'subnet') ? 'subnets'
+        : (id === 'security-group') ? 'security-groups'
+        : (id === 'project') ? 'vms'
         : id;
       document.querySelectorAll('.console__nav [data-nav]').forEach(n => {
         n.classList.toggle('pf-m-current', n.dataset.nav === navId);
@@ -10831,7 +11147,7 @@
         const memoryErr = draft.fieldErrors?.memory;
         panel.innerHTML = `
           <h3>Configuration</h3>
-          <p class="create-resource-wiz__help">Define compute resources for this instance type.</p>
+          <p class="create-resource-wiz__help">Define vCPUs and Memory for this instance type.</p>
           <div class="form-field${cpuErr ? ' pf-m-error' : ''}">
             <label for="create-it-cpu">vCPUs <span class="req">*</span></label>
             <input type="number" id="create-it-cpu" class="unit-size-input" min="1" step="1" value="${escAttr(draft.cpu)}" required
@@ -11244,6 +11560,233 @@
       }, true);
     }
 
+    function positionDetailPopover(pop, trigger, closeBtnId) {
+      pop.hidden = false;
+      pop.classList.add('pf-m-open', 'pf-m-left');
+      pop.classList.remove('pf-m-right');
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        let left = rect.left - pr.width - gap;
+        let top = rect.top + (rect.height / 2) - (pr.height / 2);
+        if (left < 8) {
+          pop.classList.remove('pf-m-left');
+          pop.classList.add('pf-m-right');
+          left = rect.right + gap;
+        }
+        top = Math.max(8, Math.min(top, window.innerHeight - pr.height - 8));
+        pop.style.left = `${Math.max(8, left)}px`;
+        pop.style.top = `${top}px`;
+        document.getElementById(closeBtnId)?.focus({ preventScroll: true });
+      });
+    }
+
+    let diskImagePopoverTrigger = null;
+    function closeDiskImagePopover() {
+      const pop = document.getElementById('disk-image-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (diskImagePopoverTrigger) {
+        diskImagePopoverTrigger.setAttribute('aria-expanded', 'false');
+        diskImagePopoverTrigger = null;
+      }
+    }
+
+    function openDiskImagePopover(trigger, label) {
+      const pop = document.getElementById('disk-image-popover');
+      const body = document.getElementById('disk-image-popover-body');
+      if (!pop || !body) return;
+      if (diskImagePopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeDiskImagePopover();
+        return;
+      }
+      closeItPciPopover();
+      closeStorageTierPopover();
+      const di = findDiskImageByCatalogLabel(label);
+      const opt = CATALOG_DISK_IMAGE_OPTIONS.find(d => d.title === label || d.id === label);
+      const sourceType = di?.sourceType || 'Registry';
+      const image = di?.sourceRef || (opt ? `quay.io/osac/${opt.id}` : String(label || '—'));
+      const arch = di
+        ? ((di.architecture || []).join(', ') || '—')
+        : (opt?.arch || '—');
+      const guestOs = di
+        ? formatDiskImageGuestOs(di.guestOs)
+        : (opt?.guestOs ? formatDiskImageGuestOs(opt.guestOs) : '—');
+      const esc = v => String(v || '—').replace(/</g, '&lt;');
+      body.innerHTML = `
+        <dl class="nic-detail-dl">
+          <dt>Source type</dt><dd>${esc(sourceType)}</dd>
+          <dt>Image</dt><dd><code>${esc(image)}</code></dd>
+          <dt>Guest operating system</dt><dd>${esc(guestOs)}</dd>
+          <dt>Architecture</dt><dd>${esc(arch)}</dd>
+        </dl>
+      `;
+      if (diskImagePopoverTrigger && diskImagePopoverTrigger !== trigger) {
+        diskImagePopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      diskImagePopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      positionDetailPopover(pop, trigger, 'disk-image-popover-close');
+    }
+
+    let itPciPopoverTrigger = null;
+    function closeItPciPopover() {
+      const pop = document.getElementById('it-pci-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (itPciPopoverTrigger) {
+        itPciPopoverTrigger.setAttribute('aria-expanded', 'false');
+        itPciPopoverTrigger = null;
+      }
+    }
+
+    function openItPciPopover(trigger) {
+      const pop = document.getElementById('it-pci-popover');
+      const body = document.getElementById('it-pci-popover-body');
+      if (!pop || !body) return;
+      if (itPciPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeItPciPopover();
+        return;
+      }
+      closeDiskImagePopover();
+      closeStorageTierPopover();
+      const pci = trigger.getAttribute('data-pci') || '—';
+      const resource = trigger.getAttribute('data-gpu-resource') || '—';
+      const esc = v => String(v || '—').replace(/</g, '&lt;');
+      body.innerHTML = `
+        <dl class="nic-detail-dl">
+          <dt>PCI device selector</dt><dd>${esc(pci)}</dd>
+          ${resource && resource !== '—' ? `<dt>Resource name</dt><dd>${esc(resource)}</dd>` : ''}
+        </dl>
+      `;
+      if (itPciPopoverTrigger && itPciPopoverTrigger !== trigger) {
+        itPciPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      itPciPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      positionDetailPopover(pop, trigger, 'it-pci-popover-close');
+    }
+
+    let storageTierPopoverTrigger = null;
+    function closeStorageTierPopover() {
+      const pop = document.getElementById('storage-tier-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (storageTierPopoverTrigger) {
+        storageTierPopoverTrigger.setAttribute('aria-expanded', 'false');
+        storageTierPopoverTrigger = null;
+      }
+    }
+
+    function resolveStorageTierForPopover(ref) {
+      const key = String(ref || '').trim();
+      if (!key) return null;
+      const tiers = getStorageTiers();
+      return tiers.find(t => t.id === key || t.name === key)
+        || STORAGE_TIERS_MOCK.map(mapStorageTierForSelect).find(t => t.id === key || t.name === key)
+        || null;
+    }
+
+    function openStorageTierPopover(trigger, ref) {
+      const pop = document.getElementById('storage-tier-popover');
+      const body = document.getElementById('storage-tier-popover-body');
+      if (!pop || !body) return;
+      if (storageTierPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeStorageTierPopover();
+        return;
+      }
+      closeDiskImagePopover();
+      closeItPciPopover();
+      const tier = resolveStorageTierForPopover(ref);
+      const esc = v => String(v || '—').replace(/</g, '&lt;');
+      const description = tier?.description || 'Storage tiers are defined by your cloud provider administrator.';
+      body.innerHTML = `
+        <dl class="nic-detail-dl">
+          <dt>Description</dt><dd>${esc(description)}</dd>
+        </dl>
+      `;
+      if (storageTierPopoverTrigger && storageTierPopoverTrigger !== trigger) {
+        storageTierPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      storageTierPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      positionDetailPopover(pop, trigger, 'storage-tier-popover-close');
+    }
+
+    function wireVmConfigPopovers() {
+      if (document.body.dataset.vmConfigPopoversWired) return;
+      document.body.dataset.vmConfigPopoversWired = '1';
+      document.addEventListener('click', e => {
+        if (e.target.closest('#disk-image-popover-close')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeDiskImagePopover();
+          return;
+        }
+        if (e.target.closest('#it-pci-popover-close')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeItPciPopover();
+          return;
+        }
+        if (e.target.closest('#storage-tier-popover-close')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeStorageTierPopover();
+          return;
+        }
+        const diskTrigger = e.target.closest('[data-disk-image-detail]');
+        if (diskTrigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openDiskImagePopover(diskTrigger, diskTrigger.getAttribute('data-disk-image-detail') || '');
+          return;
+        }
+        const pciTrigger = e.target.closest('[data-it-pci-detail]');
+        if (pciTrigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openItPciPopover(pciTrigger);
+          return;
+        }
+        const tierTrigger = e.target.closest('[data-storage-tier-detail]');
+        if (tierTrigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openStorageTierPopover(tierTrigger, tierTrigger.getAttribute('data-storage-tier-detail') || '');
+          return;
+        }
+        if (
+          e.target.closest('#disk-image-popover')
+          || e.target.closest('#it-pci-popover')
+          || e.target.closest('#storage-tier-popover')
+        ) return;
+        closeDiskImagePopover();
+        closeItPciPopover();
+        closeStorageTierPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        closeDiskImagePopover();
+        closeItPciPopover();
+        closeStorageTierPopover();
+      });
+      window.addEventListener('resize', () => {
+        closeDiskImagePopover();
+        closeItPciPopover();
+        closeStorageTierPopover();
+      });
+      window.addEventListener('scroll', () => {
+        closeDiskImagePopover();
+        closeItPciPopover();
+        closeStorageTierPopover();
+      }, true);
+    }
+
         
 
     function normalizeDisk(dsk) {
@@ -11553,6 +12096,10 @@
         alerts: [],
         gpuDevices: [],
         hostDevices: [],
+        autoAttachExternalIp: false,
+        externalIpAttached: null,
+        internalIpAttached: null,
+        externalIp: '',
         ...v,
         osFull: v.osFull || (v.os ? (osFullMap[v.os] || v.os) : ''),
         nics: v.nics || [{
@@ -11574,7 +12121,78 @@
       if (specs.cpu !== '—') enriched.cpu = String(specs.cpu);
       if (specs.mem !== '—') enriched.mem = specs.mem;
       enriched.utilization = getVmUtilization(enriched);
+      normalizeVmIpState(enriched);
       return enriched;
+    }
+
+    /** Resolve attach state from wizard auto-attach + current IPs (mutates vm). */
+    function normalizeVmIpState(vm) {
+      if (!vm) return;
+      const nicIp = (vm.nics && vm.nics[0] && vm.nics[0].ip && vm.nics[0].ip !== '—')
+        ? vm.nics[0].ip
+        : (vm.ip && vm.ip !== '—' ? vm.ip : '');
+      if (vm.internalIpAttached == null) {
+        vm.internalIpAttached = !!nicIp;
+      }
+      if (vm.internalIpAttached && !vm.internalIp) {
+        vm.internalIp = nicIp || mockInternalIp(vm);
+      }
+      if (!vm.internalIpAttached) {
+        vm.internalIp = '';
+      }
+      if (vm.externalIpAttached == null) {
+        vm.externalIpAttached = !!(vm.autoAttachExternalIp || (vm.externalIp && vm.externalIp !== '—'));
+      }
+      if (vm.externalIpAttached && !vm.externalIp) {
+        vm.externalIp = mockExternalIp(vm);
+      }
+      if (!vm.externalIpAttached) {
+        vm.externalIp = '';
+      }
+    }
+
+    function mockInternalIp(vm) {
+      const seed = hashVmSeed(vm?.name || 'vm') % 200 + 20;
+      return `10.130.1.${seed}`;
+    }
+
+    function mockExternalIp(vm) {
+      const seed = hashVmSeed(vm?.name || 'vm') % 200 + 10;
+      return `203.0.113.${seed}`;
+    }
+
+    function toggleVmIpAttachment(kind) {
+      const name = state.selectedVmName;
+      const vm = VMS.find(v => v.name === name);
+      if (!vm) return;
+      if (kind === 'external') {
+        if (vm.externalIpAttached) {
+          vm.externalIpAttached = false;
+          vm.externalIp = '';
+          vm.autoAttachExternalIp = false;
+          toast('External IP detached.');
+        } else {
+          vm.externalIpAttached = true;
+          vm.externalIp = mockExternalIp(vm);
+          vm.autoAttachExternalIp = true;
+          toast('External IP attached.');
+        }
+      } else if (kind === 'internal') {
+        if (vm.internalIpAttached) {
+          vm.internalIpAttached = false;
+          vm.internalIp = '';
+          if (Array.isArray(vm.nics) && vm.nics[0]) vm.nics[0].ip = '—';
+          vm.ip = '—';
+          toast('Internal IP detached.');
+        } else {
+          vm.internalIpAttached = true;
+          vm.internalIp = mockInternalIp(vm);
+          if (Array.isArray(vm.nics) && vm.nics[0]) vm.nics[0].ip = vm.internalIp;
+          vm.ip = vm.internalIp;
+          toast('Internal IP attached.');
+        }
+      }
+      renderVmDetail();
     }
 
     /** Attachment name follows the selected virtual network (unique per virtual machine / wizard list). */
@@ -12950,14 +13568,18 @@
       const pauseTip = canPause ? 'Pause' : (starting ? startingReason : notRunningReason);
       const startTip = canStart ? 'Start' : (starting ? startingReason : runningReason);
 
-      const projectDisplay = v.project || v.ns || 'project-a';
-      const osKnown = (v.osFull || v.os || '').trim();
-      const osDisplay = osKnown
-        ? osKnown
-        : '<span class="muted">—</span><span class="form-helper" style="display:block;margin-top:2px;">Guest agent not reporting</span>';
+      const projectDisplay = detailNameLink(v.project || v.ns || 'project-a', 'data-open-project', v.project || v.ns || 'project-a');
+      const guestOsFamilyDisplay = vmGuestOsFamilyDisplay(v);
       const computeFields = vmComputeOverviewFields(v);
-      const imageDisplay = vmDiskImageDisplay(v);
-      const catalogItemDisplay = v.catalogItem || '—';
+      const imageLabel = vmDiskImageDisplay(v);
+      const diskImageDisplay = imageLabel === '—'
+        ? '—'
+        : `<button type="button" class="name-link name-link--dotted" data-disk-image-detail="${escAttr(imageLabel)}" aria-haspopup="dialog" aria-expanded="false">${String(imageLabel).replace(/</g, '&lt;')}</button>`;
+      const catalogItemRef = v.catalogItem || '';
+      const catalogMatch = findCatalogItemByRef(catalogItemRef);
+      const catalogItemDisplay = catalogMatch
+        ? detailNameLink(catalogMatch.name, 'data-open-catalog', catalogMatch.id)
+        : (catalogItemRef ? String(catalogItemRef).replace(/</g, '&lt;') : '—');
       const sshDisplay = /win/i.test(String(v.os || v.osFull || ''))
         ? 'Not applicable'
         : ((v.sshPublicKey && String(v.sshPublicKey).trim()) ? 'Configured' : 'Not configured');
@@ -12972,10 +13594,12 @@
         const label = dsk.label || detail.name || (dsk.bootable ? 'Boot disk' : `Disk ${diskIdx + 1}`);
         const size = typeof dsk.size === 'number' ? `${dsk.size} ${dsk.unit || 'GiB'}` : (dsk.size || detail.size || '—');
         const tier = dsk.storageTierLabel || detail.storageTier || 'Balanced';
+        const tierId = dsk.storageTierId || '';
         return {
           label,
           size,
           tier,
+          tierId,
           bootable: !!(dsk.bootable || /boot/i.test(label)),
           diskIdx,
           detailName: detail.name,
@@ -12991,6 +13615,21 @@
       const editDisabledAttr = canEditConfig ? '' : ' disabled';
       const editTitleAttr = canEditConfig ? ' title="Edit"' : ` title="${noEditReason}"`;
       const addDisabledAttrs = canEditConfig ? '' : ` disabled title="${noEditReason}"`;
+      const itNameSafe = String(computeFields.name).replace(/</g, '&lt;');
+      const hasPciInfo = Number(computeFields.gpuCount) > 0 || (computeFields.gpuPci && computeFields.gpuPci !== '—');
+      const itNameDisplay = hasPciInfo
+        ? `<button type="button" class="name-link name-link--dotted" data-it-pci-detail
+            data-pci="${escAttr(computeFields.gpuPci)}"
+            data-gpu-resource="${escAttr(computeFields.gpuResource)}"
+            aria-haspopup="dialog" aria-expanded="false">${itNameSafe}</button>`
+        : itNameSafe;
+      const itSubtitleRow = `
+        <div class="ethan-detail-col__subtitle-row">
+          <h4 class="ethan-detail-col__subtitle">Instance type</h4>
+          <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit instance type"${editTitleAttr}${editDisabledAttr}>
+            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          </button>
+        </div>`;
 
       const header = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
@@ -13062,15 +13701,13 @@
                 </section>
                 <section class="ethan-detail-col" aria-labelledby="vm-config-title">
                   <h3 class="ethan-detail-col__title" id="vm-config-title">Configuration</h3>
-                  ${itField('Operating system', osDisplay)}
-                  ${itField('Compute resource', `
-                    <span class="vm-compute-row">
-                      ${computeFields.computeResource}
-                      <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources"${editTitleAttr}${editDisabledAttr}>
-                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                      </button>
-                    </span>`)}
-                  ${itField('Disk image', imageDisplay)}
+                  ${itField('Guest operating system family', guestOsFamilyDisplay)}
+                  ${itField('Disk image', diskImageDisplay)}
+                  ${itSubtitleRow}
+                  ${itField('Name', itNameDisplay)}
+                  ${itField('vCPUs', String(computeFields.vcpu).replace(/</g, '&lt;'))}
+                  ${itField('Memory', String(computeFields.memory).replace(/</g, '&lt;'))}
+                  ${itField('GPU count', String(computeFields.gpuCount).replace(/</g, '&lt;'))}
                 </section>
                 <section class="ethan-detail-col" aria-labelledby="vm-ssh-title">
                   <h3 class="ethan-detail-col__title ethan-detail-col__title--spacer" id="vm-ssh-title" aria-hidden="true">&nbsp;</h3>
@@ -13087,31 +13724,39 @@
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--network" aria-label="Networks">
                   <colgroup>
-                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col overview-col--actions" />
+                    <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col overview-col--actions" />
                   </colgroup>
                   <thead>
                     <tr>
-                      <th scope="col">Name</th>
                       <th scope="col">Virtual network</th>
-                      <th scope="col">IP address</th>
-                      <th scope="col">Security groups</th>
                       <th scope="col">Subnet</th>
+                      <th scope="col">Security groups</th>
                       <th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody>
                     ${nics.map(n => {
                       const detail = normalizeNic(n);
-                      const sgs = (detail.securityGroups || []).join(', ') || '—';
                       const menuKey = `nic:${detail.name}`;
                       const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                      const vnRef = detail.virtualNetwork || '';
+                      const vnMatch = findNetworkByRef(vnRef);
+                      const vnCell = vnMatch
+                        ? detailNameLink(vnMatch.name, 'data-open-network', vnMatch.id)
+                        : String(vnRef || '—').replace(/</g, '&lt;');
+                      const subnetName = detail.subnet || '';
+                      const subnetCell = subnetName
+                        ? detailNameLink(subnetName, 'data-open-subnet', subnetName)
+                        : '—';
+                      const sgs = detail.securityGroups || [];
+                      const sgCell = sgs.length
+                        ? `<span class="overview-sg-list">${sgs.map(sg => detailNameLink(sg, 'data-open-security-group', sg)).join('')}</span>`
+                        : '—';
                       return `
                       <tr>
-                        <td>${detail.name}</td>
-                        <td>${detail.virtualNetwork}</td>
-                        <td>${detail.ip || '—'}</td>
-                        <td>${sgs}</td>
-                        <td>${detail.subnet || '—'}</td>
+                        <td>${vnCell}</td>
+                        <td>${subnetCell}</td>
+                        <td>${sgCell}</td>
                         <td class="overview-table__actions">
                           <div class="nic-actions-wrap">
                             <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}"
@@ -13149,16 +13794,19 @@
                     ${diskRows.map(d => {
                       const menuKey = `disk:${d.diskIdx}`;
                       const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                      const tierCell = d.tier && d.tier !== '—'
+                        ? `<button type="button" class="name-link name-link--dotted" data-storage-tier-detail="${escAttr(d.tierId || d.tier)}" aria-haspopup="dialog" aria-expanded="false">${String(d.tier).replace(/</g, '&lt;')}</button>`
+                        : '—';
                       return `
                       <tr>
                         <td>
                           <span class="overview-table__name">
                             ${d.label}
-                            ${d.bootable ? '<span class="pf-v6-c-badge pf-m-read bootable-badge">Bootable</span>' : ''}
+                            ${d.bootable ? pfAnnotationLabel('Bootable', 'bootable-label') : ''}
                           </span>
                         </td>
                         <td>${d.size}</td>
-                        <td>${d.tier}</td>
+                        <td>${tierCell}</td>
                         <td class="overview-table__actions">
                           <div class="nic-actions-wrap">
                             <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}"
@@ -13188,6 +13836,27 @@
             </section>
           </div>
           <aside class="vm-overview-v2__aside" aria-label="Sidebar">
+            <section class="catalog-hw-specs vm-overview-v2__aside-card" aria-labelledby="vm-ip-title">
+              <h3 class="catalog-hw-specs__title" id="vm-ip-title">IP addresses</h3>
+              <div class="vm-ip-card__row">
+                <div class="vm-ip-card__meta">
+                  <div class="vm-ip-card__label">External IP</div>
+                  <p class="vm-ip-card__value">${v.externalIpAttached && v.externalIp ? String(v.externalIp).replace(/</g, '&lt;') : '—'}</p>
+                </div>
+                <button type="button" class="name-link" data-ip-toggle="external"${canEditConfig ? '' : ' disabled title="No configuration edits for this role"'}>
+                  ${v.externalIpAttached ? 'Detach' : 'Attach'}
+                </button>
+              </div>
+              <div class="vm-ip-card__row">
+                <div class="vm-ip-card__meta">
+                  <div class="vm-ip-card__label">Internal IP</div>
+                  <p class="vm-ip-card__value">${v.internalIpAttached && v.internalIp ? String(v.internalIp).replace(/</g, '&lt;') : '—'}</p>
+                </div>
+                <button type="button" class="name-link" data-ip-toggle="internal"${canEditConfig ? '' : ' disabled title="No configuration edits for this role"'}>
+                  ${v.internalIpAttached ? 'Detach' : 'Attach'}
+                </button>
+              </div>
+            </section>
             <section class="catalog-hw-specs vm-overview-v2__aside-card" aria-labelledby="vm-alerts-title">
               <h3 class="catalog-hw-specs__title" id="vm-alerts-title">Alerts</h3>
               ${alerts.length ? `
@@ -13199,11 +13868,11 @@
                     </li>
                   `).join('')}
                 </ul>
-              ` : '<p class="vm-overview-v2__aside-empty" aria-hidden="true">&nbsp;</p>'}
+              ` : '<p class="vm-overview-v2__aside-empty muted">No alerts</p>'}
             </section>
             <section class="catalog-hw-specs vm-overview-v2__aside-card" aria-labelledby="vm-activity-title">
               <h3 class="catalog-hw-specs__title" id="vm-activity-title">Recent activity</h3>
-              <p class="vm-overview-v2__aside-empty" aria-hidden="true">&nbsp;</p>
+              <p class="vm-overview-v2__aside-empty muted">No recent activity</p>
             </section>
           </aside>
         </div>
@@ -13215,6 +13884,39 @@
         e.preventDefault();
         state.selectedVmName = null;
         setView('vms');
+      });
+      root.querySelector('[data-open-project]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openProjectDetail(e.currentTarget.dataset.openProject);
+      });
+      root.querySelector('[data-open-catalog]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openCatalogItemDetail(e.currentTarget.dataset.openCatalog);
+      });
+      root.querySelectorAll('[data-open-network]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openNetworkDetail(e.currentTarget.dataset.openNetwork);
+        });
+      });
+      root.querySelectorAll('[data-open-subnet]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openSubnetDetail(e.currentTarget.dataset.openSubnet);
+        });
+      });
+      root.querySelectorAll('[data-open-security-group]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openSecurityGroupDetail(e.currentTarget.dataset.openSecurityGroup);
+        });
+      });
+      root.querySelectorAll('[data-ip-toggle]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          if (!canEditConfig) return;
+          toggleVmIpAttachment(e.currentTarget.dataset.ipToggle);
+        });
       });
       root.querySelectorAll('[data-vm-action]').forEach(b => {
         b.addEventListener('click', () => {
@@ -13285,7 +13987,7 @@
         return [
           { key: 'catalog', label: 'Select template', navNum: 1 },
           { key: 'details', label: 'Details', navNum: 2 },
-          { key: 'config-compute', label: 'Compute resource', navNum: 3 },
+          { key: 'config-compute', label: 'Instance type', navNum: 3 },
           { key: 'config-storage', label: 'Storage', navNum: 4 },
           { key: 'config-network', label: 'Network', navNum: 5 },
           { key: 'access-init', label: 'Access & Initial run', navNum: 6 },
@@ -13303,7 +14005,7 @@
         { key: 'deploy', label: 'Deployment details' },
         { key: 'os', label: 'Guest OS' },
         { key: 'boot', label: 'Boot source' },
-        { key: 'compute', label: 'Compute resources' },
+        { key: 'compute', label: 'Instance types' },
         { key: 'customize', label: 'Configuration' },
         { key: 'review', label: 'Review and create' },
       ];
@@ -13428,15 +14130,21 @@
       clearListEmptyState('net-table-scroll', 'net-empty-state');
       tbody.innerHTML = rows.map(n => `
         <tr class="pf-v6-c-table__tr">
-          <td class="pf-v6-c-table__td"><button type="button" class="name-link">${n.name}</button></td>
+          <td class="pf-v6-c-table__td"><button type="button" class="name-link" data-open-network="${String(n.id).replace(/"/g, '&quot;')}">${String(n.name).replace(/</g, '&lt;')}</button></td>
           <td class="pf-v6-c-table__td"><span class="cond-pill">${n.type}</span></td>
-          <td class="pf-v6-c-table__td">${n.project}</td>
+          <td class="pf-v6-c-table__td"><button type="button" class="name-link" data-open-project="${String(n.project).replace(/"/g, '&quot;')}">${String(n.project).replace(/</g, '&lt;')}</button></td>
           <td class="pf-v6-c-table__td">${n.cidr}</td>
           <td class="pf-v6-c-table__td">${n.status}</td>
           <td class="pf-v6-c-table__td">${n.vms}</td>
           <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${n.name}"><i class="fa-solid fa-ellipsis-v"></i></button></td>
         </tr>
       `).join('');
+      tbody.querySelectorAll('[data-open-network]').forEach(btn => {
+        btn.addEventListener('click', () => openNetworkDetail(btn.dataset.openNetwork));
+      });
+      tbody.querySelectorAll('[data-open-project]').forEach(btn => {
+        btn.addEventListener('click', () => openProjectDetail(btn.dataset.openProject));
+      });
     }
 
     function typeLabel(t) {
@@ -14302,7 +15010,7 @@
                             <i class="fa-brands fa-redhat" style="color:#ee0000;"></i> ${v.name}
                           </label>
                         </td>
-                        <td><span class="pf-v6-c-badge pf-m-read arch-badge">${v.arch}</span></td>
+                        <td>${pfAnnotationLabel(v.arch, 'arch-label')}</td>
                         <td>${v.project}</td>
                         <td>${v.size}</td>
                       </tr>
@@ -14342,7 +15050,7 @@
         const sizeValid = sizeOptions.some(s => s.value === d.size);
         if (!sizeValid) d.size = currentSeries.defaultSize;
         panel.innerHTML = `
-          <h3>Compute resources</h3>
+          <h3>Instance types</h3>
           <p class="step-help">Define resources by selecting series and size.</p>
           <div class="subtabs">
             <button type="button" class="subtab pf-m-selected">Red Hat provided</button>
@@ -14570,7 +15278,7 @@
             editableItems.push({
               label: 'Compute',
               value: `${selSpecs.cpu} · ${selSpecs.mem}`,
-              note: 'Starting default · Compute resource step',
+              note: 'Starting default · Instance type step',
             });
           }
           if (fieldBeh.bootDisk === 'editable') {
@@ -15015,7 +15723,7 @@
           const vmComputeToggleDesc = selectedCompute.desc || '';
           const computeFieldHtml = computeEditable ? `
               <div class="form-field">
-                <label id="f-compute-resource-label">Compute resource <span class="req">*</span></label>
+                <label id="f-compute-resource-label">Instance type <span class="req">*</span></label>
                 <div class="rich-select rich-select--typeahead ${state.vmComputeMenuOpen ? 'pf-m-expanded' : ''}" id="vm-compute-select">
                   ${pfRichSelectToggle({
                     id: 'f-compute-resource-toggle',
@@ -15030,7 +15738,7 @@
                   <div class="pf-v6-c-menu rich-select__menu" id="vm-compute-menu" role="listbox" ${state.vmComputeMenuOpen ? '' : 'hidden'}>
                     <div class="rich-select__search">
                       <i class="fa-solid fa-search" aria-hidden="true"></i>
-                      <input type="search" id="vm-compute-search" placeholder="Search compute resources" value="${String(state.vmComputeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search compute resources" />
+                      <input type="search" id="vm-compute-search" placeholder="Search instance types" value="${String(state.vmComputeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search instance types" />
                     </div>
                     <hr class="rich-select__menu-divider" />
                     <div class="rich-select__menu-list">
@@ -15048,7 +15756,7 @@
                           </span>
                         </button>
                       `;
-                      }).join('') || emptyStateMenuSearchHtml('compute resources')}
+                      }).join('') || emptyStateMenuSearchHtml('instance types')}
                     </div>
                   </div>
                 </div>
@@ -15057,22 +15765,22 @@
           ` : `
               <div class="form-field">
                 <label for="f-compute-resource" class="label-with-optional">
-                  <span>Compute resource</span>
+                  <span>Instance type</span>
                   ${fieldGovBadge('locked')}
                 </label>
                 <input type="text" id="f-compute-resource" class="unit-size-input"
                   value="${(computeLabel || '—').replace(/"/g, '&quot;')}"
-                  disabled aria-disabled="true" aria-label="Compute resource"
+                  disabled aria-disabled="true" aria-label="Instance type"
                   aria-describedby="f-compute-locked-help" />
-                <p class="form-helper" id="f-compute-locked-help">This size is set by the template and can’t be changed during create. You can edit compute resources after the virtual machine is created.</p>
+                <p class="form-helper" id="f-compute-locked-help">This size is set by the template and can’t be changed during create. You can edit the instance type after the virtual machine is created.</p>
               </div>
           `;
           const stepHelp = computeEditable
-            ? 'Choose a compute size.'
-            : 'Compute size is locked by the template.';
+            ? 'Choose an instance type.'
+            : 'Instance type is locked by the template.';
 
           panel.innerHTML = `
-            <h3>Compute resource</h3>
+            <h3>Instance type</h3>
             <p class="step-help">${stepHelp}</p>
             <div class="vm-config__fields">
               ${computeFieldHtml}
@@ -16177,8 +16885,8 @@
               ${reviewRow('Guest OS', guestOsLabel)}
               ${reviewRow('Disk image', reviewValue(diskImageLabel, diskImageChanged))}
             `)}
-            ${reviewNebiusSection('Compute resource', 'config-compute', `
-              ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
+            ${reviewNebiusSection('Instance type', 'config-compute', `
+              ${reviewRow('Instance type', reviewValue(compute, computeChanged))}
             `)}
             ${reviewNebiusSection('Storage', 'config-storage', `
               ${reviewRow('Boot disk', reviewValue(bootDisk, diskChanged))}
@@ -16367,7 +17075,7 @@
               virtualNetwork: d.virtualNetwork,
               subnet: d.subnet || primaryNet?.subnets?.[0] || '',
               securityGroups: [...(d.securityGroups || [])],
-              ip: '—',
+              ip: mockInternalIp({ name: d.name }),
             });
           }
           for (const extra of (d.extraNetworks || [])) {
@@ -16379,6 +17087,9 @@
               ip: '—',
             });
           }
+          const primaryIp = createdNics[0]?.ip && createdNics[0].ip !== '—'
+            ? createdNics[0].ip
+            : mockInternalIp({ name: d.name });
           const createdDisks = [
             {
               name: 'Boot disk',
@@ -16405,11 +17116,16 @@
             osFull: source?.osFull || osFullMapCreate[osLabel] || osLabel,
             conditions: ['Provisioning=True'],
             node: source?.node || 'cnvge-079.lab.eng.thv2.redhat.com',
-            ip: '—',
+            ip: primaryIp,
             created: new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
             computeResource: d.computeResource,
             sshPublicKey: (d.sshPublicKey || '').trim(),
             sshKeyFileName: (d.sshPublicKey || '').trim() ? (d.sshKeyFileName || '') : '',
+            autoAttachExternalIp: !!d.autoAttachExternalIp,
+            externalIpAttached: !!d.autoAttachExternalIp,
+            externalIp: d.autoAttachExternalIp ? mockExternalIp({ name: d.name }) : '',
+            internalIpAttached: true,
+            internalIp: primaryIp,
             nics: createdNics.length ? createdNics : undefined,
             disks: createdDisks,
           });
@@ -16518,7 +17234,7 @@
     function catalogStepsForRole() {
       const steps = [
         { key: 'ci-details', label: 'Details' },
-        { key: 'ci-access', label: 'Compute resources' },
+        { key: 'ci-access', label: 'Instance types' },
         { key: 'ci-visibility', label: 'Visibility' },
         { key: 'ci-storage', label: 'Storage' },
         { key: 'ci-access-init', label: 'Access & Initial run' },
@@ -16556,6 +17272,13 @@
         <div class="ethan-detail-field__label">${label}</div>
         <div class="ethan-detail-field__value">${valueHtml}</div>
       </div>`;
+    }
+
+    /** Compact PF Label for tags/annotations (not counts — those stay Badge). */
+    function pfAnnotationLabel(text, extraClass = '') {
+      const safe = String(text || '').replace(/</g, '&lt;');
+      const cls = ['pf-v6-c-label', 'pf-m-outline', 'pf-m-compact', 'pf-m-grey', extraClass].filter(Boolean).join(' ');
+      return `<span class="${cls}"><span class="pf-v6-c-label__content"><span class="pf-v6-c-label__text">${safe}</span></span></span>`;
     }
 
     function normalizeInstanceTypeLifecycle(state) {
@@ -17159,8 +17882,8 @@
       { key: 'diskImageId', label: 'Disk image' },
       { key: 'diskImageAccess', label: 'Disk image access' },
       { key: 'guestOsFamily', label: 'Guest operating system' },
-      { key: 'instanceTypeId', label: 'Compute resources' },
-      { key: 'computeAccess', label: 'Compute access' },
+      { key: 'instanceTypeId', label: 'Instance type' },
+      { key: 'computeAccess', label: 'Instance type access' },
       { key: 'runStrategy', label: 'Run strategy' },
       { key: 'runStrategyAccess', label: 'Run strategy access' },
       { key: 'visibility', label: 'Visibility' },
@@ -17211,7 +17934,7 @@
 
     function catalogComputeToggleSummary(id) {
       const it = getCatalogInstanceType(id);
-      if (!it) return { title: 'Not set', desc: 'Tenants choose compute when creating a virtual machine' };
+      if (!it) return { title: 'Not set', desc: 'Tenants choose an instance type when creating a virtual machine' };
       return {
         title: it.label || it.name,
         desc: `${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
@@ -17578,11 +18301,11 @@
           return `${o.label} ${o.desc}`.toLowerCase().includes(q);
         });
         panel.innerHTML = `
-          <h3>Compute resources</h3>
-          <p class="create-resource-wiz__help">Optionally set compute defaults for this catalog item. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
+          <h3>Instance types</h3>
+          <p class="create-resource-wiz__help">Optionally set instance type defaults for this catalog item. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
           <div class="form-field">
             ${renderCatalogFieldLabelRow({
-              labelHtml: 'Compute resource',
+              labelHtml: 'Instance type',
               labelId: 'ci-compute-section-label',
               tag: 'h4',
               labelClass: 'config-section-title config-section-title--first',
@@ -17603,7 +18326,7 @@
               <div class="pf-v6-c-menu rich-select__menu" id="ci-compute-menu" role="listbox" ${c.computeMenuOpen ? '' : 'hidden'}>
                 <div class="rich-select__search">
                   <i class="fa-solid fa-search" aria-hidden="true"></i>
-                  <input type="search" id="ci-compute-search" placeholder="Search compute resources" value="${String(c.computeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search compute resources" />
+                  <input type="search" id="ci-compute-search" placeholder="Search instance types" value="${String(c.computeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search instance types" />
                 </div>
                 <hr class="rich-select__menu-divider" />
                 <div class="rich-select__menu-list">
@@ -17611,7 +18334,7 @@
                     <span class="pf-v6-c-menu__item-main">
                       <span class="rich-select__option-body">
                         <span class="rich-select__option-title">Not set</span>
-                        <span class="rich-select__option-desc">Tenants choose compute when creating a virtual machine</span>
+                        <span class="rich-select__option-desc">Tenants choose an instance type when creating a virtual machine</span>
                       </span>
                     </span>
                   </button>
@@ -17626,7 +18349,7 @@
                         </span>
                       </span>
                     </button>`;
-                  }).join('') : emptyStateMenuSearchHtml('compute resources')}
+                  }).join('') : emptyStateMenuSearchHtml('instance types')}
                 </div>
               </div>
             </div>
@@ -18270,9 +18993,9 @@
               ${reviewRow('Guest operating system', c.guestOsFamily ? esc(c.guestOsFamily) : 'Not set')}
               ${reviewRow('Status', 'Unpublished')}
             `, 'ci-review')}
-            ${reviewNebiusSection('Compute resources', 'ci-access', `
-              ${reviewRow('Compute resource', esc(compute.summary))}
-              ${reviewRow('Compute access', catalogAccessLabel(c.computeAccess || c.tenantAccess))}
+            ${reviewNebiusSection('Instance types', 'ci-access', `
+              ${reviewRow('Instance type', esc(compute.summary))}
+              ${reviewRow('Instance type access', catalogAccessLabel(c.computeAccess || c.tenantAccess))}
               ${reviewRow('Run strategy', runOpt ? esc(runOpt.label) : 'Not set')}
               ${reviewRow('Run strategy access', catalogAccessLabel(c.runStrategyAccess))}
             `, 'ci-review')}
@@ -18460,6 +19183,487 @@
         || TENANT_CATALOG_ITEMS.find(x => x.id === id);
     }
 
+    /** Match catalog by id or exact name — used for conditional overview links. */
+    function findCatalogItemByRef(ref) {
+      const key = String(ref || '').trim();
+      if (!key) return null;
+      return findCatalogItemById(key)
+        || PROVIDER_CATALOG_ITEMS.find(x => x.name === key)
+        || TENANT_CATALOG_ITEMS.find(x => x.name === key)
+        || null;
+    }
+
+    function findNetworkByRef(ref) {
+      const key = String(ref || '').trim();
+      if (!key) return null;
+      return NETWORKS.find(n => n.id === key || n.name === key) || null;
+    }
+
+    /** Resolve a catalog disk-image label to a DISK_IMAGES row when one exists. */
+    function findDiskImageByCatalogLabel(label) {
+      const raw = String(label || '').trim();
+      if (!raw || /^not set$/i.test(raw)) return null;
+      const byName = DISK_IMAGES.find(d => d.name === raw);
+      if (byName) return byName;
+      const opt = CATALOG_DISK_IMAGE_OPTIONS.find(d => d.title === raw || d.id === raw);
+      if (opt) {
+        const candidates = [
+          opt.id,
+          opt.id.replace(/(\d)(\d)$/, '$1-$2'),
+          opt.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        ];
+        for (const c of candidates) {
+          const hit = DISK_IMAGES.find(d => d.name === c || d.name.replace(/-/g, '') === c.replace(/-/g, ''));
+          if (hit) return hit;
+        }
+      }
+      const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9.-]/g, '');
+      return DISK_IMAGES.find(d => d.name === slug || d.name.replace(/-/g, '') === slug.replace(/[.-]/g, '')) || null;
+    }
+
+    function statusBadgeHtml(status) {
+      const key = String(status || '').toLowerCase();
+      const mod = key === 'ready' ? 'pf-m-ready'
+        : key === 'provisioning' ? 'pf-m-provisioning'
+        : 'pf-m-other';
+      return `<span class="status-badge ${mod}">${String(status || '—').replace(/</g, '&lt;')}</span>`;
+    }
+
+    function detailNameLink(label, datasetAttr, datasetValue) {
+      const safe = String(label || '—').replace(/</g, '&lt;');
+      const val = String(datasetValue ?? label ?? '').replace(/"/g, '&quot;');
+      return `<button type="button" class="name-link" ${datasetAttr}="${val}">${safe}</button>`;
+    }
+
+    /** Shared stub crumbs: return to VM or VN when that was the entry context. */
+    function stubDetailBreadcrumbHtml(currentLabel) {
+      const safeCurrent = String(currentLabel || '—').replace(/</g, '&lt;');
+      const vmName = state.selectedVmName;
+      const net = state.selectedNetworkId ? findNetworkByRef(state.selectedNetworkId) : null;
+      if (vmName) {
+        const safeVm = String(vmName).replace(/</g, '&lt;');
+        return `
+          <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+            <ol class="pf-v6-c-breadcrumb__list">
+              <li class="pf-v6-c-breadcrumb__item">
+                <a href="#" class="pf-v6-c-breadcrumb__link" data-stub-back="vms">Virtual machines</a>
+              </li>
+              <li class="pf-v6-c-breadcrumb__item">
+                <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                  <i class="fas fa-angle-right" aria-hidden="true"></i>
+                </span>
+                <a href="#" class="pf-v6-c-breadcrumb__link" data-stub-back="vm">${safeVm}</a>
+              </li>
+              <li class="pf-v6-c-breadcrumb__item">
+                <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                  <i class="fas fa-angle-right" aria-hidden="true"></i>
+                </span>
+                <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeCurrent}</span>
+              </li>
+            </ol>
+          </nav>`;
+      }
+      if (net) {
+        const safeNet = String(net.name).replace(/</g, '&lt;');
+        return `
+          <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+            <ol class="pf-v6-c-breadcrumb__list">
+              <li class="pf-v6-c-breadcrumb__item">
+                <a href="#" class="pf-v6-c-breadcrumb__link" data-stub-back="networks">Virtual networks</a>
+              </li>
+              <li class="pf-v6-c-breadcrumb__item">
+                <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                  <i class="fas fa-angle-right" aria-hidden="true"></i>
+                </span>
+                <a href="#" class="pf-v6-c-breadcrumb__link" data-stub-back="network">${safeNet}</a>
+              </li>
+              <li class="pf-v6-c-breadcrumb__item">
+                <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                  <i class="fas fa-angle-right" aria-hidden="true"></i>
+                </span>
+                <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeCurrent}</span>
+              </li>
+            </ol>
+          </nav>`;
+      }
+      return `
+        <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol class="pf-v6-c-breadcrumb__list">
+            <li class="pf-v6-c-breadcrumb__item">
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-stub-back="vms">Virtual machines</a>
+            </li>
+            <li class="pf-v6-c-breadcrumb__item">
+              <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeCurrent}</span>
+            </li>
+          </ol>
+        </nav>`;
+    }
+
+    function wireStubDetailBreadcrumb(root, { clearKeys = [] } = {}) {
+      root.querySelectorAll('[data-stub-back]').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          clearKeys.forEach(key => { state[key] = null; });
+          const target = link.getAttribute('data-stub-back');
+          if (target === 'vm' && state.selectedVmName) {
+            setView('vm');
+            renderVmDetail();
+            return;
+          }
+          if (target === 'network' && state.selectedNetworkId) {
+            setView('network');
+            renderNetworkDetail();
+            return;
+          }
+          if (target === 'networks') {
+            state.selectedNetworkId = null;
+            setView('networks');
+            renderNetworks(document.getElementById('net-search')?.value || '');
+            return;
+          }
+          state.selectedVmName = null;
+          setView('vms');
+        });
+      });
+    }
+
+    function openProjectDetail(name) {
+      const project = String(name || '').trim();
+      if (!project) return;
+      state.selectedProjectName = project;
+      setView('project');
+      renderProjectDetail();
+    }
+
+    function renderProjectDetail() {
+      const root = document.getElementById('project-detail-root');
+      if (!root) return;
+      const name = String(state.selectedProjectName || '').trim();
+      if (!name) {
+        root.innerHTML = '<p class="muted">Project not found.</p>';
+        return;
+      }
+      const safe = name.replace(/</g, '&lt;');
+      const vmCount = VMS.filter(v => (v.project || v.ns) === name).length;
+      const netCount = NETWORKS.filter(n => n.project === name).length;
+      root.innerHTML = `
+        ${stubDetailBreadcrumbHtml(safe)}
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safe}</h2>
+            <p class="ethan-detail-header__subtitle">Project stub — full project management is not in this prototype.</p>
+          </div>
+        </div>
+        <div class="ethan-detail-panel">
+          <div class="ethan-detail-cols ethan-detail-cols--2">
+            <section class="ethan-detail-col" aria-labelledby="project-overview-title">
+              <h3 class="ethan-detail-col__title" id="project-overview-title">Overview</h3>
+              ${itField('Name', safe)}
+              ${itField('Status', statusBadgeHtml('Ready'))}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="project-resources-title">
+              <h3 class="ethan-detail-col__title" id="project-resources-title">Resources</h3>
+              ${itField('Virtual machines', String(vmCount))}
+              ${itField('Virtual networks', String(netCount))}
+            </section>
+          </div>
+        </div>
+      `;
+      wireStubDetailBreadcrumb(root, { clearKeys: ['selectedProjectName'] });
+    }
+
+    function findSubnetByName(name) {
+      const key = String(name || '').trim();
+      if (!key) return null;
+      for (const net of NETWORKS) {
+        const hit = (net.subnets || []).find(s => s.name === key);
+        if (hit) {
+          return { ...hit, networkId: net.id, networkName: net.name, project: net.project };
+        }
+      }
+      // Allow linking even when subnet isn't in NETWORKS seed (e.g. wizard / sample data)
+      return { name: key, status: 'Ready', cidr: '—', vlan: null, networkId: null, networkName: null, project: null };
+    }
+
+    function findSecurityGroupByName(name) {
+      const key = String(name || '').trim();
+      if (!key) return null;
+      for (const net of NETWORKS) {
+        const hit = (net.securityGroups || []).find(s => s.name === key);
+        if (hit) {
+          return { ...hit, networkId: net.id, networkName: net.name, project: net.project };
+        }
+      }
+      if (CONFIG_SECURITY_GROUPS.includes(key)) {
+        return { name: key, status: 'Ready', summary: '—', networkId: null, networkName: null, project: null };
+      }
+      return { name: key, status: 'Ready', summary: '—', networkId: null, networkName: null, project: null };
+    }
+
+    function openSubnetDetail(name) {
+      const subnet = findSubnetByName(name);
+      if (!subnet) return;
+      state.selectedSubnetName = subnet.name;
+      setView('subnet');
+      renderSubnetDetail();
+    }
+
+    function renderSubnetDetail() {
+      const root = document.getElementById('subnet-detail-root');
+      if (!root) return;
+      const subnet = findSubnetByName(state.selectedSubnetName);
+      if (!subnet) {
+        root.innerHTML = '<p class="muted">Subnet not found.</p>';
+        return;
+      }
+      const safe = String(subnet.name).replace(/</g, '&lt;');
+      const networkLink = subnet.networkName
+        ? detailNameLink(subnet.networkName, 'data-open-network', subnet.networkId || subnet.networkName)
+        : '—';
+      const projectLink = subnet.project
+        ? detailNameLink(subnet.project, 'data-open-project', subnet.project)
+        : '—';
+      root.innerHTML = `
+        ${stubDetailBreadcrumbHtml(safe)}
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safe}</h2>
+            <p class="ethan-detail-header__subtitle">Subnet stub — full subnet management is not in this prototype.</p>
+          </div>
+        </div>
+        <div class="ethan-detail-panel">
+          <div class="ethan-detail-cols ethan-detail-cols--2">
+            <section class="ethan-detail-col" aria-labelledby="subnet-overview-title">
+              <h3 class="ethan-detail-col__title" id="subnet-overview-title">Overview</h3>
+              ${itField('Name', safe)}
+              ${itField('Status', statusBadgeHtml(subnet.status || 'Ready'))}
+              ${itField('Project', projectLink)}
+              ${itField('Virtual network', networkLink)}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="subnet-config-title">
+              <h3 class="ethan-detail-col__title" id="subnet-config-title">Configuration</h3>
+              ${itField('IPv4 CIDR', String(subnet.cidr || '—').replace(/</g, '&lt;'))}
+              ${itField('VLAN', subnet.vlan != null ? String(subnet.vlan) : '—')}
+            </section>
+          </div>
+        </div>
+      `;
+      wireStubDetailBreadcrumb(root, { clearKeys: ['selectedSubnetName'] });
+      root.querySelector('[data-open-network]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openNetworkDetail(e.currentTarget.dataset.openNetwork);
+      });
+      root.querySelector('[data-open-project]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openProjectDetail(e.currentTarget.dataset.openProject);
+      });
+    }
+
+    function openSecurityGroupDetail(name) {
+      const sg = findSecurityGroupByName(name);
+      if (!sg) return;
+      state.selectedSecurityGroupName = sg.name;
+      setView('security-group');
+      renderSecurityGroupDetail();
+    }
+
+    function renderSecurityGroupDetail() {
+      const root = document.getElementById('security-group-detail-root');
+      if (!root) return;
+      const sg = findSecurityGroupByName(state.selectedSecurityGroupName);
+      if (!sg) {
+        root.innerHTML = '<p class="muted">Security group not found.</p>';
+        return;
+      }
+      const safe = String(sg.name).replace(/</g, '&lt;');
+      const networkLink = sg.networkName
+        ? detailNameLink(sg.networkName, 'data-open-network', sg.networkId || sg.networkName)
+        : '—';
+      const projectLink = sg.project
+        ? detailNameLink(sg.project, 'data-open-project', sg.project)
+        : '—';
+      root.innerHTML = `
+        ${stubDetailBreadcrumbHtml(safe)}
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safe}</h2>
+            <p class="ethan-detail-header__subtitle">Security group stub — full security group management is not in this prototype.</p>
+          </div>
+        </div>
+        <div class="ethan-detail-panel">
+          <div class="ethan-detail-cols ethan-detail-cols--2">
+            <section class="ethan-detail-col" aria-labelledby="sg-overview-title">
+              <h3 class="ethan-detail-col__title" id="sg-overview-title">Overview</h3>
+              ${itField('Name', safe)}
+              ${itField('Status', statusBadgeHtml(sg.status || 'Ready'))}
+              ${itField('Project', projectLink)}
+              ${itField('Virtual network', networkLink)}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="sg-rules-title">
+              <h3 class="ethan-detail-col__title" id="sg-rules-title">Rules</h3>
+              ${itField('Summary', String(sg.summary || '—').replace(/</g, '&lt;'))}
+            </section>
+          </div>
+        </div>
+      `;
+      wireStubDetailBreadcrumb(root, { clearKeys: ['selectedSecurityGroupName'] });
+      root.querySelector('[data-open-network]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openNetworkDetail(e.currentTarget.dataset.openNetwork);
+      });
+      root.querySelector('[data-open-project]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openProjectDetail(e.currentTarget.dataset.openProject);
+      });
+    }
+
+    function openNetworkDetail(ref) {
+      const net = findNetworkByRef(ref);
+      if (!net) return;
+      state.selectedNetworkId = net.id;
+      setView('network');
+      renderNetworkDetail();
+    }
+
+    function renderNetworkDetail() {
+      const root = document.getElementById('network-detail-root');
+      if (!root) return;
+      const net = findNetworkByRef(state.selectedNetworkId);
+      if (!net) {
+        root.innerHTML = '<p class="muted">Virtual network not found.</p>';
+        return;
+      }
+      const safeName = String(net.name).replace(/</g, '&lt;');
+      const desc = String(net.description || `${net.type} network`).replace(/</g, '&lt;');
+      const subnets = Array.isArray(net.subnets) ? net.subnets : [];
+      const sgs = Array.isArray(net.securityGroups) ? net.securityGroups : [];
+
+      const subnetRows = subnets.length
+        ? subnets.map(s => `
+            <li class="ethan-resource-list__item">
+              <button type="button" class="name-link" data-open-subnet="${String(s.name).replace(/"/g, '&quot;')}">${String(s.name).replace(/</g, '&lt;')}</button>
+              ${statusBadgeHtml(s.status)}
+              <span class="ethan-resource-list__meta">${String(s.cidr || '—').replace(/</g, '&lt;')}${s.vlan != null ? ` · VLAN ${s.vlan}` : ''}</span>
+              <div class="ethan-resource-list__actions">
+                <button type="button" class="kebab" disabled aria-label="Actions for ${String(s.name).replace(/"/g, '&quot;')}" title="Not available in this prototype">
+                  <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>`).join('')
+        : '<li class="muted" style="padding:12px 0;">No subnets yet.</li>';
+
+      const sgRows = sgs.length
+        ? sgs.map(sg => `
+            <li class="ethan-resource-list__item">
+              <button type="button" class="name-link" data-open-security-group="${String(sg.name).replace(/"/g, '&quot;')}">${String(sg.name).replace(/</g, '&lt;')}</button>
+              ${statusBadgeHtml(sg.status)}
+              <span class="ethan-resource-list__meta">${String(sg.summary || '—').replace(/</g, '&lt;')}</span>
+              <div class="ethan-resource-list__actions">
+                <button type="button" class="kebab" disabled aria-label="Actions for ${String(sg.name).replace(/"/g, '&quot;')}" title="Not available in this prototype">
+                  <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                </button>
+              </div>
+            </li>`).join('')
+        : '<li class="muted" style="padding:12px 0;">No security groups yet.</li>';
+
+      root.innerHTML = `
+        <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol class="pf-v6-c-breadcrumb__list">
+            <li class="pf-v6-c-breadcrumb__item">
+              <a href="#" class="pf-v6-c-breadcrumb__link" data-breadcrumb-networks>Virtual networks</a>
+            </li>
+            <li class="pf-v6-c-breadcrumb__item">
+              <span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true">
+                <i class="fas fa-angle-right" aria-hidden="true"></i>
+              </span>
+              <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeName}</span>
+            </li>
+          </ol>
+        </nav>
+        <div class="ethan-detail-header">
+          <div class="ethan-detail-header__main">
+            <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${safeName}</h2>
+            <p class="ethan-detail-header__subtitle">${desc}</p>
+          </div>
+          <div class="ethan-detail-header__actions" role="group" aria-label="Virtual network actions">
+            <button type="button" class="pf-v6-c-menu-toggle pf-m-secondary" disabled title="Not available in this prototype">
+              <span class="pf-v6-c-menu-toggle__text">Actions</span>
+              <span class="pf-v6-c-menu-toggle__controls">
+                <span class="pf-v6-c-menu-toggle__toggle-icon">
+                  <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="ethan-detail-panel">
+          <div class="ethan-detail-top">
+            <div class="ethan-detail-top__cols">
+              <section class="ethan-detail-col" aria-labelledby="vn-overview-title">
+                <h3 class="ethan-detail-col__title" id="vn-overview-title">Overview</h3>
+                ${itField('Status', statusBadgeHtml(net.status))}
+                ${itField('Created', String(net.created || '—').replace(/</g, '&lt;'))}
+                ${itField('Project', detailNameLink(net.project, 'data-open-project', net.project))}
+                ${itField('Type', String(net.type || '—').replace(/</g, '&lt;'))}
+              </section>
+              <section class="ethan-detail-col" aria-labelledby="vn-config-title">
+                <h3 class="ethan-detail-col__title" id="vn-config-title">Configuration</h3>
+                ${itField('IPv4 CIDR', String(net.cidr || '—').replace(/</g, '&lt;'))}
+                ${itField('IPv6 CIDR', String(net.ipv6Cidr || '—').replace(/</g, '&lt;'))}
+              </section>
+            </div>
+            <aside class="ethan-aside-card" aria-labelledby="vn-nat-title">
+              <div class="ethan-aside-card__head">
+                <h3 class="ethan-aside-card__title" id="vn-nat-title">NAT gateway</h3>
+                <button type="button" class="name-link" disabled title="Not available in this prototype">+ Attach</button>
+              </div>
+              <p class="ethan-aside-card__body">No NAT gateway attached to this virtual network.</p>
+            </aside>
+          </div>
+          <section class="ethan-resource-section" aria-labelledby="vn-subnets-title">
+            <div class="ethan-resource-section__head">
+              <h3 class="ethan-detail-col__title" id="vn-subnets-title">Subnets</h3>
+              <button type="button" class="name-link" disabled title="Not available in this prototype">+ Add</button>
+            </div>
+            <ul class="ethan-resource-list">${subnetRows}</ul>
+          </section>
+          <section class="ethan-resource-section" aria-labelledby="vn-sg-title">
+            <div class="ethan-resource-section__head">
+              <h3 class="ethan-detail-col__title" id="vn-sg-title">Security groups</h3>
+              <button type="button" class="name-link" disabled title="Not available in this prototype">+ Add</button>
+            </div>
+            <ul class="ethan-resource-list">${sgRows}</ul>
+          </section>
+        </div>
+      `;
+
+      root.querySelector('[data-breadcrumb-networks]')?.addEventListener('click', e => {
+        e.preventDefault();
+        state.selectedNetworkId = null;
+        setView('networks');
+        renderNetworks(document.getElementById('net-search')?.value || '');
+      });
+      root.querySelector('[data-open-project]')?.addEventListener('click', e => {
+        e.preventDefault();
+        openProjectDetail(e.currentTarget.dataset.openProject);
+      });
+      root.querySelectorAll('[data-open-subnet]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openSubnetDetail(e.currentTarget.dataset.openSubnet);
+        });
+      });
+      root.querySelectorAll('[data-open-security-group]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openSecurityGroupDetail(e.currentTarget.dataset.openSecurityGroup);
+        });
+      });
+    }
+
     function publishLabelHtml(state) {
       const key = String(state || 'unpublished').toLowerCase();
       const mod = key === 'live' ? 'pf-m-live' : 'pf-m-unpublished';
@@ -18501,12 +19705,17 @@
 
     function catalogCardSpecsRowsHtml(item) {
       const compute = resolveCatalogItemCompute(item);
-      const diskImage = String(item.diskImage || 'Not set').replace(/</g, '&lt;');
+      const diskRaw = String(item.diskImage || 'Not set');
+      const diskImage = diskRaw.replace(/</g, '&lt;');
       const diskLocked = item.diskImageAccess
         ? item.diskImageAccess === 'locked'
         : (!!item.diskImage && !!item.diskLocked);
       const govBadge = catalogGovBadge(diskLocked ? 'locked' : 'editable');
       const diskIcon = catalogDiskImageIconHtml(item.diskImage);
+      const diskMatch = findDiskImageByCatalogLabel(item.diskImage);
+      const diskValueHtml = diskMatch
+        ? `<button type="button" class="name-link" data-open-disk-image="${String(diskMatch.name).replace(/"/g, '&quot;')}">${diskIcon}${diskImage}</button>${govBadge}`
+        : `<span class="catalog-disk-image-value">${diskIcon}${diskImage}${govBadge}</span>`;
       const rows = [
         { label: 'vCPUs', value: compute.cpu },
         { label: 'Memory', value: compute.memory },
@@ -18519,13 +19728,7 @@
         </div>`).join('')}
         <div class="catalog-card-specs__row">
           <dt class="catalog-card-specs__label">Disk image</dt>
-          <dd class="catalog-card-specs__value">
-            <span class="catalog-disk-image-value">
-              ${diskIcon}
-              ${diskImage}
-              ${govBadge}
-            </span>
-          </dd>
+          <dd class="catalog-card-specs__value">${diskValueHtml}</dd>
         </div>`;
     }
 
@@ -18993,12 +20196,12 @@
     function wireCatalogCards(root) {
       root.querySelectorAll('[data-catalog-card]').forEach(card => {
         card.addEventListener('click', e => {
-          if (e.target.closest('[data-ci-kebab]') || e.target.closest('.kebab')) return;
+          if (e.target.closest('[data-ci-kebab]') || e.target.closest('.kebab') || e.target.closest('[data-open-disk-image]')) return;
           openCatalogItemDetail(card.dataset.catalogCard);
         });
         card.addEventListener('keydown', e => {
           if (e.key !== 'Enter' && e.key !== ' ') return;
-          if (e.target.closest('[data-ci-kebab]')) return;
+          if (e.target.closest('[data-ci-kebab]') || e.target.closest('[data-open-disk-image]')) return;
           e.preventDefault();
           openCatalogItemDetail(card.dataset.catalogCard);
         });
@@ -19010,6 +20213,13 @@
           openCatalogItemDetail(link.dataset.catalogOpen);
         });
       });
+      root.querySelectorAll('[data-open-disk-image]').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          openDiskImageDetail(link.dataset.openDiskImage);
+        });
+      });
       root.querySelectorAll('[data-ci-kebab]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.stopPropagation();
@@ -19018,7 +20228,7 @@
       });
       root.querySelectorAll('[data-catalog-row]').forEach(row => {
         row.addEventListener('click', e => {
-          if (e.target.closest('[data-ci-kebab]') || e.target.closest('[data-catalog-open]')) return;
+          if (e.target.closest('[data-ci-kebab]') || e.target.closest('[data-catalog-open]') || e.target.closest('[data-open-disk-image]')) return;
           openCatalogItemDetail(row.dataset.catalogRow);
         });
       });
@@ -19097,7 +20307,11 @@
               <tbody class="pf-v6-c-table__tbody">
                 ${items.map(item => {
                   const name = String(item.name).replace(/</g, '&lt;');
-                  const diskImage = String(item.diskImage).replace(/</g, '&lt;');
+                  const diskMatch = findDiskImageByCatalogLabel(item.diskImage);
+                  const diskLabel = String(item.diskImage || '—').replace(/</g, '&lt;');
+                  const diskImage = diskMatch
+                    ? `<button type="button" class="name-link" data-open-disk-image="${String(diskMatch.name).replace(/"/g, '&quot;')}">${diskLabel}</button>`
+                    : diskLabel;
                   const visibility = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
                   const compute = resolveCatalogItemCompute(item).summary.replace(/</g, '&lt;');
                   const rate = catalogRateLine(item);
@@ -19883,6 +21097,11 @@
       state.selectedVmName = null;
       state.selectedInstanceTypeName = null;
       state.selectedDiskImageName = null;
+      state.selectedNetworkId = null;
+      state.selectedProjectName = null;
+      state.selectedSubnetName = null;
+      state.selectedSecurityGroupName = null;
+      state.selectedCatalogItemId = null;
       closeInstanceTypeActionsMenu();
       closeDiskImageActionsMenu();
       closeVmDetailActionsMenu();
@@ -19894,6 +21113,7 @@
       }
       if (nav === 'instance-types') renderInstanceTypes();
       if (nav === 'disk-images') renderDiskImages();
+      if (nav === 'networks') renderNetworks(document.getElementById('net-search')?.value || '');
     }));
     document.getElementById('btn-create-catalog-item')?.addEventListener('click', () => openCatalogItemWizard());
     document.getElementById('catalog-search')?.addEventListener('input', e => {
@@ -20097,6 +21317,7 @@
     wireEditComputeModal();
     wireEditSshModal();
     wireNicDetailPopover();
+    wireVmConfigPopovers();
     wireFsHelpPopover();
     wireUtilHelpPopover();
     wirePfTooltips();
@@ -20153,6 +21374,42 @@
         </span>
       </button>
       <div class="pf-v6-c-popover__body" id="nic-detail-popover-body"></div>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-popover pf-m-left" id="disk-image-popover" role="dialog" aria-modal="true" aria-label="Disk image details" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="disk-image-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="disk-image-popover-body"></div>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-popover pf-m-left" id="it-pci-popover" role="dialog" aria-modal="true" aria-label="PCI device selector" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="it-pci-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="it-pci-popover-body"></div>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-popover pf-m-left" id="storage-tier-popover" role="dialog" aria-modal="true" aria-label="Storage tier details" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="storage-tier-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <div class="pf-v6-c-popover__body" id="storage-tier-popover-body"></div>
     </div>
   </div>
 
