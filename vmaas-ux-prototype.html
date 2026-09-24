@@ -1159,7 +1159,7 @@
     .vm-dl .res-icon {
       width: 18px; height: 18px; font-size: 8px;
     }
-    .vm-arch-badge.pf-v6-c-badge {
+    .vm-arch-label.pf-v6-c-label {
       flex-shrink: 0;
       vertical-align: middle;
     }
@@ -1702,6 +1702,12 @@
       text-decoration: underline dotted;
       text-underline-offset: 3px;
     }
+    /* Overview status opens a popover — same dotted cue as other popover values. */
+    .vm-overview-v2 .status-link__label,
+    .vm-overview-v2 .status-link:hover .status-link__label {
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
+    }
     .ethan-detail-col__subtitle {
       margin: 8px 0 16px;
       font-size: 14px;
@@ -1710,6 +1716,26 @@
       color: var(--vmaas-text, #151515);
     }
     .ethan-detail-col__subtitle:first-child { margin-top: 0; }
+    /* Instance type heading + Edit — same modal class as Add network / Add disk */
+    .ethan-detail-col__subtitle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0 16px;
+    }
+    .ethan-detail-col__subtitle-row .ethan-detail-col__subtitle {
+      margin: 0;
+    }
+    .ethan-detail-col__subtitle-row:first-child { margin-top: 0; }
+    /* Annotation tags use Label (not Badge); keep text regular weight */
+    .pf-v6-c-label.pf-m-compact .pf-v6-c-label__text {
+      font-weight: 400;
+    }
+    .bootable-label.pf-v6-c-label,
+    .arch-label.pf-v6-c-label {
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
     #disk-image-popover,
     #it-pci-popover,
     #storage-tier-popover {
@@ -1801,7 +1827,7 @@
     .pf-v6-c-button.pf-m-small {
       font-size: 13px; padding: 4px 12px; min-height: 28px;
     }
-    .vm-detail__title .vm-arch-badge { margin-left: 4px; vertical-align: middle; }
+    .vm-detail__title .vm-arch-label { margin-left: 4px; vertical-align: middle; }
     .vm-vnc {
       display: flex; flex-direction: column; align-items: stretch; text-align: left; min-width: 0;
     }
@@ -4780,7 +4806,7 @@
     .boot-table .toolbar .pf-v6-c-button { margin-inline-start: auto; }
     .boot-table table { width: 100%; }
     .boot-table th, .boot-table td { font-size: 13px; padding: 8px 10px; }
-    .arch-badge.pf-v6-c-badge {
+    .arch-label.pf-v6-c-label {
       flex-shrink: 0;
     }
 
@@ -4928,7 +4954,7 @@
     }
     .storage-toolbar .filter-name-search { flex: 1; min-width: 180px; max-width: 280px; height: 36px; }
     .storage-toolbar .form-check { margin: 0 0 0 4px; }
-    .bootable-badge.pf-v6-c-badge {
+    .bootable-label.pf-v6-c-label {
       flex-shrink: 0;
     }
     .side-table__name-cell {
@@ -6120,7 +6146,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · overview-align 7108</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · overview-labels 7110</span>
         </div>
       </div>
       <div class="console__body">
@@ -13591,18 +13617,19 @@
       const addDisabledAttrs = canEditConfig ? '' : ` disabled title="${noEditReason}"`;
       const itNameSafe = String(computeFields.name).replace(/</g, '&lt;');
       const hasPciInfo = Number(computeFields.gpuCount) > 0 || (computeFields.gpuPci && computeFields.gpuPci !== '—');
-      const itNameDisplay = `
-        <span class="vm-compute-row">
-          ${hasPciInfo
-            ? `<button type="button" class="name-link name-link--dotted" data-it-pci-detail
-                data-pci="${escAttr(computeFields.gpuPci)}"
-                data-gpu-resource="${escAttr(computeFields.gpuResource)}"
-                aria-haspopup="dialog" aria-expanded="false">${itNameSafe}</button>`
-            : `<span>${itNameSafe}</span>`}
+      const itNameDisplay = hasPciInfo
+        ? `<button type="button" class="name-link name-link--dotted" data-it-pci-detail
+            data-pci="${escAttr(computeFields.gpuPci)}"
+            data-gpu-resource="${escAttr(computeFields.gpuResource)}"
+            aria-haspopup="dialog" aria-expanded="false">${itNameSafe}</button>`
+        : itNameSafe;
+      const itSubtitleRow = `
+        <div class="ethan-detail-col__subtitle-row">
+          <h4 class="ethan-detail-col__subtitle">Instance type</h4>
           <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit instance type"${editTitleAttr}${editDisabledAttr}>
             <i class="fa-solid fa-pen" aria-hidden="true"></i>
           </button>
-        </span>`;
+        </div>`;
 
       const header = `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
@@ -13676,7 +13703,7 @@
                   <h3 class="ethan-detail-col__title" id="vm-config-title">Configuration</h3>
                   ${itField('Guest operating system family', guestOsFamilyDisplay)}
                   ${itField('Disk image', diskImageDisplay)}
-                  <h4 class="ethan-detail-col__subtitle">Instance type</h4>
+                  ${itSubtitleRow}
                   ${itField('Name', itNameDisplay)}
                   ${itField('vCPUs', String(computeFields.vcpu).replace(/</g, '&lt;'))}
                   ${itField('Memory', String(computeFields.memory).replace(/</g, '&lt;'))}
@@ -13775,7 +13802,7 @@
                         <td>
                           <span class="overview-table__name">
                             ${d.label}
-                            ${d.bootable ? '<span class="pf-v6-c-badge pf-m-read bootable-badge">Bootable</span>' : ''}
+                            ${d.bootable ? pfAnnotationLabel('Bootable', 'bootable-label') : ''}
                           </span>
                         </td>
                         <td>${d.size}</td>
@@ -14983,7 +15010,7 @@
                             <i class="fa-brands fa-redhat" style="color:#ee0000;"></i> ${v.name}
                           </label>
                         </td>
-                        <td><span class="pf-v6-c-badge pf-m-read arch-badge">${v.arch}</span></td>
+                        <td>${pfAnnotationLabel(v.arch, 'arch-label')}</td>
                         <td>${v.project}</td>
                         <td>${v.size}</td>
                       </tr>
@@ -17245,6 +17272,13 @@
         <div class="ethan-detail-field__label">${label}</div>
         <div class="ethan-detail-field__value">${valueHtml}</div>
       </div>`;
+    }
+
+    /** Compact PF Label for tags/annotations (not counts — those stay Badge). */
+    function pfAnnotationLabel(text, extraClass = '') {
+      const safe = String(text || '').replace(/</g, '&lt;');
+      const cls = ['pf-v6-c-label', 'pf-m-outline', 'pf-m-compact', 'pf-m-grey', extraClass].filter(Boolean).join(' ');
+      return `<span class="${cls}"><span class="pf-v6-c-label__content"><span class="pf-v6-c-label__text">${safe}</span></span></span>`;
     }
 
     function normalizeInstanceTypeLifecycle(state) {
