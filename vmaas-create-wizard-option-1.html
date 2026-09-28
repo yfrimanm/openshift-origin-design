@@ -4114,15 +4114,15 @@
             </button>
           </div>
           <h1 class="pf-v6-c-modal-box__title" id="compute-modal-title">
-            <span class="pf-v6-c-modal-box__title-text">Edit compute resources</span>
+            <span class="pf-v6-c-modal-box__title-text">Edit instance type</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="compute-modal-desc">
-            Choose a compute size for this Virtual machine.
+            Choose an instance type for this virtual machine.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
           <div class="form-field">
-            <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
+            <label for="f-edit-compute-resource">Instance type <span class="req">*</span></label>
             <span class="pf-v6-c-form-control" id="compute-modal-select-wrap"></span>
           </div>
         </div>
@@ -4480,7 +4480,7 @@
       return COMPUTE_RESOURCES.find(c => c.id === id)?.label || id || '—';
     }
 
-    /** Derive card CPU/Mem from compute resource so Catalog stays aligned with Compute. */
+    /** Derive card CPU/Mem from instance type so Catalog stays aligned with Compute. */
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
       if (!c) return { cpu: '—', mem: '—' };
@@ -4672,10 +4672,10 @@
       if (body) {
         body.innerHTML = `
           <div class="form-field">
-            <label for="f-edit-compute-resource">Compute resource <span class="req">*</span></label>
+            <label for="f-edit-compute-resource">Instance type <span class="req">*</span></label>
             ${pfSelect({
               id: 'f-edit-compute-resource',
-              ariaLabel: 'Compute resource',
+              ariaLabel: 'Instance type',
               required: true,
               optionsHtml: COMPUTE_RESOURCES.map(c =>
                 `<option value="${c.id}" ${current === c.id ? 'selected' : ''}>${c.label}</option>`
@@ -4706,7 +4706,7 @@
       vm.mem = specs.mem;
       closeEditComputeModal();
       renderVmDetail();
-      toast(`Compute resources updated to ${computeResourceLabel(id)}.`, 'success');
+      toast(`Instance type updated to ${computeResourceLabel(id)}.`, 'success');
     }
 
     function wireEditComputeModal() {
@@ -8018,11 +8018,11 @@
                       <dt>Status</dt><dd>${statusCell(v.status, v.name)}</dd>
                       <dt>Created</dt><dd>${v.created || '—'}</dd>
                       <dt>Operating system</dt><dd>${osDisplay}</dd>
-                      <dt>Compute resources</dt>
+                      <dt>Instance type</dt>
                       <dd>
                         <span class="vm-compute-row">
                           ${v.computeResource ? formatComputeDisplay(v.computeResource) : `${v.cpu || '1 vCPU'} | ${v.mem || '128 MiB'} Memory`}
-                          <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit compute resources" title="Edit">
+                          <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit instance type" title="Edit">
                             <i class="fa-solid fa-pen" aria-hidden="true"></i>
                           </button>
                         </span>
@@ -8535,7 +8535,7 @@
         { key: 'deploy', label: 'Deployment details' },
         { key: 'os', label: 'Guest OS' },
         { key: 'boot', label: 'Boot source' },
-        { key: 'compute', label: 'Compute resources' },
+        { key: 'compute', label: 'Instance types' },
         { key: 'customize', label: 'Configuration' },
         { key: 'review', label: 'Review and create' },
       ];
@@ -9418,7 +9418,7 @@
         const sizeValid = sizeOptions.some(s => s.value === d.size);
         if (!sizeValid) d.size = currentSeries.defaultSize;
         panel.innerHTML = `
-          <h3>Compute resources</h3>
+          <h3>Instance types</h3>
           <p class="step-help">Define resources by selecting series and size.</p>
           <div class="subtabs">
             <button type="button" class="subtab pf-m-selected">Red Hat provided</button>
@@ -10055,12 +10055,12 @@
           const computeFieldHtml = computeEditable ? `
               <div class="form-field">
                 <label for="f-compute-resource" class="label-with-optional">
-                  <span>Compute resource <span class="req">*</span></span>
+                  <span>Instance type <span class="req">*</span></span>
                   ${fieldGovLabel('editable')}
                 </label>
                 ${pfSelect({
                   id: 'f-compute-resource',
-                  ariaLabel: 'Compute resource',
+                  ariaLabel: 'Instance type',
                   required: true,
                   optionsHtml: COMPUTE_RESOURCES.map(c =>
                     `<option value="${c.id}" ${d.computeResource === c.id ? 'selected' : ''}>${c.label}</option>`
@@ -10071,12 +10071,12 @@
           ` : `
               <div class="form-field">
                 <label for="f-compute-resource" class="label-with-optional">
-                  <span>Compute resource</span>
+                  <span>Instance type</span>
                   ${fieldGovLabel('locked')}
                 </label>
                 <input type="text" id="f-compute-resource" class="unit-size-input"
                   value="${(computeLabel || '—').replace(/"/g, '&quot;')}"
-                  disabled aria-disabled="true" aria-label="Compute resource" />
+                  disabled aria-disabled="true" aria-label="Instance type" />
               </div>
           `;
           const stepHelp = computeEditable
@@ -10690,7 +10690,7 @@
               ${reviewRow('OS image', osImage)}
             `)}
             ${reviewSection('Configure', 'configure', `
-              ${reviewRow('Compute resource', reviewValue(compute, computeChanged))}
+              ${reviewRow('Instance type', reviewValue(compute, computeChanged))}
               ${windowsAccess
                 ? reviewRow('Access method', 'Password / RDP after create')
                 : reviewRow('SSH public key', sshVal)}

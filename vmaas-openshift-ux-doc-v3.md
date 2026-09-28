@@ -40,7 +40,7 @@ VM Overview is split into smaller cards that each own a specific domain:
 
 ### Details
 
-- Fields: **Name** (+ amd64 badge) · **Project** · **Status** · **Created** · **Operating system** (or *Guest agent is required.*) · **Compute resources** (with edit pencil).
+- Fields: **Name** (+ amd64 badge) · **Project** · **Status** · **Created** · **Operating system** (or *Guest agent is required.*) · **Instance types** (with edit pencil).
 - **VNC console** lives in the Details card (Open web console + preview), not a separate side card.
 
 ### Network (n) / Storage (n)

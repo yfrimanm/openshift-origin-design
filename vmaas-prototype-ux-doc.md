@@ -47,8 +47,8 @@ Document the current OSAC VMaaS HTML prototype so engineering and stakeholders c
 
 | Area | Decision |
 |---|---|
-| **IA (Create)** | Select template → Details → Compute resource → Storage → Network → Review and create |
-| **Create dropdowns** | Shared **typeahead rich-select** (FormControl toggle + search menu), matching **Compute resource**: Project, Storage tier (boot + extra disks), Virtual network, Subnet. Security groups stay multi-select chips. |
+| **IA (Create)** | Select template → Details → Instance type → Storage → Network → Review and create |
+| **Create dropdowns** | Shared **typeahead rich-select** (FormControl toggle + search menu), matching **Instance type**: Project, Storage tier (boot + extra disks), Virtual network, Subnet. Security groups stay multi-select chips. |
 | **After create** | Lands on new VM Overview + success toast |
 | **Overview** | 2/3 main + 1/3 sidebar; stacked fields in **Overview** \| **Configuration** \| **SSH**; Network / Storage tables + Utilization; header PF actions + Delete |
 | **Instance types** | Provider list + create (Tenant before Name) + 3-column detail; lifecycle Actions |
@@ -80,7 +80,7 @@ Figure: Row Actions kebab
 
 ### Step 1 — Select template
 
-- **Project** is a typeahead rich-select (same chrome as Compute resource)
+- **Project** is a typeahead rich-select (same chrome as Instance type)
 - Project scopes available templates and creation target
 - Selecting a template opens **Template settings** drawer (Locked / Editable governance)
 
@@ -102,19 +102,19 @@ Figure: Template settings drawer
 
 Figure: Details
 
-### Step 3 — Compute resource
+### Step 3 — Instance type
 
 - Size locked or editable per template governance
-- **Compute resource** typeahead rich-select: FormControl toggle, stacked title + description when applicable, searchable menu (reference pattern for other wizard dropdowns)
+- **Instance type** typeahead rich-select: FormControl toggle, stacked title + description when applicable, searchable menu (reference pattern for other wizard dropdowns)
 
-![Figure: Compute resource](videos/vmaas-prototype-ux-doc/05-compute.png)
+![Figure: Instance type](videos/vmaas-prototype-ux-doc/05-compute.png)
 
-Figure: Compute resource
+Figure: Instance type
 
 ### Step 4 — Storage
 
 - Boot disk size / **Storage tier**
-- **Storage tier** (boot + each extra disk) uses the same typeahead rich-select as Compute resource (stacked title/description + search) — not a native `<select>`
+- **Storage tier** (boot + each extra disk) uses the same typeahead rich-select as Instance type (stacked title/description + search) — not a native `<select>`
 - Additional disks via inline **Add disk** sets (not a modal on this step)
 
 ![Figure: Storage](videos/vmaas-prototype-ux-doc/06-storage.png)
@@ -176,7 +176,7 @@ Figure: Exit confirmation
 | Column | Fields |
 |---|---|
 | **Overview** | Project · Status (link → popover) · Created · Catalog item |
-| **Configuration** | Operating system · Compute resource · Image · vCPUs · Memory |
+| **Configuration** | Operating system · Instance type · Image · vCPUs · Memory |
 | **SSH** | SSH public key |
 
 ### Network / Storage tables
@@ -439,7 +439,7 @@ Figure: Disk image detail
 | `02-select-template.png` | Create — Select template |
 | `03-template-drawer.png` | Template settings drawer |
 | `04-details.png` | Create — Details |
-| `05-compute.png` | Create — Compute resource |
+| `05-compute.png` | Create — Instance type |
 | `06-storage.png` | Create — Storage |
 | `07-network.png` | Create — Network |
 | `08-review.png` | Create — Review and create |

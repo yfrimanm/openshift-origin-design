@@ -13,7 +13,7 @@
 | **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [GitHub](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
 
-**IA:** Select template → Details → Compute resource → Storage → Network → Review and create
+**IA:** Select template → Details → Instance type → Storage → Network → Review and create
 
 ---
 
@@ -125,15 +125,15 @@ Figure: Details
 
 ---
 
-## Step 3 — Compute resource
+## Step 3 — Instance type
 
-- Compute resource locked or editable per template
+- Instance type locked or editable per template
 - Helper when locked: size is set by the template; can edit after create
 - OS image and Access are not on this step
 
-![Figure: Compute resource](videos/vmaas-create-vm-only-ux-doc/06-compute-resource.png)
+![Figure: Instance type](videos/vmaas-create-vm-only-ux-doc/06-compute-resource.png)
 
-Figure: Compute resource
+Figure: Instance type
 
 ---
 
@@ -174,7 +174,7 @@ Figure: Additional network set (inline Add / Remove)
 
 ## Step 6 — Review and create
 
-Grouped review: Details (incl. Access) / Compute resource / Storage / Network with edit links. Cost panel. *Start this Virtual machine after creation* — **checked by default** (CNV parity).
+Grouped review: Details (incl. Access) / Instance type / Storage / Network with edit links. Cost panel. *Start this Virtual machine after creation* — **checked by default** (CNV parity).
 
 - Access: *Configured* / *Not configured*
 - Additional disks / networks listed or *None*

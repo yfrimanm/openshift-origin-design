@@ -117,7 +117,7 @@ async function main() {
   }
 
   await clickNext(page);
-  await waitStep(page, 'Compute resource');
+  await waitStep(page, 'Instance type');
   await shot(page, '05-compute');
 
   await clickNext(page);

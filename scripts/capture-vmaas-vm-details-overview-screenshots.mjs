@@ -183,7 +183,7 @@ async function main() {
   await backToVmList(page);
   await openVmDetail(page, runningVm);
 
-  // 09 — Edit compute resources
+  // 09 — Edit instance type
   await page.locator('[data-edit-compute]').first().click();
   await page.waitForSelector('#compute-overlay.pf-m-open', { timeout: 5000 });
   await page.waitForTimeout(300);

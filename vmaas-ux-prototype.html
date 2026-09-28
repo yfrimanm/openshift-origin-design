@@ -3926,6 +3926,9 @@
     .form-check {
       display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 20px 0 0;
     }
+    .form-check--gpu-filter {
+      margin: 0 0 16px;
+    }
 
     /* PF6 Felt selectable boxes (cards-as-tiles) — Guest OS, tenant access, etc. */
     .felt-select-boxes {
@@ -6146,7 +6149,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · overview-labels 7110</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 28 · catalog-link 7114</span>
         </div>
       </div>
       <div class="console__body">
@@ -7020,7 +7023,7 @@
             <span class="pf-v6-c-modal-box__title-text">Edit instance type</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="compute-modal-desc">
-            Choose an instance type for this virtual machine.
+            This virtual machine configuration allows instance types without a GPU.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
@@ -7116,7 +7119,7 @@
         sshKeyFileName: 'id_ed25519.pub',
         guestAgent: true,
         osFull: 'Red Hat Enterprise Linux 9.5',
-        catalogItem: 'rhel-general-purpose',
+        catalogItem: 'vm-inference-standard',
         imageLabel: 'RHEL 9.4',
         computeResource: 'small',
         nics: [{
@@ -7138,11 +7141,11 @@
           network: '5.3 KBps', netIn: '2.9 KBps', netOut: '2.4 KBps',
         },
       },
-      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'general-purpose-server', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'bare-metal-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }] },
-      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
-      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', imageLabel: 'Fedora 41', catalogItem: 'developer-workstation', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
-      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
+      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-inference-standard', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', computeResource: 'large-gpu', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }] },
+      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'vm-windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
+      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', imageLabel: 'Fedora 41', catalogItem: 'vm-dev-workstation', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
+      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'vm-legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
     const FILTER_CATALOG = {
@@ -7412,16 +7415,20 @@
 
     const CATALOG_OS_IMAGES = ['rhel.10', 'rhel.9', 'Windows.2k25', 'fedora'];
     const COMPUTE_RESOURCES = [
-      { id: 'nano', label: 'nano: 1 vCPU, 512 MiB Memory', hourly: 0.05 },
-      { id: 'micro', label: 'micro: 1 vCPU, 1 GiB Memory', hourly: 0.12 },
-      { id: 'small', label: 'small: 1 vCPU, 2 GiB Memory', hourly: 0.80 },
-      { id: 'medium', label: 'medium: 1 vCPU, 4 GiB Memory', hourly: 1.60 },
-      { id: '2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory', hourly: 2.40 },
-      { id: 'large', label: 'large: 2 vCPUs, 8 GiB Memory', hourly: 4.70 },
-      { id: 'xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory', hourly: 9.40 },
-      { id: '2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory', hourly: 18.80 },
-      { id: '4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory', hourly: 37.60 },
-      { id: '8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory', hourly: 75.20 },
+      { id: 'nano', label: 'nano: 1 vCPU, 512 MiB Memory', hourly: 0.05, gpus: 0 },
+      { id: 'micro', label: 'micro: 1 vCPU, 1 GiB Memory', hourly: 0.12, gpus: 0 },
+      { id: 'small', label: 'small: 1 vCPU, 2 GiB Memory', hourly: 0.80, gpus: 0 },
+      { id: 'medium', label: 'medium: 1 vCPU, 4 GiB Memory', hourly: 1.60, gpus: 0 },
+      { id: '2xmedium', label: '2xmedium: 2 vCPUs, 4 GiB Memory', hourly: 2.40, gpus: 0 },
+      { id: 'large', label: 'large: 2 vCPUs, 8 GiB Memory', hourly: 4.70, gpus: 0 },
+      { id: 'xlarge', label: 'xlarge: 4 vCPUs, 16 GiB Memory', hourly: 9.40, gpus: 0 },
+      { id: '2xlarge', label: '2xlarge: 8 vCPUs, 32 GiB Memory', hourly: 18.80, gpus: 0 },
+      { id: '4xlarge', label: '4xlarge: 16 vCPUs, 64 GiB Memory', hourly: 37.60, gpus: 0 },
+      { id: '8xlarge', label: '8xlarge: 32 vCPUs, 128 GiB Memory', hourly: 75.20, gpus: 0 },
+      { id: 'small-gpu', label: 'small-gpu: 1 vCPU, 2 GiB Memory, 1 GPU', hourly: 1.90, gpus: 1, gpuResource: 'NVIDIA A100 40 GB' },
+      { id: 'medium-gpu', label: 'medium-gpu: 2 vCPUs, 8 GiB Memory, 1 GPU', hourly: 5.80, gpus: 1, gpuResource: 'NVIDIA A100 40 GB' },
+      { id: 'large-gpu', label: 'large-gpu: 4 vCPUs, 16 GiB Memory, 1 GPU', hourly: 12.40, gpus: 1, gpuResource: 'NVIDIA A100 80 GB' },
+      { id: '2xlarge-gpu', label: '2xlarge-gpu: 8 vCPUs, 32 GiB Memory, 2 GPUs', hourly: 28.60, gpus: 2, gpuResource: 'NVIDIA A100 80 GB' },
     ];
     const CATALOG_BOOT_DISK_GIB = [5, 10, 20];
     /** Storage estimate rate (~$0.10 / GiB / month) */
@@ -7431,17 +7438,27 @@
       return COMPUTE_RESOURCES.find(c => c.id === id)?.label || id || '—';
     }
 
+    function computeResourceHasGpu(resourceOrId) {
+      const c = typeof resourceOrId === 'string'
+        ? COMPUTE_RESOURCES.find(x => x.id === resourceOrId)
+        : resourceOrId;
+      return Number(c?.gpus) > 0;
+    }
+
     function computeResourceParts(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
       const label = c?.label || id || '—';
       const m = String(label).match(/^([^:]+):\s*(.+)$/);
-      if (m) return { title: m[1].trim(), desc: m[2].trim(), hourly: c?.hourly };
-      return { title: label, desc: '', hourly: c?.hourly };
+      if (m) return { title: m[1].trim(), desc: m[2].trim(), hourly: c?.hourly, gpus: Number(c?.gpus) || 0 };
+      return { title: label, desc: '', hourly: c?.hourly, gpus: Number(c?.gpus) || 0 };
     }
 
-    function filteredVmComputeResources(filter = '') {
+    function filteredVmComputeResources(filter = '', opts = {}) {
       const q = (filter || '').toLowerCase();
+      const { requireGpu } = opts;
       return COMPUTE_RESOURCES.filter(c => {
+        if (requireGpu === true && !computeResourceHasGpu(c)) return false;
+        if (requireGpu === false && computeResourceHasGpu(c)) return false;
         if (!q) return true;
         return `${c.id} ${c.label}`.toLowerCase().includes(q);
       });
@@ -7455,13 +7472,42 @@
     /** Derive card CPU/Mem from instance type so Catalog stays aligned with Compute. */
     function computeResourceSpecs(id) {
       const c = COMPUTE_RESOURCES.find(x => x.id === id);
-      if (!c) return { cpu: '—', mem: '—' };
-      const m = String(c.label).match(/:\s*(\d+)\s*vCPUs?,\s*(.+?)\s*Memory/i);
-      if (!m) return { cpu: '—', mem: '—' };
+      if (!c) return { cpu: '—', mem: '—', gpus: 0, gpuResource: null };
+      const m = String(c.label).match(/:\s*(\d+)\s*vCPUs?,\s*([^,]+?)\s*Memory/i);
+      if (!m) return { cpu: '—', mem: '—', gpus: Number(c.gpus) || 0, gpuResource: c.gpuResource || null };
       return {
         cpu: Number(m[1]) === 1 ? '1 vCPU' : `${m[1]} vCPUs`,
         mem: m[2].trim(),
+        gpus: Number(c.gpus) || 0,
+        gpuResource: c.gpuResource || null,
       };
+    }
+
+    function applyComputeResourceToVm(vm, id) {
+      if (!vm || !id) return;
+      const specs = computeResourceSpecs(id);
+      vm.computeResource = id;
+      if (specs.cpu !== '—') vm.cpu = String(specs.cpu);
+      if (specs.mem !== '—') vm.mem = specs.mem;
+      if (specs.gpus > 0) {
+        const name = specs.gpuResource || 'GPU';
+        vm.gpuDevices = Array.from({ length: specs.gpus }, () => ({ name }));
+        if (!vm.gpuPci) vm.gpuPci = '2080';
+      } else {
+        vm.gpuDevices = [];
+        vm.gpuPci = '';
+      }
+    }
+
+    function vmRequiresGpu(vm) {
+      if (computeResourceHasGpu(resolveVmComputeId(vm))) return true;
+      return Array.isArray(vm?.gpuDevices) && vm.gpuDevices.length > 0;
+    }
+
+    function editComputeModalDescription(requireGpu) {
+      return requireGpu
+        ? 'This virtual machine configuration allows instance types with a GPU.'
+        : 'This virtual machine configuration allows instance types without a GPU.';
     }
 
 
@@ -7673,7 +7719,10 @@
       if (!m || !body) return;
       const selectedParts = computeResourceParts(m.selectedId);
       const toggleDesc = selectedParts.desc || '';
-      const vmComputeOptions = filteredVmComputeResources(m.filter);
+      const requireGpu = !!m.requireGpu;
+      const vmComputeOptions = filteredVmComputeResources(m.filter, { requireGpu });
+      const descEl = document.getElementById('compute-modal-desc');
+      if (descEl) descEl.textContent = editComputeModalDescription(requireGpu);
       body.innerHTML = `
         <div class="form-field">
           <label id="f-edit-compute-resource-label">Instance type <span class="req">*</span></label>
@@ -7752,10 +7801,14 @@
     function openEditComputeModal() {
       const vm = VMS.find(v => v.name === state.selectedVmName);
       if (!vm) return;
+      const requireGpu = vmRequiresGpu(vm);
+      const selectedId = resolveVmComputeId(vm);
+      const matching = filteredVmComputeResources('', { requireGpu });
       state.editComputeModal = {
-        selectedId: resolveVmComputeId(vm),
+        selectedId: matching.some(c => c.id === selectedId) ? selectedId : (matching[0]?.id || selectedId),
         menuOpen: false,
         filter: '',
+        requireGpu,
       };
       renderEditComputeModal();
       const overlay = document.getElementById('compute-overlay');
@@ -7776,10 +7829,11 @@
       const id = state.editComputeModal?.selectedId
         || document.getElementById('f-edit-compute-resource')?.value;
       if (!vm || !id) return;
-      const specs = computeResourceSpecs(id);
-      vm.computeResource = id;
-      vm.cpu = String(specs.cpu);
-      vm.mem = specs.mem;
+      if (state.editComputeModal && computeResourceHasGpu(id) !== !!state.editComputeModal.requireGpu) {
+        toast('Choose an instance type that matches this virtual machine’s GPU configuration.', 'danger');
+        return;
+      }
+      applyComputeResourceToVm(vm, id);
       closeEditComputeModal();
       renderVmDetail();
       toast(`Instance type updated to ${computeResourceLabel(id)}.`, 'success');
@@ -8394,6 +8448,7 @@
       catalogEditOriginal: null,
       vmComputeMenuOpen: false,
       vmComputeFilter: '',
+      vmShowGpuIts: false,
       vmBootTierMenuOpen: false,
       vmBootTierFilter: '',
       vmVnMenuOpen: false,
@@ -12120,6 +12175,11 @@
       enriched.computeResource = computeId;
       if (specs.cpu !== '—') enriched.cpu = String(specs.cpu);
       if (specs.mem !== '—') enriched.mem = specs.mem;
+      if (specs.gpus > 0 && !(Array.isArray(enriched.gpuDevices) && enriched.gpuDevices.length)) {
+        const name = specs.gpuResource || 'GPU';
+        enriched.gpuDevices = Array.from({ length: specs.gpus }, () => ({ name }));
+        if (!enriched.gpuPci) enriched.gpuPci = '2080';
+      }
       enriched.utilization = getVmUtilization(enriched);
       normalizeVmIpState(enriched);
       return enriched;
@@ -14065,6 +14125,7 @@
       state.sgMenuOpen = false;
       state.vmComputeMenuOpen = false;
       state.vmComputeFilter = '';
+      state.vmShowGpuIts = false;
       state.vmBootTierMenuOpen = false;
       state.vmBootTierFilter = '';
       state.vmVnMenuOpen = false;
@@ -15142,7 +15203,10 @@
           }
           d.diskImageMenuOpen = false;
           d.diskImageFilter = '';
-          if (tpl.computeResource) d.computeResource = tpl.computeResource;
+          if (tpl.computeResource) {
+            d.computeResource = tpl.computeResource;
+            state.vmShowGpuIts = computeResourceHasGpu(tpl.computeResource);
+          }
           if (tpl.bootDiskGiB != null) d.bootDiskGiB = tpl.bootDiskGiB;
           const tplBootDisk = (tpl.disks || []).find(disk =>
             disk.bootable || disk.name === 'Boot disk' || disk.name === 'rootdisk'
@@ -15681,7 +15745,10 @@
           if (!d.diskImageId && tpl.diskImageId) {
             applyDiskImageToForm(d, tpl.diskImageId, { syncInit: !d.initMethod });
           }
-          if (tpl.computeResource && !d.computeResource) d.computeResource = tpl.computeResource;
+          if (tpl.computeResource && !d.computeResource) {
+            d.computeResource = tpl.computeResource;
+            state.vmShowGpuIts = computeResourceHasGpu(tpl.computeResource);
+          }
           if (d.bootDiskGiB == null && tpl.bootDiskGiB != null) d.bootDiskGiB = tpl.bootDiskGiB;
         }
         if (!d.computeResource || !COMPUTE_RESOURCES.some(c => c.id === d.computeResource)) {
@@ -15719,9 +15786,25 @@
           const computeEditable = fieldBeh.compute === 'editable';
           const computeLabel = computeResourceLabel(d.computeResource);
           const selectedCompute = computeResourceParts(d.computeResource);
-          const vmComputeOptions = filteredVmComputeResources(state.vmComputeFilter);
-          const vmComputeToggleDesc = selectedCompute.desc || '';
+          const showGpuIts = !!state.vmShowGpuIts;
+          const requireGpu = showGpuIts;
+          let vmComputeOptions = filteredVmComputeResources(state.vmComputeFilter, { requireGpu });
+          // Keep selection in the active GPU pool (create is where GPU vs non-GPU is chosen).
+          if (computeEditable && !vmComputeOptions.some(c => c.id === d.computeResource)) {
+            const pool = filteredVmComputeResources('', { requireGpu });
+            if (pool.length) d.computeResource = pool[0].id;
+            vmComputeOptions = filteredVmComputeResources(state.vmComputeFilter, { requireGpu });
+          }
+          const selectedComputeFresh = computeResourceParts(d.computeResource);
+          const vmComputeToggleDesc = selectedComputeFresh.desc || '';
+          const gpuFilterHtml = computeEditable ? `
+              <label class="form-check form-check--gpu-filter" for="f-show-gpu-its">
+                <input type="checkbox" id="f-show-gpu-its" ${showGpuIts ? 'checked' : ''} />
+                Show instance types with GPU
+              </label>
+          ` : '';
           const computeFieldHtml = computeEditable ? `
+              ${gpuFilterHtml}
               <div class="form-field">
                 <label id="f-compute-resource-label">Instance type <span class="req">*</span></label>
                 <div class="rich-select rich-select--typeahead ${state.vmComputeMenuOpen ? 'pf-m-expanded' : ''}" id="vm-compute-select">
@@ -15731,7 +15814,7 @@
                     ariaExpanded: state.vmComputeMenuOpen,
                     stacked: true,
                     mainHtml: `
-                      <span class="rich-select__toggle-label" id="f-compute-resource">${selectedCompute.title}</span>
+                      <span class="rich-select__toggle-label" id="f-compute-resource">${selectedComputeFresh.title}</span>
                       ${vmComputeToggleDesc ? `<span class="rich-select__toggle-desc">${vmComputeToggleDesc}</span>` : ''}
                     `,
                   })}
@@ -15760,7 +15843,6 @@
                     </div>
                   </div>
                 </div>
-                <p class="form-helper">Starting default from the template. Change if this virtual machine needs a different size.</p>
               </div>
           ` : `
               <div class="form-field">
@@ -15776,7 +15858,7 @@
               </div>
           `;
           const stepHelp = computeEditable
-            ? 'Choose an instance type.'
+            ? 'Choose an instance type. Use the GPU checkbox to switch between instance types with and without a GPU.'
             : 'Instance type is locked by the template.';
 
           panel.innerHTML = `
@@ -15788,6 +15870,17 @@
           `;
 
           if (computeEditable) {
+            panel.querySelector('#f-show-gpu-its')?.addEventListener('change', e => {
+              state.vmShowGpuIts = !!e.target.checked;
+              state.vmComputeMenuOpen = false;
+              state.vmComputeFilter = '';
+              const pool = filteredVmComputeResources('', { requireGpu: state.vmShowGpuIts });
+              if (!pool.some(c => c.id === d.computeResource)) {
+                d.computeResource = pool[0]?.id || d.computeResource;
+              }
+              updateCostEstimate(key);
+              renderWizard();
+            });
             const computeRoot = panel.querySelector('#vm-compute-select');
             bindRichSelect(computeRoot, {
               toggleSel: '#f-compute-resource-toggle',
@@ -17108,7 +17201,12 @@
             })),
           ];
           const osLabel = source?.os || osMap[d.osFamily] || 'Other';
-          VMS.unshift({
+          const tplForCatalog = TEMPLATES.find(t => t.id === d.templateId);
+          const catalogRef = d.catalogPreset?.label
+            || tplForCatalog?.name
+            || tplForCatalog?.slug
+            || '';
+          const createdVmRecord = {
             name: d.name,
             ns: d.project || 'project-a',
             status: d.startAfter ? 'starting' : 'stopped',
@@ -17119,6 +17217,7 @@
             ip: primaryIp,
             created: new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
             computeResource: d.computeResource,
+            catalogItem: catalogRef || undefined,
             sshPublicKey: (d.sshPublicKey || '').trim(),
             sshKeyFileName: (d.sshPublicKey || '').trim() ? (d.sshKeyFileName || '') : '',
             autoAttachExternalIp: !!d.autoAttachExternalIp,
@@ -17128,7 +17227,9 @@
             internalIp: primaryIp,
             nics: createdNics.length ? createdNics : undefined,
             disks: createdDisks,
-          });
+          };
+          applyComputeResourceToVm(createdVmRecord, d.computeResource);
+          VMS.unshift(createdVmRecord);
         }
         const createdName = state.data.name;
         const createdVm = VMS.find(v => v.name === createdName);
@@ -17667,6 +17768,40 @@
         visibilityLabel: 'Tenant scoped',
         tenants: ['tenant-c'],
         created: 'Jul 14, 2026, 9:05 AM',
+      },
+      {
+        id: 'pci-4',
+        name: 'vm-windows-workstation',
+        scope: 'provider',
+        description: 'Windows workstation profile for desktop and office workloads.',
+        publishState: 'live',
+        instanceTypeId: 'medium',
+        diskImage: 'Windows Server 2022',
+        diskLocked: true,
+        computeLocked: false,
+        rateHour: '$3.10/hr',
+        rateMonth: '$1,980/mo per instance',
+        visibility: 'global',
+        visibilityLabel: 'Global public',
+        tenants: [],
+        created: 'Jun 3, 2026, 2:18 PM',
+      },
+      {
+        id: 'pci-5',
+        name: 'vm-legacy-app-server',
+        scope: 'provider',
+        description: 'Legacy application server for older RHEL workloads.',
+        publishState: 'unpublished',
+        instanceTypeId: 'small',
+        diskImage: 'RHEL 8.10',
+        diskLocked: true,
+        computeLocked: true,
+        rateHour: '$2.40/hr',
+        rateMonth: '$1,520/mo per instance',
+        visibility: 'tenant',
+        visibilityLabel: 'Tenant scoped',
+        tenants: ['tenant-a'],
+        created: 'May 19, 2026, 10:44 AM',
       },
     ];
 
@@ -19897,8 +20032,10 @@
       const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
       const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
       const launchDisabled = isProvider && item.publishState !== 'live';
-
-      root.innerHTML = `
+      const fromVm = !!state.selectedVmName;
+      const crumbHtml = fromVm
+        ? stubDetailBreadcrumbHtml(item.name)
+        : `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
           <ol class="pf-v6-c-breadcrumb__list">
             <li class="pf-v6-c-breadcrumb__item">
@@ -19911,7 +20048,10 @@
               <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeName}</span>
             </li>
           </ol>
-        </nav>
+        </nav>`;
+
+      root.innerHTML = `
+        ${crumbHtml}
         <div class="ethan-detail-header ethan-detail-header--catalog">
           <div class="ethan-detail-header__main">
             <div class="ethan-detail-header__title-row">
@@ -19993,6 +20133,9 @@
         setView('templates');
         renderCatalog();
       });
+      if (fromVm) {
+        wireStubDetailBreadcrumb(root, { clearKeys: ['selectedCatalogItemId'] });
+      }
       root.querySelector('#ci-launch-btn')?.addEventListener('click', () => {
         applyCatalogItemAction('launch');
       });

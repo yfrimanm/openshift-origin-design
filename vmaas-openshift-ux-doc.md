@@ -135,7 +135,7 @@ Nav → **Virtual machines** (default landing).
 | 1 | **Deployment details** | Creation method = Custom · Name · Description · Location |
 | 2 | **Guest OS** | “Guest operating system” — tiles **RHEL** · **Microsoft Windows** · **Other Linux** + **Guest operating system type** dropdown (e.g. `rhel.10`, preselected for family) |
 | 3 | **Boot source** | “Select a boot source (volume or ISO) now or configure it later.” — Boot source (volume table + Add boot source) **or** No boot source |
-| 4 | **Compute resources** | “Define resources by selecting series and size.” — Red Hat provided / User provided · series cards (default **General Purpose**) · Size dropdown **preselected** to `medium: 1 vCPU, 4 GiB Memory` (user can change) |
+| 4 | **Instance types** | “Define resources by selecting series and size.” — Red Hat provided / User provided · series cards (default **General Purpose**) · Size dropdown **preselected** to `medium: 1 vCPU, 4 GiB Memory` (user can change) |
 | 5 | **Customization** | “Optionally, explore the tabs…” — **Find settings** · Details / Storage / **Network** / Scheduling / **SSH** / Initial run / Metadata |
 
 #### Customization → SSH

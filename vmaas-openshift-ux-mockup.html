@@ -2600,7 +2600,7 @@
         { key: 'deploy', label: 'Deployment details' },
         { key: 'os', label: 'Guest OS' },
         { key: 'boot', label: 'Boot source' },
-        { key: 'compute', label: 'Compute resources' },
+        { key: 'compute', label: 'Instance types' },
         { key: 'customize', label: 'Customization' },
         { key: 'review', label: 'Review and create' },
       ];
@@ -3226,7 +3226,7 @@
         const sizeValid = sizeOptions.some(s => s.value === d.size);
         if (!sizeValid) d.size = currentSeries.defaultSize;
         panel.innerHTML = `
-          <h3>Compute resources</h3>
+          <h3>Instance types</h3>
           <p class="step-help">Define resources by selecting series and size.</p>
           <div class="subtabs">
             <button type="button" class="subtab pf-m-selected">Red Hat provided</button>

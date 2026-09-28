@@ -115,7 +115,7 @@ async function main() {
   await page.locator('#f-regen').click();
   await page.waitForTimeout(200);
   await clickNext(page);
-  await waitStep(page, 'Compute resource');
+  await waitStep(page, 'Instance type');
   await page.waitForTimeout(300);
   await shotPage(page, '06-compute-resource');
 

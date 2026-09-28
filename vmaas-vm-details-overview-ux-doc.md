@@ -32,7 +32,7 @@ Document OSAC VMaaS **Virtual machine details Overview**: CNV-inspired card layo
 | **Actions** | Control ▸, Open console, Delete — disabled copy uses **Virtual machine** / **Virtual machines**. |
 | **Operating system** | Show OS from create/template metadata when known. If unknown: **—** + *Guest agent not reporting*. |
 | **SSH** | *Configured* + pencil, or ***Not configured*** as a link (+ pencil) → edit modal. Windows: *Not applicable*. **Tenant User:** pencil / link disabled. |
-| **Compute** | **Compute resource** + edit pencil. **Tenant User:** pencil disabled. |
+| **Compute** | **Instance type** + edit pencil. **Tenant User:** pencil disabled. |
 | **Console** | VNC console stays in the Details card (right), separated from the DL by a PF6 **vertical divider** — same card/grid, clearer identity vs access. |
 | **Network / Storage** | Card **Add** + row kebab **Edit** / **Delete**. Delete disabled in-menu with reason (last network / boot disk). Terminology: **Network**. **Tenant User:** Add + row kebabs disabled. |
 | **Utilization** | Metrics only when status is **Running**. Otherwise: *Virtual machine is not running*. Time range shown as static “Last 5 minutes”. |
@@ -64,7 +64,7 @@ Figure: Overview — running
 | **Status** | Link → popover (Ask AI placeholder + Learn more) |
 | **Created** | Timestamp |
 | **Operating system** | Metadata OS, or soft empty (*Guest agent not reporting*) |
-| **Compute resource** | Summary + edit |
+| **Instance type** | Summary + edit |
 | **SSH public key** | Configured / Not configured (link) + pencil |
 | **VNC console** | Open web console + preview (right of DL). Separated by PF6 vertical divider within the same Details card. Opens full-page console (see **Web console** below). |
 
@@ -78,20 +78,20 @@ Figure: Status popover
 
 Figure: SSH Not configured
 
-### Edit compute resources
+### Edit instance type
 
-Opens from the Compute resource pencil on the Details card.
+Opens from the Instance type pencil on the Details card.
 
 | Element | Copy / behavior |
 |---|---|
-| Title | Edit compute resources |
-| Description | Choose a compute size for this Virtual machine. |
-| Field | **Compute resource** (required) |
+| Title | Edit instance type |
+| Description | Choose an instance type for this virtual machine. |
+| Field | **Instance type** (required) |
 | Actions | **Save** · **Cancel** |
 
-![Figure: Edit compute resources](videos/vmaas-vm-details-overview-ux-doc/09-edit-compute-modal.png)
+![Figure: Edit instance type](videos/vmaas-vm-details-overview-ux-doc/09-edit-compute-modal.png)
 
-Figure: Edit compute resources
+Figure: Edit instance type
 
 ### Edit SSH public key
 
