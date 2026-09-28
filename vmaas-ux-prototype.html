@@ -6149,7 +6149,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 24 · it-gpu-filter 7113</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Sep 28 · catalog-link 7114</span>
         </div>
       </div>
       <div class="console__body">
@@ -7119,7 +7119,7 @@
         sshKeyFileName: 'id_ed25519.pub',
         guestAgent: true,
         osFull: 'Red Hat Enterprise Linux 9.5',
-        catalogItem: 'rhel-general-purpose',
+        catalogItem: 'vm-inference-standard',
         imageLabel: 'RHEL 9.4',
         computeResource: 'small',
         nics: [{
@@ -7141,11 +7141,11 @@
           network: '5.3 KBps', netIn: '2.9 KBps', netOut: '2.4 KBps',
         },
       },
-      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'general-purpose-server', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'bare-metal-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', computeResource: 'large-gpu', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }] },
-      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
-      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', imageLabel: 'Fedora 41', catalogItem: 'developer-workstation', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
-      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
+      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-inference-standard', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', computeResource: 'large-gpu', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }] },
+      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'vm-windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48' },
+      { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', imageLabel: 'Fedora 41', catalogItem: 'vm-dev-workstation', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }] },
+      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'vm-legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
     ];
 
     const FILTER_CATALOG = {
@@ -17201,6 +17201,11 @@
             })),
           ];
           const osLabel = source?.os || osMap[d.osFamily] || 'Other';
+          const tplForCatalog = TEMPLATES.find(t => t.id === d.templateId);
+          const catalogRef = d.catalogPreset?.label
+            || tplForCatalog?.name
+            || tplForCatalog?.slug
+            || '';
           const createdVmRecord = {
             name: d.name,
             ns: d.project || 'project-a',
@@ -17212,6 +17217,7 @@
             ip: primaryIp,
             created: new Date().toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
             computeResource: d.computeResource,
+            catalogItem: catalogRef || undefined,
             sshPublicKey: (d.sshPublicKey || '').trim(),
             sshKeyFileName: (d.sshPublicKey || '').trim() ? (d.sshKeyFileName || '') : '',
             autoAttachExternalIp: !!d.autoAttachExternalIp,
@@ -17762,6 +17768,40 @@
         visibilityLabel: 'Tenant scoped',
         tenants: ['tenant-c'],
         created: 'Jul 14, 2026, 9:05 AM',
+      },
+      {
+        id: 'pci-4',
+        name: 'vm-windows-workstation',
+        scope: 'provider',
+        description: 'Windows workstation profile for desktop and office workloads.',
+        publishState: 'live',
+        instanceTypeId: 'medium',
+        diskImage: 'Windows Server 2022',
+        diskLocked: true,
+        computeLocked: false,
+        rateHour: '$3.10/hr',
+        rateMonth: '$1,980/mo per instance',
+        visibility: 'global',
+        visibilityLabel: 'Global public',
+        tenants: [],
+        created: 'Jun 3, 2026, 2:18 PM',
+      },
+      {
+        id: 'pci-5',
+        name: 'vm-legacy-app-server',
+        scope: 'provider',
+        description: 'Legacy application server for older RHEL workloads.',
+        publishState: 'unpublished',
+        instanceTypeId: 'small',
+        diskImage: 'RHEL 8.10',
+        diskLocked: true,
+        computeLocked: true,
+        rateHour: '$2.40/hr',
+        rateMonth: '$1,520/mo per instance',
+        visibility: 'tenant',
+        visibilityLabel: 'Tenant scoped',
+        tenants: ['tenant-a'],
+        created: 'May 19, 2026, 10:44 AM',
       },
     ];
 
@@ -19992,8 +20032,10 @@
       const scopeLabel = catalogPublishScopeLabel(item).replace(/</g, '&lt;');
       const scopeIcon = item.visibility === 'tenant' ? 'cubes' : 'globe';
       const launchDisabled = isProvider && item.publishState !== 'live';
-
-      root.innerHTML = `
+      const fromVm = !!state.selectedVmName;
+      const crumbHtml = fromVm
+        ? stubDetailBreadcrumbHtml(item.name)
+        : `
         <nav class="pf-v6-c-breadcrumb vm-detail__breadcrumb" aria-label="Breadcrumb">
           <ol class="pf-v6-c-breadcrumb__list">
             <li class="pf-v6-c-breadcrumb__item">
@@ -20006,7 +20048,10 @@
               <span class="pf-v6-c-breadcrumb__link pf-m-current" aria-current="page">${safeName}</span>
             </li>
           </ol>
-        </nav>
+        </nav>`;
+
+      root.innerHTML = `
+        ${crumbHtml}
         <div class="ethan-detail-header ethan-detail-header--catalog">
           <div class="ethan-detail-header__main">
             <div class="ethan-detail-header__title-row">
@@ -20088,6 +20133,9 @@
         setView('templates');
         renderCatalog();
       });
+      if (fromVm) {
+        wireStubDetailBreadcrumb(root, { clearKeys: ['selectedCatalogItemId'] });
+      }
       root.querySelector('#ci-launch-btn')?.addEventListener('click', () => {
         applyCatalogItemAction('launch');
       });
