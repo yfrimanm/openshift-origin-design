@@ -7535,7 +7535,12 @@
       const cpuCount = parseInt(String(specs.cpu).match(/\d+/)?.[0] || '1', 10) || 1;
       const memory = specs.mem && specs.mem !== '—' ? specs.mem : (vm.mem || '—');
       const gpuDevices = Array.isArray(vm?.gpuDevices) ? vm.gpuDevices : [];
-      const gpuCount = gpuDevices.length;
+      const gpuCountFromDevices = gpuDevices.length;
+      const gpuCountFromIt = Number(specs.gpus) || 0;
+      const gpuCount = Math.max(gpuCountFromDevices, gpuCountFromIt);
+      const gpuResource = (gpuDevices[0]?.name && gpuDevices[0].name !== '—')
+        ? gpuDevices[0].name
+        : (specs.gpuResource || '—');
       return {
         computeId,
         name: parts.title || computeId || '—',
@@ -7544,7 +7549,7 @@
         memory,
         gpuCount: String(gpuCount),
         gpuPci: gpuCount > 0 ? (vm.gpuPci || '2080') : '—',
-        gpuResource: gpuDevices[0]?.name || '—',
+        gpuResource,
       };
     }
 
@@ -13676,13 +13681,18 @@
       const editTitleAttr = canEditConfig ? ' title="Edit"' : ` title="${noEditReason}"`;
       const addDisabledAttrs = canEditConfig ? '' : ` disabled title="${noEditReason}"`;
       const itNameSafe = String(computeFields.name).replace(/</g, '&lt;');
-      const hasPciInfo = Number(computeFields.gpuCount) > 0 || (computeFields.gpuPci && computeFields.gpuPci !== '—');
-      const itNameDisplay = hasPciInfo
+      const hasGpu = Number(computeFields.gpuCount) > 0;
+      const gpuTypeSafe = String(computeFields.gpuResource || '—').replace(/</g, '&lt;');
+      const gpuTypeDisplay = hasGpu
         ? `<button type="button" class="name-link name-link--dotted" data-it-pci-detail
             data-pci="${escAttr(computeFields.gpuPci)}"
             data-gpu-resource="${escAttr(computeFields.gpuResource)}"
-            aria-haspopup="dialog" aria-expanded="false">${itNameSafe}</button>`
-        : itNameSafe;
+            aria-haspopup="dialog" aria-expanded="false">${gpuTypeSafe}</button>`
+        : '';
+      const gpuFieldsHtml = hasGpu
+        ? `${itField('GPU count', String(computeFields.gpuCount).replace(/</g, '&lt;'))}
+                  ${itField('GPU type', gpuTypeDisplay)}`
+        : '';
       const itSubtitleRow = `
         <div class="ethan-detail-col__subtitle-row">
           <h4 class="ethan-detail-col__subtitle">Instance type</h4>
