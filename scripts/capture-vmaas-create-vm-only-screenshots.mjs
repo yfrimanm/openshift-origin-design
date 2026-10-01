@@ -34,8 +34,8 @@ async function clickNext(page) {
 }
 
 async function waitStep(page, title) {
-  // Prefer the step title (first matching h3), not nested section titles like "Additional networks".
-  await page.locator('#wiz-panel h3').filter({ hasText: new RegExp(`^${title}$`) }).first().waitFor({ timeout: 8000 });
+  // Prefer the step title (first matching h3). Allow leading whitespace / trailing labels like "Optional".
+  await page.locator('#wiz-panel h3').filter({ hasText: new RegExp(`^\\s*${title}`) }).first().waitFor({ timeout: 8000 });
 }
 
 async function closeDrawer(page) {
@@ -70,6 +70,24 @@ async function selectGuestOs(page, label) {
   }
 }
 
+async function selectTplProject(page, projectId) {
+  await page.locator('#f-tpl-project-toggle').click();
+  await page.waitForTimeout(250);
+  const opt = page.locator(`[data-tpl-project="${projectId}"]`).first();
+  if (await opt.count()) {
+    await opt.click();
+  } else {
+    // Fallback: search then pick first match
+    const search = page.locator('#vm-tpl-project-search');
+    if (await search.count()) {
+      await search.fill(projectId);
+      await page.waitForTimeout(200);
+      await page.locator('[data-tpl-project]').first().click();
+    }
+  }
+  await page.waitForTimeout(400);
+}
+
 async function main() {
   await mkdir(outDir, { recursive: true });
   const browser = await chromium.launch({ headless: true });
@@ -99,11 +117,9 @@ async function main() {
 
   await shotPage(page, '02-select-template');
 
-  await page.locator('#f-tpl-project').selectOption('yifat');
-  await page.waitForTimeout(400);
+  await selectTplProject(page, 'yifat');
   await shotPage(page, '02b-select-template-empty');
-  await page.locator('#f-tpl-project').selectOption('project-a');
-  await page.waitForTimeout(350);
+  await selectTplProject(page, 'project-a');
 
   const lockedCard = page.locator('.tpl-card').filter({ hasNotText: 'Editable' }).first();
   if (await lockedCard.count()) await lockedCard.click();
@@ -165,12 +181,12 @@ async function main() {
   await shotPage(page, '09c-access-linux');
 
   // Switch to Windows Sysprep cards via Details guest OS
-  await page.locator('#wiz-nav button, .pf-v6-c-wizard__nav-link').filter({ hasText: /^Details$/ }).first().click();
+  await page.locator('.pf-v6-c-wizard__nav-link').filter({ hasText: /Details/ }).first().click();
   await waitStep(page, 'Details');
   await page.waitForTimeout(300);
   await selectGuestOs(page, 'Microsoft Windows');
   await ensureDiskImage(page);
-  await page.locator('#wiz-nav button, .pf-v6-c-wizard__nav-link').filter({ hasText: /Access/ }).first().click();
+  await page.locator('.pf-v6-c-wizard__nav-link').filter({ hasText: /Access/ }).first().click();
   await waitStep(page, 'Access & Initial run');
   await page.waitForTimeout(400);
   await shotPage(page, '09d-access-windows-sysprep');

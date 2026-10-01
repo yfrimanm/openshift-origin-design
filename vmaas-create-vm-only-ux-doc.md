@@ -13,7 +13,7 @@
 | **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [GitHub](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **Regenerate screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
 
-**IA:** Select template → Details → Instance type → Storage → Network → Review and create
+**IA:** Select template → Details → Instance type → Storage → Network → Access & Initial run → Review and create
 
 ---
 
@@ -28,7 +28,7 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | Decision | Detail |
 |---|---|
 | **Scope** | List + Create wizard. VM **Name** links open details Overview (see companion doc). |
-| **IA** | Flat wizard steps — no **Configure** parent in the nav. |
+| **IA** | Flat wizard steps — Select template → Details → Instance type → Storage → Network → **Access & Initial run** → Review and create. |
 | **Primary CTA** | **Create Virtual machine** |
 | **Role labels** | **Tenant Admin**, **Tenant User** (OSAC personas). Demo switcher only — gates Create / power / networks / Overview config edit. |
 | **Tenant Admin** | Create VM, power, **edit** config, create/view networks (incl. Shared / Provider — same network create as prior author/orgadmin). Default for Create demos. |
@@ -37,8 +37,8 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **List filters** | `Project: All projects` (folder) · `All power states` · `All operating systems` · `Hardware devices` (GPU / Host) · search. Multi-select menus kept. |
 | **Row kebab / Actions** | Control ▸, Open console, Delete. Disabled reasons use **Virtual machine** wording. |
 | **Status** | Status is a link → PF6 popover (title, body, **Ask AI about this status** placeholder, Learn more). |
-| **OS image** | On template selection + Review — not on Details. |
-| **Access** | Optional SSH / cloud-init on **Details**. |
+| **Details** | Name, description, **Guest OS cards** (Linux / Microsoft Windows / Unspecified) + disk image typeahead. Project is context-only (chosen on Select template). |
+| **Access & Initial run** | Optional. **Linux:** SSH public key + Cloud-init. **Windows:** Sysprep (Unattend.xml) via **Attach existing** / **Create new** felt cards (OSAC-5009). No SSH on Windows. |
 | **Locked vs Editable** | Template governance: lock / pen. Prefer **Locked** / **Editable**. |
 | **Project** | On Select template only — filters available templates and sets where the VM is created. Users see projects they can access. Not on Details. |
 | **Exit confirm** | Exit without saving / Continue creating. |
@@ -46,6 +46,7 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 | **Start after create** | Review checkbox **Start this Virtual machine after creation** — checked by default (CNV parity). |
 | **Shell chrome** | PatternFly **Felt + Glass** (PF 6.6.1), aligned to Ethan’s [osac-bmaas](https://heyethankim.github.io/osac-bmaas/) — soft floating sidebar/main panels, Felt current nav accent (no hard nav divider). |
 | **Additional disk / network** | Wizard uses **inline** Add / Remove sets (Disk set N / Network set N). Overview cards still use **Add** modals. |
+| **Form width** | Create wizard fields, cards, uploads, and helpers share one **40rem** column (no zigzag). |
 
 ---
 
@@ -57,8 +58,6 @@ Document the Create Virtual machine flow for OSAC VMaaS (catalog / template–fi
 - Search matches name / IP / OS / project. No Save search / Saved searches.
 - Toolbar **Actions** disabled until selection; matches row kebab when enabled.
 
-![Figure: Virtual machines list](videos/vmaas-create-vm-only-ux-doc/01-vm-list.png)
-
 Figure: Virtual machines list
 
 ### Row kebab / Actions menu
@@ -66,8 +65,6 @@ Figure: Virtual machines list
 - **Control** flyout: Start / Stop / Pause / Restart / Reset (state-dependent)
 - **Open console** — disabled when not running (*The Virtual machine is not running*)
 - **Delete** — disabled while running (*The Virtual machine is running*)
-
-![Figure: Row Actions kebab](videos/vmaas-create-vm-only-ux-doc/01b-vm-kebab.png)
 
 Figure: Row Actions kebab
 
@@ -86,11 +83,7 @@ Selecting a template opens a drawer (**Template settings**):
 - **Locked by this template** — OS image always; compute / boot disk when locked
 - **Editable later** — fields the user can change on later steps
 
-![Figure: Select template](videos/vmaas-create-vm-only-ux-doc/02-select-template.png)
-
 Figure: Select template
-
-![Figure: Select template — empty project](videos/vmaas-create-vm-only-ux-doc/02b-select-template-empty.png)
 
 Figure: Select template — no templates in project
 
@@ -100,11 +93,7 @@ Figure: Select template — no templates in project
 - Card cost may prefix hourly with **From** when size is editable.
 - Templates are filtered by `template.project === selected project`.
 
-![Figure: Template drawer — locked](videos/vmaas-create-vm-only-ux-doc/03-template-drawer-locked.png)
-
 Figure: Template drawer — locked
-
-![Figure: Template drawer — editable](videos/vmaas-create-vm-only-ux-doc/04-template-drawer-editable.png)
 
 Figure: Template drawer — editable
 
@@ -112,14 +101,14 @@ Figure: Template drawer — editable
 
 ## Step 2 — Details
 
-- Help: *Name your Virtual machine and optionally set access.*
-- Context note (not a dropdown): *Your Virtual machine will be created in project: **{project}***
+- Help: *Name your virtual machine and choose a disk image.*
+- Context note (not a dropdown): *Your virtual machine will be created in project: **{project}***
 - **Name** (required) + generate
 - **Description** (optional)
 - Project is chosen on Select template (not editable here)
-- **Access** (optional) — SSH public key and cloud-init
-
-![Figure: Details](videos/vmaas-create-vm-only-ux-doc/05-details.png)
+- **Disk image**
+  - **Guest operating system** — 3 felt cards: Linux / Microsoft Windows / Unspecified (same card pattern as Sysprep mode)
+  - **Image reference** — required typeahead rich-select filtered by guest OS
 
 Figure: Details
 
@@ -130,8 +119,6 @@ Figure: Details
 - Instance type locked or editable per template
 - Helper when locked: size is set by the template; can edit after create
 - OS image and Access are not on this step
-
-![Figure: Instance type](videos/vmaas-create-vm-only-ux-doc/06-compute-resource.png)
 
 Figure: Instance type
 
@@ -144,11 +131,7 @@ Figure: Instance type
 - Each added disk is a **Disk set N** with Size, Storage tier (helpers), and **Remove** (danger link + MinusCircle)
 - Matches Ethan’s OSAC config-sets pattern (no Add disk modal on this step). Overview **Add disk** still uses a modal.
 
-![Figure: Storage](videos/vmaas-create-vm-only-ux-doc/07-storage.png)
-
 Figure: Storage
-
-![Figure: Additional disk set](videos/vmaas-create-vm-only-ux-doc/08-additional-disk-set.png)
 
 Figure: Additional disk set (inline Add / Remove)
 
@@ -162,25 +145,45 @@ Figure: Additional disk set (inline Add / Remove)
 - Terminology: **Network** (not “network interface”)
 - Overview **Add network** still uses a modal.
 
-![Figure: Network](videos/vmaas-create-vm-only-ux-doc/09-network.png)
-
 Figure: Network
-
-![Figure: Additional network set](videos/vmaas-create-vm-only-ux-doc/09b-additional-network-set.png)
 
 Figure: Additional network set (inline Add / Remove)
 
 ---
 
-## Step 6 — Review and create
+## Step 6 — Access & Initial run (optional)
 
-Grouped review: Details (incl. Access) / Instance type / Storage / Network with edit links. Cost panel. *Start this Virtual machine after creation* — **checked by default** (CNV parity).
+Guest OS from Details drives the content of this step.
 
-- Access: *Configured* / *Not configured*
+### Linux (and Unspecified)
+
+- **SSH public key** — PF file upload (paste or browse). Optional.
+- **Cloud-init** — optional user data textarea.
+
+Figure: Access & Initial run — Linux (SSH + Cloud-init)
+
+### Microsoft Windows (OSAC-5009)
+
+- No SSH.
+- **Sysprep** (Windows only) — helper: *Supply an Unattend.xml for first-boot customization, or leave unset to boot without one.*
+- Mode selection uses **felt cards** (same pattern as Guest OS):
+  - **Attach existing Sysprep** — pick a saved Unattend.xml secret (write-only; contents never shown)
+  - **Create new Sysprep** — upload / paste Unattend.xml; optional **Save as secret for future VM deployments**
+- Unattend is optional at create time.
+
+Figure: Access & Initial run — Windows Sysprep cards (Create new)
+
+Figure: Access & Initial run — Windows Sysprep (Attach existing)
+
+---
+
+## Step 7 — Review and create
+
+Grouped review: Details / Instance type / Storage / Network / **Access & Initial run** with edit links. Cost panel. *Start this Virtual machine after creation* — **checked by default** (CNV parity).
+
+- Access: method-specific summary (SSH / Cloud-init / Sysprep attach or create) or *Not configured*
 - Additional disks / networks listed or *None*
 - Create success: toast reflects Stopped vs starting → Running
-
-![Figure: Review and create](videos/vmaas-create-vm-only-ux-doc/10-review.png)
 
 Figure: Review and create
 
@@ -195,8 +198,6 @@ Figure: Review and create
 | Primary | Exit without saving |
 | Secondary | Continue creating |
 
-![Figure: Exit confirmation](videos/vmaas-create-vm-only-ux-doc/11-exit-modal.png)
-
 Figure: Exit confirmation
 
 ---
@@ -205,6 +206,7 @@ Figure: Exit confirmation
 
 - **Details / Overview UX doc** — day-2 Overview cards, Network/Storage Add·Edit·Delete, Utilization empty state, SSH, Status → AI placeholder
 - **Mock (shared):** https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html
+- **OSAC-5009** — Windows Unattend.xml / Sysprep at create (Access & Initial run)
 
 ---
 
@@ -218,6 +220,6 @@ Figure: Exit confirmation
 | **Create Virtual machine** | Can | Can not |
 | **Power** (Start / Stop / Pause / Restart) | Can | Can |
 | **Open console** | Can | Can |
-| **Edit Overview config** (compute, SSH, Add/Edit/Delete network or disk) | Can | Can not — controls disabled |
-| **Create networks** (Isolated / Shared / Provider) | Can | Can not |
-| **View networks** | Can | Can |
+| **Delete Virtual machine** | Can | Can not |
+| **Edit Overview config** (instance type, SSH, network, disk) | Can | Can not (view only) |
+| **Create / manage networks** | Can | Can not (view) |
