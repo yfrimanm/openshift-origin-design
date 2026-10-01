@@ -3612,6 +3612,12 @@
     }
 
     .form-field { margin-bottom: 16px; max-width: 560px; }
+    /* Guest OS 3-up needs a wider field than default form controls. */
+    #vm-guest-os-field,
+    .form-field:has(.felt-select-boxes--guest-os),
+    .form-field[data-field="diskImage"] {
+      max-width: min(48rem, 100%);
+    }
     .form-field label {
       display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px;
     }
@@ -11102,10 +11108,10 @@
         <div class="${rootClass}" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
           ${options.map(opt => {
             const isSelected = current === opt.value;
-            const iconHtml = opt.iconClass ? `
-              <span class="felt-select-box__icon${opt.iconMod ? ` felt-select-box__icon--${opt.iconMod}` : ''}" aria-hidden="true">
-                <i class="${opt.iconClass}"></i>
-              </span>` : '';
+            const iconHtml = `
+              <span class="felt-select-box__icon${opt.iconClass ? (opt.iconMod ? ` felt-select-box__icon--${opt.iconMod}` : '') : ' felt-select-box__icon--spacer'}" aria-hidden="true">
+                ${opt.iconClass ? `<i class="${opt.iconClass}"></i>` : ''}
+              </span>`;
             const titleHtml = opt.govBadge
               ? `<span class="felt-select-box__title felt-select-box__title--with-badge">
                   <span class="felt-select-box__title-text">${opt.title}</span>
