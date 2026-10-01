@@ -4018,19 +4018,38 @@
     .felt-select-boxes.felt-select-boxes--guest-os {
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
-      max-width: 52rem;
+      max-width: min(56rem, 100%);
     }
     .felt-select-boxes--guest-os .felt-select-box {
-      padding: 14px 14px;
+      padding: 14px 16px;
       gap: 10px;
       min-height: 0;
     }
     .felt-select-boxes--guest-os .felt-select-box:has(.felt-select-box__input:checked) {
-      padding: 13px 13px;
+      padding: 13px 15px;
     }
+    /* Don't reserve Selected-badge width on unselected cards (was wrapping "Unspecifie/d"). */
+    .felt-select-boxes--guest-os .felt-select-box__text {
+      padding-inline-end: 0;
+    }
+    .felt-select-boxes--guest-os .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__text {
+      padding-inline-end: 4.25rem;
+    }
+    .felt-select-boxes--guest-os .felt-select-box__title {
+      white-space: nowrap;
+    }
+    .felt-select-boxes--guest-os .felt-select-box__badge {
+      top: 8px;
+      right: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
+    }
+    /* Helper/desc may wrap to multiple longer rows. */
     .felt-select-boxes--guest-os .felt-select-box__desc {
       font-size: 12px;
-      line-height: 1.35;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      white-space: normal;
     }
     @media (max-width: 900px) {
       .felt-select-boxes.felt-select-boxes--guest-os {
