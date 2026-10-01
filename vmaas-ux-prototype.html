@@ -4001,9 +4001,25 @@
     .icon-btn:hover { background: #e7f1fa; }
     .form-check {
       display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 20px 0 0;
+      font-weight: 400;
+    }
+    .form-field > label.form-check,
+    .form-field label.form-check,
+    .create-resource-wiz .form-field label.form-check,
+    .create-resource-wiz .form-field > label.form-check {
+      font-weight: 400;
     }
     .form-check--gpu-filter {
       margin: 0 0 16px;
+      font-weight: 400;
+    }
+    .sysprep-save-secret,
+    .form-field > label.sysprep-save-secret,
+    .create-resource-wiz .form-field label.sysprep-save-secret {
+      font-weight: 400;
+    }
+    .sysprep-save-secret .sysprep-save-secret__text {
+      font-weight: 400;
     }
 
     /* PF6 Felt selectable boxes (cards-as-tiles) — Guest OS, tenant access, etc. */
@@ -4028,11 +4044,8 @@
     .felt-select-boxes--guest-os .felt-select-box:has(.felt-select-box__input:checked) {
       padding: 13px 15px;
     }
-    /* Don't reserve Selected-badge width on unselected cards (was wrapping "Unspecifie/d"). */
+    /* Don't shift title/desc when Selected appears — always reserve badge gutter. */
     .felt-select-boxes--guest-os .felt-select-box__text {
-      padding-inline-end: 0;
-    }
-    .felt-select-boxes--guest-os .felt-select-box:has(.felt-select-box__input:checked) .felt-select-box__text {
       padding-inline-end: 4.25rem;
     }
     .felt-select-boxes--guest-os .felt-select-box__title {
@@ -6269,7 +6282,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7122</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7123</span>
         </div>
       </div>
       <div class="console__body">
@@ -14929,9 +14942,6 @@
             d.osImage = '';
             d.osType = '';
           }
-          const diskPrompt = !d.diskImageId
-            ? '<p class="form-helper" id="vm-disk-image-prompt">Select a disk image to continue.</p>'
-            : '';
           diskImageSection = `
             <hr class="form-section-divider" />
             <h3>Disk image</h3>
@@ -14960,7 +14970,7 @@
                 optionAttr: 'data-vm-disk-image',
                 emptyNoun: 'disk images',
                 invalid: !!state.fieldErrors.diskImage,
-                describedBy: state.fieldErrors.diskImage ? 'err-diskImage' : (!d.diskImageId ? 'vm-disk-image-prompt' : ''),
+                describedBy: state.fieldErrors.diskImage ? 'err-diskImage' : '',
                 options: filteredForFamily.map(img => ({
                   id: img.id,
                   title: img.title,
@@ -14968,7 +14978,6 @@
                 })),
               })}
               ${fieldErrorHtml('diskImage')}
-              ${state.fieldErrors.diskImage ? '' : diskPrompt}
             </div>
           `;
         }
