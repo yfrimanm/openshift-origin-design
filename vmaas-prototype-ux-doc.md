@@ -10,7 +10,8 @@
 | **Create Virtual machine** | List + Create wizard (all steps) |
 | **Windows Sysprep Create** | Access & Initial run — Windows Unattend.xml / Sysprep (OSAC-5009) |
 | **VM Overview** | Day-2 details Overview |
-| **Catalog** | Provider list / create / detail / edit Review / delete |
+| **Catalog** | Provider list / detail / edit / delete |
+| **Create catalog item** | Provider create wizard (Details → Instance types → Visibility → Storage → Access & Initial run → Review) |
 | **Instance types** | Provider list / create / details |
 | **Disk images** | Provider list / create / details |
 
