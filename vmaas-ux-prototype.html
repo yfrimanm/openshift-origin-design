@@ -3800,23 +3800,29 @@
       cursor: pointer;
     }
     .sysprep-save-secret {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
       margin-top: 12px;
       max-width: 560px;
       min-height: 24px;
+      cursor: pointer;
     }
-    .sysprep-save-secret input {
+    .sysprep-save-secret input[type="checkbox"] {
       margin: 0;
+      padding: 0;
       width: 16px;
       height: 16px;
-      flex-shrink: 0;
+      flex: 0 0 16px;
+      align-self: center;
       accent-color: var(--vmaas-blue, #0066cc);
+      cursor: pointer;
     }
-    .sysprep-save-secret label {
+    .sysprep-save-secret .sysprep-save-secret__text {
+      margin: 0;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 16px;
+      color: var(--vmaas-text, #151515);
       cursor: pointer;
     }
     .sysprep-attach-empty {
@@ -6219,7 +6225,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7119</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7120</span>
         </div>
       </div>
       <div class="console__body">
@@ -16919,17 +16925,17 @@
                   <span class="pf-v6-c-form-control pf-m-resize-vertical">
                     <textarea id="f-unattend-xml" class="pf-m-unattend${hasUnattend ? ' pf-m-has-content' : ''}" rows="8"
                       aria-label="Unattend.xml" aria-describedby="f-unattend-help"
-                      placeholder="Paste a well-formed Unattend.xml answer file">${String(d.sysprep || '').replace(/</g, '&lt;')}</textarea>
+                      placeholder="Paste XML content">${String(d.sysprep || '').replace(/</g, '&lt;')}</textarea>
                   </span>
                 </div>
               </div>
               <p class="form-helper" id="f-unattend-help">
-                Upload or paste a well-formed Unattend.xml answer file (max 1 MiB). Stored as a secret; never shown again after create.
+                Max size 1 MiB. Stored as a secret; never shown again after create.
               </p>
-              <div class="sysprep-save-secret">
+              <label class="sysprep-save-secret" for="f-sysprep-save-secret">
                 <input type="checkbox" id="f-sysprep-save-secret" ${d.sysprepSaveAsSecret ? 'checked' : ''} />
-                <label for="f-sysprep-save-secret">Save as secret for future VM deployments</label>
-              </div>
+                <span class="sysprep-save-secret__text">Save as secret for future VM deployments</span>
+              </label>
               <div class="form-field" id="f-sysprep-secret-name-wrap" style="margin-top:12px;${d.sysprepSaveAsSecret ? '' : 'display:none;'}">
                 <label for="f-sysprep-secret-name">Secret name</label>
                 <input type="text" id="f-sysprep-secret-name"
@@ -19443,10 +19449,10 @@
         const initExpanded = !!(initValue && String(initValue).trim());
         const initLabel = windowsCatalog ? 'Unattend.xml' : 'Cloud-init';
         const initPlaceholder = windowsCatalog
-          ? 'Paste a well-formed Unattend.xml answer file'
+          ? 'Paste Unattend.xml content'
           : 'Add cloud-init configuration';
         const initHelp = windowsCatalog
-          ? 'Optional Windows answer file default for tenants. Stored as a secret at create time; never returned on GET.'
+          ? 'Optional Windows answer file default for tenants. Max 1 MiB. Stored as a secret at create time; never returned on GET.'
           : 'Optional user data applied when the virtual machine starts.';
         panel.innerHTML = `
           <h3 class="label-with-optional">
