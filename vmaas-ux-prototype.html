@@ -3781,32 +3781,39 @@
       background: transparent;
     }
     .form-field .pf-v6-c-file-upload textarea.pf-m-unattend:focus { outline: none; }
-    .sysprep-mode-radios {
-      display: flex;
-      flex-direction: column;
+    /* Sysprep mode: 2 cards, same pattern as Guest OS. */
+    .felt-select-boxes.felt-select-boxes--sysprep-mode {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
-      max-width: 560px;
-      margin-top: 4px;
+      width: 100%;
+      max-width: 40rem;
     }
-    .sysprep-mode-radios .pf-v6-c-radio {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0;
-      min-height: 24px;
+    .felt-select-boxes--sysprep-mode .felt-select-box {
+      padding: 14px 14px;
+      gap: 10px;
+      min-height: 0;
     }
-    .sysprep-mode-radios .pf-v6-c-radio__input {
-      margin: 0;
-      flex-shrink: 0;
-      width: 16px;
-      height: 16px;
-      accent-color: var(--vmaas-blue, #0066cc);
+    .felt-select-boxes--sysprep-mode .felt-select-box:has(.felt-select-box__input:checked) {
+      padding: 13px 13px;
     }
-    .sysprep-mode-radios .pf-v6-c-radio__label {
-      font-size: 14px;
+    .felt-select-boxes--sysprep-mode .felt-select-box__text {
+      padding-inline-end: 4rem;
+    }
+    .felt-select-boxes--sysprep-mode .felt-select-box__title {
+      white-space: nowrap;
+    }
+    .felt-select-boxes--sysprep-mode .felt-select-box__desc {
+      font-size: 12px;
       line-height: 1.4;
-      color: var(--vmaas-text, #151515);
-      cursor: pointer;
+    }
+    .felt-select-boxes--sysprep-mode .felt-select-box__badge {
+      top: 8px;
+      right: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
+    }
+    @media (max-width: 640px) {
+      .felt-select-boxes.felt-select-boxes--sysprep-mode { grid-template-columns: 1fr; }
     }
     .sysprep-save-secret {
       display: inline-flex;
@@ -6318,7 +6325,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7126</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7127</span>
         </div>
       </div>
       <div class="console__body">
@@ -11188,6 +11195,29 @@
             value: 'Unspecified',
             title: 'Unspecified',
             desc: 'Unspecified guest operating systems',
+          },
+        ],
+      });
+    }
+
+    function renderSysprepModeSelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'create',
+        labelledBy,
+        extraClass: 'felt-select-boxes--sysprep-mode',
+        options: [
+          {
+            value: 'attach',
+            title: 'Attach existing Sysprep',
+            desc: 'Use a saved Unattend.xml secret',
+            iconClass: 'fa-solid fa-link',
+          },
+          {
+            value: 'create',
+            title: 'Create new Sysprep',
+            desc: 'Upload or paste an Unattend.xml file',
+            iconClass: 'fa-solid fa-file-arrow-up',
           },
         ],
       });
@@ -17076,18 +17106,11 @@
               <p class="form-helper" id="sysprep-mode-help" style="margin-bottom:12px;">
                 Supply an Unattend.xml for first-boot customization, or leave unset to boot without one.
               </p>
-              <div class="sysprep-mode-radios" role="radiogroup" aria-labelledby="sysprep-mode-label" aria-describedby="sysprep-mode-help">
-                <label class="pf-v6-c-radio">
-                  <input class="pf-v6-c-radio__input" type="radio" name="sysprepMode" value="attach"
-                    ${mode === 'attach' ? 'checked' : ''} />
-                  <span class="pf-v6-c-radio__label">Attach existing Sysprep</span>
-                </label>
-                <label class="pf-v6-c-radio">
-                  <input class="pf-v6-c-radio__input" type="radio" name="sysprepMode" value="create"
-                    ${mode === 'create' ? 'checked' : ''} />
-                  <span class="pf-v6-c-radio__label">Create new Sysprep</span>
-                </label>
-              </div>
+              ${renderSysprepModeSelectBoxes({
+                name: 'sysprepMode',
+                selected: mode,
+                labelledBy: 'sysprep-mode-label',
+              })}
             </div>
             ${mode === 'attach' ? attachPanel : createPanel}
           `;
