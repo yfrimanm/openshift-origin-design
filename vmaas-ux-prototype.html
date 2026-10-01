@@ -6219,7 +6219,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7118</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7119</span>
         </div>
       </div>
       <div class="console__body">
@@ -8286,6 +8286,30 @@
       ensureSysprepState(d);
       if (d.sysprepMode === 'attach') return !!String(d.sysprepSecretId || '').trim();
       return !!String(d.sysprep || '').trim();
+    }
+
+    /** Soft client check for mock — server remains source of truth for well-formedness. */
+    function unattendLooksValid(xml) {
+      const s = String(xml || '').trim();
+      if (!s) return true; // empty = omit (optional)
+      if (s.length > 1024 * 1024) return false;
+      return s.startsWith('<') && /unattend/i.test(s);
+    }
+
+    function validateWindowsSysprepOrToast(d = state.data) {
+      if (!isWindowsOs(d)) return true;
+      ensureSysprepState(d);
+      if (d.sysprepMode !== 'create' || !String(d.sysprep || '').trim()) return true;
+      const xml = d.sysprep;
+      if (String(xml).trim().length > 1024 * 1024) {
+        toast('Unattend.xml must be 1 MiB or smaller.');
+        return false;
+      }
+      if (!unattendLooksValid(xml)) {
+        toast('Unattend.xml must be well-formed XML (root element unattend).');
+        return false;
+      }
+      return true;
     }
 
     /** Review display — never echo Unattend.xml body (write-only secret). */
@@ -11118,10 +11142,17 @@
       if (d.guestOsFamily === 'Microsoft Windows' || d.osFamily === 'windows') {
         d.sshPublicKey = '';
         d.sshKeyFileName = '';
+        d.cloudInit = '';
         ensureSysprepState(d);
         if (syncInit) d.initMethod = 'sysprep';
-      } else if (syncInit) {
-        d.initMethod = initMethodForGuestOs(d.guestOsFamily || 'Linux');
+      } else {
+        d.sysprep = '';
+        d.sysprepFileName = '';
+        d.sysprepSecretId = '';
+        d.sysprepSaveAsSecret = false;
+        d.sysprepSecretName = '';
+        d.sysprepMode = 'create';
+        if (syncInit) d.initMethod = initMethodForGuestOs(d.guestOsFamily || 'Linux');
       }
     }
 
@@ -13784,7 +13815,7 @@
         ? 'Not applicable'
         : ((v.sshPublicKey && String(v.sshPublicKey).trim()) ? 'Configured' : 'Not configured');
       const sysprepDisplay = /win/i.test(String(v.os || v.osFull || ''))
-        ? (v.sysprepConfigured ? 'Provided (hidden)' : 'Not configured')
+        ? (v.sysprepConfigured ? 'Provided (hidden) · create-time' : 'Not configured')
         : null;
 
       const nics = (v.nics && v.nics.length) ? v.nics : [{ name: 'tenant-workload', virtualNetwork: 'tenant-workload', ip: '—' }];
@@ -13920,7 +13951,7 @@
                 <section class="ethan-detail-col" aria-labelledby="vm-ssh-title">
                   <h3 class="ethan-detail-col__title ethan-detail-col__title--spacer" id="vm-ssh-title" aria-hidden="true">&nbsp;</h3>
                   ${sysprepDisplay != null
-                    ? `${itField('SSH public key', sshDisplay)}${itField('Sysprep (Unattend.xml)', sysprepDisplay)}`
+                    ? itField('Sysprep (Unattend.xml)', sysprepDisplay)
                     : itField('SSH public key', sshDisplay)}
                 </section>
               </div>
@@ -15011,6 +15042,15 @@
               if (d.guestOsFamily === 'Microsoft Windows') {
                 d.sshPublicKey = '';
                 d.sshKeyFileName = '';
+                d.cloudInit = '';
+                ensureSysprepState(d);
+              } else {
+                d.sysprep = '';
+                d.sysprepFileName = '';
+                d.sysprepSecretId = '';
+                d.sysprepSaveAsSecret = false;
+                d.sysprepSecretName = '';
+                d.sysprepMode = 'create';
               }
               d.diskImageMenuOpen = false;
               renderWizard();
@@ -16884,7 +16924,7 @@
                 </div>
               </div>
               <p class="form-helper" id="f-unattend-help">
-                Upload or paste the answer file. It is stored as a secret and never shown again after create.
+                Upload or paste a well-formed Unattend.xml answer file (max 1 MiB). Stored as a secret; never shown again after create.
               </p>
               <div class="sysprep-save-secret">
                 <input type="checkbox" id="f-sysprep-save-secret" ${d.sysprepSaveAsSecret ? 'checked' : ''} />
@@ -16919,6 +16959,10 @@
                 stacked: true,
                 options: secretOptions,
               }) : `<p class="sysprep-attach-empty" id="f-sysprep-secret-help">No saved Sysprep secrets in this project yet. Create one with <strong>Create new Sysprep</strong> and enable <strong>Save as secret</strong>.</p>`}
+              ${secrets.length && d.sysprepSecretId ? `
+                <div style="margin-top:8px;">
+                  <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="f-sysprep-secret-clear">Clear selection</button>
+                </div>` : ''}
               ${secrets.length ? `<p class="form-helper" id="f-sysprep-secret-help">
                 Choose a saved Unattend.xml secret. Contents stay write-only and are never shown in the UI.
               </p>` : ''}
@@ -17012,6 +17056,12 @@
               },
             });
             restoreRichSearchFocus(panel);
+            panel.querySelector('#f-sysprep-secret-clear')?.addEventListener('click', () => {
+              d.sysprepSecretId = '';
+              state.sysprepSecretMenuOpen = false;
+              state.sysprepSecretFilter = '';
+              renderWizard();
+            });
           }
           const saveChk = panel.querySelector('#f-sysprep-save-secret');
           const nameWrap = panel.querySelector('#f-sysprep-secret-name-wrap');
@@ -17429,6 +17479,10 @@
       readFields();
       const steps = stepsForType();
       const key = steps[state.step].key;
+
+      if (state.wizard === 'vm' && (key === 'access-init' || key === 'review') && isWindowsOs(state.data)) {
+        if (!validateWindowsSysprepOrToast(state.data)) return;
+      }
 
       if (state.wizard === 'network') {
         if (key === 'net-basics' && !state.netData.name) {
@@ -19404,7 +19458,7 @@
             </span>
           </h3>
           <p class="create-resource-wiz__help">${windowsCatalog
-            ? 'Optionally set a default Unattend.xml for Windows VMs created from this catalog item. SSH keys are not used for Windows.'
+            ? 'Optionally set a default Unattend.xml for Windows VMs created from this catalog item.'
             : 'Optionally set user data for first boot. SSH keys are set when creating a virtual machine.'}</p>
           <div class="form-field" style="margin-top:16px;">
             ${renderCatalogFieldLabelRow({
