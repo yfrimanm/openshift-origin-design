@@ -1,13 +1,16 @@
 # VMaaS prototype — UX documentation
 
-Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit)
+**Source of truth (Google Doc, tabbed):** [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit)
+
+**Mock (aligned):** [vmaas-ux-prototype.html?v=7128](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7128) · Build Oct 1 · osac-5009 **7128**
 
 | Tab | Contents |
 |---|---|
 | **Overview** | Goal, personas, UX summary, links |
-| **Create Virtual machine** | List + Create wizard |
+| **Create Virtual machine** | List + Create wizard (all steps) |
+| **Windows Sysprep Create** | Access & Initial run — Windows Unattend.xml / Sysprep (OSAC-5009) |
 | **VM Overview** | Day-2 details Overview |
-| **Catalog** | Provider list / create Visibility / detail / edit Review / delete |
+| **Catalog** | Provider list / create / detail / edit Review / delete |
 | **Instance types** | Provider list / create / details |
 | **Disk images** | Provider list / create / details |
 
@@ -15,449 +18,38 @@ Google Doc (tabbed): [VMaaS prototype — UX documentation](https://docs.google.
 
 | | |
 |---|---|
-| **Scope of this doc** | Full interactive prototype as shipped on Pages: **Virtual machines** list + Create wizard + **Overview**, provider **Catalog**, plus **Instance types** and **Disk images** |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant) |
-| **Deep links** | [Create VM](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant&create=1) · [Overview (indigo-quokka-89)](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant&vm=indigo-quokka-89) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant&role=provider) |
-| **Google Doc** | [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
-| **Screenshots** | `videos/vmaas-prototype-ux-doc/` |
-| **Regenerate screenshots** | `node scripts/capture-vmaas-prototype-ux-doc.mjs` |
-| **Companion docs** | [Create Virtual machine](vmaas-create-vm-only-ux-doc.md) · [VM details Overview](vmaas-vm-details-overview-ux-doc.md) |
-
-**Source snapshot:** Pages build `?v=20260916-tenant` (screenshots refreshed 2026-09-16 — VM Overview v2, provider create Tenant-before-Name).
-
----
+| **Scope** | Full interactive prototype: Virtual machines list + Create wizard + Overview, plus provider Catalog, Instance types, Disk images |
+| **Interactive mock** | https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7128 |
+| **Deep links** | [Create](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7128&create=1) · [Overview](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7128&vm=indigo-quokka-89) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7128&role=provider) |
+| **Google Doc** | [Tabbed source of truth](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
+| **Create screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [gh-pages](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
+| **Regenerate Create screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
 
 ## Goal
 
-Document the current OSAC VMaaS HTML prototype so engineering and stakeholders can review **one coherent product surface**: tenant Create / Overview flows and provider infrastructure (Instance types, Disk images), aligned to OSAC patterns (Felt + Glass chrome, stacked detail fields, danger Delete).
-
----
+One coherent product surface for engineering and stakeholders: tenant Create / Overview flows and provider infrastructure, aligned to OSAC PatternFly Felt + Glass.
 
 ## Personas (demo role switcher)
 
-| Role | Sees | Primary flows in this mock |
+| Role | Sees | Primary flows |
 |---|---|---|
-| **Tenant Admin** | Services → Virtual machines, Networking | List, Create wizard, VM Overview (editable config) |
-| **Tenant User** | Same nav; Create hidden | Power / console; Overview config read-only |
-| **Cloud provider admin** | Catalog, Infrastructure → Instance types, Disk images | Catalog create / detail; provider resource list / create / details |
-
----
+| **Tenant Admin** | Services → Virtual machines, Networking | List, Create wizard, VM Overview (editable) |
+| **Tenant User** | Same nav; Create hidden | Power / console; Overview read-only |
+| **Cloud provider admin** | Catalog, Instance types, Disk images | Provider list / create / detail |
 
 ## UX summary
 
 | Area | Decision |
 |---|---|
-| **IA (Create)** | Select template → Details → Instance type → Storage → Network → Review and create |
-| **Create dropdowns** | Shared **typeahead rich-select** (FormControl toggle + search menu), matching **Instance type**: Project, Storage tier (boot + extra disks), Virtual network, Subnet. Security groups stay multi-select chips. |
-| **After create** | Lands on new VM Overview + success toast |
-| **Overview** | 2/3 main + 1/3 sidebar; stacked fields in **Overview** \| **Configuration** \| **SSH**; Network / Storage tables + Utilization; header PF actions + Delete |
-| **Instance types** | Provider list + create (Tenant before Name) + 3-column detail; lifecycle Actions |
-| **Disk images** | Provider list + create (Tenant before Name) + 2-column detail; show-obsolete; lifecycle Actions |
-| **Shell** | PatternFly Felt + Glass; soft floating nav/content |
+| **IA (Create)** | Select template → Details → Instance type → Storage → Network → **Access & Initial run** → Review and create |
+| **Details** | Name, description, Guest OS felt cards + disk image typeahead. Project context-only. |
+| **Access & Initial run** | Optional. Linux: SSH + Cloud-init. Windows: Sysprep Unattend.xml (Attach existing / Create new felt cards). |
+| **Create dropdowns** | Typeahead rich-select for Project, Instance type, Storage tier, Virtual network, Subnet. Security groups = multi-select chips. |
+| **Form width** | Wizard fields / cards / uploads / helpers = **40rem** column |
+| **After create** | New VM Overview + success toast |
+| **Start after create** | Checked by default (CNV parity) |
+| **Shell** | PatternFly Felt + Glass |
 
 ---
 
-# Part A — Virtual machines (Tenant Admin)
-
-## Entry — list
-
-- Primary CTA: **Create Virtual machine**
-- **Name** opens Overview
-- Filter row: Project · Power state · Operating system · Hardware devices · Search
-- Row kebab: Control ▸ · Open console · Delete (danger)
-
-![Figure: Virtual machines list](videos/vmaas-prototype-ux-doc/01-vm-list.png)
-
-Figure: Virtual machines list
-
-![Figure: Row Actions kebab](videos/vmaas-prototype-ux-doc/01b-vm-kebab.png)
-
-Figure: Row Actions kebab
-
----
-
-## Create wizard
-
-### Step 1 — Select template
-
-- **Project** is a typeahead rich-select (same chrome as Instance type)
-- Project scopes available templates and creation target
-- Selecting a template opens **Template settings** drawer (Locked / Editable governance)
-
-![Figure: Select template](videos/vmaas-prototype-ux-doc/02-select-template.png)
-
-Figure: Select template
-
-![Figure: Template drawer](videos/vmaas-prototype-ux-doc/03-template-drawer.png)
-
-Figure: Template settings drawer
-
-### Step 2 — Details
-
-- Name (required) + generate; optional description
-- Project shown as context (chosen on Select template)
-- Optional Access: SSH public key / cloud-init
-
-![Figure: Details](videos/vmaas-prototype-ux-doc/04-details.png)
-
-Figure: Details
-
-### Step 3 — Instance type
-
-- Size locked or editable per template governance
-- **Instance type** typeahead rich-select: FormControl toggle, stacked title + description when applicable, searchable menu (reference pattern for other wizard dropdowns)
-
-![Figure: Instance type](videos/vmaas-prototype-ux-doc/05-compute.png)
-
-Figure: Instance type
-
-### Step 4 — Storage
-
-- Boot disk size / **Storage tier**
-- **Storage tier** (boot + each extra disk) uses the same typeahead rich-select as Instance type (stacked title/description + search) — not a native `<select>`
-- Additional disks via inline **Add disk** sets (not a modal on this step)
-
-![Figure: Storage](videos/vmaas-prototype-ux-doc/06-storage.png)
-
-Figure: Storage (editable template — Storage tier matches Compute rich-select chrome)
-
-![Figure: Storage tier menu open](videos/vmaas-prototype-ux-doc/06b-storage-tier-open.png)
-
-Figure: Storage tier — typeahead menu (search + stacked title/description options)
-
-### Step 5 — Network
-
-- **Virtual network** and **Subnet** (primary + additional) use the same typeahead rich-select chrome as Compute
-- **Security groups** remain a multi-select chip control (intentional; not a single-select dropdown)
-- Additional networks via inline **Add network** sets
-
-![Figure: Network](videos/vmaas-prototype-ux-doc/07-network.png)
-
-Figure: Network
-
-### Step 6 — Review and create
-
-- Grouped review with edit links; **Estimate cost** panel
-- **Start this Virtual machine after creation** — checked by default
-
-![Figure: Review and create](videos/vmaas-prototype-ux-doc/08-review.png)
-
-Figure: Review and create
-
-### Exit confirmation
-
-| Element | Copy |
-|---|---|
-| Title | Exit Virtual machine creation? |
-| Body | If you leave now, any information you’ve entered won’t be saved. |
-| Primary | Exit without saving |
-| Secondary | Continue creating |
-
-![Figure: Exit confirmation](videos/vmaas-prototype-ux-doc/09-exit-modal.png)
-
-Figure: Exit confirmation
-
----
-
-## VM Overview (day-2)
-
-**Entry:** list Name link, after Create, or `?vm={name}`.
-
-### Layout
-
-| Area | Contents |
-|---|---|
-| **Header** | Breadcrumb (`Virtual machines > {name}`) · title + subtitle · **Open console** (primary) · divider · Start / Restart / Stop / Pause · **Delete** (danger) |
-| **Main (2/3)** | Overview / Configuration / SSH columns · Network table · Storage table · Utilization |
-| **Sidebar (1/3)** | Alerts · Recent activity (gray specification-style cards) |
-
-### Details (stacked fields)
-
-| Column | Fields |
-|---|---|
-| **Overview** | Project · Status (link → popover) · Created · Catalog item |
-| **Configuration** | Operating system · Instance type · Image · vCPUs · Memory |
-| **SSH** | SSH public key |
-
-### Network / Storage tables
-
-Section titles match Utilization styling. Tables share a **5-column grid** so Storage columns align under Network (Name spans 2 cols · Size · Storage tier spans 2 cols).
-
-**Utilization:** Metrics when Running; time range filter on the right; otherwise *Virtual machine is not running*.
-
-![Figure: VM Overview](videos/vmaas-prototype-ux-doc/10-vm-overview.png)
-
-Figure: Overview — running (v2 layout)
-
-![Figure: Details columns](videos/vmaas-prototype-ux-doc/10b-vm-details-card.png)
-
-Figure: Overview / Configuration / SSH columns
-
-![Figure: Status popover](videos/vmaas-prototype-ux-doc/10c-status-popover.png)
-
-Figure: Status popover (Ask AI placeholder + Learn more)
-
----
-
-# Part B — Catalog (Cloud provider admin)
-
-Switch role to **Cloud provider admin**. Default landing: **Catalog**.
-
-## Catalog — list
-
-| Column | Notes |
-|---|---|
-| Name | Link → detail |
-| Status | Live / Unpublished |
-| Visibility | Global public / Tenant scoped |
-| Instance type · Disk image · Rate | Card view also shows specs + rate |
-
-Primary CTA: **Create catalog item**.
-
-![Figure: Catalog list](videos/vmaas-prototype-ux-doc/17-catalog-list.png)
-
-Figure: Catalog list (provider)
-
----
-
-## Create catalog item — Visibility step
-
-Wizard steps: Details → Instance type & Access → **Visibility** → Storage → Review.
-
-| Option | Meaning |
-|---|---|
-| **Global public** | Available to all tenants when published |
-| **Tenant scoped** | Visible only to selected tenants |
-
-![Figure: Create catalog item — Visibility](videos/vmaas-prototype-ux-doc/18-catalog-create-visibility.png)
-
-Figure: Create catalog item — Visibility step
-
----
-
-## Catalog item — details
-
-| Section | Fields |
-|---|---|
-| **Overview** | Service · Status (Live / Unpublished) · Rate |
-| **Publishing** | Visibility (Global public) · Created |
-| **Hardware specifications** | Size (+ Locked) · vCPUs · Memory · GPU · Disk image (+ Locked) |
-
-Header actions: **Launch instance** · **Actions** (Edit / Duplicate / Publish or Unpublish / Delete).
-
-![Figure: Catalog item detail](videos/vmaas-prototype-ux-doc/19-catalog-item-detail.png)
-
-Figure: Catalog item detail
-
-![Figure: Hardware specifications](videos/vmaas-prototype-ux-doc/19b-catalog-hardware-specs.png)
-
-Figure: Hardware specifications card (Ethan stacked fields + Locked badges)
-
----
-
-## Edit catalog item — Review
-
-Same wizard as create (Details → Instance type & Access → Visibility → Storage → Review), opened from **Actions → Edit**.
-
-| Review state | Behavior |
-|---|---|
-| **No changes** | Helper: “No changes yet…” · **Save changes** disabled · info alert that changes apply immediately |
-| **With changes** | Before → after rows for each edited field · **Save changes** enabled |
-
-![Figure: Edit catalog — Review empty](videos/vmaas-prototype-ux-doc/20-catalog-edit-review-empty.png)
-
-Figure: Edit catalog item — Review with no changes
-
-![Figure: Edit catalog — Review with changes](videos/vmaas-prototype-ux-doc/21-catalog-edit-review-changes.png)
-
-Figure: Edit catalog item — Review with before/after summary
-
----
-
-## Delete catalog item
-
-**Actions → Delete** opens a danger confirmation modal naming the catalog item. Confirm permanently removes it from the catalog.
-
-![Figure: Delete catalog item](videos/vmaas-prototype-ux-doc/22-catalog-delete-modal.png)
-
-Figure: Delete catalog item confirmation
-
----
-
-# Part C — Infrastructure (Cloud provider admin)
-
-From **Infrastructure** in the left nav: Instance types, Disk images.
-
-## Instance types — list
-
-| Column | Notes |
-|---|---|
-| Name | Link → detail |
-| Lifecycle state | Active / Deprecated / Obsolete badges |
-| vCPUs · Memory (GiB) · GPUs · Created | |
-| Actions | Kebab — lifecycle + Delete (danger) |
-
-Primary CTA: **Create instance type**.
-
-![Figure: Instance types list](videos/vmaas-prototype-ux-doc/11-instance-types-list.png)
-
-Figure: Instance types list
-
----
-
-## Instance types — create
-
-Breadcrumb: Instance types › Create.
-
-| Field | Required | Notes |
-|---|---|---|
-| Tenant | Yes* | Before Name; assign tenant or check **Make this resource global** |
-| Name | Yes | DNS label (RFC 1035); unique per tenant |
-| Description | No | |
-| vCPUs | Yes | |
-| Memory (GiB) | Yes | |
-| GPU count / Resource name / PCI device selector | No | GPU section |
-
-Actions: **Create** · **Cancel**.
-
-![Figure: Create instance type](videos/vmaas-prototype-ux-doc/12-create-instance-type.png)
-
-Figure: Create instance type
-
----
-
-## Instance types — details
-
-Single panel, three columns:
-
-| Column | Fields |
-|---|---|
-| **Overview** | Lifecycle state · Name · Created |
-| **Compute** | vCPUs · Memory (GiB) |
-| **GPU** | Count · PCI device selector · Resource name |
-
-Header: name + subtitle (`N vCPUs · M GiB`) · secondary **Actions** (Set Active / Deprecate / Mark Obsolete / Delete).
-
-![Figure: Instance type detail](videos/vmaas-prototype-ux-doc/13-instance-type-detail.png)
-
-Figure: Instance type detail
-
-![Figure: Instance type Actions](videos/vmaas-prototype-ux-doc/13b-instance-type-actions.png)
-
-Figure: Instance type Actions menu
-
----
-
-## Disk images — list
-
-Aligned to [osac-ui PR 164](https://github.com/osac-project/osac-ui/pull/164).
-
-| Column | Notes |
-|---|---|
-| Name | Link → detail |
-| Lifecycle | Available / Deprecated / Obsolete |
-| Guest operating system | Linux / Microsoft Windows |
-| Architecture | e.g. amd64, arm64 |
-| Visibility | Global or tenant name |
-| Created | |
-| Actions | Kebab — Deprecate / Obsolete / Reactivate; Delete when Obsolete |
-
-Toolbar: **Show obsolete** (off by default — Obsolete rows hidden).
-
-Primary CTA: **Create disk image**.
-
-![Figure: Disk images list](videos/vmaas-prototype-ux-doc/14-disk-images-list.png)
-
-Figure: Disk images list
-
----
-
-## Disk images — create
-
-Aligned to product `DiskImageForm` + design screenshot.
-
-Breadcrumb: Disk images › Create.
-
-| Field | Required | Notes |
-|---|---|---|
-| Tenant | Yes* | Before Name; assign tenant or check **Make this resource global** |
-| Name | Yes | DNS label; unique per tenant |
-| Image | Yes | Example: `quay.io/containerdisks/fedora:latest` |
-| Guest operating system | Yes | Radio: Linux / Microsoft Windows (default Linux) |
-| Architecture | Yes | Multi-select (amd64 / arm64 / s390x); helper: you may select multiple types; placeholder *Select options* |
-| Visibility | No | Default Global |
-
-Actions: **Create** · **Cancel**. Success opens the new image’s detail page.
-
-![Figure: Create disk image](videos/vmaas-prototype-ux-doc/15-create-disk-image.png)
-
-Figure: Create disk image
-
----
-
-## Disk images — details
-
-Aligned to [osac-ui PR 177](https://github.com/osac-project/osac-ui/pull/177).
-
-Two columns:
-
-| Column | Fields |
-|---|---|
-| **Overview** | Lifecycle · Visibility · Created · Deprecation / Obsolescence timestamps (when set) |
-| **Image** | Source type · Image · Guest operating system · Architecture |
-
-Header: name + subtitle (`Guest OS · architecture`) · **Actions** when transitions are available.
-
-![Figure: Disk image detail](videos/vmaas-prototype-ux-doc/16-disk-image-detail.png)
-
-Figure: Disk image detail
-
-### Lifecycle actions (Disk images)
-
-| Current | Available actions |
-|---|---|
-| Available | Deprecate · Obsolete |
-| Deprecated | Obsolete · Reactivate |
-| Obsolete | Reactivate · Delete (danger) |
-
----
-
-## Related
-
-- Detailed Create-only write-up: `vmaas-create-vm-only-ux-doc.md`
-- Detailed Overview write-up: `vmaas-vm-details-overview-ux-doc.md`
-- Live mock: https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=20260916-tenant
-
----
-
-## Appendix — Screenshot index
-
-| File | Screen |
-|---|---|
-| `01-vm-list.png` | Virtual machines list |
-| `01b-vm-kebab.png` | Row Actions kebab |
-| `02-select-template.png` | Create — Select template |
-| `03-template-drawer.png` | Template settings drawer |
-| `04-details.png` | Create — Details |
-| `05-compute.png` | Create — Instance type |
-| `06-storage.png` | Create — Storage |
-| `07-network.png` | Create — Network |
-| `08-review.png` | Create — Review and create |
-| `09-exit-modal.png` | Exit confirmation |
-| `10-vm-overview.png` | VM Overview |
-| `10b-vm-details-card.png` | Details card (stacked fields) |
-| `10c-status-popover.png` | Status popover |
-| `11-instance-types-list.png` | Instance types list |
-| `12-create-instance-type.png` | Create instance type |
-| `13-instance-type-detail.png` | Instance type detail |
-| `13b-instance-type-actions.png` | Instance type Actions |
-| `14-disk-images-list.png` | Disk images list |
-| `15-create-disk-image.png` | Create disk image |
-| `16-disk-image-detail.png` | Disk image detail |
-| `17-catalog-list.png` | Catalog list (provider) |
-| `18-catalog-create-visibility.png` | Create catalog item — Visibility |
-| `19-catalog-item-detail.png` | Catalog item detail |
-| `19b-catalog-hardware-specs.png` | Hardware specifications card |
-| `20-catalog-edit-review-empty.png` | Edit catalog — Review (no changes) |
-| `21-catalog-edit-review-changes.png` | Edit catalog — Review (with changes) |
-| `22-catalog-delete-modal.png` | Delete catalog item confirmation |
+*Create / Sysprep step detail and screenshots live in the Google Doc tabs — keep this markdown as a short local mirror only.*
