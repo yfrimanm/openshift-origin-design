@@ -6294,7 +6294,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7124</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7125</span>
         </div>
       </div>
       <div class="console__body">
@@ -17037,7 +17037,7 @@
                   <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="f-sysprep-secret-clear">Clear selection</button>
                 </div>` : ''}
               ${secrets.length ? `<p class="form-helper" id="f-sysprep-secret-help">
-                Choose a saved Unattend.xml secret. Contents stay write-only and are never shown in the UI.
+                Contents are write-only and never shown in the UI.
               </p>` : ''}
             </div>
           `;
@@ -17050,7 +17050,7 @@
                 </span>
               </label>
               <p class="form-helper" id="sysprep-mode-help" style="margin-bottom:12px;">
-                Attach a saved Unattend.xml secret, or upload a new answer file for first-boot customization. Optional — leave unset to boot without one.
+                Supply an Unattend.xml answer file for first-boot customization, or leave unset to boot without one.
               </p>
               <div class="sysprep-mode-radios" role="radiogroup" aria-labelledby="sysprep-mode-label" aria-describedby="sysprep-mode-help">
                 <label class="pf-v6-c-radio">
