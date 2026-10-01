@@ -3844,6 +3844,30 @@
     .form-helper {
       margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--vmaas-text-subtle); max-width: 560px;
     }
+    /* Wizard: one helper style + same width as fields (Storage/Network used PF helper markup). */
+    #overlay #wiz-panel .form-helper,
+    #overlay #wiz-panel .pf-v6-c-form__helper-text,
+    #overlay #wiz-panel .vm-config__fields .form-helper,
+    #overlay #wiz-panel .vm-config__fields .pf-v6-c-form__helper-text {
+      margin: 6px 0 0;
+      max-width: 40rem;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle);
+    }
+    #overlay #wiz-panel .pf-v6-c-helper-text__item-text {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle);
+    }
+    #overlay #wiz-panel #sysprep-mode-help {
+      white-space: nowrap;
+    }
+    @media (max-width: 640px) {
+      #overlay #wiz-panel #sysprep-mode-help {
+        white-space: normal;
+      }
+    }
     /* Validation error — danger border wins over default/focus blue (MTV Create plan pattern). */
     .form-field.pf-m-error > input,
     .form-field.pf-m-error > textarea,
@@ -6294,7 +6318,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7125</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7126</span>
         </div>
       </div>
       <div class="console__body">
@@ -17050,7 +17074,7 @@
                 </span>
               </label>
               <p class="form-helper" id="sysprep-mode-help" style="margin-bottom:12px;">
-                Supply an Unattend.xml answer file for first-boot customization, or leave unset to boot without one.
+                Supply an Unattend.xml for first-boot customization, or leave unset to boot without one.
               </p>
               <div class="sysprep-mode-radios" role="radiogroup" aria-labelledby="sysprep-mode-label" aria-describedby="sysprep-mode-help">
                 <label class="pf-v6-c-radio">
