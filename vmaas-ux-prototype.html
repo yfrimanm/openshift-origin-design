@@ -6339,7 +6339,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7128</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7129</span>
         </div>
       </div>
       <div class="console__body">
@@ -21441,10 +21441,13 @@
       const navNetworks = document.querySelector('[data-nav="networks"]');
       const navInfrastructure = document.getElementById('nav-infrastructure');
       const navPlatform = document.getElementById('nav-platform');
+      const navServices = document.getElementById('nav-services');
       const canCreateCatalog = role.canManageProviderCatalog || role.canManageTenantCatalog;
       createBtn.hidden = !role.canCreate;
       if (createCatalog) createCatalog.hidden = !canCreateCatalog;
       if (navPlatform) navPlatform.hidden = !role.canManageProviderCatalog;
+      // Services (VMs, etc.) is tenant work — hide for Cloud provider admin.
+      if (navServices) navServices.hidden = !!role.canManageProviderCatalog;
       if (createNet) createNet.hidden = !role.canCreateNetwork;
       if (navNetworks) navNetworks.hidden = !role.canViewNetworks;
       if (navInfrastructure) navInfrastructure.hidden = !role.canManageInfrastructure;
