@@ -4014,8 +4014,33 @@
       margin-top: 8px;
       max-width: 40rem;
     }
+    /* Guest OS: 3 fixed options — one row avoids an orphan Unspecified card. */
+    .felt-select-boxes.felt-select-boxes--guest-os {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 52rem;
+    }
+    .felt-select-boxes--guest-os .felt-select-box {
+      padding: 14px 14px;
+      gap: 10px;
+      min-height: 0;
+    }
+    .felt-select-boxes--guest-os .felt-select-box:has(.felt-select-box__input:checked) {
+      padding: 13px 13px;
+    }
+    .felt-select-boxes--guest-os .felt-select-box__desc {
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    @media (max-width: 900px) {
+      .felt-select-boxes.felt-select-boxes--guest-os {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 40rem;
+      }
+    }
     @media (max-width: 640px) {
-      .felt-select-boxes { grid-template-columns: 1fr; }
+      .felt-select-boxes,
+      .felt-select-boxes.felt-select-boxes--guest-os { grid-template-columns: 1fr; }
     }
     .felt-select-box {
       position: relative;
@@ -11038,10 +11063,11 @@
       return '<span class="catalog-gov-badge">Locked</span>';
     }
 
-    function renderFeltSelectBoxes({ name, selected, labelledBy, options }) {
+    function renderFeltSelectBoxes({ name, selected, labelledBy, options, extraClass = '' }) {
       const current = selected ?? options[0]?.value;
+      const rootClass = ['felt-select-boxes', extraClass].filter(Boolean).join(' ');
       return `
-        <div class="felt-select-boxes" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
+        <div class="${rootClass}" role="radiogroup" ${labelledBy ? `aria-labelledby="${labelledBy}"` : ''}>
           ${options.map(opt => {
             const isSelected = current === opt.value;
             const iconHtml = opt.iconClass ? `
@@ -11074,6 +11100,7 @@
         name,
         selected: selected || 'Linux',
         labelledBy,
+        extraClass: 'felt-select-boxes--guest-os',
         options: [
           {
             value: 'Linux',
