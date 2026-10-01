@@ -3775,18 +3775,23 @@
     .sysprep-mode-radios {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       max-width: 560px;
+      margin-top: 4px;
     }
     .sysprep-mode-radios .pf-v6-c-radio {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
       margin: 0;
+      min-height: 24px;
     }
     .sysprep-mode-radios .pf-v6-c-radio__input {
-      margin-top: 3px;
+      margin: 0;
       flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--vmaas-blue, #0066cc);
     }
     .sysprep-mode-radios .pf-v6-c-radio__label {
       font-size: 14px;
@@ -3796,16 +3801,30 @@
     }
     .sysprep-save-secret {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
       margin-top: 12px;
       max-width: 560px;
+      min-height: 24px;
     }
-    .sysprep-save-secret input { margin-top: 3px; }
+    .sysprep-save-secret input {
+      margin: 0;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      accent-color: var(--vmaas-blue, #0066cc);
+    }
     .sysprep-save-secret label {
       font-size: 14px;
       line-height: 1.4;
       cursor: pointer;
+    }
+    .sysprep-attach-empty {
+      margin: 8px 0 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle);
+      max-width: 560px;
     }
     .form-helper {
       margin: 6px 0 0; font-size: 13px; line-height: 1.45; color: var(--vmaas-text-subtle); max-width: 560px;
@@ -6200,7 +6219,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7117</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7118</span>
         </div>
       </div>
       <div class="console__body">
@@ -8566,6 +8585,8 @@
       vmBootTierFilter: '',
       vmVnMenuOpen: false,
       vmVnFilter: '',
+      sysprepSecretMenuOpen: false,
+      sysprepSecretFilter: '',
       vmSubnetMenuOpen: false,
       vmSubnetFilter: '',
       vmTplProjectMenuOpen: false,
@@ -14264,6 +14285,8 @@
       state.vmBootTierFilter = '';
       state.vmVnMenuOpen = false;
       state.vmVnFilter = '';
+      state.sysprepSecretMenuOpen = false;
+      state.sysprepSecretFilter = '';
       state.vmSubnetMenuOpen = false;
       state.vmSubnetFilter = '';
       state.vmTplProjectMenuOpen = false;
@@ -16773,11 +16796,10 @@
         }
         const hasKey = !!(d.sshPublicKey && String(d.sshPublicKey).trim());
         const fileName = d.sshKeyFileName || '';
-        const sshHtml = windowsAccess ? `
-          <p class="catalog-preset-note">
-            SSH keys are not used for Windows. Set the administrator password after creation, then connect with RDP.
-          </p>
-        ` : `
+        const sysprepMode = windowsAccess && d.sysprepMode === 'attach' ? 'attach' : 'create';
+        const sysprepSecrets = windowsAccess ? sysprepSecretsForProject(d.project) : [];
+        // SSH field omitted for Windows — no banner needed when the control is hidden.
+        const sshHtml = windowsAccess ? '' : `
           <div class="form-field">
             <label for="f-ssh-key">SSH public key</label>
             <div class="pf-v6-c-file-upload${hasKey ? ' pf-m-show-details' : ''}" id="f-ssh-upload">
@@ -16819,20 +16841,19 @@
 
         let initHtml = '';
         if (windowsAccess) {
-          const mode = d.sysprepMode === 'attach' ? 'attach' : 'create';
-          const secrets = sysprepSecretsForProject(d.project);
+          const mode = sysprepMode;
+          const secrets = sysprepSecrets;
           const hasUnattend = !!(d.sysprep && String(d.sysprep).trim());
           const unattendName = d.sysprepFileName || '';
-          const attachOptions = [
-            `<option value="">Select a Sysprep secret</option>`,
-            ...secrets.map(s =>
-              `<option value="${s.id}" ${d.sysprepSecretId === s.id ? 'selected' : ''}>${String(s.name).replace(/</g, '&lt;')}</option>`
-            ),
-          ].join('');
+          const secretOptions = secrets.map(s => ({
+            id: s.id,
+            title: s.name,
+            desc: s.project ? `Project: ${s.project}` : '',
+          }));
           const createPanel = `
-            <div class="form-field" style="margin-top:12px;">
+            <div class="form-field" style="margin-top:16px;">
               <label for="f-unattend-xml">Unattend.xml</label>
-              <div class="pf-v6-c-file-upload${hasUnattend || unattendName ? ' pf-m-show-details' : ' pf-m-show-details'}" id="f-unattend-upload">
+              <div class="pf-v6-c-file-upload pf-m-show-details" id="f-unattend-upload">
                 <div class="pf-v6-c-file-upload__file-select">
                   <div class="pf-v6-c-input-group">
                     <div class="pf-v6-c-input-group__item pf-m-fill">
@@ -16863,7 +16884,7 @@
                 </div>
               </div>
               <p class="form-helper" id="f-unattend-help">
-                Upload or paste an Unattend.xml answer file for Windows first-boot customization. Content is stored as a secret and is not shown again after create.
+                Upload or paste the answer file. It is stored as a secret and never shown again after create.
               </p>
               <div class="sysprep-save-secret">
                 <input type="checkbox" id="f-sysprep-save-secret" ${d.sysprepSaveAsSecret ? 'checked' : ''} />
@@ -16878,14 +16899,29 @@
             </div>
           `;
           const attachPanel = `
-            <div class="form-field" style="margin-top:12px;">
-              <label for="f-sysprep-secret">Sysprep secret</label>
-              <select id="f-sysprep-secret" aria-describedby="f-sysprep-secret-help">
-                ${attachOptions}
-              </select>
-              <p class="form-helper" id="f-sysprep-secret-help">
-                Select a previously saved Unattend.xml secret. The answer file body is write-only and never displayed.
-              </p>
+            <div class="form-field" style="margin-top:16px;">
+              <label id="f-sysprep-secret-label">Sysprep secret</label>
+              ${secrets.length ? renderTypeaheadRichSelectHtml({
+                rootId: 'vm-sysprep-secret-select',
+                toggleId: 'f-sysprep-secret-toggle',
+                menuId: 'vm-sysprep-secret-menu',
+                searchId: 'vm-sysprep-secret-search',
+                labelId: 'f-sysprep-secret-label',
+                open: !!state.sysprepSecretMenuOpen,
+                filter: state.sysprepSecretFilter || '',
+                searchPlaceholder: 'Search Sysprep secrets',
+                selectedId: d.sysprepSecretId || '',
+                placeholder: 'Select a Sysprep secret',
+                optionAttr: 'data-sysprep-secret',
+                hiddenInputId: 'f-sysprep-secret',
+                describedBy: 'f-sysprep-secret-help',
+                emptyNoun: 'Sysprep secrets',
+                stacked: true,
+                options: secretOptions,
+              }) : `<p class="sysprep-attach-empty" id="f-sysprep-secret-help">No saved Sysprep secrets in this project yet. Create one with <strong>Create new Sysprep</strong> and enable <strong>Save as secret</strong>.</p>`}
+              ${secrets.length ? `<p class="form-helper" id="f-sysprep-secret-help">
+                Choose a saved Unattend.xml secret. Contents stay write-only and are never shown in the UI.
+              </p>` : ''}
             </div>
           `;
           initHtml = `
@@ -16896,10 +16932,10 @@
                   <span class="pf-v6-c-label__content"><span class="pf-v6-c-label__text">Windows only</span></span>
                 </span>
               </label>
-              <p class="form-helper" style="margin-bottom:10px;">
-                Provide an Unattend.xml answer file to customize Windows setup on first boot, or skip to boot without one.
+              <p class="form-helper" id="sysprep-mode-help" style="margin-bottom:12px;">
+                Attach a saved Unattend.xml secret, or upload a new answer file for first-boot customization. Optional — leave unset to boot without one.
               </p>
-              <div class="sysprep-mode-radios" role="radiogroup" aria-labelledby="sysprep-mode-label">
+              <div class="sysprep-mode-radios" role="radiogroup" aria-labelledby="sysprep-mode-label" aria-describedby="sysprep-mode-help">
                 <label class="pf-v6-c-radio">
                   <input class="pf-v6-c-radio__input" type="radio" name="sysprepMode" value="attach"
                     ${mode === 'attach' ? 'checked' : ''} />
@@ -16941,9 +16977,11 @@
               </span>
             </span>
           </h3>
-          <p class="step-help">Configure access and the first-boot initialization for this virtual machine.</p>
+          <p class="step-help">${windowsAccess
+            ? 'Configure first-boot customization for this Windows virtual machine.'
+            : 'Configure access and the first-boot initialization for this virtual machine.'}</p>
           ${sshHtml}
-          <hr class="form-section-divider" />
+          ${sshHtml ? '<hr class="form-section-divider" />' : ''}
           ${initHtml}
         `;
 
@@ -16951,13 +16989,30 @@
           panel.querySelectorAll('input[name="sysprepMode"]').forEach(r => {
             r.addEventListener('change', () => {
               d.sysprepMode = r.value === 'attach' ? 'attach' : 'create';
+              state.sysprepSecretMenuOpen = false;
+              state.sysprepSecretFilter = '';
               renderWizard();
             });
           });
-          const secretSelect = panel.querySelector('#f-sysprep-secret');
-          secretSelect?.addEventListener('change', () => {
-            d.sysprepSecretId = secretSelect.value || '';
-          });
+          if (sysprepMode === 'attach' && sysprepSecrets.length) {
+            wireTypeaheadRichSelect(panel, {
+              rootId: 'vm-sysprep-secret-select',
+              toggleId: 'f-sysprep-secret-toggle',
+              menuId: 'vm-sysprep-secret-menu',
+              searchId: 'vm-sysprep-secret-search',
+              optionSel: '[data-sysprep-secret]',
+              getOptionId: opt => opt.dataset.sysprepSecret,
+              setOpen: (open) => { state.sysprepSecretMenuOpen = open; },
+              setFilter: (v) => { state.sysprepSecretFilter = v; },
+              onSelectId: (value) => {
+                d.sysprepSecretId = value || '';
+                state.sysprepSecretMenuOpen = false;
+                state.sysprepSecretFilter = '';
+                renderWizard();
+              },
+            });
+            restoreRichSearchFocus(panel);
+          }
           const saveChk = panel.querySelector('#f-sysprep-save-secret');
           const nameWrap = panel.querySelector('#f-sysprep-secret-name-wrap');
           const nameInput = panel.querySelector('#f-sysprep-secret-name');
