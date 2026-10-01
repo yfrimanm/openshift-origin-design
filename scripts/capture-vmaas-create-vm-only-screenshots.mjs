@@ -46,6 +46,30 @@ async function closeDrawer(page) {
   }
 }
 
+async function ensureDiskImage(page) {
+  const toggle = page.locator('#vm-disk-image-toggle');
+  if (!(await toggle.count())) return;
+  const selected = await page.locator('#vm-disk-image-select .rich-select__toggle-label').textContent().catch(() => '');
+  if (selected && !/select a disk image/i.test(selected)) return;
+  await toggle.click();
+  await page.waitForTimeout(250);
+  const opt = page.locator('[data-vm-disk-image]').first();
+  if (await opt.count()) {
+    await opt.click();
+    await page.waitForTimeout(300);
+  } else {
+    await page.keyboard.press('Escape');
+  }
+}
+
+async function selectGuestOs(page, label) {
+  const card = page.locator(`input[name="vmGuestOs"][value="${label}"]`).locator('xpath=ancestor::label[1]');
+  if (await card.count()) {
+    await card.click();
+    await page.waitForTimeout(400);
+  }
+}
+
 async function main() {
   await mkdir(outDir, { recursive: true });
   const browser = await chromium.launch({ headless: true });
@@ -59,7 +83,6 @@ async function main() {
   if (await kebab.count()) {
     await kebab.click();
     await page.waitForTimeout(400);
-    // Capture kebab menu in frame (not clipped by viewport edge)
     const menu = page.locator('#vm-kebab-menu');
     if (await menu.count() && await menu.isVisible()) {
       await shotEl(page, '#vm-kebab-menu', '01b-vm-kebab');
@@ -74,17 +97,14 @@ async function main() {
   await page.waitForSelector('#overlay.pf-m-open', { timeout: 5000 });
   await page.waitForTimeout(400);
 
-  // Select template grid — no drawer open (avoids cards cut by drawer)
   await shotPage(page, '02-select-template');
 
-  // Empty project (yifat / vmaas have no templates)
   await page.locator('#f-tpl-project').selectOption('yifat');
   await page.waitForTimeout(400);
   await shotPage(page, '02b-select-template-empty');
   await page.locator('#f-tpl-project').selectOption('project-a');
   await page.waitForTimeout(350);
 
-  // Locked template — shoot drawer panel only
   const lockedCard = page.locator('.tpl-card').filter({ hasNotText: 'Editable' }).first();
   if (await lockedCard.count()) await lockedCard.click();
   else await page.locator('.tpl-card').first().click();
@@ -93,7 +113,6 @@ async function main() {
   await shotEl(page, '#tpl-drawer', '03-template-drawer-locked');
   await closeDrawer(page);
 
-  // Editable template drawer
   const editableCard = page.locator('.tpl-card').filter({ hasText: 'Editable' }).first();
   if (await editableCard.count()) {
     await editableCard.click();
@@ -101,7 +120,6 @@ async function main() {
     await page.waitForTimeout(400);
     await shotEl(page, '#tpl-drawer', '04-template-drawer-editable');
     await closeDrawer(page);
-    // Keep editable selected for remaining flow
     await editableCard.click();
     await page.waitForTimeout(250);
     await closeDrawer(page);
@@ -110,10 +128,11 @@ async function main() {
   await clickNext(page);
   await waitStep(page, 'Details');
   await page.waitForTimeout(300);
-  await shotPage(page, '05-details');
-
   await page.locator('#f-regen').click();
   await page.waitForTimeout(200);
+  await ensureDiskImage(page);
+  await shotPage(page, '05-details');
+
   await clickNext(page);
   await waitStep(page, 'Instance type');
   await page.waitForTimeout(300);
@@ -124,7 +143,6 @@ async function main() {
   await page.waitForTimeout(300);
   await shotPage(page, '07-storage');
 
-  // Inline Add disk → Disk set (Ethan's config-sets pattern; no modal)
   await page.locator('#f-add-disk').click();
   await page.waitForSelector('.inline-set[data-disk-set]', { timeout: 5000 });
   await page.waitForTimeout(350);
@@ -133,14 +151,37 @@ async function main() {
   await clickNext(page);
   await waitStep(page, 'Network');
   await page.waitForTimeout(300);
-  // Primary network fields + Additional networks (empty Add link)
   await shotPage(page, '09-network');
 
-  // Inline Add network → Network set
   await page.locator('#f-add-network').click();
   await page.waitForSelector('.inline-set[data-network-set]', { timeout: 5000 });
   await page.waitForTimeout(350);
   await shotPage(page, '09b-additional-network-set');
+
+  await clickNext(page);
+  await waitStep(page, 'Access & Initial run');
+  await page.waitForTimeout(350);
+  // Linux path: SSH + Cloud-init
+  await shotPage(page, '09c-access-linux');
+
+  // Switch to Windows Sysprep cards via Details guest OS
+  await page.locator('#wiz-nav button, .pf-v6-c-wizard__nav-link').filter({ hasText: /^Details$/ }).first().click();
+  await waitStep(page, 'Details');
+  await page.waitForTimeout(300);
+  await selectGuestOs(page, 'Microsoft Windows');
+  await ensureDiskImage(page);
+  await page.locator('#wiz-nav button, .pf-v6-c-wizard__nav-link').filter({ hasText: /Access/ }).first().click();
+  await waitStep(page, 'Access & Initial run');
+  await page.waitForTimeout(400);
+  await shotPage(page, '09d-access-windows-sysprep');
+
+  // Attach existing card selected
+  const attachCard = page.locator('input[name="sysprepMode"][value="attach"]').locator('xpath=ancestor::label[1]');
+  if (await attachCard.count()) {
+    await attachCard.click();
+    await page.waitForTimeout(350);
+    await shotPage(page, '09e-access-windows-attach');
+  }
 
   await clickNext(page);
   await waitStep(page, 'Review and create');
