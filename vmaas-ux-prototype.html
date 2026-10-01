@@ -3612,11 +3612,14 @@
     }
 
     .form-field { margin-bottom: 16px; max-width: 560px; }
-    /* Guest OS 3-up needs a wider field than default form controls. */
-    #vm-guest-os-field,
-    .form-field:has(.felt-select-boxes--guest-os),
-    .form-field[data-field="diskImage"] {
-      max-width: min(48rem, 100%);
+    /* Keep Create VM wizard fields one consistent width (no zigzag across steps). */
+    #overlay #wiz-panel .form-field,
+    #overlay #wiz-panel .felt-select-boxes {
+      max-width: 40rem;
+    }
+    #overlay #wiz-panel .felt-select-boxes.felt-select-boxes--guest-os {
+      max-width: 40rem;
+      width: 100%;
     }
     .form-field label {
       display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px;
@@ -4039,34 +4042,33 @@
     /* Guest OS: 3 fixed options — one row avoids an orphan Unspecified card. */
     .felt-select-boxes.felt-select-boxes--guest-os {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      max-width: none;
+      gap: 12px;
       width: 100%;
     }
     .felt-select-boxes--guest-os .felt-select-box {
-      padding: 16px 18px;
-      gap: 12px;
+      padding: 14px 14px;
+      gap: 10px;
       min-height: 0;
     }
     .felt-select-boxes--guest-os .felt-select-box:has(.felt-select-box__input:checked) {
-      padding: 15px 17px;
+      padding: 13px 13px;
     }
     /* Don't shift title/desc when Selected appears — always reserve badge gutter. */
     .felt-select-boxes--guest-os .felt-select-box__text {
-      padding-inline-end: 4.25rem;
+      padding-inline-end: 4rem;
     }
     .felt-select-boxes--guest-os .felt-select-box__title {
       white-space: nowrap;
     }
     .felt-select-boxes--guest-os .felt-select-box__badge {
-      top: 10px;
-      right: 12px;
-      padding: 2px 8px;
-      font-size: 12px;
+      top: 8px;
+      right: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
     }
     /* Helper/desc may wrap to multiple longer rows. */
     .felt-select-boxes--guest-os .felt-select-box__desc {
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.4;
       overflow-wrap: break-word;
       white-space: normal;
@@ -4078,11 +4080,6 @@
     @media (max-width: 900px) {
       .felt-select-boxes.felt-select-boxes--guest-os {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      #vm-guest-os-field,
-      .form-field:has(.felt-select-boxes--guest-os),
-      .form-field[data-field="diskImage"] {
-        max-width: min(40rem, 100%);
       }
     }
     @media (max-width: 640px) {
