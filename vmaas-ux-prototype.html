@@ -4084,6 +4084,52 @@
       margin-top: 8px;
       max-width: 40rem;
     }
+    /* Network type: 3 cards (Isolated / Shared / Provider), same pattern as Guest OS. */
+    .felt-select-boxes.felt-select-boxes--network-type {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    .felt-select-boxes.felt-select-boxes--network-type-single {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 20rem;
+      gap: 12px;
+      width: 100%;
+    }
+    .felt-select-boxes--network-type .felt-select-box,
+    .felt-select-boxes--network-type-single .felt-select-box {
+      padding: 14px 14px;
+      gap: 10px;
+      min-height: 0;
+    }
+    .felt-select-boxes--network-type .felt-select-box:has(.felt-select-box__input:checked),
+    .felt-select-boxes--network-type-single .felt-select-box:has(.felt-select-box__input:checked) {
+      padding: 13px 13px;
+    }
+    .felt-select-boxes--network-type .felt-select-box__text,
+    .felt-select-boxes--network-type-single .felt-select-box__text {
+      padding-inline-end: 4rem;
+    }
+    .felt-select-boxes--network-type .felt-select-box__desc,
+    .felt-select-boxes--network-type-single .felt-select-box__desc {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .felt-select-boxes--network-type .felt-select-box__badge,
+    .felt-select-boxes--network-type-single .felt-select-box__badge {
+      top: 8px;
+      right: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
+    }
+    @media (max-width: 900px) {
+      .felt-select-boxes.felt-select-boxes--network-type {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .felt-select-boxes.felt-select-boxes--network-type { grid-template-columns: 1fr; }
+    }
     /* Guest OS: 3 fixed options — one row avoids an orphan Unspecified card. */
     .felt-select-boxes.felt-select-boxes--guest-os {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6339,7 +6385,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 1 · osac-5009 7129</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · network-create 7130</span>
         </div>
       </div>
       <div class="console__body">
@@ -11419,6 +11465,40 @@
       });
     }
 
+    function renderNetworkTypeSelectBoxes({ name, selected, labelledBy, includeOrgTypes = true }) {
+      const options = [
+        {
+          value: 'isolated',
+          title: 'Isolated',
+          desc: 'Private network for workloads in a project',
+          iconClass: 'fa-solid fa-lock',
+        },
+      ];
+      if (includeOrgTypes) {
+        options.push(
+          {
+            value: 'shared',
+            title: 'Shared',
+            desc: 'Organization-scoped network usable across projects',
+            iconClass: 'fa-solid fa-share-nodes',
+          },
+          {
+            value: 'provider',
+            title: 'Provider',
+            desc: 'Provider-backed network for the platform',
+            iconClass: 'fa-solid fa-cloud',
+          },
+        );
+      }
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || options[0].value,
+        labelledBy,
+        extraClass: includeOrgTypes ? 'felt-select-boxes--network-type' : 'felt-select-boxes--network-type-single',
+        options,
+      });
+    }
+
     function renderReviewRows(rows) {
       return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
         <div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>`;
@@ -11554,19 +11634,41 @@
             </div></div></div>
           </div>`;
       } else {
+        const reviewRow = (label, value) => `
+          <div class="review-nebius__row">
+            <span class="review-nebius__label">${label}</span>
+            <span class="review-nebius__value">${value || '—'}</span>
+          </div>`;
         const labels = draft.labels.length ? draft.labels.map(escAttr).join(', ') : '—';
         panel.innerHTML = `
-          ${renderReviewRows([
-            ['Name', escAttr(draft.name)],
-            ['Description', escAttr(draft.description || '—')],
-            ['Scope', escAttr(providerScopeLabel(draft))],
-            ['Labels', labels],
-            ['vCPUs', escAttr(draft.cpu)],
-            ['Memory (GiB)', escAttr(draft.memoryGiB)],
-            ['GPU count', escAttr(draft.gpuCount || 0)],
-            ['Resource name', escAttr(draft.gpuResource || '—')],
-            ['PCI device selector', escAttr(draft.gpuPci || '—')],
-          ])}`;
+          <h3>Review and create</h3>
+          <p class="create-resource-wiz__help">Confirm instance type settings before create.</p>
+          <div class="review-nebius">
+            ${reviewNebiusSection('General', 'general', `
+              ${reviewRow('Name', escAttr(draft.name))}
+              ${reviewRow('Description', escAttr(draft.description || '—'))}
+              ${reviewRow('Scope', escAttr(providerScopeLabel(draft)))}
+              ${reviewRow('Labels', labels)}
+            `, 'it-review')}
+            ${reviewNebiusSection('Configuration', 'configuration', `
+              ${reviewRow('vCPUs', escAttr(draft.cpu))}
+              ${reviewRow('Memory (GiB)', escAttr(draft.memoryGiB))}
+              ${reviewRow('GPU count', escAttr(draft.gpuCount || 0))}
+              ${reviewRow('Resource name', escAttr(draft.gpuResource || '—'))}
+              ${reviewRow('PCI device selector', escAttr(draft.gpuPci || '—'))}
+            `, 'it-review')}
+          </div>`;
+        panel.querySelectorAll('[data-review-goto]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetKey = btn.dataset.reviewGoto;
+            const idx = PROVIDER_CREATE_STEPS.findIndex(s => s.key === targetKey);
+            if (idx < 0) return;
+            draft.step = idx;
+            draft.maxVisited = Math.max(draft.maxVisited, idx);
+            draft.fieldErrors = {};
+            renderCreateInstanceTypeWizard();
+          });
+        });
       }
     }
 
@@ -11740,18 +11842,40 @@
             </div>`}
           </div>`;
       } else {
+        const reviewRow = (label, value) => `
+          <div class="review-nebius__row">
+            <span class="review-nebius__label">${label}</span>
+            <span class="review-nebius__value">${value || '—'}</span>
+          </div>`;
         const labels = draft.labels.length ? draft.labels.map(escAttr).join(', ') : '—';
         const arch = draft.architectures.length ? draft.architectures.map(escAttr).join(', ') : '—';
         panel.innerHTML = `
-          ${renderReviewRows([
-            ['Name', escAttr(draft.name)],
-            ['Description', escAttr(draft.description || '—')],
-            ['Scope', escAttr(providerScopeLabel(draft))],
-            ['Labels', labels],
-            ['Image', escAttr(draft.image)],
-            ['Guest operating system', escAttr(draft.guestOsFamily)],
-            ['Architecture', arch],
-          ])}`;
+          <h3>Review and create</h3>
+          <p class="create-resource-wiz__help">Confirm disk image settings before create.</p>
+          <div class="review-nebius">
+            ${reviewNebiusSection('General', 'general', `
+              ${reviewRow('Name', escAttr(draft.name))}
+              ${reviewRow('Description', escAttr(draft.description || '—'))}
+              ${reviewRow('Scope', escAttr(providerScopeLabel(draft)))}
+              ${reviewRow('Labels', labels)}
+            `, 'di-review')}
+            ${reviewNebiusSection('Configuration', 'configuration', `
+              ${reviewRow('Image', escAttr(draft.image))}
+              ${reviewRow('Guest operating system', escAttr(draft.guestOsFamily))}
+              ${reviewRow('Architecture', arch)}
+            `, 'di-review')}
+          </div>`;
+        panel.querySelectorAll('[data-review-goto]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetKey = btn.dataset.reviewGoto;
+            const idx = PROVIDER_CREATE_STEPS.findIndex(s => s.key === targetKey);
+            if (idx < 0) return;
+            draft.step = idx;
+            draft.maxVisited = Math.max(draft.maxVisited, idx);
+            draft.fieldErrors = {};
+            renderCreateDiskImageWizard();
+          });
+        });
       }
     }
 
@@ -14855,58 +14979,91 @@
     function renderNetworkWizardPanel(panel, key) {
       const n = state.netData;
       const role = ROLES[document.getElementById('role-select').value];
+      const includeOrgTypes = !!role.canCreateOrgNetwork;
       if (key === 'net-type') {
-        const cards = [
-          methodCard('isolated', 'Isolated',
-            'Private network for workloads in a project. Maps to VCD vApp / isolated networks.',
-            'fa-lock', n.type === 'isolated'),
-        ];
-        if (role.canCreateOrgNetwork) {
-          cards.push(methodCard('shared', 'Shared',
-            'Organization-scoped network usable across projects in the tenant.',
-            'fa-share-nodes', n.type === 'shared'));
-          cards.push(methodCard('provider', 'Provider',
-            'Provider-backed network. May be read-only or provisioned by the platform.',
-            'fa-cloud', n.type === 'provider'));
-        }
+        if (!includeOrgTypes && n.type !== 'isolated') n.type = 'isolated';
         panel.innerHTML = `
-          <h3>Type</h3>
-          <p class="step-help">Choose the network type. Tenant Admins can create Isolated, Shared, and Provider networks.</p>
-          <div class="method-grid">${cards.join('')}</div>
+          <h3 id="net-type-label">Type</h3>
+          <p class="step-help">${includeOrgTypes
+            ? 'Choose the network type. Tenant Admins can create Isolated, Shared, and Provider networks.'
+            : 'Choose the network type for this project.'}</p>
+          ${renderNetworkTypeSelectBoxes({
+            name: 'netType',
+            selected: n.type || 'isolated',
+            labelledBy: 'net-type-label',
+            includeOrgTypes,
+          })}
         `;
-        panel.querySelectorAll('[data-method]').forEach(b => {
-          b.onclick = () => { n.type = b.dataset.method; renderWizard(); };
+        panel.querySelectorAll('input[name="netType"]').forEach(r => {
+          r.addEventListener('change', () => {
+            n.type = r.value;
+            renderWizard();
+          });
         });
         return;
       }
       if (key === 'net-basics') {
+        if (n.netProjectMenuOpen == null) n.netProjectMenuOpen = false;
+        if (n.netProjectFilter == null) n.netProjectFilter = '';
+        const currentProject = n.project || 'project-a';
+        const projectOpts = PROJECTS.includes(currentProject)
+          ? PROJECTS
+          : [currentProject, ...PROJECTS];
         panel.innerHTML = `
           <h3>Basics</h3>
           <p class="step-help">Name and locate the network. It will appear in Create virtual machine → Network for NIC attach.</p>
           <div class="form-field">
-            <label>Name <span class="req">*</span></label>
-            <input type="text" id="f-net-name" value="${n.name}" placeholder="e.g. app-tier" />
+            <label for="f-net-name">Name <span class="req">*</span></label>
+            <input type="text" id="f-net-name" value="${String(n.name || '').replace(/"/g, '&quot;')}" placeholder="e.g. app-tier" />
           </div>
           <div class="form-field">
-            <label>Description</label>
-            <textarea id="f-net-desc" rows="2">${n.description || ''}</textarea>
+            <label for="f-net-desc">Description</label>
+            <textarea id="f-net-desc" rows="2">${String(n.description || '').replace(/</g, '&lt;')}</textarea>
           </div>
           <div class="form-field">
-            <label for="f-net-project">Project <span class="req">*</span></label>
-            ${pfCreatableSearch({
-              id: 'f-net-project',
-              placeholder: 'Search project',
-              value: n.project || 'project-a',
-              ariaLabel: 'Search project',
+            <label id="f-net-project-label">Project <span class="req">*</span></label>
+            ${renderTypeaheadRichSelectHtml({
+              rootId: 'net-project-select',
+              toggleId: 'f-net-project-toggle',
+              menuId: 'net-project-menu',
+              searchId: 'net-project-search',
+              labelId: 'f-net-project-label',
+              open: !!n.netProjectMenuOpen,
+              filter: n.netProjectFilter || '',
+              searchPlaceholder: 'Search projects',
+              selectedId: currentProject,
+              placeholder: 'Select a project',
+              optionAttr: 'data-net-project',
+              hiddenInputId: 'f-net-project',
+              emptyNoun: 'projects',
+              options: projectOpts.map(p => ({ id: p, title: p })),
             })}
           </div>
         `;
-        wireCreatableSearch({
-          id: 'f-net-project',
-          options: PROJECTS,
-          noun: 'project',
-          onChange: value => { n.project = value || 'project-a'; },
+        wireTypeaheadRichSelect(panel, {
+          rootId: 'net-project-select',
+          toggleId: 'f-net-project-toggle',
+          menuId: 'net-project-menu',
+          searchId: 'net-project-search',
+          optionSel: '[data-net-project]',
+          getOptionId: opt => opt.dataset.netProject,
+          setOpen: (open) => {
+            readFields();
+            n.netProjectMenuOpen = open;
+          },
+          setFilter: (v) => {
+            readFields();
+            n.netProjectFilter = v;
+          },
+          onSelectId: (value) => {
+            readFields();
+            n.project = value || 'project-a';
+            n.netProjectMenuOpen = false;
+            n.netProjectFilter = '';
+            renderWizard();
+          },
         });
+        restoreRichSearchFocus(panel);
         return;
       }
       if (key === 'net-addressing') {
@@ -14914,16 +15071,16 @@
           <h3>Addressing</h3>
           <p class="step-help">Define the subnet and optional gateway / DNS. DHCP can assign addresses to attached VMs.</p>
           <div class="form-field">
-            <label>CIDR / subnet <span class="req">*</span></label>
-            <input type="text" id="f-net-cidr" value="${n.cidr}" placeholder="192.168.20.0/24" />
+            <label for="f-net-cidr">CIDR / subnet <span class="req">*</span></label>
+            <input type="text" id="f-net-cidr" value="${String(n.cidr || '').replace(/"/g, '&quot;')}" placeholder="192.168.20.0/24" />
           </div>
           <div class="form-field">
-            <label>Gateway (optional)</label>
-            <input type="text" id="f-net-gateway" value="${n.gateway || ''}" placeholder="192.168.20.1" />
+            <label for="f-net-gateway">Gateway (optional)</label>
+            <input type="text" id="f-net-gateway" value="${String(n.gateway || '').replace(/"/g, '&quot;')}" placeholder="192.168.20.1" />
           </div>
           <div class="form-field">
-            <label>DNS (optional)</label>
-            <input type="text" id="f-net-dns" value="${n.dns || ''}" placeholder="1.1.1.1" />
+            <label for="f-net-dns">DNS (optional)</label>
+            <input type="text" id="f-net-dns" value="${String(n.dns || '').replace(/"/g, '&quot;')}" placeholder="1.1.1.1" />
           </div>
           <label class="form-check">
             <input type="checkbox" id="f-net-dhcp" ${n.dhcp ? 'checked' : ''} />
@@ -14932,24 +15089,43 @@
         `;
         return;
       }
+      const reviewRow = (label, value) => `
+        <div class="review-nebius__row">
+          <span class="review-nebius__label">${label}</span>
+          <span class="review-nebius__value">${value || '—'}</span>
+        </div>`;
       panel.innerHTML = `
         <h3>Review and create</h3>
         <p class="step-help">Confirm network settings before create.</p>
-        <div class="review-block">
-          <details class="review-section" open>
-            <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Network</summary>
-            <dl class="review-dl">
-              <dt>Name</dt><dd>${n.name || '—'}</dd>
-              <dt>Type</dt><dd>${typeLabel(n.type)}</dd>
-              <dt>Project</dt><dd>${n.project}</dd>
-              <dt>CIDR</dt><dd>${n.cidr || '—'}</dd>
-              <dt>Gateway</dt><dd>${n.gateway || '—'}</dd>
-              <dt>DNS</dt><dd>${n.dns || '—'}</dd>
-              <dt>DHCP</dt><dd>${n.dhcp ? 'Enabled' : 'Disabled'}</dd>
-            </dl>
-          </details>
+        <div class="review-nebius">
+          ${reviewNebiusSection('Type', 'net-type', `
+            ${reviewRow('Network type', typeLabel(n.type))}
+          `, 'net-review')}
+          ${reviewNebiusSection('Basics', 'net-basics', `
+            ${reviewRow('Name', String(n.name || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('Description', String(n.description || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('Project', String(n.project || '—').replace(/</g, '&lt;'))}
+          `, 'net-review')}
+          ${reviewNebiusSection('Addressing', 'net-addressing', `
+            ${reviewRow('CIDR / subnet', String(n.cidr || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('Gateway', String(n.gateway || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('DNS', String(n.dns || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('DHCP', n.dhcp ? 'Enabled' : 'Disabled')}
+          `, 'net-review')}
         </div>
       `;
+      panel.querySelectorAll('[data-review-goto]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetKey = btn.dataset.reviewGoto;
+          const steps = stepsForType();
+          const idx = steps.findIndex(s => s.key === targetKey);
+          if (idx < 0) return;
+          readFields();
+          state.step = idx;
+          state.maxVisited = Math.max(state.maxVisited, idx);
+          renderWizard();
+        });
+      });
     }
 
     function syncStartCheckbox(key) {
