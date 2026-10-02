@@ -694,7 +694,8 @@
     #create-ci-panel .felt-select-boxes,
     #create-it-panel .name-row,
     #create-it-panel .tenant-typeahead,
-    #create-it-panel .label-chip-input {
+    #create-it-panel .label-chip-input,
+    #create-it-panel .felt-select-boxes {
       max-width: none;
       width: 100%;
       box-sizing: border-box;
@@ -4130,6 +4131,72 @@
     @media (max-width: 640px) {
       .felt-select-boxes.felt-select-boxes--network-type { grid-template-columns: 1fr; }
     }
+    /* Create method: Custom / Template / Clone — same felt pattern as Network type. */
+    .felt-select-boxes.felt-select-boxes--create-method {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    .felt-select-boxes--create-method .felt-select-box {
+      padding: 14px 14px;
+      gap: 10px;
+      min-height: 0;
+    }
+    .felt-select-boxes--create-method .felt-select-box:has(.felt-select-box__input:checked) {
+      padding: 13px 13px;
+    }
+    .felt-select-boxes--create-method .felt-select-box__text {
+      padding-inline-end: 4rem;
+    }
+    .felt-select-boxes--create-method .felt-select-box__desc {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .felt-select-boxes--create-method .felt-select-box__badge {
+      top: 8px;
+      right: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
+    }
+    @media (max-width: 900px) {
+      .felt-select-boxes.felt-select-boxes--create-method {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .felt-select-boxes.felt-select-boxes--create-method { grid-template-columns: 1fr; }
+    }
+    /* Provider IT/DI scope: Global / Tenant scoped — same felt pattern as Catalog Visibility. */
+    .felt-select-boxes.felt-select-boxes--scope {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 28rem;
+    }
+    .felt-select-boxes--scope .felt-select-box {
+      padding: 14px 14px;
+      gap: 10px;
+      min-height: 0;
+    }
+    .felt-select-boxes--scope .felt-select-box:has(.felt-select-box__input:checked) {
+      padding: 13px 13px;
+    }
+    .felt-select-boxes--scope .felt-select-box__text {
+      padding-inline-end: 4rem;
+    }
+    .felt-select-boxes--scope .felt-select-box__desc {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .felt-select-boxes--scope .felt-select-box__badge {
+      top: 8px;
+      right: 10px;
+      padding: 1px 7px;
+      font-size: 11px;
+    }
+    @media (max-width: 560px) {
+      .felt-select-boxes.felt-select-boxes--scope { grid-template-columns: 1fr; }
+    }
     /* Guest OS: 3 fixed options — one row avoids an orphan Unspecified card. */
     .felt-select-boxes.felt-select-boxes--guest-os {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6389,7 +6456,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · wizard-align 7131</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · felt-align 7132</span>
         </div>
       </div>
       <div class="console__body">
@@ -6677,12 +6744,12 @@
 
             <div id="vm-table-area">
               <div style="overflow-x:auto;" id="vm-table-scroll">
-                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                  <thead class="pf-v6-c-table__thead">
-                    <tr class="pf-v6-c-table__tr" id="vm-thead-row"></tr>
-                  </thead>
-                  <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
-                </table>
+              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr" id="vm-thead-row"></tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody" id="vm-tbody"></tbody>
+              </table>
               </div>
               <div class="vm-cards" id="vm-cards-gallery" hidden role="list" aria-label="Virtual machines"></div>
             </div>
@@ -6711,20 +6778,20 @@
             </div>
             <div id="net-table-area">
               <div style="overflow-x:auto;" id="net-table-scroll">
-                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                  <thead class="pf-v6-c-table__thead">
-                    <tr class="pf-v6-c-table__tr">
-                      <th class="pf-v6-c-table__th" scope="col">Name</th>
-                      <th class="pf-v6-c-table__th" scope="col">Type</th>
-                      <th class="pf-v6-c-table__th" scope="col">Project</th>
-                      <th class="pf-v6-c-table__th" scope="col">CIDR</th>
-                      <th class="pf-v6-c-table__th" scope="col">Status</th>
-                      <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
-                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                    </tr>
-                  </thead>
-                  <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
-                </table>
+              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr">
+                    <th class="pf-v6-c-table__th" scope="col">Name</th>
+                    <th class="pf-v6-c-table__th" scope="col">Type</th>
+                    <th class="pf-v6-c-table__th" scope="col">Project</th>
+                    <th class="pf-v6-c-table__th" scope="col">CIDR</th>
+                    <th class="pf-v6-c-table__th" scope="col">Status</th>
+                    <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
+                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
+              </table>
               </div>
             </div>
           </section>
@@ -6750,7 +6817,7 @@
               <div class="page-header__text">
                 <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Catalog</h2>
                 <p class="page-desc" id="catalog-page-desc">Create catalog items from master templates, and then attach them to tenants.</p>
-              </div>
+            </div>
               <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-catalog-item" hidden>
                 <span class="pf-v6-c-button__icon"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
                 <span class="pf-v6-c-button__text">Create catalog item</span>
@@ -6846,20 +6913,20 @@
             </div>
             <div id="disk-images-table-area">
               <div style="overflow-x:auto;" id="disk-images-table-scroll">
-                <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
-                  <thead class="pf-v6-c-table__thead">
-                    <tr class="pf-v6-c-table__tr">
-                      <th class="pf-v6-c-table__th" scope="col">Name</th>
-                      <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
+              <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
+                <thead class="pf-v6-c-table__thead">
+                  <tr class="pf-v6-c-table__tr">
+                    <th class="pf-v6-c-table__th" scope="col">Name</th>
+                    <th class="pf-v6-c-table__th" scope="col">Lifecycle</th>
                       <th class="pf-v6-c-table__th" scope="col">Guest operating system</th>
-                      <th class="pf-v6-c-table__th" scope="col">Architecture</th>
+                    <th class="pf-v6-c-table__th" scope="col">Architecture</th>
                       <th class="pf-v6-c-table__th" scope="col">Visibility</th>
-                      <th class="pf-v6-c-table__th" scope="col">Created</th>
-                      <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
-                    </tr>
-                  </thead>
-                  <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
-                </table>
+                    <th class="pf-v6-c-table__th" scope="col">Created</th>
+                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody class="pf-v6-c-table__tbody" id="disk-images-tbody"></tbody>
+              </table>
               </div>
             </div>
           </section>
@@ -6894,9 +6961,9 @@
                     <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-di-back" disabled>Back</button>
                     <button type="button" class="pf-v6-c-button pf-m-primary" id="create-di-next">Next</button>
                     <button type="button" class="pf-v6-c-button pf-m-link" id="create-di-cancel">Cancel</button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
             </div>
           </section>
 
@@ -6926,10 +6993,10 @@
                     <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-it-back" disabled>Back</button>
                     <button type="button" class="pf-v6-c-button pf-m-primary" id="create-it-next">Next</button>
                     <button type="button" class="pf-v6-c-button pf-m-link" id="create-it-cancel">Cancel</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
           </section>
 
           <section class="view" id="view-create-catalog-item">
@@ -6958,9 +7025,9 @@
                     <button type="button" class="pf-v6-c-button pf-m-secondary" id="create-ci-back" disabled>Back</button>
                     <button type="button" class="pf-v6-c-button pf-m-primary" id="create-ci-next">Next</button>
                     <button type="button" class="pf-v6-c-button pf-m-link" id="create-ci-cancel">Cancel</button>
-                  </div>
                 </div>
-              </div>
+                </div>
+                </div>
             </div>
           </section>
 
@@ -7975,8 +8042,8 @@
       const vmComputeOptions = filteredVmComputeResources(m.filter, { requireGpu });
       const descEl = document.getElementById('compute-modal-desc');
       if (descEl) descEl.textContent = editComputeModalDescription(requireGpu);
-      body.innerHTML = `
-        <div class="form-field">
+        body.innerHTML = `
+          <div class="form-field">
           <label id="f-edit-compute-resource-label">Instance type <span class="req">*</span></label>
           <div class="rich-select rich-select--typeahead ${m.menuOpen ? 'pf-m-expanded' : ''}" id="edit-compute-select">
             ${pfRichSelectToggle({
@@ -8017,8 +8084,8 @@
             </div>
             <input type="hidden" id="f-edit-compute-resource" value="${richSelectEsc(m.selectedId)}" />
           </div>
-        </div>
-      `;
+          </div>
+        `;
 
       wireModalTypeaheadRichSelect(body, fid => renderEditComputeModal(fid), {
         toggleId: 'edit-compute-toggle',
@@ -10977,14 +11044,16 @@
         </ul>` : '';
       return `
         <div class="form-field">
-          <label class="form-check" for="${prefix}-global">
-            <input type="checkbox" id="${prefix}-global" ${draft.isGlobal ? 'checked' : ''} />
-            Make this resource global
-          </label>
+          <label id="${prefix}-scope-label">Scope <span class="req">*</span></label>
+          ${renderScopeSelectBoxes({
+            name: `${prefix}Scope`,
+            selected: draft.isGlobal ? 'global' : 'tenant',
+            labelledBy: `${prefix}-scope-label`,
+          })}
           <div class="pf-v6-c-form__helper-text">
             <div class="pf-v6-c-helper-text">
               <div class="pf-v6-c-helper-text__item">
-                <span class="pf-v6-c-helper-text__item-text">When unchecked, assign this resource to a tenant. Global resources are available to all tenants.</span>
+                <span class="pf-v6-c-helper-text__item-text">Global resources are available to all tenants. Tenant-scoped resources must be assigned to one tenant.</span>
               </div>
             </div>
           </div>
@@ -11018,15 +11087,17 @@
         if (typeof syncGeneralFields === 'function') syncGeneralFields(prefix, draft);
         rerender();
       };
-      document.getElementById(`${prefix}-global`)?.addEventListener('change', e => {
-        draft.isGlobal = !!e.target.checked;
-        if (draft.isGlobal) {
-          draft.tenantId = '';
-          draft.tenantFilter = '';
-          draft.tenantMenuOpen = false;
-        }
-        if (draft.fieldErrors) delete draft.fieldErrors.tenant;
-        refresh();
+      document.querySelectorAll(`input[name="${prefix}Scope"]`).forEach(r => {
+        r.addEventListener('change', () => {
+          draft.isGlobal = r.value === 'global';
+          if (draft.isGlobal) {
+            draft.tenantId = '';
+            draft.tenantFilter = '';
+            draft.tenantMenuOpen = false;
+          }
+          if (draft.fieldErrors) delete draft.fieldErrors.tenant;
+          refresh();
+        });
       });
 
       const openMenu = (clearFilter = false) => {
@@ -11177,8 +11248,8 @@
       draft.name = (document.getElementById(`${prefix}-name`)?.value || '').trim();
       draft.description = (document.getElementById(`${prefix}-description`)?.value || '').trim();
       draft.labelDraft = document.getElementById(`${prefix}-label-input`)?.value || draft.labelDraft || '';
-      const globalEl = document.getElementById(`${prefix}-global`);
-      if (globalEl) draft.isGlobal = !!globalEl.checked;
+      const globalEl = document.querySelector(`input[name="${prefix}Scope"]:checked`);
+      if (globalEl) draft.isGlobal = globalEl.value === 'global';
     }
 
     function validateGeneralStep(draft, existingNames) {
@@ -11189,7 +11260,7 @@
         errors.name = `${draft.name} already exists.`;
       }
       if (!draft.isGlobal && !draft.tenantId) {
-        errors.tenant = 'Select a tenant, or make this resource global.';
+        errors.tenant = 'Select a tenant, or choose Global scope.';
       }
       draft.fieldErrors = errors;
       return Object.keys(errors).length === 0;
@@ -11466,6 +11537,60 @@
             desc: 'Visible only to selected tenants',
             iconClass: 'fa-solid fa-building',
             iconMod: 'tenant',
+          },
+        ],
+      });
+    }
+
+    function renderScopeSelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'tenant',
+        labelledBy,
+        extraClass: 'felt-select-boxes--scope',
+        options: [
+          {
+            value: 'global',
+            title: 'Global',
+            desc: 'Available to all tenants on the platform',
+            iconClass: 'fa-solid fa-globe',
+            iconMod: 'global',
+          },
+          {
+            value: 'tenant',
+            title: 'Tenant scoped',
+            desc: 'Assigned to one tenant',
+            iconClass: 'fa-solid fa-building',
+            iconMod: 'tenant',
+          },
+        ],
+      });
+    }
+
+    function renderCreateMethodSelectBoxes({ name, selected, labelledBy }) {
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'custom',
+        labelledBy,
+        extraClass: 'felt-select-boxes--create-method',
+        options: [
+          {
+            value: 'custom',
+            title: 'Custom configuration',
+            desc: 'Select an operating system and the right performance for your workload',
+            iconClass: 'fa-solid fa-circle-plus',
+          },
+          {
+            value: 'template',
+            title: 'Create from template',
+            desc: 'Use a pre-configured template with standardized images and defaults',
+            iconClass: 'fa-solid fa-layer-group',
+          },
+          {
+            value: 'clone',
+            title: 'Clone existing virtual machine',
+            desc: 'Create a copy of an existing virtual machine',
+            iconClass: 'fa-solid fa-copy',
           },
         ],
       });
@@ -12436,7 +12561,7 @@
                   </span>
                 </button>
               `).join('') || emptyStateMenuSearchHtml('options')}
-            </div>
+      </div>
           </div>
           <input type="hidden" id="${rootId}-value" value="${richSelectEsc(selectedId || '')}" />
         </div>
@@ -13136,15 +13261,15 @@
           setFilter: v => { m.vnFilter = v; },
           onSelectId: value => {
             m.virtualNetwork = value;
-            m.subnet = '';
-            m.securityGroups = [];
+        m.subnet = '';
+        m.securityGroups = [];
             m.vnMenuOpen = false;
             m.vnFilter = '';
             m.subnetMenuOpen = false;
             m.subnetFilter = '';
-            const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
-            if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
-            if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+        const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+        if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
+        if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
             refresh('net-vn-toggle');
           },
         });
@@ -13166,10 +13291,10 @@
           setFilter: v => { m.subnetFilter = v; },
           onSelectId: value => {
             m.subnet = value;
-            if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+        if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
             m.subnetMenuOpen = false;
             m.subnetFilter = '';
-            m.sgMenuOpen = false;
+        m.sgMenuOpen = false;
             refresh('net-subnet-toggle');
           },
         });
@@ -13623,9 +13748,9 @@
       document.addEventListener('mousedown', e => {
         if (!state.diskModal?.tierOpen) return;
         if (e.target.closest('#disk-tier-select')) return;
-        state.diskModal.tierOpen = false;
-        state.diskModal.tierFilter = '';
-        renderAddDiskModal();
+          state.diskModal.tierOpen = false;
+          state.diskModal.tierFilter = '';
+          renderAddDiskModal();
       }, { signal: ac.signal });
 
       document.getElementById('disk-modal-save')?.addEventListener('click', saveAddDiskModal);
@@ -13952,102 +14077,102 @@
       if (v.status !== 'running') {
         return '<div class="util-empty" role="status">Virtual machine is not running</div>';
       }
-      return `
-        <div class="util-grid">
-          <div class="util-tile">
+              return `
+                  <div class="util-grid">
+                    <div class="util-tile">
             <div class="util-tile__label">vCPUs</div>
             <div class="util-tile__abs">${u.cpuAbs || '—'}</div>
             <div class="util-tile__abs-sub">Requested of ${u.cpuOf || '1'}</div>
-            <div class="util-donut-wrap">
+                      <div class="util-donut-wrap">
               <div class="util-donut" style="--pct:${Math.min(cpuPct, 100)}" role="img" aria-label="${cpuPct}% vCPU used">
-                <svg viewBox="0 0 100 100" aria-hidden="true">
-                  <circle class="util-donut__track" cx="50" cy="50" r="40" />
-                  <circle class="util-donut__arc" cx="50" cy="50" r="40" />
-                </svg>
-                <span class="util-donut__center">${cpuPct}% Used</span>
-              </div>
-            </div>
-            <div class="util-spark" aria-hidden="true">
+                          <svg viewBox="0 0 100 100" aria-hidden="true">
+                            <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                            <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                          </svg>
+                          <span class="util-donut__center">${cpuPct}% Used</span>
+                        </div>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
               <div class="util-spark__y"><span>${Number(u.cpuOf || 1) * 1000}.00</span><span>0.00</span></div>
-              <div class="util-spark__plot">
-                <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                  <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,35 40,34 60,35 80,34 100,35 120,34" />
-                  <line x1="0" y1="6" x2="120" y2="6" stroke="#ec7a08" stroke-width="1" stroke-dasharray="3 3" opacity="0.75" />
-                </svg>
-              </div>
-              <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
-            </div>
-          </div>
-          <div class="util-tile">
-            <div class="util-tile__label">Memory</div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,35 40,34 60,35 80,34 100,35 120,34" />
+                            <line x1="0" y1="6" x2="120" y2="6" stroke="#ec7a08" stroke-width="1" stroke-dasharray="3 3" opacity="0.75" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                    <div class="util-tile">
+                      <div class="util-tile__label">Memory</div>
             <div class="util-tile__abs">${u.memAbs || '—'}</div>
             <div class="util-tile__abs-sub">Used of ${u.memOf || '—'}</div>
-            <div class="util-donut-wrap">
-              <div class="util-donut" style="--pct:${Math.min(memPct, 100)}" role="img" aria-label="${memPct}% memory used">
-                <svg viewBox="0 0 100 100" aria-hidden="true">
-                  <circle class="util-donut__track" cx="50" cy="50" r="40" />
-                  <circle class="util-donut__arc" cx="50" cy="50" r="40" />
-                </svg>
-                <span class="util-donut__center">${memPct}% Used</span>
-              </div>
-            </div>
-            <div class="util-spark" aria-hidden="true">
+                      <div class="util-donut-wrap">
+                        <div class="util-donut" style="--pct:${Math.min(memPct, 100)}" role="img" aria-label="${memPct}% memory used">
+                          <svg viewBox="0 0 100 100" aria-hidden="true">
+                            <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                            <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                          </svg>
+                          <span class="util-donut__center">${memPct}% Used</span>
+                        </div>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
               <div class="util-spark__y"><span>${u.memOf || '—'}</span><span>0.00 B</span></div>
-              <div class="util-spark__plot">
-                <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                  <polyline fill="rgba(0,102,204,0.12)" stroke="none" points="0,40 0,28 20,27 40,28 60,27 80,28 100,27 120,28 120,40" />
-                  <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,28 20,27 40,28 60,27 80,28 100,27 120,28" />
-                  <line x1="0" y1="4" x2="120" y2="4" stroke="#ec7a08" stroke-width="1" stroke-dasharray="3 3" opacity="0.75" />
-                </svg>
-              </div>
-              <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
-            </div>
-          </div>
-          <div class="util-tile">
-            <div class="util-tile__label">Storage</div>
-            ${storHasData ? `
-              <div class="util-tile__abs">${u.storAbs || '—'}</div>
-              <div class="util-tile__abs-sub">Used of ${u.storOf || '—'}</div>
-              <div class="util-donut-wrap">
-                <div class="util-donut" style="--pct:${Math.min(storPct, 100)}" role="img" aria-label="${storPct}% storage used">
-                  <svg viewBox="0 0 100 100" aria-hidden="true">
-                    <circle class="util-donut__track" cx="50" cy="50" r="40" />
-                    <circle class="util-donut__arc" cx="50" cy="50" r="40" />
-                  </svg>
-                  <span class="util-donut__center">${storPct}% Used</span>
-                </div>
-              </div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="rgba(0,102,204,0.12)" stroke="none" points="0,40 0,28 20,27 40,28 60,27 80,28 100,27 120,28 120,40" />
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,28 20,27 40,28 60,27 80,28 100,27 120,28" />
+                            <line x1="0" y1="4" x2="120" y2="4" stroke="#ec7a08" stroke-width="1" stroke-dasharray="3 3" opacity="0.75" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                    <div class="util-tile">
+                      <div class="util-tile__label">Storage</div>
+                      ${storHasData ? `
+                        <div class="util-tile__abs">${u.storAbs || '—'}</div>
+                        <div class="util-tile__abs-sub">Used of ${u.storOf || '—'}</div>
+                        <div class="util-donut-wrap">
+                          <div class="util-donut" style="--pct:${Math.min(storPct, 100)}" role="img" aria-label="${storPct}% storage used">
+                            <svg viewBox="0 0 100 100" aria-hidden="true">
+                              <circle class="util-donut__track" cx="50" cy="50" r="40" />
+                              <circle class="util-donut__arc" cx="50" cy="50" r="40" />
+                            </svg>
+                            <span class="util-donut__center">${storPct}% Used</span>
+                          </div>
+                        </div>
             ` : '<div class="util-tile__nodata">No data available</div>'}
-            <div class="util-spark" aria-hidden="true">
-              <div class="util-spark__y"><span>${storHasData ? (u.storOf || '—') : '—'}</span><span>0 B</span></div>
-              <div class="util-spark__plot">
-                <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                  <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,36 40,36 60,36 80,36 100,36 120,36" />
-                </svg>
-              </div>
-              <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
-            </div>
-          </div>
-          <div class="util-tile util-tile--net">
-            <div class="util-tile__label">Network transfer</div>
-            <div class="util-tile__abs">${u.network || '0 Bps'}</div>
-            <div class="util-tile__abs-sub">Total</div>
-            <div class="util-net-body">
-              <div class="util-net-row"><span>${u.netIn || '0 Bs'}</span><span>In</span></div>
-              <div class="util-net-row"><span>${u.netOut || '0 Bs'}</span><span>Out</span></div>
-              <button type="button" class="name-link util-tile__breakdown">Breakdown by network</button>
-            </div>
-            <div class="util-spark" aria-hidden="true">
-              <div class="util-spark__y"><span>&nbsp;</span><span>&nbsp;</span></div>
-              <div class="util-spark__plot">
-                <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                  <polyline fill="rgba(0,102,204,0.15)" stroke="none" points="0,40 0,18 24,18 24,22 48,22 48,28 72,28 72,34 96,34 96,36 120,36 120,40" />
-                  <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,18 24,18 24,22 48,22 48,28 72,28 72,34 96,34 96,36 120,36" />
-                </svg>
-              </div>
-              <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
-            </div>
-          </div>
+                      <div class="util-spark" aria-hidden="true">
+                        <div class="util-spark__y"><span>${storHasData ? (u.storOf || '—') : '—'}</span><span>0 B</span></div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,36 20,36 40,36 60,36 80,36 100,36 120,36" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
+                    <div class="util-tile util-tile--net">
+                      <div class="util-tile__label">Network transfer</div>
+                      <div class="util-tile__abs">${u.network || '0 Bps'}</div>
+                      <div class="util-tile__abs-sub">Total</div>
+                      <div class="util-net-body">
+                        <div class="util-net-row"><span>${u.netIn || '0 Bs'}</span><span>In</span></div>
+                        <div class="util-net-row"><span>${u.netOut || '0 Bs'}</span><span>Out</span></div>
+                        <button type="button" class="name-link util-tile__breakdown">Breakdown by network</button>
+                      </div>
+                      <div class="util-spark" aria-hidden="true">
+                        <div class="util-spark__y"><span>&nbsp;</span><span>&nbsp;</span></div>
+                        <div class="util-spark__plot">
+                          <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                            <polyline fill="rgba(0,102,204,0.15)" stroke="none" points="0,40 0,18 24,18 24,22 48,22 48,28 72,28 72,34 96,34 96,36 120,36 120,40" />
+                            <polyline fill="none" stroke="#0066cc" stroke-width="1.5" points="0,18 24,18 24,22 48,22 48,28 72,28 72,34 96,34 96,36 120,36" />
+                          </svg>
+                        </div>
+                        <div class="util-spark__x"><span>5:36 PM</span><span>5:41 PM</span></div>
+                      </div>
+                    </div>
         </div>`;
     }
 
@@ -14169,14 +14294,14 @@
               <div>
                 <h2 class="ethan-detail-header__title pf-v6-c-title pf-m-2xl pf-m-page-title">${v.name}</h2>
                 <p class="ethan-detail-header__subtitle">Review configuration, networking, storage, and utilization for this virtual machine.</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
           <div class="ethan-detail-header__actions" role="group" aria-label="Virtual machine actions">
             <button type="button" class="pf-v6-c-button pf-m-primary" id="vm-open-console">
               <span class="pf-v6-c-button__icon"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
               <span class="pf-v6-c-button__text">Open console</span>
-            </button>
+                        </button>
             <span class="ethan-detail-header__actions-divider" aria-hidden="true"></span>
             <button type="button" class="pf-v6-c-button pf-m-secondary" data-vm-action="start" ${canStart ? '' : `disabled title="${startTip}"`}>
               <span class="pf-v6-c-button__text">Start</span>
@@ -14200,8 +14325,8 @@
                 </span>
               </span>
             </button>
-          </div>
-        </div>
+                  </div>
+                </div>
       `;
 
       const body = `
@@ -14238,8 +14363,8 @@
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
               <div class="vm-overview-v2__section-head">
                 <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
-                <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net"${addDisabledAttrs}>Add network</button>
-              </div>
+                    <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net"${addDisabledAttrs}>Add network</button>
+                  </div>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--network" aria-label="Networks">
                   <colgroup>
@@ -14253,11 +14378,11 @@
                       <th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    ${nics.map(n => {
-                      const detail = normalizeNic(n);
-                      const menuKey = `nic:${detail.name}`;
-                      const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                    <tbody>
+                      ${nics.map(n => {
+                        const detail = normalizeNic(n);
+                        const menuKey = `nic:${detail.name}`;
+                        const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
                       const vnRef = detail.virtualNetwork || '';
                       const vnMatch = findNetworkByRef(vnRef);
                       const vnCell = vnMatch
@@ -14271,31 +14396,31 @@
                       const sgCell = sgs.length
                         ? `<span class="overview-sg-list">${sgs.map(sg => detailNameLink(sg, 'data-open-security-group', sg)).join('')}</span>`
                         : '—';
-                      return `
-                      <tr>
+                        return `
+                        <tr>
                         <td>${vnCell}</td>
                         <td>${subnetCell}</td>
                         <td>${sgCell}</td>
                         <td class="overview-table__actions">
-                          <div class="nic-actions-wrap">
+                            <div class="nic-actions-wrap">
                             <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}"
                               aria-label="Actions for ${detail.name}" aria-expanded="${menuOpen}" aria-haspopup="menu" aria-controls="vm-overview-row-menu"${addDisabledAttrs}>
-                              <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>`;
-                    }).join('')}
-                  </tbody>
-                </table>
-              </div>
+                                <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>`;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">
               <div class="vm-overview-v2__section-head">
                 <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage (${diskRows.length})</h3>
-                <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk"${addDisabledAttrs}>Add disk</button>
-              </div>
+                    <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk"${addDisabledAttrs}>Add disk</button>
+                  </div>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
                   <colgroup>
@@ -14309,36 +14434,36 @@
                       <th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th>
                     </tr>
                   </thead>
-                  <tbody>
+                    <tbody>
                     ${diskRows.map(d => {
                       const menuKey = `disk:${d.diskIdx}`;
-                      const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                        const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
                       const tierCell = d.tier && d.tier !== '—'
                         ? `<button type="button" class="name-link name-link--dotted" data-storage-tier-detail="${escAttr(d.tierId || d.tier)}" aria-haspopup="dialog" aria-expanded="false">${String(d.tier).replace(/</g, '&lt;')}</button>`
                         : '—';
-                      return `
-                      <tr>
-                        <td>
+                        return `
+                        <tr>
+                          <td>
                           <span class="overview-table__name">
                             ${d.label}
                             ${d.bootable ? pfAnnotationLabel('Bootable', 'bootable-label') : ''}
-                          </span>
-                        </td>
+                            </span>
+                          </td>
                         <td>${d.size}</td>
                         <td>${tierCell}</td>
                         <td class="overview-table__actions">
-                          <div class="nic-actions-wrap">
+                            <div class="nic-actions-wrap">
                             <button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}"
                               aria-label="Actions for ${d.detailName}" aria-expanded="${menuOpen}" aria-haspopup="menu" aria-controls="vm-overview-row-menu"${addDisabledAttrs}>
-                              <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>`;
-                    }).join('')}
-                  </tbody>
-                </table>
-              </div>
+                                <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>`;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-util-title">
@@ -14346,14 +14471,14 @@
                 <h3 class="ethan-detail-col__title" id="vm-util-title">
                   Utilization
                   <button type="button" class="util-title-info" id="btn-util-help" data-util-help aria-label="Utilization information" aria-haspopup="dialog" aria-expanded="false">
-                    <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
-                  </button>
-                </h3>
+                      <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                    </button>
+                  </h3>
                 <span class="filter-select filter-select--static">Last 5 minutes <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-              </div>
+                </div>
               ${renderVmUtilizationTiles(v, u)}
             </section>
-          </div>
+                </div>
           <aside class="vm-overview-v2__aside" aria-label="Sidebar">
             <section class="catalog-hw-specs vm-overview-v2__aside-card" aria-labelledby="vm-ip-title">
               <h3 class="catalog-hw-specs__title" id="vm-ip-title">IP addresses</h3>
@@ -14361,11 +14486,11 @@
                 <div class="vm-ip-card__meta">
                   <div class="vm-ip-card__label">External IP</div>
                   <p class="vm-ip-card__value">${v.externalIpAttached && v.externalIp ? String(v.externalIp).replace(/</g, '&lt;') : '—'}</p>
-                </div>
+              </div>
                 <button type="button" class="name-link" data-ip-toggle="external"${canEditConfig ? '' : ' disabled title="No configuration edits for this role"'}>
                   ${v.externalIpAttached ? 'Detach' : 'Attach'}
                 </button>
-              </div>
+            </div>
               <div class="vm-ip-card__row">
                 <div class="vm-ip-card__meta">
                   <div class="vm-ip-card__label">Internal IP</div>
@@ -14394,8 +14519,8 @@
               <p class="vm-overview-v2__aside-empty muted">No recent activity</p>
             </section>
           </aside>
-        </div>
-      `;
+          </div>
+        `;
 
       root.innerHTML = header + body;
 
@@ -14435,8 +14560,8 @@
           e.preventDefault();
           if (!canEditConfig) return;
           toggleVmIpAttachment(e.currentTarget.dataset.ipToggle);
-        });
-      });
+              });
+            });
       root.querySelectorAll('[data-vm-action]').forEach(b => {
         b.addEventListener('click', () => {
           hidePfTooltip();
@@ -14444,7 +14569,7 @@
         });
       });
       root.querySelector('#vm-detail-actions-btn')?.addEventListener('click', e => {
-        e.stopPropagation();
+          e.stopPropagation();
         openVmDetailActionsMenu(e.currentTarget, v.name);
       });
       root.querySelector('#vm-open-console')?.addEventListener('click', () => {
@@ -14957,7 +15082,7 @@
       }
       // OS image is always locked by the template — never overwrite from Configure.
       if (!d.computeResource) {
-        const compute = document.getElementById('f-compute-resource');
+      const compute = document.getElementById('f-compute-resource');
         if (compute && compute.tagName === 'SELECT') d.computeResource = compute.value;
       }
     }
@@ -15243,24 +15368,18 @@
                 })),
               })}
               ${fieldErrorHtml('diskImage')}
-            </div>
+                    </div>
           `;
         }
         panel.innerHTML = `
           ${isCatalogFlow ? '' : `
           <div class="section-block">
-            <h3 class="section-label">Select a creation method</h3>
-            <div class="method-grid">
-              ${methodCard('custom', 'Custom configuration',
-                'Create a new virtual machine by selecting an operating system and the right performance for your workload.',
-                'rh-ui:add-circle', state.createType === 'custom', '(default)')}
-              ${methodCard('template', 'Create from template',
-                'Create a pre-configured virtual machine from a template with standardized images and defaults.',
-                'rh-ui:applications', state.createType === 'template')}
-              ${methodCard('clone', 'Clone existing virtual machine',
-                'Create a copy of an existing virtual machine.',
-                'rh-ui:duplicate', isClone)}
-            </div>
+            <h3 class="section-label" id="create-method-label">Select a creation method</h3>
+            ${renderCreateMethodSelectBoxes({
+              name: 'createMethod',
+              selected: isClone ? 'clone' : (state.createType || 'custom'),
+              labelledBy: 'create-method-label',
+            })}
           </div>
           `}
           <div class="${isCatalogFlow ? 'details-sections' : ''}">
@@ -15420,9 +15539,9 @@
             onChange: syncLocation,
           });
         }
-        panel.querySelectorAll('[data-method]').forEach(btn => {
-          btn.onclick = () => {
-            const v = btn.dataset.method;
+        panel.querySelectorAll('input[name="createMethod"]').forEach(r => {
+          r.addEventListener('change', () => {
+            const v = r.value;
             if (v === state.createType) return;
             state.createType = v;
             state.maxVisited = 0;
@@ -15433,9 +15552,11 @@
             state.tplView = 'cards';
             state.cloneFilter = '';
             state.cloneProject = 'all';
+            state.cloneProjectMenuOpen = false;
+            state.cloneProjectFilter = '';
             document.getElementById('wiz-desc').hidden = true;
             renderWizard();
-          };
+          });
         });
       } else if (key === 'os') {
         const families = [
@@ -16132,14 +16253,14 @@
           setFilter: (v) => { state.vmTplProjectFilter = v; },
           onSelectId: (value) => {
             d.project = value || 'project-a';
-            d.templateId = null;
-            d.catalogPreset = null;
-            state.tplDrawerOpen = false;
-            state.tplFilter = '';
+          d.templateId = null;
+          d.catalogPreset = null;
+          state.tplDrawerOpen = false;
+          state.tplFilter = '';
             state.vmTplProjectMenuOpen = false;
             state.vmTplProjectFilter = '';
-            clearFieldError('catalog');
-            renderWizard();
+          clearFieldError('catalog');
+          renderWizard();
           },
         });
         restoreRichSearchFocus(panel);
@@ -16216,19 +16337,19 @@
           </div>
           <div id="clone-source-area">
             <div id="clone-source-scroll" ${list.length ? '' : 'hidden'}>
-              <table class="pf-v6-c-table pf-m-grid-md vm-table clone-source-table" role="grid">
-                <thead class="pf-v6-c-table__thead">
-                  <tr class="pf-v6-c-table__tr">
-                    <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Select</span></th>
-                    <th class="pf-v6-c-table__th" scope="col">Name</th>
-                    <th class="pf-v6-c-table__th" scope="col">Status</th>
-                    <th class="pf-v6-c-table__th" scope="col">Created</th>
-                  </tr>
-                </thead>
-                <tbody class="pf-v6-c-table__tbody">
+          <table class="pf-v6-c-table pf-m-grid-md vm-table clone-source-table" role="grid">
+            <thead class="pf-v6-c-table__thead">
+              <tr class="pf-v6-c-table__tr">
+                <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Select</span></th>
+                <th class="pf-v6-c-table__th" scope="col">Name</th>
+                <th class="pf-v6-c-table__th" scope="col">Status</th>
+                <th class="pf-v6-c-table__th" scope="col">Created</th>
+              </tr>
+            </thead>
+            <tbody class="pf-v6-c-table__tbody">
                   ${rows}
-                </tbody>
-              </table>
+            </tbody>
+          </table>
             </div>
             ${list.length ? '' : (() => {
               const searchOnly = q && project === 'all';
@@ -16276,7 +16397,7 @@
             state.cloneProject = value || 'all';
             state.cloneProjectMenuOpen = false;
             state.cloneProjectFilter = '';
-            renderWizard();
+          renderWizard();
           },
         });
         restoreRichSearchFocus(panel);
@@ -16705,7 +16826,7 @@
                 disk.storageTierLabel = tiers.find(t => t.id === tierId)?.name || tierId;
                 disk.tierMenuOpen = false;
                 disk.tierFilter = '';
-                updateCostEstimate(key);
+              updateCostEstimate(key);
                 renderWizard();
               },
             });
@@ -17003,15 +17124,15 @@
               setFilter: (v) => { state.vmSubnetFilter = v; },
               onSelectId: (value) => {
                 d.subnet = value;
-                d.securityGroups = [];
-                applyNetworkingSmartDefaults(d, { subnetChanged: true });
-                state.sgMenuOpen = false;
-                state.extraSgMenuOpen = null;
+              d.securityGroups = [];
+              applyNetworkingSmartDefaults(d, { subnetChanged: true });
+              state.sgMenuOpen = false;
+              state.extraSgMenuOpen = null;
                 state.vmSubnetMenuOpen = false;
                 state.vmSubnetFilter = '';
-                if (d.subnet) clearFieldError('subnet');
-                if (d.securityGroups?.length) clearFieldError('securityGroups');
-                renderWizard();
+              if (d.subnet) clearFieldError('subnet');
+              if (d.securityGroups?.length) clearFieldError('securityGroups');
+              renderWizard();
               },
             });
           }
@@ -17088,17 +17209,17 @@
               setFilter: (v) => { item.vnFilter = v; },
               onSelectId: (value) => {
                 item.virtualNetwork = value;
-                const cfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === item.virtualNetwork);
-                item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
-                item.subnet = cfg?.subnets?.[0] || '';
-                item.securityGroups = item.subnet ? [DEFAULT_SECURITY_GROUP] : [];
+              const cfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === item.virtualNetwork);
+              item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
+              item.subnet = cfg?.subnets?.[0] || '';
+              item.securityGroups = item.subnet ? [DEFAULT_SECURITY_GROUP] : [];
                 item.name = networkAttachmentName(item.virtualNetwork, (d.extraNetworks || []).filter(n => n.id !== item.id));
                 item.vnMenuOpen = false;
                 item.vnFilter = '';
                 item.subnetMenuOpen = false;
                 item.subnetFilter = '';
-                state.extraSgMenuOpen = null;
-                renderWizard();
+              state.extraSgMenuOpen = null;
+              renderWizard();
               },
             });
             if (item.virtualNetwork) {
@@ -17113,13 +17234,13 @@
                 setFilter: (v) => { item.subnetFilter = v; },
                 onSelectId: (value) => {
                   item.subnet = value;
-                  if (!item.securityGroups?.length) item.securityGroups = [DEFAULT_SECURITY_GROUP];
+              if (!item.securityGroups?.length) item.securityGroups = [DEFAULT_SECURITY_GROUP];
                   item.subnetMenuOpen = false;
                   item.subnetFilter = '';
-                  state.extraSgMenuOpen = null;
-                  renderWizard();
+              state.extraSgMenuOpen = null;
+              renderWizard();
                 },
-              });
+            });
             }
           });
           panel.querySelectorAll('[data-extra-sg-toggle]').forEach(btn => {
@@ -21882,8 +22003,8 @@
     document.getElementById('vm-table-area')?.addEventListener('click', e => {
       const kebab = e.target.closest('[data-vm-kebab]');
       if (kebab) {
-        e.stopPropagation();
-        openVmKebabMenu(kebab.dataset.vmKebab, kebab);
+      e.stopPropagation();
+      openVmKebabMenu(kebab.dataset.vmKebab, kebab);
         return;
       }
       const openBtn = e.target.closest('[data-open-vm]');
