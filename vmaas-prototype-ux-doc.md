@@ -2,7 +2,7 @@
 
 **Source of truth (Google Doc, tabbed):** [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit)
 
-**Mock (aligned):** [vmaas-ux-prototype.html?v=7133](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7133) · Build Oct 2 · catalog-init **7133**
+**Mock (aligned):** [vmaas-ux-prototype.html?v=7134](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7134) · Build Oct 2 · catalog-init **7134**
 
 | Tab | Contents |
 |---|---|
