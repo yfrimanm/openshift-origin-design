@@ -2,7 +2,7 @@
 
 **Source of truth (Google Doc, tabbed):** [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit)
 
-**Mock (aligned):** [vmaas-ux-prototype.html?v=7132](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7132) · Build Oct 2 · felt-align **7132**
+**Mock (aligned):** [vmaas-ux-prototype.html?v=7133](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7133) · Build Oct 2 · catalog-init **7133**
 
 | Tab | Contents |
 |---|---|
@@ -20,8 +20,8 @@
 | | |
 |---|---|
 | **Scope** | Full interactive prototype: Virtual machines list + Create wizard + Overview, plus provider Catalog, Instance types, Disk images |
-| **Interactive mock** | https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7132 |
-| **Deep links** | [Create](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7132&create=1) · [Overview](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7132&vm=indigo-quokka-89) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7132&role=provider) |
+| **Interactive mock** | https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7133 |
+| **Deep links** | [Create](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7133&create=1) · [Overview](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7133&vm=indigo-quokka-89) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7133&role=provider) |
 | **Google Doc** | [Tabbed source of truth](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Create screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [gh-pages](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **Regenerate Create screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |

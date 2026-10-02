@@ -6456,7 +6456,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · felt-align 7132</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · catalog-init 7133</span>
         </div>
       </div>
       <div class="console__body">
@@ -11355,6 +11355,34 @@
             title: 'Create new Sysprep',
             desc: 'Upload or paste an Unattend.xml file',
             iconClass: 'fa-solid fa-file-arrow-up',
+          },
+        ],
+      });
+    }
+
+    function renderCatalogInitDefaultSelectBoxes({ name, selected, labelledBy, windows = false }) {
+      const noun = windows ? 'Unattend.xml' : 'Cloud-init';
+      return renderFeltSelectBoxes({
+        name,
+        selected: selected || 'none',
+        labelledBy,
+        extraClass: 'felt-select-boxes--sysprep-mode',
+        options: [
+          {
+            value: 'none',
+            title: 'No default',
+            desc: windows
+              ? 'Tenants set Unattend.xml when creating a VM'
+              : 'Tenants set cloud-init when creating a VM',
+            iconClass: 'fa-solid fa-ban',
+          },
+          {
+            value: 'provide',
+            title: `Provide default ${noun}`,
+            desc: windows
+              ? 'Seed a default Unattend.xml for VMs from this item'
+              : 'Seed default user data for VMs from this item',
+            iconClass: windows ? 'fa-solid fa-file-code' : 'fa-solid fa-file-lines',
           },
         ],
       });
@@ -18779,6 +18807,7 @@
         initMethod: 'cloud-init',
         cloudInit: '',
         sysprep: '',
+        initDefaultMode: 'none', // none | provide — catalog default user data (Option C)
         initAccess: 'editable',
         tenantAccessExpanded: false,
         diskImageMenuOpen: false,
@@ -18889,6 +18918,7 @@
         initMethod: c.initMethod === 'sysprep' ? 'sysprep' : 'cloud-init',
         cloudInit: (c.cloudInit || '').trim(),
         sysprep: (c.sysprep || '').trim(),
+        initDefaultMode: c.initDefaultMode === 'provide' ? 'provide' : 'none',
         initAccess: c.initAccess || 'editable',
       };
     }
@@ -18930,6 +18960,8 @@
         }
         case 'initMethod':
           return snapshot.initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
+        case 'initDefaultMode':
+          return snapshot.initDefaultMode === 'provide' ? 'Provide default' : 'No default';
         case 'cloudInit':
         case 'sysprep':
           return snapshot[field] ? 'Configured' : 'Not configured';
@@ -18969,6 +19001,7 @@
       { key: 'extraDisksJson', label: 'Additional disks' },
       { key: 'extraDisksAccess', label: 'Additional disks access' },
       { key: 'initMethod', label: 'Initialization' },
+      { key: 'initDefaultMode', label: 'User data default' },
       { key: 'cloudInit', label: 'Cloud-init' },
       { key: 'sysprep', label: 'Sysprep' },
       { key: 'initAccess', label: 'User data access' },
@@ -19081,6 +19114,9 @@
         initMethod: item.initMethod === 'sysprep' ? 'sysprep' : (item.initMethod || 'cloud-init'),
         cloudInit: item.cloudInit || '',
         sysprep: item.sysprep || '',
+        initDefaultMode: (
+          String(item.sysprep || '').trim() || String(item.cloudInit || '').trim()
+        ) ? 'provide' : 'none',
         initAccess: item.initAccess || (item.initLocked ? 'locked' : 'editable'),
         tenantAccessExpanded: false,
         diskImageMenuOpen: false,
@@ -19923,16 +19959,22 @@
         // Align with OSAC-5009: Windows catalog defaults use Unattend.xml only
         if (windowsCatalog) c.initMethod = 'sysprep';
         else c.initMethod = 'cloud-init';
-        const initSelected = windowsCatalog ? 'sysprep' : 'cloud-init';
-        const initValue = initSelected === 'sysprep' ? (c.sysprep || '') : (c.cloudInit || '');
+        if (c.initDefaultMode !== 'provide' && c.initDefaultMode !== 'none') {
+          const hasDefault = windowsCatalog
+            ? !!(c.sysprep && String(c.sysprep).trim())
+            : !!(c.cloudInit && String(c.cloudInit).trim());
+          c.initDefaultMode = hasDefault ? 'provide' : 'none';
+        }
+        const provideDefault = c.initDefaultMode === 'provide';
+        const initValue = windowsCatalog ? (c.sysprep || '') : (c.cloudInit || '');
         const initExpanded = !!(initValue && String(initValue).trim());
         const initLabel = windowsCatalog ? 'Unattend.xml' : 'Cloud-init';
         const initPlaceholder = windowsCatalog
           ? 'Paste Unattend.xml content'
           : 'Add cloud-init configuration';
         const initHelp = windowsCatalog
-          ? 'Optional Windows answer file default for tenants. Max 1 MiB. Stored as a secret at create time; never returned on GET.'
-          : 'Optional user data applied when the virtual machine starts.';
+          ? 'Optional Windows answer file default for tenants. Max 1 MiB. Stored as a secret at create time; never returned on GET. Attach existing secrets only when creating a VM.'
+          : 'Optional user data applied when the virtual machine starts. SSH keys are set when creating a virtual machine.';
         panel.innerHTML = `
           <h3 class="label-with-optional">
             Access &amp; Initial run
@@ -19943,8 +19985,18 @@
             </span>
           </h3>
           <p class="create-resource-wiz__help">${windowsCatalog
-            ? 'Optionally set a default Unattend.xml for Windows VMs created from this catalog item.'
-            : 'Optionally set user data for first boot. SSH keys are set when creating a virtual machine.'}</p>
+            ? 'Choose whether this catalog item seeds a default Unattend.xml for Windows VMs. Tenants can still Attach or Create Sysprep when creating a VM.'
+            : 'Choose whether this catalog item seeds default cloud-init user data. SSH keys are set when creating a virtual machine.'}</p>
+          <div class="form-field" style="margin-top:16px;">
+            <label id="ci-init-default-label">${windowsCatalog ? 'Unattend.xml default' : 'Cloud-init default'}</label>
+            ${renderCatalogInitDefaultSelectBoxes({
+              name: 'ciInitDefault',
+              selected: c.initDefaultMode || 'none',
+              labelledBy: 'ci-init-default-label',
+              windows: windowsCatalog,
+            })}
+          </div>
+          ${provideDefault ? `
           <div class="form-field" style="margin-top:16px;">
             ${renderCatalogFieldLabelRow({
               labelHtml: initLabel,
@@ -19959,38 +20011,50 @@
               aria-label="${initLabel}"
               aria-describedby="ci-init-help">${String(initValue).replace(/</g, '&lt;')}</textarea>
             <p class="form-helper" id="ci-init-help">${initHelp}</p>
-          </div>
+          </div>` : ''}
         `;
-        bindCatalogAccessSwitches(panel, c);
-        const initEl = panel.querySelector('#ci-init-config');
-        if (initEl) {
-          const syncInitHeight = () => {
-            const hasContent = !!initEl.value.trim();
-            initEl.classList.toggle('pf-m-expanded', hasContent);
-            initEl.rows = hasContent ? 8 : 1;
-            initEl.style.height = 'auto';
-            if (hasContent) initEl.style.height = Math.min(initEl.scrollHeight, 280) + 'px';
-            else initEl.style.height = '';
-          };
-          syncInitHeight();
-          initEl.addEventListener('input', () => {
-            if (windowsCatalog) c.sysprep = initEl.value;
-            else c.cloudInit = initEl.value;
+        panel.querySelectorAll('input[name="ciInitDefault"]').forEach(r => {
+          r.addEventListener('change', () => {
+            c.initDefaultMode = r.value === 'provide' ? 'provide' : 'none';
+            if (c.initDefaultMode === 'none') {
+              if (windowsCatalog) c.sysprep = '';
+              else c.cloudInit = '';
+            }
+            renderCreateCatalogItemWizard();
+          });
+        });
+        if (provideDefault) {
+          bindCatalogAccessSwitches(panel, c);
+          const initEl = panel.querySelector('#ci-init-config');
+          if (initEl) {
+            const syncInitHeight = () => {
+              const hasContent = !!initEl.value.trim();
+              initEl.classList.toggle('pf-m-expanded', hasContent);
+              initEl.rows = hasContent ? 8 : 1;
+              initEl.style.height = 'auto';
+              if (hasContent) initEl.style.height = Math.min(initEl.scrollHeight, 280) + 'px';
+              else initEl.style.height = '';
+            };
             syncInitHeight();
-          });
-          initEl.addEventListener('focus', () => {
-            if (!initEl.value.trim()) {
-              initEl.classList.add('pf-m-expanded');
-              initEl.rows = 4;
-            }
-          });
-          initEl.addEventListener('blur', () => {
-            if (!initEl.value.trim()) {
-              initEl.classList.remove('pf-m-expanded');
-              initEl.rows = 1;
-              initEl.style.height = '';
-            }
-          });
+            initEl.addEventListener('input', () => {
+              if (windowsCatalog) c.sysprep = initEl.value;
+              else c.cloudInit = initEl.value;
+              syncInitHeight();
+            });
+            initEl.addEventListener('focus', () => {
+              if (!initEl.value.trim()) {
+                initEl.classList.add('pf-m-expanded');
+                initEl.rows = 4;
+              }
+            });
+            initEl.addEventListener('blur', () => {
+              if (!initEl.value.trim()) {
+                initEl.classList.remove('pf-m-expanded');
+                initEl.rows = 1;
+                initEl.style.height = '';
+              }
+            });
+          }
         }
         return;
       }
@@ -20000,13 +20064,17 @@
       const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
       const bootTier = (c.bootStorageTierId && getStorageTiers().find(t => t.id === c.bootStorageTierId)) || null;
       const initMethod = c.initMethod === 'sysprep' || c.guestOsFamily === 'Microsoft Windows' ? 'sysprep' : 'cloud-init';
-      const initConfigured = initMethod === 'sysprep'
+      const provideDefault = c.initDefaultMode === 'provide';
+      const initConfigured = provideDefault && (initMethod === 'sysprep'
         ? !!(c.sysprep && String(c.sysprep).trim())
-        : !!(c.cloudInit && String(c.cloudInit).trim());
+        : !!(c.cloudInit && String(c.cloudInit).trim()));
       const initLabel = initMethod === 'sysprep' ? 'Unattend.xml' : 'Cloud-init';
-      const initReviewVal = initConfigured
-        ? (initMethod === 'sysprep' ? 'Provided (hidden)' : 'Configured')
-        : 'Not configured';
+      const initDefaultLabel = initMethod === 'sysprep' ? 'Unattend.xml default' : 'Cloud-init default';
+      const initReviewVal = !provideDefault
+        ? 'No default'
+        : (initConfigured
+          ? (initMethod === 'sysprep' ? 'Provided (hidden)' : 'Configured')
+          : 'Provide default (empty)');
       const esc = value => String(value ?? '—').replace(/</g, '&lt;');
       if (state.catalogEditId) {
         readCatalogCreateFields();
@@ -20085,8 +20153,8 @@
               ${extraDisksRows}
             `, 'ci-review')}
             ${reviewNebiusSection('Access & Initial run', 'ci-access-init', `
-              ${reviewRow(initLabel, initReviewVal)}
-              ${reviewRow('User data access', catalogAccessLabel(c.initAccess))}
+              ${reviewRow(initDefaultLabel, initReviewVal)}
+              ${provideDefault ? reviewRow('User data access', catalogAccessLabel(c.initAccess)) : ''}
             `, 'ci-review')}
           </div>
         `;
@@ -20119,10 +20187,16 @@
       });
       const initMethod = document.querySelector('input[name="ciInitMethod"]:checked');
       if (initMethod) c.initMethod = initMethod.value === 'sysprep' ? 'sysprep' : 'cloud-init';
+      const initDefault = document.querySelector('input[name="ciInitDefault"]:checked');
+      if (initDefault) c.initDefaultMode = initDefault.value === 'provide' ? 'provide' : 'none';
       const initConfig = document.getElementById('ci-init-config');
       if (initConfig) {
         if (c.initMethod === 'sysprep') c.sysprep = initConfig.value;
         else c.cloudInit = initConfig.value;
+      }
+      if (c.initDefaultMode === 'none') {
+        if (c.initMethod === 'sysprep') c.sysprep = '';
+        else c.cloudInit = '';
       }
       const boot = document.getElementById('ci-boot-disk');
       if (boot) {
@@ -20198,8 +20272,8 @@
         })),
         extraDisksAccess: (c.extraDisks || []).length ? (c.extraDisksAccess || 'editable') : 'editable',
         initMethod,
-        cloudInit: initMethod === 'cloud-init' ? (c.cloudInit || '') : '',
-        sysprep: initMethod === 'sysprep' ? (c.sysprep || '') : '',
+        cloudInit: (c.initDefaultMode === 'provide' && initMethod === 'cloud-init') ? (c.cloudInit || '') : '',
+        sysprep: (c.initDefaultMode === 'provide' && initMethod === 'sysprep') ? (c.sysprep || '') : '',
         initAccess: c.initAccess || 'editable',
         initLocked: (c.initAccess || 'editable') === 'locked',
       };
