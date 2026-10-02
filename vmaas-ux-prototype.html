@@ -4372,6 +4372,10 @@
     .clone-source-project .pf-v6-c-form-control {
       width: auto; min-width: 180px; max-width: 240px;
     }
+    .clone-source-project .rich-select,
+    .clone-source-project [id="clone-project-select"] {
+      width: 220px; min-width: 180px; max-width: 280px;
+    }
     .clone-source-toolbar .filter-name-search {
       flex: 1; min-width: 200px; max-width: 360px; height: 36px; box-sizing: border-box;
     }
@@ -6385,7 +6389,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · network-create 7130</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 2 · wizard-align 7131</span>
         </div>
       </div>
       <div class="console__body">
@@ -8757,6 +8761,8 @@
       },
       cloneFilter: '',
       cloneProject: 'all',
+      cloneProjectMenuOpen: false,
+      cloneProjectFilter: '',
       catalogFilter: '',
       catalogTenantFilter: 'all',
       catalogPublishFilter: 'all',
@@ -11503,15 +11509,18 @@
       return `<dl class="review-summary-dl">${rows.map(([label, value]) => `
         <div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}</dl>`;
     }
-    function reviewNebiusSection(title, stepKey, rowsHtml, idPrefix = 'review') {
+    function reviewNebiusSection(title, stepKey, rowsHtml, idPrefix = 'review', { editable = true } = {}) {
+      const titleInner = editable
+        ? `<button type="button" class="review-nebius__title-link" data-review-goto="${stepKey}"
+                aria-label="Edit ${title}">
+                ${title}
+              </button>`
+        : title;
       return `
         <section class="review-nebius__section" aria-labelledby="${idPrefix}-${stepKey}">
           <div class="review-nebius__head">
             <h4 class="review-nebius__title" id="${idPrefix}-${stepKey}">
-              <button type="button" class="review-nebius__title-link" data-review-goto="${stepKey}"
-                aria-label="Edit ${title}">
-                ${title}
-              </button>
+              ${titleInner}
             </h4>
           </div>
           <div class="review-nebius__card">
@@ -16146,15 +16155,17 @@
       } else if (key === 'clone-source') {
         const q = (state.cloneFilter || '').toLowerCase();
         const project = state.cloneProject || 'all';
+        if (state.cloneProjectMenuOpen == null) state.cloneProjectMenuOpen = false;
+        if (state.cloneProjectFilter == null) state.cloneProjectFilter = '';
         const list = VMS.filter(v => {
           if (project !== 'all' && v.ns !== project) return false;
           if (q && !v.name.toLowerCase().includes(q)) return false;
           return true;
         });
-        const projectOpts = [
-          { value: 'all', label: 'All projects' },
-          ...PROJECTS.map(p => ({ value: p, label: p })),
-        ].map(o => `<option value="${o.value}" ${o.value === project ? 'selected' : ''}>${o.label}</option>`).join('');
+        const projectOptions = [
+          { id: 'all', title: 'All projects' },
+          ...PROJECTS.map(p => ({ id: p, title: p })),
+        ];
         const rows = list.map(v => {
           const selected = d.cloneSourceName === v.name;
           return `
@@ -16177,13 +16188,23 @@
           <p class="step-help">Select a virtual machine to clone.</p>
           <div class="clone-source-toolbar">
             <div class="clone-source-project">
-              <label for="clone-project">Project</label>
-              <span class="pf-v6-c-form-control">
-                <select id="clone-project" aria-label="Project">${projectOpts}</select>
-                <span class="pf-v6-c-form-control__utilities">
-                  <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
-                </span>
-              </span>
+              <label id="clone-project-label">Project</label>
+              ${renderTypeaheadRichSelectHtml({
+                rootId: 'clone-project-select',
+                toggleId: 'clone-project-toggle',
+                menuId: 'clone-project-menu',
+                searchId: 'clone-project-search',
+                labelId: 'clone-project-label',
+                open: !!state.cloneProjectMenuOpen,
+                filter: state.cloneProjectFilter || '',
+                searchPlaceholder: 'Search projects',
+                selectedId: project,
+                placeholder: 'Select a project',
+                optionAttr: 'data-clone-project',
+                hiddenInputId: 'clone-project',
+                emptyNoun: 'projects',
+                options: projectOptions,
+              })}
             </div>
             <button type="button" class="filter-btn" id="clone-filter-btn" aria-label="Filter">
               <i class="fa-solid fa-filter" aria-hidden="true"></i> Filter
@@ -16235,10 +16256,30 @@
             selectSource(row.dataset.cloneVm);
           });
         });
-        panel.querySelector('#clone-project')?.addEventListener('change', e => {
-          state.cloneProject = e.target.value;
-          renderWizard();
+        wireTypeaheadRichSelect(panel, {
+          rootId: 'clone-project-select',
+          toggleId: 'clone-project-toggle',
+          menuId: 'clone-project-menu',
+          searchId: 'clone-project-search',
+          optionSel: '[data-clone-project]',
+          getOptionId: opt => opt.dataset.cloneProject,
+          setOpen: (open) => {
+            state.cloneFilter = document.getElementById('clone-filter')?.value || state.cloneFilter || '';
+            state.cloneProjectMenuOpen = open;
+          },
+          setFilter: (v) => {
+            state.cloneFilter = document.getElementById('clone-filter')?.value || state.cloneFilter || '';
+            state.cloneProjectFilter = v;
+          },
+          onSelectId: (value) => {
+            state.cloneFilter = document.getElementById('clone-filter')?.value || state.cloneFilter || '';
+            state.cloneProject = value || 'all';
+            state.cloneProjectMenuOpen = false;
+            state.cloneProjectFilter = '';
+            renderWizard();
+          },
         });
+        restoreRichSearchFocus(panel);
         panel.querySelector('#clone-filter')?.addEventListener('input', e => {
           state.cloneFilter = e.target.value;
           renderWizard();
@@ -17603,16 +17644,20 @@
 
       } else if (state.createType === 'clone') {
         const source = VMS.find(v => v.name === d.cloneSourceName);
+        const reviewRow = (label, value) => `
+          <div class="review-nebius__row">
+            <span class="review-nebius__label">${label}</span>
+            <span class="review-nebius__value">${value || '—'}</span>
+          </div>`;
         panel.innerHTML = `
           <h3>Review and create</h3>
           <p class="step-help">Before you clone your virtual machine, review its configuration. You can create your own unique virtual machine name, or we can generate a name for you.</p>
-          <div class="review-block">
-            <details class="review-section" open>
-              <summary><i class="fa-solid fa-chevron-down" style="font-size:12px;"></i> Details</summary>
-              <div class="form-field" style="margin-top:12px;">
+          <div class="review-nebius">
+            ${reviewNebiusSection('Details', 'deploy', `
+              <div class="form-field" style="margin-top:0;">
                 <label for="f-name">Name <span class="req">*</span></label>
                 <div class="name-row">
-                  <input type="text" id="f-name" value="${d.name || ''}" placeholder="Enter a name or click the refresh icon to generate one" />
+                  <input type="text" id="f-name" value="${String(d.name || '').replace(/"/g, '&quot;')}" placeholder="Enter a name or click the refresh icon to generate one" />
                   <button type="button" class="icon-btn" id="f-regen" title="Generate unique virtual machine name" aria-label="Generate unique virtual machine name">
                     <i class="fa-solid fa-rotate"></i>
                   </button>
@@ -17620,26 +17665,23 @@
               </div>
               <div class="form-field">
                 <label for="f-desc">Description</label>
-                <input type="text" id="f-desc" value="${d.description || ''}" />
+                <input type="text" id="f-desc" value="${String(d.description || '').replace(/"/g, '&quot;')}" />
               </div>
-              <dl class="review-dl">
-                <dt>Source virtual machine</dt><dd>${source ? source.name : (d.cloneSourceName || '—')}</dd>
-                <dt>Cluster</dt><dd>—</dd>
-                <dt>Project</dt><dd>${d.project || 'project-a'}</dd>
-                <dt>Group</dt><dd>${d.group || '—'}</dd>
-              </dl>
-            </details>
-            <details class="review-section">
-              <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Storage</summary>
-              <p class="muted" style="margin:8px 0 0;font-size:13px;">Disks are cloned from the source virtual machine (Clone PVC).</p>
-            </details>
-            <details class="review-section">
-              <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Network</summary>
-              <p class="muted" style="margin:8px 0 0;font-size:13px;">Networks are copied from the source virtual machine.</p>
-            </details>
-            <details class="review-section">
-              <summary><i class="fa-solid fa-chevron-right" style="font-size:12px;"></i> Hardware devices</summary>
-            </details>
+              ${reviewRow('Project', d.project || 'project-a')}
+              ${reviewRow('Group', d.group || '—')}
+            `, 'clone-review', { editable: false })}
+            ${reviewNebiusSection('Source', 'clone-source', `
+              ${reviewRow('Source virtual machine', source ? source.name : (d.cloneSourceName || '—'))}
+            `, 'clone-review')}
+            ${reviewNebiusSection('Storage', 'clone-storage', `
+              ${reviewRow('Disks', 'Cloned from the source virtual machine (Clone PVC)')}
+            `, 'clone-review', { editable: false })}
+            ${reviewNebiusSection('Network', 'clone-network', `
+              ${reviewRow('Networks', 'Copied from the source virtual machine')}
+            `, 'clone-review', { editable: false })}
+            ${reviewNebiusSection('Hardware devices', 'clone-hw', `
+              ${reviewRow('Devices', 'Copied from the source virtual machine')}
+            `, 'clone-review', { editable: false })}
           </div>
         `;
         panel.querySelector('#f-regen')?.addEventListener('click', () => {
@@ -17651,6 +17693,18 @@
             input.focus();
             input.select();
           }
+        });
+        panel.querySelectorAll('[data-review-goto]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetKey = btn.dataset.reviewGoto;
+            const steps = stepsForType();
+            const idx = steps.findIndex(s => s.key === targetKey);
+            if (idx < 0) return;
+            readFields();
+            state.step = idx;
+            state.maxVisited = Math.max(state.maxVisited, idx);
+            renderWizard();
+          });
         });
       } else {
         const tpl = TEMPLATES.find(t => t.id === d.templateId);
