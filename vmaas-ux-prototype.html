@@ -1320,14 +1320,19 @@
       max-width: none;
     }
     .name-row .name-valid {
-      flex: 0 0 auto;
-      width: 36px;
+      width: auto;
       height: 36px;
+      margin-inline: 8px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: var(--pf-t--global--icon--color--status--success--default, #3d7317);
-      font-size: 1rem;
+      flex: 0 0 auto;
+      color: var(--vmaas-blue);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .name-row .name-valid[hidden] {
+      display: none;
     }
     .secret-data-row { margin: 0 0 16px; }
     .overview-sg-list {
@@ -4190,7 +4195,7 @@
       max-width: 40rem;
     }
 
-    .name-row { display: flex; gap: 8px; align-items: center; max-width: 560px; }
+    .name-row { display: flex; gap: 12px; align-items: center; max-width: 560px; }
     .name-row input { flex: 1; }
     .icon-btn {
       width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
@@ -10300,6 +10305,7 @@
         returnTarget: returnTarget || 'vm',
         overlayWasOpen,
         previousView,
+        fieldErrors: {},
       };
       setView('create-secret');
       renderCreateSecretWizard();
@@ -10340,10 +10346,18 @@
       readSecretCreateFields();
       const key = SECRET_CREATE_STEPS[s.step]?.key;
       if (key === 'general') {
+        const existing = PROJECT_SECRETS.map(sec => sec.name);
         if (!secretNameIsValid(s.name)) {
-          toast('Enter a DNS-safe secret name (lowercase letters, numbers, and hyphens).');
+          s.fieldErrors = { ...(s.fieldErrors || {}), name: 'Enter a valid DNS label (RFC 1035).' };
+          renderCreateSecretWizard();
           return;
         }
+        if (existing.includes(s.name)) {
+          s.fieldErrors = { ...(s.fieldErrors || {}), name: `${s.name} already exists.` };
+          renderCreateSecretWizard();
+          return;
+        }
+        if (s.fieldErrors) delete s.fieldErrors.name;
         s.step = 1;
         s.maxVisited = Math.max(s.maxVisited, 1);
         renderCreateSecretWizard();
@@ -10382,7 +10396,8 @@
       const next = document.getElementById('create-secret-next');
       if (!s || !panel) return;
       const key = SECRET_CREATE_STEPS[s.step]?.key;
-      const nameOk = secretNameIsValid(s.name);
+      const nameErr = s.fieldErrors?.name;
+      const nameOk = !nameErr && secretNameIsValid(s.name);
       if (nav) {
         nav.innerHTML = SECRET_CREATE_STEPS.map((st, i) => {
           const current = i === s.step;
@@ -10419,25 +10434,21 @@
             <label for="sc-project">Project <span class="req">*</span></label>
             <select id="sc-project">${PROJECTS.map(p => `<option value="${p}" ${p === s.project ? 'selected' : ''}>${p === 'project-a' ? 'Root' : p}</option>`).join('')}</select>
           </div>
-          <div class="form-field">
+          <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="sc-name-field">
             <label for="sc-name">Name <span class="req">*</span></label>
             <div class="name-row">
               <input type="text" id="sc-name" value="${escAttr(s.name)}" autocomplete="off" required
-                aria-describedby="sc-name-help" />
-              <span class="name-valid pf-v6-c-icon pf-m-inline pf-m-status pf-m-success" ${nameOk ? '' : 'hidden'} aria-hidden="true">
-                <span class="pf-v6-c-icon__content"><i class="fas fa-check-circle"></i></span>
+                ${nameErr ? 'aria-describedby="sc-name-error" aria-invalid="true"' : 'aria-describedby="sc-name-help"'} />
+              <span class="name-valid" ${nameOk ? '' : 'hidden'} aria-hidden="true">
+                <i class="fa-solid fa-check"></i>
               </span>
               <button type="button" class="icon-btn" id="sc-regen-name" title="Generate name" aria-label="Generate name">
                 <i class="fa-solid fa-rotate" aria-hidden="true"></i>
               </button>
             </div>
-            <div class="pf-v6-c-form__helper-text">
-              <div class="pf-v6-c-helper-text">
-                <div class="pf-v6-c-helper-text__item">
-                  <span class="pf-v6-c-helper-text__item-text" id="sc-name-help">Enter a valid DNS label (RFC 1035), or click Generate to create one.</span>
-                </div>
-              </div>
-            </div>
+            ${nameErr
+              ? providerFieldErrorHtml(nameErr, 'sc-name-error')
+              : pfHelperText('Enter a valid DNS label (RFC 1035), or click Generate to create one.', 'sc-name-help')}
           </div>
           <div class="form-field">
             <label for="sc-desc">Description</label>
@@ -10486,10 +10497,11 @@
       panel.querySelector('#sc-name')?.addEventListener('input', () => {
         persistLive();
         const icon = panel.querySelector('.name-valid');
-        if (icon) icon.hidden = !secretNameIsValid(state.secretCreate?.name);
+        if (icon) icon.hidden = !secretNameIsValid((panel.querySelector('#sc-name')?.value || '').trim());
       });
       panel.querySelector('#sc-regen-name')?.addEventListener('click', () => {
         s.name = generateSecretName();
+        if (s.fieldErrors) delete s.fieldErrors.name;
         renderCreateSecretWizard();
         const input = document.getElementById('sc-name');
         input?.focus();
@@ -12005,6 +12017,7 @@
     }
     function renderGeneralStep(prefix, draft, help, { tenantFirst = false } = {}) {
       const nameErr = draft.fieldErrors?.name;
+      const nameOk = !nameErr && isValidDnsLabel(draft.name);
       const nameField = `
         <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="${prefix}-name-field">
           <label for="${prefix}-name">Name <span class="req">*</span></label>
@@ -12013,6 +12026,9 @@
               ${nameErr
                 ? `aria-describedby="${prefix}-name-error" aria-invalid="true"`
                 : `aria-describedby="${prefix}-name-help"`} />
+            <span class="name-valid" ${nameOk ? '' : 'hidden'} aria-hidden="true">
+              <i class="fa-solid fa-check"></i>
+            </span>
             <button type="button" class="icon-btn" id="${prefix}-regen-name" title="Generate name" aria-label="Generate name">
               <i class="fa-solid fa-rotate" aria-hidden="true"></i>
             </button>
@@ -12046,23 +12062,29 @@
 
 
     function bindProviderNameRegen(prefix, draft, kind, rerender) {
+      const input = document.getElementById(`${prefix}-name`);
+      const icon = document.querySelector(`#${prefix}-name-field .name-valid`);
+      const syncValidIcon = () => {
+        if (icon) icon.hidden = !isValidDnsLabel((input?.value || '').trim());
+      };
+      input?.addEventListener('input', syncValidIcon);
       document.getElementById(`${prefix}-regen-name`)?.addEventListener('click', () => {
         draft.name = generateProviderResourceName(kind);
         if (draft.fieldErrors) delete draft.fieldErrors.name;
         if (rerender) {
           rerender();
-          const input = document.getElementById(`${prefix}-name`);
-          input?.focus();
-          input?.select();
+          const next = document.getElementById(`${prefix}-name`);
+          next?.focus();
+          next?.select();
           return;
         }
-        const input = document.getElementById(`${prefix}-name`);
         if (input) {
           input.value = draft.name;
           input.focus();
           input.select();
         }
         document.getElementById(`${prefix}-name-field`)?.classList.remove('pf-m-error');
+        syncValidIcon();
       });
     }
 
