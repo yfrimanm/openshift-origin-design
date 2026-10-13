@@ -2795,6 +2795,7 @@
       justify-content: flex-start;
     }
     #compute-overlay .form-field { max-width: none; width: 100%; margin-bottom: 0; }
+    #compute-overlay .compute-resize-alert { margin: 0 0 16px; }
     #compute-overlay .pf-v6-c-form-control,
     #compute-overlay .pf-v6-c-form-control select {
       width: 100%;
@@ -7775,6 +7776,8 @@
           { name: 'Boot disk', size: 30, unit: 'GiB', bootable: true, storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
           { name: 'cloud-init-disk', size: 'Dynamic', storageTierId: 'st-balanced-01', storageTierLabel: 'Balanced' },
         ],
+        /** OSAC-4281: boot disk access mode drives hot-plug vs restart resize path */
+        bootDiskAccessMode: 'RWX',
         utilizationDisplay: {
           cpuAbs: '92 m', cpuOf: '1', cpuPct: 9.2,
           memAbs: '573 MiB', memOf: '2 GiB', memPct: 28,
@@ -7782,11 +7785,11 @@
           network: '5.3 KBps', netIn: '2.9 KBps', netOut: '2.4 KBps',
         },
       },
-      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-inference-standard', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38' },
-      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', computeResource: 'large-gpu', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }], sshSecretId: 'ssh-cluster-admin', cloudInitSource: 'inline', cloudInit: '#cloud-config\npackages:\n  - nginx\n' },
-      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'vm-windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48', sysprepConfigured: true, sysprepSecretId: 'sysprep-corp-std' },
+      { name: 'azure-baboon-27', ns: 'yifat', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-inference-standard', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '10.130.1.223', created: '11 Feb 2026, 8:38', bootDiskAccessMode: 'RWO' },
+      { name: 'rhel9-black-gunnysack-58', ns: 'project-a', status: 'running', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 9', imageLabel: 'RHEL 9.4', catalogItem: 'vm-gpu-training-server', conditions: ['DataVolumesReady=True', 'Ready=True'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '10.130.1.224', created: '19 Jan 2026, 7:29', computeResource: 'large-gpu', gpuDevices: [{ name: 'NVIDIA A100 80 GB' }], hostDevices: [{ name: 'host-pci-1' }], sshSecretId: 'ssh-cluster-admin', cloudInitSource: 'inline', cloudInit: '#cloud-config\npackages:\n  - nginx\n', bootDiskAccessMode: 'RWO' },
+      { name: 'windows-golden-eider-58', ns: 'project-a', status: 'stopped', os: 'Windows', osFull: 'Microsoft Windows Server 2022', imageLabel: 'Windows Server 2022', catalogItem: 'vm-windows-workstation', conditions: ['Ready=True'], node: 'cnvge-079.lab.eng.thv2.redhat.com', ip: '—', created: '11 Feb 2026, 9:48', sysprepConfigured: true, sysprepSecretId: 'sysprep-corp-std', bootDiskAccessMode: 'RWO' },
       { name: 'fedora-aqua-barnacle-58', ns: 'yifat', status: 'running', os: 'Fedora', osFull: 'Fedora Linux 41', imageLabel: 'Fedora 41', catalogItem: 'vm-dev-workstation', conditions: ['DataVolumesReady=True', 'LiveMigratable=True'], node: 'cnvge-081.lab.eng.thv2.redhat.com', ip: '10.130.1.231', created: '11 Feb 2026, 8:49', hostDevices: [{ name: 'host-usb-1' }], sshSecretId: 'ssh-yifat-dev', cloudInitSource: 'secret', cloudInitSecretId: 'ud-fedora-init' },
-      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'vm-legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }] },
+      { name: 'rhel8-mystic-eagle-22', ns: 'vmaas', status: 'ErrorPvcNotFound', os: 'RHEL', osFull: 'Red Hat Enterprise Linux 8', imageLabel: 'RHEL 8.10', catalogItem: 'vm-legacy-app-server', conditions: ['Provisioning=False', 'Ready=False'], node: 'cnvge-080.lab.eng.thv2.redhat.com', ip: '—', created: '22 Jan 2026, 14:42', alerts: [{ severity: 'warning', message: 'Boot disk is unavailable' }, { severity: 'warning', message: 'Virtual machine is not Ready' }], bootDiskAccessMode: 'RWO' },
     ];
 
     const FILTER_CATALOG = {
@@ -8151,6 +8154,80 @@
         : 'This virtual machine configuration allows instance types without a GPU.';
     }
 
+    /** OSAC-4281: boot disk access mode (RWX → hot-plug; RWO / unknown → restart). */
+    function vmBootDiskAccessMode(vm) {
+      const mode = String(vm?.bootDiskAccessMode || '').trim().toUpperCase();
+      return mode === 'RWX' || mode === 'RWO' ? mode : 'UNKNOWN';
+    }
+
+    function vmPowerKind(status) {
+      const s = String(status || '').toLowerCase();
+      if (s === 'running') return 'running';
+      if (s === 'stopped') return 'stopped';
+      if (
+        s === 'starting'
+        || s === 'provisioning'
+        || s === 'waitingforvolumebinding'
+        || s === 'waitingforreceiver'
+      ) return 'starting';
+      if (s === 'stopping' || s === 'deleting' || s === 'terminating') return 'stopping';
+      if (s === 'paused' || s === 'migrating') return s;
+      if (s === 'errorpvcnotfound' || /^error/.test(s)) return 'error';
+      return 'other';
+    }
+
+    /** Enabled only when RUNNING or STOPPED (ticket); disabled STARTING / STOPPING / DELETING. */
+    function canResizeVmInstanceType(vm) {
+      const kind = vmPowerKind(vm?.status);
+      return kind === 'running' || kind === 'stopped';
+    }
+
+    function resizeVmInstanceTypeDisabledReason(vm) {
+      const kind = vmPowerKind(vm?.status);
+      if (kind === 'starting') {
+        return 'Resize is unavailable while the virtual machine is starting.';
+      }
+      if (kind === 'stopping') {
+        return 'Resize is unavailable while the virtual machine is stopping or deleting.';
+      }
+      if (kind === 'running' || kind === 'stopped') return '';
+      return 'Resize is available when the virtual machine is running or stopped.';
+    }
+
+    /**
+     * OSAC-4281 resize paths:
+     * - hotplug: RUNNING + RWX
+     * - restart-running: RUNNING + RWO / unknown
+     * - restart-stopped: STOPPED + any
+     */
+    function vmResizePath(vm) {
+      const kind = vmPowerKind(vm?.status);
+      if (kind === 'stopped') return 'restart-stopped';
+      if (kind === 'running') {
+        return vmBootDiskAccessMode(vm) === 'RWX' ? 'hotplug' : 'restart-running';
+      }
+      return null;
+    }
+
+    function editComputeResizeAlertHtml(path, selectionChanged) {
+      if (!selectionChanged) return '';
+      if (path === 'restart-running') {
+        return `
+          <div class="pf-v6-c-alert pf-m-inline pf-m-warning compute-resize-alert" role="status">
+            <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+            <div class="pf-v6-c-alert__title">This resize requires a VM restart. The VM will not be restarted automatically.</div>
+          </div>`;
+      }
+      if (path === 'restart-stopped') {
+        return `
+          <div class="pf-v6-c-alert pf-m-inline pf-m-info compute-resize-alert" role="status">
+            <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
+            <div class="pf-v6-c-alert__title">Resize will apply on next start.</div>
+          </div>`;
+      }
+      return '';
+    }
+
 
     function formatComputeDisplay(id) {
       const specs = computeResourceSpecs(id);
@@ -8367,9 +8444,12 @@
       const toggleDesc = selectedParts.desc || '';
       const requireGpu = !!m.requireGpu;
       const vmComputeOptions = filteredVmComputeResources(m.filter, { requireGpu });
+      const selectionChanged = !!m.initialId && m.selectedId !== m.initialId;
+      const resizeAlert = editComputeResizeAlertHtml(m.resizePath, selectionChanged);
       const descEl = document.getElementById('compute-modal-desc');
       if (descEl) descEl.textContent = editComputeModalDescription(requireGpu);
         body.innerHTML = `
+          ${resizeAlert}
           <div class="form-field">
           <label id="f-edit-compute-resource-label">Instance type <span class="req">*</span></label>
           <div class="rich-select rich-select--typeahead ${m.menuOpen ? 'pf-m-expanded' : ''}" id="edit-compute-select">
@@ -8446,12 +8526,15 @@
 
     function openEditComputeModal() {
       const vm = VMS.find(v => v.name === state.selectedVmName);
-      if (!vm) return;
+      if (!vm || !canResizeVmInstanceType(vm)) return;
       const requireGpu = vmRequiresGpu(vm);
       const selectedId = resolveVmComputeId(vm);
       const matching = filteredVmComputeResources('', { requireGpu });
+      const initialId = matching.some(c => c.id === selectedId) ? selectedId : (matching[0]?.id || selectedId);
       state.editComputeModal = {
-        selectedId: matching.some(c => c.id === selectedId) ? selectedId : (matching[0]?.id || selectedId),
+        selectedId: initialId,
+        initialId,
+        resizePath: vmResizePath(vm),
         menuOpen: false,
         filter: '',
         requireGpu,
@@ -8475,14 +8558,33 @@
       const id = state.editComputeModal?.selectedId
         || document.getElementById('f-edit-compute-resource')?.value;
       if (!vm || !id) return;
+      if (!canResizeVmInstanceType(vm)) {
+        toast(resizeVmInstanceTypeDisabledReason(vm) || 'Resize is unavailable for this virtual machine.', 'danger');
+        return;
+      }
       if (state.editComputeModal && computeResourceHasGpu(id) !== !!state.editComputeModal.requireGpu) {
         toast('Choose an instance type that matches this virtual machine’s GPU configuration.', 'danger');
         return;
       }
+      const path = state.editComputeModal?.resizePath || vmResizePath(vm);
+      const changed = !!state.editComputeModal?.initialId && id !== state.editComputeModal.initialId;
       applyComputeResourceToVm(vm, id);
       closeEditComputeModal();
       renderVmDetail();
-      toast(`Instance type updated to ${computeResourceLabel(id)}.`, 'success');
+      const label = computeResourceLabel(id);
+      if (!changed) {
+        toast(`Instance type updated to ${label}.`, 'success');
+        return;
+      }
+      if (path === 'restart-running') {
+        toast(`Instance type updated to ${label}. Restart the virtual machine to apply the resize.`, 'success');
+        return;
+      }
+      if (path === 'restart-stopped') {
+        toast(`Instance type updated to ${label}. Resize will apply on next start.`, 'success');
+        return;
+      }
+      toast(`Instance type updated to ${label}.`, 'success');
     }
 
     function wireEditComputeModal() {
@@ -9299,7 +9401,7 @@
       overviewMenuOpen: null, // 'nic:<name>' | 'disk:<index>'
       overviewRowMenuBtn: null,
       overviewRowMenuConfig: null,
-      editComputeModal: null, // { selectedId, menuOpen, filter }
+      editComputeModal: null, // { selectedId, initialId, resizePath, menuOpen, filter, requireGpu }
       deleteResource: null, // { kind: 'nic'|'disk', name, index? }
       deleteCatalogItemId: null,
       nicModal: null, // { context, view, name, model, network, bootSource, mac, linkState }
@@ -15239,6 +15341,12 @@
       const editDisabledAttr = canEditConfig ? '' : ' disabled';
       const editTitleAttr = canEditConfig ? ' title="Edit"' : ` title="${noEditReason}"`;
       const addDisabledAttrs = canEditConfig ? '' : ` disabled title="${noEditReason}"`;
+      const canResizeCompute = canEditConfig && canResizeVmInstanceType(v);
+      const resizeDisabledReason = !canEditConfig
+        ? noEditReason
+        : (resizeVmInstanceTypeDisabledReason(v) || 'Resize is unavailable for this virtual machine.');
+      const editComputeDisabledAttr = canResizeCompute ? '' : ' disabled';
+      const editComputeTitleAttr = canResizeCompute ? ' title="Edit"' : ` title="${resizeDisabledReason}"`;
       const itNameSafe = String(computeFields.name).replace(/</g, '&lt;');
       const hasGpu = Number(computeFields.gpuCount) > 0;
       const gpuTypeSafe = String(computeFields.gpuResource || '—').replace(/</g, '&lt;');
@@ -15255,7 +15363,7 @@
       const itSubtitleRow = `
         <div class="ethan-detail-col__subtitle-row">
           <h4 class="ethan-detail-col__subtitle">Instance type</h4>
-          <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit instance type"${editTitleAttr}${editDisabledAttr}>
+          <button type="button" class="vm-edit-inline" data-edit-compute aria-label="Edit instance type"${editComputeTitleAttr}${editComputeDisabledAttr}>
             <i class="fa-solid fa-pen" aria-hidden="true"></i>
           </button>
         </div>`;
@@ -15564,7 +15672,7 @@
       root.querySelector('#btn-overview-add-net')?.addEventListener('click', () => openAddNetworkModal('vm-detail'));
       root.querySelector('#btn-overview-add-disk')?.addEventListener('click', () => openAddDiskModal('vm-detail'));
       root.querySelector('[data-edit-compute]')?.addEventListener('click', () => {
-        if (!canEditConfig) return;
+        if (!canResizeCompute) return;
         openEditComputeModal();
       });
       root.querySelectorAll('[data-overview-row-menu]').forEach(b => {
