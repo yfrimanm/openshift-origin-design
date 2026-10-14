@@ -420,6 +420,19 @@
     .page-header--with-desc { align-items: flex-start; }
     .page-header__text { min-width: 0; flex: 1 1 auto; }
     .page-header__text .page-title { flex: none; margin-bottom: 4px; }
+    .page-section-label {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 0 8px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--vmaas-bg-subtle, #f2f2f2);
+      color: var(--vmaas-text-subtle, #6a6e73);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
     .page-desc {
       margin: 0;
       max-width: 52rem;
@@ -427,6 +440,25 @@
       line-height: 1.45;
       color: var(--vmaas-text-subtle);
     }
+    .net-summary {
+      margin: 12px 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.45;
+      color: var(--vmaas-text);
+    }
+    .net-nat-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.35;
+    }
+    .net-nat-cell__ip {
+      font-size: 12px;
+      color: var(--vmaas-text-subtle);
+    }
+    #net-toolbar .tpl-view-toggle { margin-left: auto; }
+    #net-toolbar .filter-name-search { max-width: 280px; }
     .lifecycle-label {
       display: inline-flex;
       align-items: center;
@@ -6721,7 +6753,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7142</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7143</span>
         </div>
       </div>
       <div class="console__body">
@@ -7025,37 +7057,72 @@
           </section>
 
           <section class="view" id="view-networks">
-            <div class="page-header">
-              <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Networks</h2>
-              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-network">Create</button>
+            <div class="page-header page-header--with-desc">
+              <div class="page-header__text">
+                <span class="page-section-label">Networking</span>
+                <h2 class="page-title pf-v6-c-title pf-m-2xl pf-m-page-title">Virtual networks</h2>
+                <p class="page-desc">Virtual networks your tenant uses for workloads and catalog networking.</p>
+              </div>
+              <button type="button" class="pf-v6-c-button pf-m-primary" id="btn-create-network">
+                <span class="pf-v6-c-button__icon pf-m-start"><i class="fa-solid fa-plus" aria-hidden="true"></i></span>
+                <span class="pf-v6-c-button__text">Create virtual network</span>
+              </button>
             </div>
-            <p class="muted" style="margin:-8px 0 16px;font-size:13px;max-width:720px;line-height:1.45;">
-              Create and manage tenant networks here. Attach a network in
-              <strong>Create virtual machine → Network</strong>.
-            </p>
-            <div class="filter-bar">
-              <button type="button" class="filter-select">Project: <strong>All</strong> <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></button>
+            <div class="tpl-toolbar" id="net-toolbar">
+              <div class="filter-dd-wrap" id="net-status-dd">
+                <button type="button" class="pf-v6-c-menu-toggle filter-dd-btn" id="net-status-toggle" aria-expanded="false" aria-haspopup="listbox" aria-label="Filter by status">
+                  <span class="pf-v6-c-menu-toggle__text" id="net-status-label">All statuses</span>
+                  <span class="pf-v6-c-menu-toggle__controls">
+                    <span class="pf-v6-c-menu-toggle__toggle-icon" aria-hidden="true">
+                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                    </span>
+                  </span>
+                </button>
+                <div class="pf-v6-c-menu filter-dd-menu" id="net-status-menu" role="listbox" aria-label="Status filter">
+                  <div class="pf-v6-c-menu__content">
+                    <ul class="pf-v6-c-menu__list" role="presentation">
+                      <li class="pf-v6-c-menu__list-item" role="option" tabindex="0" data-net-status="all" aria-selected="true">
+                        <button type="button" class="pf-v6-c-menu__item"><span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">All statuses</span></span></button>
+                      </li>
+                      <li class="pf-v6-c-menu__list-item" role="option" tabindex="0" data-net-status="Ready">
+                        <button type="button" class="pf-v6-c-menu__item"><span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Ready</span></span></button>
+                      </li>
+                      <li class="pf-v6-c-menu__list-item" role="option" tabindex="0" data-net-status="Provisioning">
+                        <button type="button" class="pf-v6-c-menu__item"><span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Provisioning</span></span></button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
               <div class="filter-name-search">
                 <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                <input type="search" id="net-search" placeholder="Search by name..." aria-label="Search networks" />
+                <input type="search" id="net-search" placeholder="Search virtual networks" aria-label="Search virtual networks" />
+              </div>
+              <div class="tpl-view-toggle" id="net-view-toggle" role="group" aria-label="Virtual networks view">
+                <button type="button" data-net-view="cards" aria-pressed="false" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+                <button type="button" data-net-view="list" class="pf-m-selected" aria-pressed="true" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
               </div>
             </div>
+            <p class="net-summary" id="net-summary" hidden></p>
             <div id="net-table-area">
               <div style="overflow-x:auto;" id="net-table-scroll">
               <table class="pf-v6-c-table pf-m-grid-md vm-table" role="grid">
                 <thead class="pf-v6-c-table__thead">
                   <tr class="pf-v6-c-table__tr">
                     <th class="pf-v6-c-table__th" scope="col">Name</th>
-                    <th class="pf-v6-c-table__th" scope="col">Project</th>
-                    <th class="pf-v6-c-table__th" scope="col">CIDR</th>
                     <th class="pf-v6-c-table__th" scope="col">Status</th>
-                    <th class="pf-v6-c-table__th" scope="col">Connected VMs</th>
+                    <th class="pf-v6-c-table__th" scope="col">IPv4 CIDR</th>
+                    <th class="pf-v6-c-table__th" scope="col">IPv6 CIDR</th>
+                    <th class="pf-v6-c-table__th" scope="col">Subnets</th>
+                    <th class="pf-v6-c-table__th" scope="col">Security groups</th>
+                    <th class="pf-v6-c-table__th" scope="col">NAT gateway</th>
                     <th class="pf-v6-c-table__th" scope="col" style="width:40px;"><span class="pf-v6-screen-reader">Actions</span></th>
                   </tr>
                 </thead>
                 <tbody class="pf-v6-c-table__tbody" id="net-tbody"></tbody>
               </table>
               </div>
+              <div class="vm-cards" id="net-cards-gallery" hidden role="list" aria-label="Virtual networks"></div>
             </div>
           </section>
 
@@ -9328,6 +9395,7 @@
         vms: 5,
         description: 'Primary tenant compute network',
         created: 'Jul 1, 2026, 11:00 AM',
+        natGateway: { name: 'edge-nat', ip: '203.0.113.0' },
         subnets: [
           { name: 'bm-compute-a', status: 'Ready', cidr: '10.42.0.0/24', vlan: 200 },
           { name: 'bm-compute-b', status: 'Provisioning', cidr: '10.42.1.0/24', vlan: 201 },
@@ -9339,52 +9407,17 @@
         ],
       },
       {
-        id: 'net-default',
-        name: 'default',
-        type: 'Provider',
-        project: 'project-a',
-        cidr: '10.128.0.0/14',
-        ipv6Cidr: '',
-        status: 'Ready',
-        vms: 3,
-        description: 'Default provider network',
-        created: 'Jan 12, 2026, 9:00 AM',
-        subnets: [
-          { name: 'default-a', status: 'Ready', cidr: '10.128.0.0/24', vlan: 100 },
-        ],
-        securityGroups: [
-          { name: 'allow-ssh-https', status: 'Ready', summary: 'In: SSH (22), HTTPS (443) · Out: Allow all' },
-        ],
-      },
-      {
-        id: 'net-app',
-        name: 'app-tier',
-        type: 'Isolated',
-        project: 'yifat',
-        cidr: '192.168.10.0/24',
-        ipv6Cidr: '',
-        status: 'Ready',
-        vms: 1,
-        description: 'Application tier network',
-        created: 'Mar 4, 2026, 2:15 PM',
-        subnets: [
-          { name: 'app-subnet-a', status: 'Ready', cidr: '192.168.10.0/24', vlan: 310 },
-        ],
-        securityGroups: [
-          { name: 'web-sg', status: 'Ready', summary: 'In: HTTP/HTTPS · Out: Allow all' },
-        ],
-      },
-      {
         id: 'net-shared',
-        name: 'org-shared',
+        name: 'shared-services',
         type: 'Shared',
         project: 'vmaas',
         cidr: '10.40.0.0/22',
-        ipv6Cidr: '',
+        ipv6Cidr: '2001:db8:10::/48',
         status: 'Ready',
         vms: 0,
-        description: 'Organization shared services network',
+        description: 'Shared services network for common platform workloads',
         created: 'Feb 18, 2026, 10:30 AM',
+        natGateway: null,
         subnets: [
           { name: 'shared-a', status: 'Ready', cidr: '10.40.0.0/24', vlan: 400 },
         ],
@@ -9419,6 +9452,8 @@
       tplFilter: '',
       tplView: 'cards', // cards | list
       vmView: 'list', // list | cards
+      netView: 'list', // list | cards
+      netStatusFilter: 'all', // all | Ready | Provisioning
       /* Template step filters — Figma Oeu6pCcWLzQWnQfBjwzbsn */
       tplFilters: {
         osImages: [], // empty = all; values from CATALOG_OS_IMAGES
@@ -16043,41 +16078,172 @@
       renderWizard();
     }
 
+    function netNatHtml(n, { stacked = true } = {}) {
+      const nat = n && n.natGateway;
+      if (!nat || !nat.name) return '<span class="muted">-</span>';
+      const name = String(nat.name).replace(/</g, '&lt;');
+      const ip = nat.ip ? String(nat.ip).replace(/</g, '&lt;') : '';
+      if (!stacked || !ip) return name;
+      return `<span class="net-nat-cell"><span>${name}</span><span class="net-nat-cell__ip">${ip}</span></span>`;
+    }
+
+    function syncNetListViewChrome() {
+      document.querySelectorAll('#net-view-toggle [data-net-view]').forEach(btn => {
+        const selected = btn.dataset.netView === state.netView;
+        btn.classList.toggle('pf-m-selected', selected);
+        btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      });
+      const label = document.getElementById('net-status-label');
+      if (label) {
+        label.textContent = state.netStatusFilter === 'all' ? 'All statuses' : state.netStatusFilter;
+      }
+      document.querySelectorAll('#net-status-menu [data-net-status]').forEach(item => {
+        item.setAttribute('aria-selected', item.dataset.netStatus === state.netStatusFilter ? 'true' : 'false');
+      });
+    }
+
+    function filteredNetworks(q = '') {
+      const search = String(q || '').trim().toLowerCase();
+      const status = state.netStatusFilter || 'all';
+      return NETWORKS.filter(n => {
+        if (status !== 'all' && String(n.status) !== status) return false;
+        if (!search) return true;
+        return String(n.name || '').toLowerCase().includes(search)
+          || String(n.cidr || '').toLowerCase().includes(search)
+          || String(n.ipv6Cidr || '').toLowerCase().includes(search);
+      });
+    }
+
+    function renderNetworkListCard(n) {
+      const id = String(n.id).replace(/"/g, '&quot;');
+      const name = String(n.name).replace(/</g, '&lt;');
+      const subnetCount = Array.isArray(n.subnets) ? n.subnets.length : 0;
+      const sgCount = Array.isArray(n.securityGroups) ? n.securityGroups.length : 0;
+      const ipv4 = String(n.cidr || '—').replace(/</g, '&lt;');
+      const ipv6 = n.ipv6Cidr ? String(n.ipv6Cidr).replace(/</g, '&lt;') : '—';
+      return `
+        <article class="tpl-card vm-list-card" data-net-card="${id}" role="listitem" tabindex="0" aria-label="${name}">
+          <div class="vm-list-card__header">
+            <div class="vm-list-card__header-left">
+              <span class="vm-list-card__icon" aria-hidden="true">
+                <i class="fa-solid fa-network-wired"></i>
+              </span>
+            </div>
+            <div class="vm-list-card__header-right">
+              ${statusBadgeHtml(n.status)}
+              <button type="button" class="kebab" aria-label="Actions for ${name}" disabled title="Not available in this prototype">
+                <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="tpl-card__title name-link" data-open-network="${id}">${name}</button>
+          <dl class="vm-list-card__footer vm-list-card__footer--fields">
+            <div class="vm-list-card__footer-row"><dt>IPv4 CIDR</dt><dd>${ipv4}</dd></div>
+            <div class="vm-list-card__footer-row"><dt>IPv6 CIDR</dt><dd>${ipv6 === '—' ? '<span class="muted">—</span>' : ipv6}</dd></div>
+            <div class="vm-list-card__footer-row"><dt>Subnets</dt><dd>${subnetCount}</dd></div>
+            <div class="vm-list-card__footer-row"><dt>Security groups</dt><dd>${sgCount}</dd></div>
+            <div class="vm-list-card__footer-row"><dt>NAT gateway</dt><dd>${netNatHtml(n, { stacked: false })}</dd></div>
+          </dl>
+        </article>
+      `;
+    }
+
+    function bindNetworkOpeners(root) {
+      if (!root) return;
+      root.querySelectorAll('[data-open-network]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          openNetworkDetail(btn.dataset.openNetwork);
+        });
+      });
+    }
+
     function renderNetworks(q = '') {
       const search = String(q || '').trim();
-      const rows = NETWORKS.filter(n => !search || n.name.toLowerCase().includes(search.toLowerCase()));
+      const rows = filteredNetworks(search);
       const tbody = document.getElementById('net-tbody');
+      const tableScroll = document.getElementById('net-table-scroll');
+      const gallery = document.getElementById('net-cards-gallery');
+      const summary = document.getElementById('net-summary');
       if (!tbody) return;
+
+      syncNetListViewChrome();
+      const isCards = state.netView === 'cards';
+      const n = rows.length;
+      if (summary) {
+        if (!n && !NETWORKS.length) {
+          summary.hidden = true;
+          summary.textContent = '';
+        } else {
+          summary.hidden = false;
+          summary.textContent = `${n} virtual network${n === 1 ? '' : 's'}`;
+        }
+      }
+
       if (!rows.length) {
         tbody.innerHTML = '';
+        if (gallery) {
+          gallery.hidden = true;
+          gallery.innerHTML = '';
+        }
+        if (tableScroll) tableScroll.hidden = true;
         const emptyHtml = !NETWORKS.length
           ? emptyStateHtml({
             title: 'No virtual networks yet',
             body: 'Create a virtual network to attach virtual machines.',
           })
-          : (search
-            ? emptyStateSearchHtml('networks')
-            : emptyStateFiltersHtml('networks'));
+          : (search || (state.netStatusFilter && state.netStatusFilter !== 'all')
+            ? (search ? emptyStateSearchHtml('virtual networks') : emptyStateFiltersHtml('virtual networks'))
+            : emptyStateFiltersHtml('virtual networks'));
         showListEmptyState('net-table-area', 'net-table-scroll', 'net-empty-state', emptyHtml);
         return;
       }
+
       clearListEmptyState('net-table-scroll', 'net-empty-state');
-      tbody.innerHTML = rows.map(n => `
+
+      if (isCards) {
+        if (tableScroll) tableScroll.hidden = true;
+        tbody.innerHTML = '';
+        if (gallery) {
+          gallery.hidden = false;
+          gallery.innerHTML = rows.map(renderNetworkListCard).join('');
+          bindNetworkOpeners(gallery);
+          gallery.querySelectorAll('[data-net-card]').forEach(card => {
+            card.addEventListener('keydown', e => {
+              if (e.key !== 'Enter' && e.key !== ' ') return;
+              e.preventDefault();
+              openNetworkDetail(card.dataset.netCard);
+            });
+          });
+        }
+        return;
+      }
+
+      if (gallery) {
+        gallery.hidden = true;
+        gallery.innerHTML = '';
+      }
+      if (tableScroll) tableScroll.hidden = false;
+      tbody.innerHTML = rows.map(nRow => {
+        const id = String(nRow.id).replace(/"/g, '&quot;');
+        const name = String(nRow.name).replace(/</g, '&lt;');
+        const subnetCount = Array.isArray(nRow.subnets) ? nRow.subnets.length : 0;
+        const sgCount = Array.isArray(nRow.securityGroups) ? nRow.securityGroups.length : 0;
+        const ipv4 = String(nRow.cidr || '—').replace(/</g, '&lt;');
+        const ipv6 = nRow.ipv6Cidr ? String(nRow.ipv6Cidr).replace(/</g, '&lt;') : '—';
+        return `
         <tr class="pf-v6-c-table__tr">
-          <td class="pf-v6-c-table__td"><button type="button" class="name-link" data-open-network="${String(n.id).replace(/"/g, '&quot;')}">${String(n.name).replace(/</g, '&lt;')}</button></td>
-          <td class="pf-v6-c-table__td"><button type="button" class="name-link" data-open-project="${String(n.project).replace(/"/g, '&quot;')}">${String(n.project).replace(/</g, '&lt;')}</button></td>
-          <td class="pf-v6-c-table__td">${n.cidr}</td>
-          <td class="pf-v6-c-table__td">${n.status}</td>
-          <td class="pf-v6-c-table__td">${n.vms}</td>
-          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${n.name}"><i class="fa-solid fa-ellipsis-v"></i></button></td>
-        </tr>
-      `).join('');
-      tbody.querySelectorAll('[data-open-network]').forEach(btn => {
-        btn.addEventListener('click', () => openNetworkDetail(btn.dataset.openNetwork));
-      });
-      tbody.querySelectorAll('[data-open-project]').forEach(btn => {
-        btn.addEventListener('click', () => openProjectDetail(btn.dataset.openProject));
-      });
+          <td class="pf-v6-c-table__td"><button type="button" class="name-link" data-open-network="${id}">${name}</button></td>
+          <td class="pf-v6-c-table__td">${statusBadgeHtml(nRow.status)}</td>
+          <td class="pf-v6-c-table__td">${ipv4}</td>
+          <td class="pf-v6-c-table__td">${ipv6 === '—' ? '<span class="muted">—</span>' : ipv6}</td>
+          <td class="pf-v6-c-table__td">${subnetCount}</td>
+          <td class="pf-v6-c-table__td">${sgCount}</td>
+          <td class="pf-v6-c-table__td">${netNatHtml(nRow)}</td>
+          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${name}" disabled title="Not available in this prototype"><i class="fa-solid fa-ellipsis-v"></i></button></td>
+        </tr>`;
+      }).join('');
+      bindNetworkOpeners(tbody);
     }
 
     function typeLabel(t) {
@@ -19259,6 +19425,7 @@
               status: 'Ready',
               vms: 0,
               description: n.description || '',
+              natGateway: null,
               subnets: n.cidr ? [{ name: n.name, status: 'Ready', cidr: n.cidr, vlan: '—' }] : [],
               securityGroups: [],
             });
@@ -22203,9 +22370,16 @@
             <aside class="ethan-aside-card" aria-labelledby="vn-nat-title">
               <div class="ethan-aside-card__head">
                 <h3 class="ethan-aside-card__title" id="vn-nat-title">NAT gateway</h3>
-                <button type="button" class="name-link" disabled title="Not available in this prototype">+ Attach</button>
+                <button type="button" class="name-link" disabled title="Not available in this prototype">${net.natGateway ? 'Manage' : '+ Attach'}</button>
               </div>
-              <p class="ethan-aside-card__body">No NAT gateway attached to this virtual network.</p>
+              ${net.natGateway && net.natGateway.name
+                ? `<div class="ethan-aside-card__body">
+                    <div class="net-nat-cell">
+                      <span>${String(net.natGateway.name).replace(/</g, '&lt;')}</span>
+                      ${net.natGateway.ip ? `<span class="net-nat-cell__ip">${String(net.natGateway.ip).replace(/</g, '&lt;')}</span>` : ''}
+                    </div>
+                  </div>`
+                : '<p class="ethan-aside-card__body">No NAT gateway attached to this virtual network.</p>'}
             </aside>
           </div>
           <section class="ethan-resource-section" aria-labelledby="vn-subnets-title">
@@ -23419,6 +23593,45 @@
     };
     document.getElementById('vm-search-global').addEventListener('input', filterVms);
     document.getElementById('net-search')?.addEventListener('input', e => renderNetworks(e.target.value));
+    document.getElementById('net-view-toggle')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-net-view]');
+      if (!btn) return;
+      const view = btn.dataset.netView;
+      if (view !== 'cards' && view !== 'list') return;
+      if (state.netView === view) return;
+      state.netView = view;
+      renderNetworks(document.getElementById('net-search')?.value || '');
+    });
+    function closeNetStatusMenu() {
+      const menu = document.getElementById('net-status-menu');
+      const toggle = document.getElementById('net-status-toggle');
+      menu?.classList.remove('pf-m-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.classList.remove('pf-m-expanded');
+    }
+    document.getElementById('net-status-toggle')?.addEventListener('click', e => {
+      e.stopPropagation();
+      const menu = document.getElementById('net-status-menu');
+      const toggle = document.getElementById('net-status-toggle');
+      if (!menu || !toggle) return;
+      const willOpen = !menu.classList.contains('pf-m-open');
+      closeNetStatusMenu();
+      if (willOpen) {
+        menu.classList.add('pf-m-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.classList.add('pf-m-expanded');
+      }
+    });
+    document.getElementById('net-status-menu')?.addEventListener('click', e => {
+      const item = e.target.closest('[data-net-status]');
+      if (!item) return;
+      state.netStatusFilter = item.dataset.netStatus || 'all';
+      closeNetStatusMenu();
+      renderNetworks(document.getElementById('net-search')?.value || '');
+    });
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#net-status-dd')) closeNetStatusMenu();
+    });
     document.getElementById('role-select').addEventListener('change', applyRole);
 
     document.getElementById('vm-bulk-menu-btn')?.addEventListener('click', e => {
