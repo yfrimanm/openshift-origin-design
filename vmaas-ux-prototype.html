@@ -16029,12 +16029,13 @@
       state.wizard = 'network';
       state.step = 0;
       state.maxVisited = 0;
+      // Prefill matches Ethan Create virtual network demo values
       state.netData = {
-        name: '',
-        description: '',
+        name: 'demo-workload',
+        description: 'Prefilled demo virtual network for tenant workloads',
         project: state.data.project || 'project-a',
-        cidr: '',
-        ipv6Cidr: '',
+        cidr: '10.60.0.0/16',
+        ipv6Cidr: '2001:db8:60::/48',
         type: 'isolated',
       };
       document.getElementById('wiz-title').textContent = 'Create virtual network';
@@ -16090,7 +16091,13 @@
       if (state.step > 0 || state.maxVisited > 0) return true;
       if (state.wizard === 'network') {
         const n = state.netData || {};
-        return !!(n.name || n.description || n.cidr || n.ipv6Cidr);
+        // Prefill is Ethan demo defaults — dirty when user changes any field
+        return n.name !== 'demo-workload'
+          || n.description !== 'Prefilled demo virtual network for tenant workloads'
+          || n.cidr !== '10.60.0.0/16'
+          || n.ipv6Cidr !== '2001:db8:60::/48'
+          || state.step > 0
+          || state.maxVisited > 0;
       }
       const d = state.data || {};
       return !!(
@@ -16392,12 +16399,20 @@
     function renderNetworkWizardPanel(panel, key) {
       const n = state.netData;
       if (key === 'net-details') {
+        const nameOk = isValidDnsLabel(n.name || '');
         panel.innerHTML = `
           <h3>Virtual network</h3>
           <p class="step-help">Create a virtual network to make address space available for workloads, subnets, and catalog networking.</p>
-          <div class="form-field">
+          <div class="form-field" id="net-name-field">
             <label for="f-net-name">Name <span class="req">*</span></label>
-            <input type="text" id="f-net-name" value="${String(n.name || '').replace(/"/g, '&quot;')}" placeholder="e.g. app-tier" />
+            <div class="name-row">
+              <input type="text" id="f-net-name" value="${String(n.name || '').replace(/"/g, '&quot;')}"
+                placeholder="e.g. demo-workload" autocomplete="off" aria-describedby="f-net-name-help" />
+              <span class="name-valid" ${nameOk ? '' : 'hidden'} aria-hidden="true">
+                <i class="fa-solid fa-circle-check"></i>
+              </span>
+            </div>
+            ${pfHelperText('Enter a valid DNS label (RFC 1035).', 'f-net-name-help')}
           </div>
           <div class="form-field">
             <label for="f-net-desc">Description</label>
@@ -16412,6 +16427,12 @@
             <input type="text" id="f-net-ipv6" value="${String(n.ipv6Cidr || '').replace(/"/g, '&quot;')}" placeholder="2001:db8::/64" />
           </div>
         `;
+        const nameInput = panel.querySelector('#f-net-name');
+        const nameIcon = panel.querySelector('.name-valid');
+        nameInput?.addEventListener('input', () => {
+          n.name = nameInput.value.trim();
+          if (nameIcon) nameIcon.hidden = !isValidDnsLabel(n.name);
+        });
         return;
       }
       const reviewRow = (label, value) => `
@@ -19211,8 +19232,8 @@
 
       if (state.wizard === 'network') {
         if (key === 'net-details') {
-          if (!state.netData.name) {
-            toast('Enter a name to continue.');
+          if (!state.netData.name || !isValidDnsLabel(state.netData.name)) {
+            toast('Enter a valid DNS label name to continue.');
             return;
           }
           if (!state.netData.cidr) {
@@ -19222,8 +19243,8 @@
         }
         if (state.step === steps.length - 1) {
           const n = state.netData;
-          if (!n.name) {
-            toast('Enter a name to continue.');
+          if (!n.name || !isValidDnsLabel(n.name)) {
+            toast('Enter a valid DNS label name to continue.');
             return;
           }
           if (!n.cidr) {
