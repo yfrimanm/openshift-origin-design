@@ -32,12 +32,12 @@ Document OSAC VMaaS **Virtual machine details Overview**: CNV-inspired card layo
 | **Actions** | Control ▸, Open console, Delete — disabled copy uses **Virtual machine** / **Virtual machines**. |
 | **Operating system** | Show OS from create/template metadata when known. If unknown: **—** + *Guest agent not reporting*. |
 | **SSH** | *Configured* + pencil, or ***Not configured*** as a link (+ pencil) → edit modal. Windows: *Not applicable*. **Tenant User:** pencil / link disabled. |
-| **Compute** | **Instance type** + edit pencil. **Tenant User:** pencil disabled. |
+| **Compute** | **Instance type** + edit pencil (resize). **Tenant Admin** and **Tenant User** can resize ([OSAC-4277](https://redhat.atlassian.net/browse/OSAC-4277) / [OSAC-4281](https://redhat.atlassian.net/browse/OSAC-4281)). |
 | **Console** | VNC console stays in the Details card (right), separated from the DL by a PF6 **vertical divider** — same card/grid, clearer identity vs access. |
 | **Network / Storage** | Card **Add** + row kebab **Edit** / **Delete**. Delete disabled in-menu with reason (last network / boot disk). Terminology: **Network**. **Tenant User:** Add + row kebabs disabled. |
 | **Utilization** | Metrics only when status is **Running**. Otherwise: *Virtual machine is not running*. Time range shown as static “Last 5 minutes”. |
 | **After create** | Lands on this Overview with success toast. |
-| **Roles** | Same shared mock shell: **Tenant Admin** (can edit Overview config) / **Tenant User** (read-only Overview config; power/console OK). Full matrix in Create doc. |
+| **Roles** | Same shared mock shell: **Tenant Admin** (can edit Overview config) / **Tenant User** (read-only Overview config **except Instance type resize**; power/console OK). Full matrix in Create doc. |
 | **Shell chrome** | Same shared mock as Create: PatternFly **Felt + Glass** (PF 6.6.1), aligned to Ethan’s [osac-bmaas](https://heyethankim.github.io/osac-bmaas/) — soft floating sidebar/main panels. |
 
 ---

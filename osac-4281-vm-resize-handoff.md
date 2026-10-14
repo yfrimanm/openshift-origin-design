@@ -33,7 +33,7 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 
 - Enabled when VM is **Running** or **Stopped**
 - Disabled during **Starting** / **Stopping** / **Deleting** (tooltip explains why)
-- **Tenant User:** edit control disabled (read-only Overview config)
+- **Roles:** **Tenant Admin** and **Tenant User** can resize (per [OSAC-4277](https://redhat.atlassian.net/browse/OSAC-4277)). Other Overview config (SSH, Network, Storage) stays read-only for Tenant User.
 
 ---
 
@@ -75,11 +75,12 @@ GPU VMs stay in the GPU instance-type set; non-GPU VMs stay non-GPU (mismatch bl
 
 ## How to review in the mock
 
-1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html) (Tenant Admin).
+1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7147) as **Tenant Admin** or **Tenant User**.
 2. Open **indigo-quokka-89** → Instance type pencil → pick another type → confirm **Apply Resize** (no alert).
 3. Open **azure-baboon-27** (Running + RWO) → change type → see **warning** alert.
 4. Open **windows-golden-eider-58** (Stopped) → change type → see **info** alert.
 5. Try a starting/stopping/error VM → edit should be unavailable.
+6. As **Tenant User**, confirm Instance type pencil works, while SSH / Network / Storage edits stay disabled.
 
 ---
 
