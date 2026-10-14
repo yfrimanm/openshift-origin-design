@@ -2796,6 +2796,116 @@
     }
     #compute-overlay .form-field { max-width: none; width: 100%; margin-bottom: 0; }
     #compute-overlay .compute-resize-alert { margin: 0 0 16px; }
+
+    /* Create VM / catalog Network — Ethan: elevated cards (shadow), no thin border */
+    .felt-select-boxes.felt-select-boxes--network-path,
+    #overlay #wiz-panel .felt-select-boxes.felt-select-boxes--network-path {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 40rem;
+    }
+    .felt-select-boxes--network-path .felt-select-box {
+      padding: 16px 18px;
+      gap: 0;
+      min-height: 0;
+      border: none;
+      border-radius: var(--pf-t--global--border--radius--lg, 12px);
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+      box-shadow: var(--pf-t--global--box-shadow--sm, 0 2px 8px rgba(0, 0, 0, 0.12));
+    }
+    .felt-select-boxes--network-path .felt-select-box:hover {
+      border: none;
+      box-shadow: var(--pf-t--global--box-shadow--md, 0 4px 16px rgba(0, 0, 0, 0.14));
+    }
+    .felt-select-boxes--network-path .felt-select-box:has(.felt-select-box__input:checked) {
+      padding: 16px 18px;
+      border: none;
+      box-shadow:
+        var(--pf-t--global--box-shadow--md, 0 4px 16px rgba(0, 0, 0, 0.14)),
+        0 0 0 2px var(--pf-t--global--border--color--clicked, #0066cc);
+    }
+    .felt-select-boxes--network-path .felt-select-box__icon { display: none; }
+    .felt-select-boxes--network-path .felt-select-box__text { padding-inline-end: 4rem; }
+    .felt-select-boxes--network-path .felt-select-box__desc {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .felt-select-boxes--network-path .felt-select-box__badge {
+      top: 10px;
+      right: 12px;
+      padding: 1px 7px;
+      font-size: 11px;
+    }
+    @media (max-width: 640px) {
+      .felt-select-boxes.felt-select-boxes--network-path { grid-template-columns: 1fr; }
+    }
+    /* Tenant default details — Ethan card: shadow + row dividers */
+    .network-path-summary {
+      display: grid;
+      gap: 0;
+      margin: 16px 0 0;
+      max-width: 40rem;
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+      border: none;
+      border-radius: var(--pf-t--global--border--radius--lg, 12px);
+      box-shadow: var(--pf-t--global--box-shadow--sm, 0 2px 8px rgba(0, 0, 0, 0.12));
+      overflow: hidden;
+    }
+    .network-path-summary__row {
+      display: grid;
+      grid-template-columns: 8.5rem minmax(0, 1fr);
+      gap: 12px 16px;
+      align-items: start;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--pf-t--global--border--color--default, #c7c7c7);
+    }
+    .network-path-summary__row:last-child {
+      border-bottom: none;
+    }
+    .network-path-summary__term {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vmaas-text, #151515);
+      padding-top: 2px;
+    }
+    .network-path-summary__name {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--vmaas-text, #151515);
+      line-height: 1.35;
+    }
+    .network-path-summary__detail {
+      display: block;
+      margin-top: 2px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .network-external-ip {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .network-external-ip > .form-field-label,
+    .network-external-ip > label.network-external-ip__heading {
+      display: block;
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .network-external-ip .pf-v6-c-switch {
+      --pf-v6-c-switch--FontSize: 14px;
+    }
+    .network-external-ip .pf-v6-c-switch__label {
+      font-weight: 400;
+    }
+    .network-external-ip .form-helper,
+    .network-external-ip .pf-v6-c-form__helper-text {
+      margin-top: 8px;
+      max-width: 40rem;
+    }
     #compute-overlay .pf-v6-c-form-control,
     #compute-overlay .pf-v6-c-form-control select {
       width: 100%;
@@ -8907,19 +9017,54 @@
     }
 
     const CONFIG_VIRTUAL_NETWORKS = [
-      { id: 'tenant-workload', label: 'tenant-workload', subnets: ['bm-compute-a', 'bm-compute-b'] },
-      { id: 'shared-services', label: 'shared-services', subnets: ['bm-compute-a', 'bm-shared'] },
+      {
+        id: 'tenant-workload',
+        label: 'tenant-workload',
+        description: 'Primary tenant compute network',
+        subnets: ['bm-compute-a', 'bm-compute-b'],
+      },
+      {
+        id: 'shared-services',
+        label: 'shared-services',
+        description: 'Shared services network',
+        subnets: ['bm-compute-a', 'bm-shared'],
+      },
     ];
+    const CONFIG_SUBNET_META = {
+      'bm-compute-a': { detail: '10.42.0.0/24 · VLAN 200' },
+      'bm-compute-b': { detail: '10.42.1.0/24 · VLAN 201' },
+      'bm-shared': { detail: '10.42.10.0/24 · VLAN 210' },
+    };
+    const TENANT_DEFAULT_NETWORK = {
+      virtualNetwork: 'tenant-workload',
+      subnet: 'bm-compute-a',
+    };
     const CONFIG_SECURITY_GROUPS = ['allow-ssh-https', 'restricted-egress', 'web-sg', 'db-sg'];
     const DEFAULT_SECURITY_GROUP = 'allow-ssh-https';
 
+    function virtualNetworkById(id) {
+      return CONFIG_VIRTUAL_NETWORKS.find(n => n.id === id) || null;
+    }
+
+    function virtualNetworkToggleLabel(id) {
+      const n = virtualNetworkById(id);
+      if (!n) return '';
+      return n.description ? `${n.label} · ${n.description}` : n.label;
+    }
+
+    function subnetToggleLabel(subnetId) {
+      if (!subnetId) return '';
+      const detail = CONFIG_SUBNET_META[subnetId]?.detail;
+      return detail ? `${subnetId} · ${detail}` : subnetId;
+    }
+
+    function subnetDetail(subnetId) {
+      return CONFIG_SUBNET_META[subnetId]?.detail || '';
+    }
+
     function isNetworkingComplete(d = state.data) {
-      return !!(
-        d.virtualNetwork
-        && d.subnet
-        && Array.isArray(d.securityGroups)
-        && d.securityGroups.length > 0
-      );
+      ensureNetworkingDefaults(d);
+      return !!(d.virtualNetwork && d.subnet);
     }
 
     function isDetailsComplete(d = state.data) {
@@ -9053,10 +9198,12 @@
 
     function validateNetworkingFields(d = state.data) {
       const errors = {};
-      if (!d.virtualNetwork) errors.virtualNetwork = 'Select a virtual network.';
-      if (!d.subnet) errors.subnet = 'Select a subnet.';
-      if (!Array.isArray(d.securityGroups) || d.securityGroups.length === 0) {
-        errors.securityGroups = 'Select at least one security group.';
+      ensureNetworkingDefaults(d);
+      if (d.networkMode === 'custom') {
+        if (!d.virtualNetwork) errors.virtualNetwork = 'Select a virtual network.';
+        if (!d.subnet) errors.subnet = 'Select a subnet.';
+      } else if (!d.virtualNetwork || !d.subnet) {
+        errors.virtualNetwork = 'Tenant default network is unavailable.';
       }
       return errors;
     }
@@ -9076,7 +9223,7 @@
     }
 
     function focusFirstFieldError(errors = state.fieldErrors) {
-      const order = ['catalog', 'name', 'project', 'diskImage', 'osImage', 'virtualNetwork', 'subnet', 'securityGroups'];
+      const order = ['catalog', 'name', 'project', 'diskImage', 'osImage', 'virtualNetwork', 'subnet'];
       const field = order.find(f => errors?.[f]);
       if (!field) return;
       if (field === 'catalog') {
@@ -9114,37 +9261,41 @@
         (key === 'clone-source' && !state.data.cloneSourceName);
     }
 
-    /** After network/subnet choice: auto-pick sole subnet and project default SG when empty. */
+    /** After network/subnet choice: auto-pick sole subnet when empty. */
     function applyNetworkingSmartDefaults(d, { networkChanged = false, subnetChanged = false } = {}) {
-      const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork);
+      const net = virtualNetworkById(d.virtualNetwork);
       if (!net) return;
       if (networkChanged) {
         d.subnet = '';
-        d.securityGroups = [];
         if (net.subnets.length === 1) d.subnet = net.subnets[0];
       }
-      if ((networkChanged || subnetChanged) && d.subnet) {
-        if (!Array.isArray(d.securityGroups) || d.securityGroups.length === 0) {
-          if (CONFIG_SECURITY_GROUPS.includes(DEFAULT_SECURITY_GROUP)) {
-            d.securityGroups = [DEFAULT_SECURITY_GROUP];
-          }
-        }
-      }
+      void subnetChanged;
     }
 
-    /** Prefill recommended project network so Network isn't an empty required form. */
+    function applyTenantDefaultNetwork(d = state.data) {
+      d.networkMode = 'tenant-default';
+      d.virtualNetwork = TENANT_DEFAULT_NETWORK.virtualNetwork;
+      const net = virtualNetworkById(d.virtualNetwork);
+      const preferred = TENANT_DEFAULT_NETWORK.subnet;
+      d.subnet = (net?.subnets || []).includes(preferred) ? preferred : (net?.subnets?.[0] || '');
+    }
+
+    /** Prefill tenant-default network; custom mode keeps user picks. */
     function ensureNetworkingDefaults(d = state.data) {
-      const knownNet = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork);
+      if (d.networkMode !== 'custom' && d.networkMode !== 'tenant-default') {
+        d.networkMode = 'tenant-default';
+      }
+      if (d.autoAttachExternalIp == null) d.autoAttachExternalIp = true;
+      if (d.networkMode !== 'custom') {
+        applyTenantDefaultNetwork(d);
+        return true;
+      }
+      const knownNet = virtualNetworkById(d.virtualNetwork);
       if (!knownNet) d.virtualNetwork = '';
       const active = knownNet || CONFIG_VIRTUAL_NETWORKS[0];
-      if (!d.virtualNetwork) d.virtualNetwork = active.id;
-      const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork) || active;
-      if (!d.subnet || !net.subnets.includes(d.subnet)) d.subnet = net.subnets[0] || '';
-      if (!Array.isArray(d.securityGroups) || d.securityGroups.length === 0) {
-        d.securityGroups = CONFIG_SECURITY_GROUPS.includes(DEFAULT_SECURITY_GROUP)
-          ? [DEFAULT_SECURITY_GROUP]
-          : (CONFIG_SECURITY_GROUPS[0] ? [CONFIG_SECURITY_GROUPS[0]] : []);
-      }
+      if (!d.virtualNetwork) d.virtualNetwork = active?.id || '';
+      const net = virtualNetworkById(d.virtualNetwork) || active;
+      if (!d.subnet || !(net?.subnets || []).includes(d.subnet)) d.subnet = net?.subnets?.[0] || '';
       return true;
     }
 
@@ -9338,10 +9489,11 @@
         bootDiskUnit: 'GiB',
         bootStorageTierId: 'st-balanced-01',
         bootStorageTierLabel: 'Balanced',
+        networkMode: 'tenant-default', // tenant-default | custom (OSAC / Ethan launch networking)
         virtualNetwork: '',
         subnet: '',
         securityGroups: [],
-        autoAttachExternalIp: false,
+        autoAttachExternalIp: true,
         project: 'project-a',
         group: '',
         sshPublicKey: '',
@@ -9363,14 +9515,13 @@
       networkModal: null,
       extIpModal: null,
       netData: {
-        type: 'isolated', // isolated | shared | provider
+        // Ethan Create virtual network: name, description, IPv4/IPv6 CIDR
         name: '',
         description: '',
         project: 'project-a',
-        cidr: '192.168.20.0/24',
-        gateway: '',
-        dns: '',
-        dhcp: true,
+        cidr: '',
+        ipv6Cidr: '',
+        type: 'isolated', // list display only — not shown in create wizard
       },
       selectedVms: new Set(),
       kebabVmName: null,
@@ -14198,6 +14349,9 @@
 
     function canSaveNetworkModal(m = state.networkModal) {
       if (!m) return false;
+      // Wizard / create-VM add-network: VN + subnet only (Ethan — no security groups).
+      // Overview add/edit still requires security groups.
+      if (m.context === 'wizard') return !!(m.virtualNetwork && m.subnet);
       return !!(m.virtualNetwork && m.subnet && Array.isArray(m.securityGroups) && m.securityGroups.length);
     }
 
@@ -14211,9 +14365,13 @@
       if (m.virtualNetwork && (!m.subnet || !subnetOpts.includes(m.subnet))) {
         m.subnet = subnetOpts[0] || '';
       }
+      const showSecurityGroups = m.context !== 'wizard';
       if (!Array.isArray(m.securityGroups)) m.securityGroups = [];
       m.securityGroups = m.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
-      if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+      if (showSecurityGroups && m.subnet && !m.securityGroups.length) {
+        m.securityGroups = [DEFAULT_SECURITY_GROUP];
+      }
+      if (!showSecurityGroups) m.securityGroups = [];
       const canSave = canSaveNetworkModal(m);
       const previewName = m.mode === 'edit' && m.editName
         ? m.editName
@@ -14228,7 +14386,7 @@
           </button>
         </span>
       `).join('');
-      const sgOpen = !!m.sgMenuOpen;
+      const sgOpen = !!m.sgMenuOpen && showSecurityGroups;
       const subnetEnabled = !!m.virtualNetwork;
       body.innerHTML = `
         ${m.error ? `
@@ -14254,7 +14412,12 @@
             hiddenInputId: 'net-f-virtual-network',
             disabled: !CONFIG_VIRTUAL_NETWORKS.length,
             emptyNoun: 'virtual networks',
-            options: CONFIG_VIRTUAL_NETWORKS.map(n => ({ id: n.id, title: n.label })),
+            stacked: true,
+            options: CONFIG_VIRTUAL_NETWORKS.map(n => ({
+              id: n.id,
+              title: n.label,
+              desc: n.description || '',
+            })),
           })}
           <p class="form-helper">Network name ${m.mode === 'edit' ? 'is' : 'will be'} <code>${previewName}</code>.</p>
           ${CONFIG_VIRTUAL_NETWORKS.length ? '' : `
@@ -14281,9 +14444,15 @@
             hiddenInputId: 'net-f-subnet',
             disabled: !subnetEnabled,
             emptyNoun: 'subnets',
-            options: subnetOpts.map(s => ({ id: s, title: s })),
+            options: subnetOpts.map(s => ({
+              id: s,
+              title: s,
+              desc: subnetDetail(s),
+            })),
+            stacked: true,
           })}
         </div>
+        ${showSecurityGroups ? `
         <div class="form-field" style="margin-top:16px;">
           <label id="net-f-sg-label">Security groups <span class="req">*</span></label>
           <div class="sg-select ${m.virtualNetwork && m.subnet ? '' : 'pf-m-disabled'} ${sgOpen ? 'pf-m-focus' : ''}"
@@ -14316,6 +14485,7 @@
             ` : ''}
           </div>
         </div>
+        ` : ''}
       `;
       footer.innerHTML = `
         <button type="button" class="pf-v6-c-button pf-m-primary" id="net-modal-save" ${canSave ? '' : 'disabled'}>${m.mode === 'edit' ? 'Save' : 'Add'}</button>
@@ -14342,15 +14512,15 @@
           setFilter: v => { m.vnFilter = v; },
           onSelectId: value => {
             m.virtualNetwork = value;
-        m.subnet = '';
-        m.securityGroups = [];
+            m.subnet = '';
+            m.securityGroups = [];
             m.vnMenuOpen = false;
             m.vnFilter = '';
             m.subnetMenuOpen = false;
             m.subnetFilter = '';
-        const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
-        if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
-        if (m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+            const selected = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === m.virtualNetwork);
+            if (selected?.subnets?.length === 1) m.subnet = selected.subnets[0];
+            if (showSecurityGroups && m.subnet) m.securityGroups = [DEFAULT_SECURITY_GROUP];
             refresh('net-vn-toggle');
           },
         });
@@ -14372,10 +14542,12 @@
           setFilter: v => { m.subnetFilter = v; },
           onSelectId: value => {
             m.subnet = value;
-        if (m.subnet && !m.securityGroups.length) m.securityGroups = [DEFAULT_SECURITY_GROUP];
+            if (showSecurityGroups && m.subnet && !m.securityGroups.length) {
+              m.securityGroups = [DEFAULT_SECURITY_GROUP];
+            }
             m.subnetMenuOpen = false;
             m.subnetFilter = '';
-        m.sgMenuOpen = false;
+            m.sgMenuOpen = false;
             refresh('net-subnet-toggle');
           },
         });
@@ -14621,7 +14793,7 @@
         virtualNetwork: defaultNet?.id || '',
         virtualNetworkLabel: defaultNet?.label || '',
         subnet: defaultNet?.subnets?.[0] || '',
-        securityGroups: [DEFAULT_SECURITY_GROUP],
+        securityGroups: [],
       });
       renderWizard();
     }
@@ -15714,10 +15886,8 @@
       }
       if (state.wizard === 'network') {
         return [
-          { key: 'net-type', label: 'Type' },
-          { key: 'net-basics', label: 'Basics' },
-          { key: 'net-addressing', label: 'Addressing' },
-          { key: 'net-review', label: 'Review and create' },
+          { key: 'net-details', label: 'Virtual network' },
+          { key: 'net-review', label: 'Review' },
         ];
       }
       if (state.createType === 'template') {
@@ -15805,10 +15975,12 @@
       state.data.sshPublicKey = '';
       state.data.sshKeyFileName = '';
       state.data.sshSecretId = '';
+      state.data.networkMode = 'tenant-default';
       state.data.virtualNetwork = '';
       state.data.subnet = '';
       state.data.securityGroups = [];
-      state.data.autoAttachExternalIp = false;
+      state.data.autoAttachExternalIp = true;
+      applyTenantDefaultNetwork(state.data);
       state.sgMenuOpen = false;
       state.vmComputeMenuOpen = false;
       state.vmComputeFilter = '';
@@ -15838,21 +16010,18 @@
     }
 
     function openNetworkWizard() {
-      const role = ROLES[document.getElementById('role-select').value];
       state.wizard = 'network';
       state.step = 0;
       state.maxVisited = 0;
       state.netData = {
-        type: role.canCreateOrgNetwork ? 'shared' : 'isolated',
         name: '',
         description: '',
         project: state.data.project || 'project-a',
-        cidr: '192.168.20.0/24',
-        gateway: '',
-        dns: '',
-        dhcp: true,
+        cidr: '',
+        ipv6Cidr: '',
+        type: 'isolated',
       };
-      document.getElementById('wiz-title').textContent = 'Create network';
+      document.getElementById('wiz-title').textContent = 'Create virtual network';
       document.getElementById('wiz-desc').hidden = true;
       document.getElementById('overlay').classList.add('pf-m-open');
       document.body.style.overflow = 'hidden';
@@ -15868,8 +16037,8 @@
         tbody.innerHTML = '';
         const emptyHtml = !NETWORKS.length
           ? emptyStateHtml({
-            title: 'No networks yet',
-            body: 'Create a network to attach virtual machines.',
+            title: 'No virtual networks yet',
+            body: 'Create a virtual network to attach virtual machines.',
           })
           : (search
             ? emptyStateSearchHtml('networks')
@@ -15905,7 +16074,7 @@
       if (state.step > 0 || state.maxVisited > 0) return true;
       if (state.wizard === 'network') {
         const n = state.netData || {};
-        return !!(n.name || n.description || (n.cidr && n.cidr !== '192.168.20.0/24'));
+        return !!(n.name || n.description || n.cidr || n.ipv6Cidr);
       }
       const d = state.data || {};
       return !!(
@@ -15932,7 +16101,7 @@
       const title = document.getElementById('cancel-modal-title-text');
       const desc = document.getElementById('cancel-modal-desc');
       if (state.wizard === 'network') {
-        title.textContent = 'Exit network creation?';
+        title.textContent = 'Exit virtual network creation?';
         desc.textContent = "If you leave now, any information you’ve entered won’t be saved.";
       } else {
         title.textContent = 'Exit virtual machine creation?';
@@ -16135,16 +16304,10 @@
         if (name) n.name = name.value.trim();
         const desc = document.getElementById('f-net-desc');
         if (desc) n.description = desc.value;
-        const project = document.getElementById('f-net-project');
-        if (project) n.project = project.value;
         const cidr = document.getElementById('f-net-cidr');
         if (cidr) n.cidr = cidr.value.trim();
-        const gateway = document.getElementById('f-net-gateway');
-        if (gateway) n.gateway = gateway.value.trim();
-        const dns = document.getElementById('f-net-dns');
-        if (dns) n.dns = dns.value.trim();
-        const dhcp = document.getElementById('f-net-dhcp');
-        if (dhcp) n.dhcp = dhcp.checked;
+        const ipv6 = document.getElementById('f-net-ipv6');
+        if (ipv6) n.ipv6Cidr = ipv6.value.trim();
         return;
       }
       const d = state.data;
@@ -16212,114 +16375,26 @@
 
     function renderNetworkWizardPanel(panel, key) {
       const n = state.netData;
-      const role = ROLES[document.getElementById('role-select').value];
-      const includeOrgTypes = !!role.canCreateOrgNetwork;
-      if (key === 'net-type') {
-        if (!includeOrgTypes && n.type !== 'isolated') n.type = 'isolated';
+      if (key === 'net-details') {
         panel.innerHTML = `
-          <h3 id="net-type-label">Type</h3>
-          <p class="step-help">${includeOrgTypes
-            ? 'Choose the network type. Tenant Admins can create Isolated, Shared, and Provider networks.'
-            : 'Choose the network type for this project.'}</p>
-          ${renderNetworkTypeSelectBoxes({
-            name: 'netType',
-            selected: n.type || 'isolated',
-            labelledBy: 'net-type-label',
-            includeOrgTypes,
-          })}
-        `;
-        panel.querySelectorAll('input[name="netType"]').forEach(r => {
-          r.addEventListener('change', () => {
-            n.type = r.value;
-            renderWizard();
-          });
-        });
-        return;
-      }
-      if (key === 'net-basics') {
-        if (n.netProjectMenuOpen == null) n.netProjectMenuOpen = false;
-        if (n.netProjectFilter == null) n.netProjectFilter = '';
-        const currentProject = n.project || 'project-a';
-        const projectOpts = PROJECTS.includes(currentProject)
-          ? PROJECTS
-          : [currentProject, ...PROJECTS];
-        panel.innerHTML = `
-          <h3>Basics</h3>
-          <p class="step-help">Name and locate the network. It will appear in Create virtual machine → Network for NIC attach.</p>
+          <h3>Virtual network</h3>
+          <p class="step-help">Create a virtual network to make address space available for workloads, subnets, and catalog networking.</p>
           <div class="form-field">
             <label for="f-net-name">Name <span class="req">*</span></label>
             <input type="text" id="f-net-name" value="${String(n.name || '').replace(/"/g, '&quot;')}" placeholder="e.g. app-tier" />
           </div>
           <div class="form-field">
             <label for="f-net-desc">Description</label>
-            <textarea id="f-net-desc" rows="2">${String(n.description || '').replace(/</g, '&lt;')}</textarea>
+            <textarea id="f-net-desc" rows="2" placeholder="Optional">${String(n.description || '').replace(/</g, '&lt;')}</textarea>
           </div>
           <div class="form-field">
-            <label id="f-net-project-label">Project <span class="req">*</span></label>
-            ${renderTypeaheadRichSelectHtml({
-              rootId: 'net-project-select',
-              toggleId: 'f-net-project-toggle',
-              menuId: 'net-project-menu',
-              searchId: 'net-project-search',
-              labelId: 'f-net-project-label',
-              open: !!n.netProjectMenuOpen,
-              filter: n.netProjectFilter || '',
-              searchPlaceholder: 'Search projects',
-              selectedId: currentProject,
-              placeholder: 'Select a project',
-              optionAttr: 'data-net-project',
-              hiddenInputId: 'f-net-project',
-              emptyNoun: 'projects',
-              options: projectOpts.map(p => ({ id: p, title: p })),
-            })}
-          </div>
-        `;
-        wireTypeaheadRichSelect(panel, {
-          rootId: 'net-project-select',
-          toggleId: 'f-net-project-toggle',
-          menuId: 'net-project-menu',
-          searchId: 'net-project-search',
-          optionSel: '[data-net-project]',
-          getOptionId: opt => opt.dataset.netProject,
-          setOpen: (open) => {
-            readFields();
-            n.netProjectMenuOpen = open;
-          },
-          setFilter: (v) => {
-            readFields();
-            n.netProjectFilter = v;
-          },
-          onSelectId: (value) => {
-            readFields();
-            n.project = value || 'project-a';
-            n.netProjectMenuOpen = false;
-            n.netProjectFilter = '';
-            renderWizard();
-          },
-        });
-        restoreRichSearchFocus(panel);
-        return;
-      }
-      if (key === 'net-addressing') {
-        panel.innerHTML = `
-          <h3>Addressing</h3>
-          <p class="step-help">Define the subnet and optional gateway / DNS. DHCP can assign addresses to attached VMs.</p>
-          <div class="form-field">
-            <label for="f-net-cidr">CIDR / subnet <span class="req">*</span></label>
-            <input type="text" id="f-net-cidr" value="${String(n.cidr || '').replace(/"/g, '&quot;')}" placeholder="192.168.20.0/24" />
+            <label for="f-net-cidr">IPv4 CIDR <span class="req">*</span></label>
+            <input type="text" id="f-net-cidr" value="${String(n.cidr || '').replace(/"/g, '&quot;')}" placeholder="10.0.0.0/24" />
           </div>
           <div class="form-field">
-            <label for="f-net-gateway">Gateway (optional)</label>
-            <input type="text" id="f-net-gateway" value="${String(n.gateway || '').replace(/"/g, '&quot;')}" placeholder="192.168.20.1" />
+            <label for="f-net-ipv6">IPv6 CIDR</label>
+            <input type="text" id="f-net-ipv6" value="${String(n.ipv6Cidr || '').replace(/"/g, '&quot;')}" placeholder="2001:db8::/64" />
           </div>
-          <div class="form-field">
-            <label for="f-net-dns">DNS (optional)</label>
-            <input type="text" id="f-net-dns" value="${String(n.dns || '').replace(/"/g, '&quot;')}" placeholder="1.1.1.1" />
-          </div>
-          <label class="form-check">
-            <input type="checkbox" id="f-net-dhcp" ${n.dhcp ? 'checked' : ''} />
-            Enable DHCP / IP pool for attached VMs
-          </label>
         `;
         return;
       }
@@ -16329,22 +16404,14 @@
           <span class="review-nebius__value">${value || '—'}</span>
         </div>`;
       panel.innerHTML = `
-        <h3>Review and create</h3>
-        <p class="step-help">Confirm network settings before create.</p>
+        <h3>Review</h3>
+        <p class="step-help">Confirm virtual network settings before create.</p>
         <div class="review-nebius">
-          ${reviewNebiusSection('Type', 'net-type', `
-            ${reviewRow('Network type', typeLabel(n.type))}
-          `, 'net-review')}
-          ${reviewNebiusSection('Basics', 'net-basics', `
+          ${reviewNebiusSection('Virtual network', 'net-details', `
             ${reviewRow('Name', String(n.name || '—').replace(/</g, '&lt;'))}
             ${reviewRow('Description', String(n.description || '—').replace(/</g, '&lt;'))}
-            ${reviewRow('Project', String(n.project || '—').replace(/</g, '&lt;'))}
-          `, 'net-review')}
-          ${reviewNebiusSection('Addressing', 'net-addressing', `
-            ${reviewRow('CIDR / subnet', String(n.cidr || '—').replace(/</g, '&lt;'))}
-            ${reviewRow('Gateway', String(n.gateway || '—').replace(/</g, '&lt;'))}
-            ${reviewRow('DNS', String(n.dns || '—').replace(/</g, '&lt;'))}
-            ${reviewRow('DHCP', n.dhcp ? 'Enabled' : 'Disabled')}
+            ${reviewRow('IPv4 CIDR', String(n.cidr || '—').replace(/</g, '&lt;'))}
+            ${reviewRow('IPv6 CIDR', String(n.ipv6Cidr || '—').replace(/</g, '&lt;'))}
           `, 'net-review')}
         </div>
       `;
@@ -16390,7 +16457,7 @@
           next.disabled = false;
         }
       } else if (state.wizard === 'network') {
-        next.textContent = key === 'net-review' ? 'Create network' : 'Next';
+        next.textContent = key === 'net-review' ? 'Create virtual network' : 'Next';
         next.disabled = false;
       } else {
         next.textContent = key === 'review' ? 'Create virtual machine' : 'Next';
@@ -17097,7 +17164,7 @@
             });
           }
           editableItems.push({ label: 'Access', value: 'SSH key, Cloud-init, or Sysprep', note: 'Access & Initial run step' });
-          editableItems.push({ label: 'Network', value: 'Virtual network, subnet, security groups', note: 'Network step' });
+          editableItems.push({ label: 'Network', value: 'Tenant default or custom network, external IP', note: 'Network step' });
           const govList = (items) => `
             <ul class="tpl-drawer__gov-list">
               ${items.map(item => `
@@ -17941,145 +18008,133 @@
           restoreRichSearchFocus(panel);
         } else if (stepKey === 'config-network') {
           ensureNetworkingDefaults(d);
-          const net = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork);
+          const isCustom = d.networkMode === 'custom';
+          const net = virtualNetworkById(d.virtualNetwork);
           const subnetOptsLive = net ? net.subnets : [];
           const subnetEnabledLive = !!d.virtualNetwork;
-          const sgEnabledLive = !!d.virtualNetwork && !!d.subnet;
-          const sgOpenLive = !!state.sgMenuOpen && sgEnabledLive;
-          if (Array.isArray(d.securityGroups)) {
-            d.securityGroups = d.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
-          }
-          if (sgEnabledLive && (!d.securityGroups || !d.securityGroups.length)) {
-            d.securityGroups = [DEFAULT_SECURITY_GROUP];
-          }
-          const chips = (d.securityGroups || []).map(sg => `
-            <span class="sg-select__chip">
-              ${sg}
-              <button type="button" data-sg-remove="${sg}" aria-label="Remove ${sg}">
-                <i class="fas fa-times" aria-hidden="true"></i>
-              </button>
-            </span>
-          `).join('');
+          const defaultVn = virtualNetworkById(TENANT_DEFAULT_NETWORK.virtualNetwork);
+          const defaultSummary = `
+            <div class="network-path-summary" aria-label="Tenant default network">
+              <div class="network-path-summary__row">
+                <div class="network-path-summary__term">Virtual network</div>
+                <div>
+                  <span class="network-path-summary__name">${escAttr(defaultVn?.label || TENANT_DEFAULT_NETWORK.virtualNetwork)}</span>
+                  <span class="network-path-summary__detail">${escAttr(defaultVn?.description || '')}</span>
+                </div>
+              </div>
+              <div class="network-path-summary__row">
+                <div class="network-path-summary__term">Subnet</div>
+                <div>
+                  <span class="network-path-summary__name">${escAttr(d.subnet || TENANT_DEFAULT_NETWORK.subnet)}</span>
+                  <span class="network-path-summary__detail">${escAttr(subnetDetail(d.subnet || TENANT_DEFAULT_NETWORK.subnet))}</span>
+                </div>
+              </div>
+            </div>`;
+          const customFields = `
+            <div class="form-field ${state.fieldErrors.virtualNetwork ? 'pf-m-error' : ''}" data-field="virtualNetwork" style="margin-top:16px;">
+              <label id="f-virtual-network-label">Virtual network <span class="req">*</span></label>
+              ${renderTypeaheadRichSelectHtml({
+                rootId: 'vm-vn-select',
+                toggleId: 'f-virtual-network-toggle',
+                menuId: 'vm-vn-menu',
+                searchId: 'vm-vn-search',
+                labelId: 'f-virtual-network-label',
+                open: !!state.vmVnMenuOpen,
+                filter: state.vmVnFilter || '',
+                searchPlaceholder: 'Search virtual networks',
+                selectedId: d.virtualNetwork || '',
+                placeholder: 'Select a virtual network',
+                optionAttr: 'data-vn',
+                hiddenInputId: 'f-virtual-network',
+                stacked: true,
+                invalid: !!state.fieldErrors.virtualNetwork,
+                describedBy: state.fieldErrors.virtualNetwork ? 'err-virtualNetwork' : '',
+                emptyNoun: 'virtual networks',
+                options: CONFIG_VIRTUAL_NETWORKS.map(n => ({
+                  id: n.id,
+                  title: n.label,
+                  desc: n.description || '',
+                })),
+              })}
+              ${fieldErrorHtml('virtualNetwork')}
+            </div>
+            <div class="form-field ${state.fieldErrors.subnet ? 'pf-m-error' : ''}" data-field="subnet">
+              <label id="f-subnet-label">Subnet <span class="req">*</span></label>
+              ${renderTypeaheadRichSelectHtml({
+                rootId: 'vm-subnet-select',
+                toggleId: 'f-subnet-toggle',
+                menuId: 'vm-subnet-menu',
+                searchId: 'vm-subnet-search',
+                labelId: 'f-subnet-label',
+                open: !!state.vmSubnetMenuOpen && subnetEnabledLive,
+                filter: state.vmSubnetFilter || '',
+                searchPlaceholder: 'Search subnets',
+                selectedId: d.subnet || '',
+                placeholder: 'Select a subnet',
+                optionAttr: 'data-subnet',
+                hiddenInputId: 'f-subnet',
+                stacked: true,
+                disabled: !subnetEnabledLive,
+                invalid: !!state.fieldErrors.subnet,
+                describedBy: state.fieldErrors.subnet ? 'err-subnet' : '',
+                emptyNoun: 'subnets',
+                options: subnetOptsLive.map(s => ({
+                  id: s,
+                  title: s,
+                  desc: subnetDetail(s),
+                })),
+              })}
+              ${fieldErrorHtml('subnet')}
+            </div>`;
+          const autoOn = !!d.autoAttachExternalIp;
+          const autoHelp = autoOn
+            ? 'Attaches an external IP so the instance is reachable outside the private network.'
+            : 'No external IP at launch. You can attach one later from the instance.';
           panel.innerHTML = `
             <h3>Network</h3>
-            <p class="step-help">Defaults are preselected. Change them if this virtual machine needs different network settings.</p>
+            <p class="step-help">Choose a network and whether to auto-attach an external IP.</p>
             <div class="vm-config__fields">
-              <div class="form-field ${state.fieldErrors.virtualNetwork ? 'pf-m-error' : ''}" data-field="virtualNetwork">
-                <label id="f-virtual-network-label">Virtual network <span class="req">*</span></label>
-                ${renderTypeaheadRichSelectHtml({
-                  rootId: 'vm-vn-select',
-                  toggleId: 'f-virtual-network-toggle',
-                  menuId: 'vm-vn-menu',
-                  searchId: 'vm-vn-search',
-                  labelId: 'f-virtual-network-label',
-                  open: !!state.vmVnMenuOpen,
-                  filter: state.vmVnFilter || '',
-                  searchPlaceholder: 'Search virtual networks',
-                  selectedId: d.virtualNetwork || '',
-                  placeholder: 'Select a virtual network',
-                  optionAttr: 'data-vn',
-                  hiddenInputId: 'f-virtual-network',
-                  invalid: !!state.fieldErrors.virtualNetwork,
-                  describedBy: state.fieldErrors.virtualNetwork ? 'err-virtualNetwork' : '',
-                  emptyNoun: 'virtual networks',
-                  options: CONFIG_VIRTUAL_NETWORKS.map(n => ({
-                    id: n.id,
-                    title: n.label,
-                  })),
-                })}
-                ${fieldErrorHtml('virtualNetwork')}
-              </div>
-              <div class="form-field ${state.fieldErrors.subnet ? 'pf-m-error' : ''}" data-field="subnet">
-                <label id="f-subnet-label">Subnet <span class="req">*</span></label>
-                ${renderTypeaheadRichSelectHtml({
-                  rootId: 'vm-subnet-select',
-                  toggleId: 'f-subnet-toggle',
-                  menuId: 'vm-subnet-menu',
-                  searchId: 'vm-subnet-search',
-                  labelId: 'f-subnet-label',
-                  open: !!state.vmSubnetMenuOpen && subnetEnabledLive,
-                  filter: state.vmSubnetFilter || '',
-                  searchPlaceholder: 'Search subnets',
-                  selectedId: d.subnet || '',
-                  placeholder: 'Select a subnet',
-                  optionAttr: 'data-subnet',
-                  hiddenInputId: 'f-subnet',
-                  disabled: !subnetEnabledLive,
-                  invalid: !!state.fieldErrors.subnet,
-                  describedBy: state.fieldErrors.subnet ? 'err-subnet' : '',
-                  emptyNoun: 'subnets',
-                  options: subnetOptsLive.map(s => ({
-                    id: s,
-                    title: s,
-                  })),
-                })}
-                ${fieldErrorHtml('subnet')}
-              </div>
-              <div class="form-field ${state.fieldErrors.securityGroups ? 'pf-m-error' : ''}" data-field="securityGroups">
-                <label id="f-sg-label">Security groups <span class="req">*</span></label>
-                <div class="sg-select ${sgEnabledLive ? '' : 'pf-m-disabled'} ${sgOpenLive ? 'pf-m-focus' : ''}"
-                  id="f-security-groups" role="combobox" aria-labelledby="f-sg-label"
-                  aria-expanded="${sgOpenLive}" aria-disabled="${!sgEnabledLive}"
-                  ${state.fieldErrors.securityGroups ? 'aria-invalid="true" aria-describedby="err-securityGroups"' : ''}>
-                  ${chips || `<span class="sg-select__placeholder">Select security groups</span>`}
-                  <span class="sg-select__actions">
-                    ${(d.securityGroups || []).length ? `
-                      <button type="button" id="f-sg-clear" aria-label="Clear security groups">
-                        <i class="fas fa-times" aria-hidden="true"></i>
-                      </button>
-                    ` : ''}
-                    <button type="button" id="f-sg-toggle" aria-label="Toggle security groups" ${sgEnabledLive ? '' : 'disabled'}>
-                      <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
-                    </button>
-                  </span>
-                  ${sgOpenLive ? `
-                    <div class="sg-select__menu" role="listbox" aria-label="Security groups">
-                      ${CONFIG_SECURITY_GROUPS.map(sg => {
-                        const checked = (d.securityGroups || []).includes(sg);
-                        return `
-                          <button type="button" class="sg-select__option" role="option" data-sg-toggle="${sg}" aria-selected="${checked}">
-                            <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
-                            ${sg}
-                          </button>
-                        `;
-                      }).join('')}
-                    </div>
-                  ` : ''}
-                </div>
-                ${fieldErrorHtml('securityGroups')}
-                ${pfHelperText('Firewall rules for inbound and outbound traffic. A project default is preselected.')}
-              </div>
               <div class="form-field">
-                <label class="form-check">
-                  <input type="checkbox" id="f-auto-external-ip" ${d.autoAttachExternalIp ? 'checked' : ''} />
-                  Auto attach external IP
+                <label id="f-network-path-label">Network <span class="req">*</span></label>
+                ${renderFeltSelectBoxes({
+                  name: 'networkPath',
+                  selected: isCustom ? 'custom' : 'tenant-default',
+                  labelledBy: 'f-network-path-label',
+                  extraClass: 'felt-select-boxes--network-path',
+                  options: [
+                    {
+                      value: 'tenant-default',
+                      title: 'Tenant default',
+                      desc: 'Network created with your tenant.',
+                    },
+                    {
+                      value: 'custom',
+                      title: 'Custom network',
+                      desc: 'Choose a virtual network and subnet.',
+                    },
+                  ],
+                })}
+              </div>
+              ${isCustom ? customFields : defaultSummary}
+              <div class="network-external-ip">
+                <label class="network-external-ip__heading" for="f-auto-external-ip">External IP</label>
+                <label class="pf-v6-c-switch" for="f-auto-external-ip">
+                  <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="f-auto-external-ip"
+                    aria-label="Auto-attach external IP" ${autoOn ? 'checked' : ''} />
+                  <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
+                  <span class="pf-v6-c-switch__label" aria-hidden="true">Auto-attach external IP</span>
                 </label>
-                ${pfHelperText('If unset, the virtual machine is created without an external IP. You can attach one later from Overview.')}
+                ${pfHelperText(autoHelp)}
               </div>
               <h3 class="config-sets-title">Additional networks</h3>
               ${(d.extraNetworks || []).length ? `
               <div class="inline-sets" aria-label="Additional networks">
                 ${(d.extraNetworks || []).map((netItem, idx) => {
-                  const netCfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === netItem.virtualNetwork);
+                  const netCfg = virtualNetworkById(netItem.virtualNetwork);
                   const subnetOpts = netCfg ? netCfg.subnets : [];
                   if (netItem.virtualNetwork && (!netItem.subnet || !subnetOpts.includes(netItem.subnet))) {
                     netItem.subnet = subnetOpts[0] || '';
                   }
-                  if (!Array.isArray(netItem.securityGroups)) netItem.securityGroups = [];
-                  netItem.securityGroups = netItem.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
-                  if (netItem.subnet && !netItem.securityGroups.length) {
-                    netItem.securityGroups = [DEFAULT_SECURITY_GROUP];
-                  }
-                  const sgEnabled = !!netItem.virtualNetwork && !!netItem.subnet;
-                  const sgOpen = state.extraSgMenuOpen === netItem.id && sgEnabled;
-                  const netChips = (netItem.securityGroups || []).map(sg => `
-                    <span class="sg-select__chip">
-                      ${sg}
-                      <button type="button" data-extra-sg-remove="${netItem.id}" data-sg="${sg}" aria-label="Remove ${sg}">
-                        <i class="fas fa-times" aria-hidden="true"></i>
-                      </button>
-                    </span>
-                  `).join('');
                   return `
                   <div class="inline-set" data-network-set="${netItem.id}">
                     <div class="inline-set__header">
@@ -18111,6 +18166,7 @@
                         options: CONFIG_VIRTUAL_NETWORKS.map(n => ({
                           id: n.id,
                           title: n.label,
+                          desc: n.description || '',
                         })),
                       })}
                       ${pfHelperText(`Network name will be <code>${String(netItem.name || '—').replace(/</g, '&lt;')}</code>.`)}
@@ -18135,43 +18191,9 @@
                         options: subnetOpts.map(s => ({
                           id: s,
                           title: s,
+                          desc: subnetDetail(s),
                         })),
                       })}
-                    </div>
-                    <div class="form-field">
-                      <label id="f-extra-sg-label-${netItem.id}">Security groups <span class="req">*</span></label>
-                      <div class="sg-select ${sgEnabled ? '' : 'pf-m-disabled'} ${sgOpen ? 'pf-m-focus' : ''}"
-                        id="f-extra-sg-${netItem.id}" role="combobox"
-                        aria-labelledby="f-extra-sg-label-${netItem.id}"
-                        aria-expanded="${sgOpen}" aria-disabled="${!sgEnabled}"
-                        data-extra-sg-root="${netItem.id}">
-                        ${netChips || `<span class="sg-select__placeholder">Select security groups</span>`}
-                        <span class="sg-select__actions">
-                          ${(netItem.securityGroups || []).length ? `
-                            <button type="button" data-extra-sg-clear="${netItem.id}" aria-label="Clear security groups">
-                              <i class="fas fa-times" aria-hidden="true"></i>
-                            </button>
-                          ` : ''}
-                          <button type="button" data-extra-sg-toggle="${netItem.id}" aria-label="Toggle security groups" ${sgEnabled ? '' : 'disabled'}>
-                            <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
-                          </button>
-                        </span>
-                        ${sgOpen ? `
-                          <div class="sg-select__menu" role="listbox" aria-label="Security groups">
-                            ${CONFIG_SECURITY_GROUPS.map(sg => {
-                              const checked = (netItem.securityGroups || []).includes(sg);
-                              return `
-                                <button type="button" class="sg-select__option" role="option"
-                                  data-extra-sg-opt="${netItem.id}" data-sg="${sg}" aria-selected="${checked}">
-                                  <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
-                                  ${sg}
-                                </button>
-                              `;
-                            }).join('')}
-                          </div>
-                        ` : ''}
-                      </div>
-                      ${pfHelperText('Firewall rules for inbound and outbound traffic.')}
                     </div>
                   </div>
                 `;
@@ -18187,116 +18209,66 @@
               </div>
             </div>
           `;
-          const vn = panel.querySelector('#f-virtual-network');
-          const sn = panel.querySelector('#f-subnet');
-          wireTypeaheadRichSelect(panel, {
-            rootId: 'vm-vn-select',
-            toggleId: 'f-virtual-network-toggle',
-            menuId: 'vm-vn-menu',
-            searchId: 'vm-vn-search',
-            optionSel: '[data-vn]',
-            getOptionId: opt => opt.dataset.vn,
-            setOpen: (open) => { state.vmVnMenuOpen = open; },
-            setFilter: (v) => { state.vmVnFilter = v; },
-            onSelectId: (value) => {
-              d.virtualNetwork = value;
-              applyNetworkingSmartDefaults(d, { networkChanged: true });
-              state.sgMenuOpen = false;
-              state.extraSgMenuOpen = null;
+          panel.querySelectorAll('input[name="networkPath"]').forEach(input => {
+            input.addEventListener('change', () => {
+              if (input.value === 'custom') {
+                d.networkMode = 'custom';
+                ensureNetworkingDefaults(d);
+              } else {
+                applyTenantDefaultNetwork(d);
+              }
+              clearFieldError('virtualNetwork');
+              clearFieldError('subnet');
               state.vmVnMenuOpen = false;
-              state.vmVnFilter = '';
               state.vmSubnetMenuOpen = false;
-              state.vmSubnetFilter = '';
-              if (d.virtualNetwork) clearFieldError('virtualNetwork');
-              if (d.subnet) clearFieldError('subnet');
-              if (d.securityGroups?.length) clearFieldError('securityGroups');
               renderWizard();
-            },
+            });
           });
-          if (subnetEnabledLive) {
+          if (isCustom) {
             wireTypeaheadRichSelect(panel, {
-              rootId: 'vm-subnet-select',
-              toggleId: 'f-subnet-toggle',
-              menuId: 'vm-subnet-menu',
-              searchId: 'vm-subnet-search',
-              optionSel: '[data-subnet]',
-              getOptionId: opt => opt.dataset.subnet,
-              setOpen: (open) => { state.vmSubnetMenuOpen = open; },
-              setFilter: (v) => { state.vmSubnetFilter = v; },
+              rootId: 'vm-vn-select',
+              toggleId: 'f-virtual-network-toggle',
+              menuId: 'vm-vn-menu',
+              searchId: 'vm-vn-search',
+              optionSel: '[data-vn]',
+              getOptionId: opt => opt.dataset.vn,
+              setOpen: (open) => { state.vmVnMenuOpen = open; },
+              setFilter: (v) => { state.vmVnFilter = v; },
               onSelectId: (value) => {
-                d.subnet = value;
-              d.securityGroups = [];
-              applyNetworkingSmartDefaults(d, { subnetChanged: true });
-              state.sgMenuOpen = false;
-              state.extraSgMenuOpen = null;
+                d.virtualNetwork = value;
+                applyNetworkingSmartDefaults(d, { networkChanged: true });
+                state.vmVnMenuOpen = false;
+                state.vmVnFilter = '';
                 state.vmSubnetMenuOpen = false;
                 state.vmSubnetFilter = '';
-              if (d.subnet) clearFieldError('subnet');
-              if (d.securityGroups?.length) clearFieldError('securityGroups');
-              renderWizard();
+                if (d.virtualNetwork) clearFieldError('virtualNetwork');
+                if (d.subnet) clearFieldError('subnet');
+                renderWizard();
               },
             });
-          }
-          // Keep refs for any legacy callers that expect these nodes
-          void vn; void sn;
-          const sgRoot = panel.querySelector('#f-security-groups');
-          if (panel._sgAbort) panel._sgAbort.abort();
-          const ac = new AbortController();
-          panel._sgAbort = ac;
-          document.addEventListener('mousedown', e => {
-            if (sgRoot && sgEnabledLive && !sgRoot.contains(e.target) && state.sgMenuOpen) {
-              state.sgMenuOpen = false;
-              renderWizard();
-              return;
-            }
-            const openExtra = state.extraSgMenuOpen
-              ? panel.querySelector(`[data-extra-sg-root="${state.extraSgMenuOpen}"]`)
-              : null;
-            if (openExtra && !openExtra.contains(e.target)) {
-              state.extraSgMenuOpen = null;
-              renderWizard();
-            }
-          }, { signal: ac.signal });
-          if (sgRoot && sgEnabledLive) {
-            const openMenu = (open) => {
-              state.sgMenuOpen = open;
-              if (open) state.extraSgMenuOpen = null;
-              renderWizard();
-            };
-            panel.querySelector('#f-sg-toggle')?.addEventListener('click', e => {
-              e.stopPropagation();
-              openMenu(!state.sgMenuOpen);
-            });
-            sgRoot.addEventListener('click', e => {
-              if (e.target.closest('[data-sg-remove]') || e.target.closest('#f-sg-clear') || e.target.closest('[data-sg-toggle]')) return;
-              openMenu(!state.sgMenuOpen);
-            });
-            panel.querySelector('#f-sg-clear')?.addEventListener('click', e => {
-              e.stopPropagation();
-              d.securityGroups = [];
-              renderWizard();
-            });
-            panel.querySelectorAll('[data-sg-remove]').forEach(btn => {
-              btn.addEventListener('click', e => {
-                e.stopPropagation();
-                d.securityGroups = (d.securityGroups || []).filter(x => x !== btn.dataset.sgRemove);
-                renderWizard();
+            if (subnetEnabledLive) {
+              wireTypeaheadRichSelect(panel, {
+                rootId: 'vm-subnet-select',
+                toggleId: 'f-subnet-toggle',
+                menuId: 'vm-subnet-menu',
+                searchId: 'vm-subnet-search',
+                optionSel: '[data-subnet]',
+                getOptionId: opt => opt.dataset.subnet,
+                setOpen: (open) => { state.vmSubnetMenuOpen = open; },
+                setFilter: (v) => { state.vmSubnetFilter = v; },
+                onSelectId: (value) => {
+                  d.subnet = value;
+                  state.vmSubnetMenuOpen = false;
+                  state.vmSubnetFilter = '';
+                  if (d.subnet) clearFieldError('subnet');
+                  renderWizard();
+                },
               });
-            });
-            panel.querySelectorAll('[data-sg-toggle]').forEach(btn => {
-              btn.addEventListener('click', e => {
-                e.stopPropagation();
-                const sg = btn.dataset.sgToggle;
-                const set = new Set(d.securityGroups || []);
-                if (set.has(sg)) set.delete(sg); else set.add(sg);
-                d.securityGroups = [...set];
-                if (d.securityGroups.length) clearFieldError('securityGroups');
-                renderWizard();
-              });
-            });
+            }
           }
           panel.querySelector('#f-auto-external-ip')?.addEventListener('change', e => {
             d.autoAttachExternalIp = e.target.checked;
+            renderWizard();
           });
           (d.extraNetworks || []).forEach(item => {
             wireTypeaheadRichSelect(panel, {
@@ -18310,17 +18282,14 @@
               setFilter: (v) => { item.vnFilter = v; },
               onSelectId: (value) => {
                 item.virtualNetwork = value;
-              const cfg = CONFIG_VIRTUAL_NETWORKS.find(n => n.id === item.virtualNetwork);
-              item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
-              item.subnet = cfg?.subnets?.[0] || '';
-              item.securityGroups = item.subnet ? [DEFAULT_SECURITY_GROUP] : [];
                 item.name = networkAttachmentName(item.virtualNetwork, (d.extraNetworks || []).filter(n => n.id !== item.id));
+                const netCfg = virtualNetworkById(value);
+                item.subnet = netCfg?.subnets?.[0] || '';
                 item.vnMenuOpen = false;
                 item.vnFilter = '';
                 item.subnetMenuOpen = false;
                 item.subnetFilter = '';
-              state.extraSgMenuOpen = null;
-              renderWizard();
+                renderWizard();
               },
             });
             if (item.virtualNetwork) {
@@ -18335,73 +18304,24 @@
                 setFilter: (v) => { item.subnetFilter = v; },
                 onSelectId: (value) => {
                   item.subnet = value;
-              if (!item.securityGroups?.length) item.securityGroups = [DEFAULT_SECURITY_GROUP];
                   item.subnetMenuOpen = false;
                   item.subnetFilter = '';
-              state.extraSgMenuOpen = null;
-              renderWizard();
+                  renderWizard();
                 },
-            });
+              });
             }
-          });
-          panel.querySelectorAll('[data-extra-sg-toggle]').forEach(btn => {
-            btn.addEventListener('click', e => {
-              e.stopPropagation();
-              const id = btn.dataset.extraSgToggle;
-              state.sgMenuOpen = false;
-              state.extraSgMenuOpen = state.extraSgMenuOpen === id ? null : id;
-              renderWizard();
-            });
-          });
-          panel.querySelectorAll('[data-extra-sg-root]').forEach(root => {
-            root.addEventListener('click', e => {
-              if (e.target.closest('[data-extra-sg-remove]') || e.target.closest('[data-extra-sg-clear]')
-                || e.target.closest('[data-extra-sg-toggle]') || e.target.closest('[data-extra-sg-opt]')) return;
-              const id = root.dataset.extraSgRoot;
-              state.sgMenuOpen = false;
-              state.extraSgMenuOpen = state.extraSgMenuOpen === id ? null : id;
-              renderWizard();
-            });
-          });
-          panel.querySelectorAll('[data-extra-sg-clear]').forEach(btn => {
-            btn.addEventListener('click', e => {
-              e.stopPropagation();
-              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgClear);
-              if (item) item.securityGroups = [];
-              renderWizard();
-            });
-          });
-          panel.querySelectorAll('[data-extra-sg-remove]').forEach(btn => {
-            btn.addEventListener('click', e => {
-              e.stopPropagation();
-              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgRemove);
-              if (!item) return;
-              item.securityGroups = (item.securityGroups || []).filter(x => x !== btn.dataset.sg);
-              renderWizard();
-            });
-          });
-          panel.querySelectorAll('[data-extra-sg-opt]').forEach(btn => {
-            btn.addEventListener('click', e => {
-              e.stopPropagation();
-              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgOpt);
-              if (!item) return;
-              const set = new Set(item.securityGroups || []);
-              const sg = btn.dataset.sg;
-              if (set.has(sg)) set.delete(sg); else set.add(sg);
-              item.securityGroups = [...set];
-              renderWizard();
-            });
           });
           panel.querySelector('#f-add-network')?.addEventListener('click', addWizardExtraNetwork);
           panel.querySelectorAll('[data-remove-network]').forEach(btn => {
             btn.addEventListener('click', () => {
               const id = btn.dataset.removeNetwork;
               d.extraNetworks = (d.extraNetworks || []).filter(net => net.id !== id);
-              if (state.extraSgMenuOpen === id) state.extraSgMenuOpen = null;
               renderWizard();
             });
           });
+          restoreRichSearchFocus(panel);
         }
+
 
       } else if (key === 'access-init') {
         if (d.cloudInit == null) d.cloudInit = '';
@@ -18940,13 +18860,12 @@
         const sysprepModeLabel = !windowsAccess
           ? ''
           : (d.sysprepMode === 'attach' ? 'Attach existing' : 'Create new');
+        ensureNetworkingDefaults(d);
+        const networkModeLabel = d.networkMode === 'custom' ? 'Custom network' : 'Tenant default';
         const vnet = d.virtualNetwork
-          ? (CONFIG_VIRTUAL_NETWORKS.find(n => n.id === d.virtualNetwork)?.label || d.virtualNetwork)
+          ? (virtualNetworkById(d.virtualNetwork)?.label || d.virtualNetwork)
           : '—';
         const subnet = d.subnet || '—';
-        const sgs = (d.securityGroups && d.securityGroups.length)
-          ? d.securityGroups.join(', ')
-          : '—';
         const autoExternalIp = d.autoAttachExternalIp ? 'Yes' : 'No';
 
         const reviewRow = (label, value, { block = false } = {}) => `
@@ -18998,18 +18917,15 @@
                 : reviewRow('Additional disks', 'None')}
             `)}
             ${reviewNebiusSection('Network', 'config-network', `
+              ${reviewRow('Network', networkModeLabel)}
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
-              ${reviewRow('Security groups', sgs)}
-              ${reviewRow('Auto attach external IP', autoExternalIp)}
+              ${reviewRow('Auto-attach external IP', autoExternalIp)}
               ${(d.extraNetworks || []).length
                 ? (d.extraNetworks || []).map((net, i) => {
                     const label = (net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;');
                     const sub = (net.subnet || '—').replace(/</g, '&lt;');
-                    const groups = (net.securityGroups || []).length
-                      ? net.securityGroups.map(sg => String(sg).replace(/</g, '&lt;')).join(', ')
-                      : '—';
-                    return reviewRow(`Network ${i + 1}`, `${label} | ${sub} | ${groups}`);
+                    return reviewRow(`Network ${i + 1}`, `${label} | ${sub}`);
                   }).join('')
                 : reviewRow('Additional networks', 'None')}
             `)}
@@ -19052,31 +18968,59 @@
       }
 
       if (state.wizard === 'network') {
-        if (key === 'net-basics' && !state.netData.name) {
-          toast('Enter a network name to continue.');
-          return;
-        }
-        if (key === 'net-addressing' && !state.netData.cidr) {
-          toast('Enter a CIDR / subnet to continue.');
-          return;
+        if (key === 'net-details') {
+          if (!state.netData.name) {
+            toast('Enter a name to continue.');
+            return;
+          }
+          if (!state.netData.cidr) {
+            toast('Enter an IPv4 CIDR to continue.');
+            return;
+          }
         }
         if (state.step === steps.length - 1) {
           const n = state.netData;
+          if (!n.name) {
+            toast('Enter a name to continue.');
+            return;
+          }
+          if (!n.cidr) {
+            toast('Enter an IPv4 CIDR to continue.');
+            return;
+          }
           if (!NETWORKS.find(x => x.name === n.name && x.project === n.project)) {
             NETWORKS.unshift({
               id: `net-${Date.now()}`,
               name: n.name,
-              type: typeLabel(n.type),
-              project: n.project,
+              type: typeLabel(n.type || 'isolated'),
+              project: n.project || 'project-a',
               cidr: n.cidr,
+              ipv6Cidr: n.ipv6Cidr || '',
               status: 'Ready',
               vms: 0,
+              description: n.description || '',
+              subnets: n.cidr ? [{ name: n.name, status: 'Ready', cidr: n.cidr, vlan: '—' }] : [],
+              securityGroups: [],
             });
+            // Also expose in Create VM network picker
+            if (!CONFIG_VIRTUAL_NETWORKS.some(v => v.id === n.name)) {
+              CONFIG_VIRTUAL_NETWORKS.unshift({
+                id: n.name,
+                label: n.name,
+                description: n.description || 'Tenant virtual network',
+                subnets: [n.name],
+              });
+            }
+            if (n.cidr) {
+              CONFIG_SUBNET_META[n.name] = {
+                detail: n.ipv6Cidr ? `${n.cidr} · ${n.ipv6Cidr}` : n.cidr,
+              };
+            }
           }
           closeWizard();
           setView('networks');
           renderNetworks(document.getElementById('net-search')?.value || '');
-          toast(`Network “${n.name}” created. Attach it from Create virtual machine → Network.`);
+          toast(`Virtual network “${n.name}” created. Attach it from Create virtual machine → Network.`);
           return;
         }
         state.step += 1;
@@ -19158,7 +19102,7 @@
           return;
         }
         if (key === 'networking' && !isNetworkingComplete(state.data)) {
-          toast('Select a virtual network, subnet, and at least one security group to continue.');
+          toast('Select a virtual network and subnet to continue.');
           return;
         }
       }
@@ -19179,7 +19123,7 @@
               name: networkAttachmentName(d.virtualNetwork, createdNics),
               virtualNetwork: d.virtualNetwork,
               subnet: d.subnet || primaryNet?.subnets?.[0] || '',
-              securityGroups: [...(d.securityGroups || [])],
+              securityGroups: [],
               ip: mockInternalIp({ name: d.name }),
             });
           }
@@ -19188,7 +19132,7 @@
               name: extra.name || networkAttachmentName(extra.virtualNetwork, createdNics),
               virtualNetwork: extra.virtualNetwork,
               subnet: extra.subnet || '',
-              securityGroups: [...(extra.securityGroups || [])],
+              securityGroups: [],
               ip: '—',
             });
           }
