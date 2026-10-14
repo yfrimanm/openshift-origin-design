@@ -459,6 +459,142 @@
     }
     #net-toolbar .tpl-view-toggle { margin-left: auto; }
     #net-toolbar .filter-name-search { max-width: 280px; }
+    /* Ethan Virtual networks — compact cards */
+    #net-cards-gallery.vm-cards {
+      grid-template-columns: repeat(auto-fill, 260px);
+      justify-content: start;
+      gap: 16px;
+    }
+    .net-list-card {
+      display: flex;
+      flex-direction: column;
+      width: 260px;
+      max-width: 100%;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+    .net-list-card__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .net-list-card__icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--vmaas-bg-subtle, #f2f2f2);
+      color: var(--vmaas-text, #151515);
+      font-size: 15px;
+    }
+    .net-list-card__header-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: -2px -6px 0 0;
+    }
+    .net-list-card__header-right .kebab {
+      border-radius: 999px;
+    }
+    .net-list-card__name {
+      display: inline;
+      align-self: flex-start;
+      margin: 0 0 12px;
+      padding: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--vmaas-blue);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+    }
+    .net-list-card__name:hover { text-decoration: underline; }
+    .net-list-card__body {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 0;
+      flex: 1;
+    }
+    .net-list-card__section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 0 12px;
+      margin: 0 0 12px;
+      border-bottom: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .net-list-card__section:last-of-type {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .net-list-card__row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .net-list-card__row dt {
+      margin: 0;
+      font-weight: 600;
+      color: var(--vmaas-text, #151515);
+      flex: 0 0 auto;
+    }
+    .net-list-card__row dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text, #151515);
+      text-align: right;
+      word-break: break-word;
+    }
+    .net-list-card__footer {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .net-list-card__footer dt {
+      margin: 0;
+      font-weight: 600;
+      color: var(--vmaas-text, #151515);
+    }
+    .net-list-card__footer dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text, #151515);
+      text-align: right;
+      word-break: break-word;
+    }
+    #net-kebab-menu:not(.pf-m-open) { display: none; }
+    #net-kebab-menu.pf-m-open {
+      display: block;
+      position: fixed;
+      z-index: 450;
+      min-width: 10.5rem;
+    }
+    #net-kebab-menu .pf-v6-c-menu__item.pf-m-danger .pf-v6-c-menu__item-text {
+      color: var(--pf-t--global--color--status--danger--default, #b1380b);
+    }
     .lifecycle-label {
       display: inline-flex;
       align-items: center;
@@ -6753,7 +6889,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7143</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7144</span>
         </div>
       </div>
       <div class="console__body">
@@ -7614,6 +7750,29 @@
           <button class="pf-v6-c-menu__item pf-m-danger" type="button" role="menuitem" data-action="delete" disabled id="vm-kebab-delete-btn">
             <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
             <span class="pf-v6-c-menu__item-description" id="vm-kebab-delete-desc">The virtual machine is running</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-menu" id="net-kebab-menu" hidden role="menu" aria-label="Virtual network actions">
+    <div class="pf-v6-c-menu__content">
+      <ul class="pf-v6-c-menu__list" role="menu">
+        <li class="pf-v6-c-menu__list-item" role="none">
+          <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-net-action="view">
+            <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">View details</span></span>
+          </button>
+        </li>
+        <li class="pf-v6-c-menu__list-item" role="none">
+          <button class="pf-v6-c-menu__item" type="button" role="menuitem" data-net-action="edit">
+            <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Edit</span></span>
+          </button>
+        </li>
+        <li class="pf-v6-c-divider" role="separator"></li>
+        <li class="pf-v6-c-menu__list-item" role="none">
+          <button class="pf-v6-c-menu__item pf-m-danger" type="button" role="menuitem" data-net-action="delete">
+            <span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">Delete</span></span>
           </button>
         </li>
       </ul>
@@ -9395,7 +9554,7 @@
         vms: 5,
         description: 'Primary tenant compute network',
         created: 'Jul 1, 2026, 11:00 AM',
-        natGateway: { name: 'edge-nat', ip: '203.0.113.0' },
+        natGateway: { name: 'edge-nat', ip: '203.0.113.10' },
         subnets: [
           { name: 'bm-compute-a', status: 'Ready', cidr: '10.42.0.0/24', vlan: 200 },
           { name: 'bm-compute-b', status: 'Provisioning', cidr: '10.42.1.0/24', vlan: 201 },
@@ -9577,6 +9736,7 @@
       },
       selectedVms: new Set(),
       kebabVmName: null,
+      kebabNetId: null,
       vmDetailActionsOpen: false,
       vmDetailActionsName: null,
       deleteVmName: null,
@@ -15257,7 +15417,9 @@
       const title = document.getElementById('delete-resource-title-text');
       const nameEl = document.getElementById('delete-resource-name');
       if (!overlay || !title || !nameEl) return;
-      const kindLabel = payload.kind === 'nic' ? 'network' : 'disk';
+      const kindLabel = payload.kind === 'nic' ? 'network'
+        : payload.kind === 'virtual-network' ? 'virtual network'
+        : 'disk';
       title.textContent = `Delete ${kindLabel}?`;
       nameEl.textContent = payload.name || 'this item';
       overlay.classList.add('pf-m-open');
@@ -15276,6 +15438,12 @@
 
     function confirmDeleteResource() {
       const payload = state.deleteResource;
+      if (payload?.kind === 'virtual-network') {
+        const id = payload.id;
+        closeDeleteResourceModal();
+        deleteVirtualNetwork(id);
+        return;
+      }
       const vm = VMS.find(x => x.name === state.selectedVmName);
       if (!payload || !vm) {
         closeDeleteResourceModal();
@@ -16078,13 +16246,65 @@
       renderWizard();
     }
 
-    function netNatHtml(n, { stacked = true } = {}) {
+    function netNatHtml(n, { stacked = true, inline = false } = {}) {
       const nat = n && n.natGateway;
       if (!nat || !nat.name) return '<span class="muted">-</span>';
       const name = String(nat.name).replace(/</g, '&lt;');
       const ip = nat.ip ? String(nat.ip).replace(/</g, '&lt;') : '';
+      if (inline) return ip ? `${name} · ${ip}` : name;
       if (!stacked || !ip) return name;
       return `<span class="net-nat-cell"><span>${name}</span><span class="net-nat-cell__ip">${ip}</span></span>`;
+    }
+
+    function closeNetKebabMenu() {
+      const menu = document.getElementById('net-kebab-menu');
+      if (menu) {
+        menu.hidden = true;
+        menu.classList.remove('pf-m-open');
+        menu.style.left = '';
+        menu.style.top = '';
+      }
+      document.querySelectorAll('[data-net-kebab].pf-m-expanded').forEach(b => {
+        b.classList.remove('pf-m-expanded');
+        b.setAttribute('aria-expanded', 'false');
+      });
+      state.kebabNetId = null;
+    }
+
+    function openNetKebabMenu(netId, btn) {
+      const menu = document.getElementById('net-kebab-menu');
+      const net = findNetworkByRef(netId);
+      if (!menu || !net || !btn) return;
+      const alreadyOpen = state.kebabNetId === net.id && menu.classList.contains('pf-m-open');
+      closeNetKebabMenu();
+      if (alreadyOpen) return;
+      state.kebabNetId = net.id;
+      menu.hidden = false;
+      menu.classList.add('pf-m-open');
+      btn.classList.add('pf-m-expanded');
+      btn.setAttribute('aria-expanded', 'true');
+      const rect = btn.getBoundingClientRect();
+      const menuWidth = Math.max(menu.offsetWidth || 168, 168);
+      const left = Math.min(window.innerWidth - menuWidth - 8, Math.max(8, rect.right - menuWidth));
+      let top = rect.bottom + 4;
+      menu.style.left = `${left}px`;
+      menu.style.top = `${top}px`;
+      requestAnimationFrame(() => {
+        const h = menu.offsetHeight || 0;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 4);
+          menu.style.top = `${top}px`;
+        }
+      });
+    }
+
+    function deleteVirtualNetwork(netId) {
+      const net = findNetworkByRef(netId);
+      if (!net) return;
+      NETWORKS = NETWORKS.filter(n => n.id !== net.id);
+      if (state.selectedNetworkId === net.id) state.selectedNetworkId = null;
+      toast(`Virtual network “${net.name}” deleted.`);
+      renderNetworks(document.getElementById('net-search')?.value || '');
     }
 
     function syncNetListViewChrome() {
@@ -16122,27 +16342,32 @@
       const ipv4 = String(n.cidr || '—').replace(/</g, '&lt;');
       const ipv6 = n.ipv6Cidr ? String(n.ipv6Cidr).replace(/</g, '&lt;') : '—';
       return `
-        <article class="tpl-card vm-list-card" data-net-card="${id}" role="listitem" tabindex="0" aria-label="${name}">
-          <div class="vm-list-card__header">
-            <div class="vm-list-card__header-left">
-              <span class="vm-list-card__icon" aria-hidden="true">
-                <i class="fa-solid fa-network-wired"></i>
-              </span>
-            </div>
-            <div class="vm-list-card__header-right">
+        <article class="net-list-card" data-net-card="${id}" role="listitem" aria-label="${name}">
+          <div class="net-list-card__header">
+            <span class="net-list-card__icon" aria-hidden="true">
+              <i class="fa-solid fa-circle-nodes"></i>
+            </span>
+            <div class="net-list-card__header-right">
               ${statusBadgeHtml(n.status)}
-              <button type="button" class="kebab" aria-label="Actions for ${name}" disabled title="Not available in this prototype">
+              <button type="button" class="kebab" data-net-kebab="${id}" aria-label="Actions for ${name}" aria-haspopup="menu" aria-expanded="false">
                 <i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i>
               </button>
             </div>
           </div>
-          <button type="button" class="tpl-card__title name-link" data-open-network="${id}">${name}</button>
-          <dl class="vm-list-card__footer vm-list-card__footer--fields">
-            <div class="vm-list-card__footer-row"><dt>IPv4 CIDR</dt><dd>${ipv4}</dd></div>
-            <div class="vm-list-card__footer-row"><dt>IPv6 CIDR</dt><dd>${ipv6 === '—' ? '<span class="muted">—</span>' : ipv6}</dd></div>
-            <div class="vm-list-card__footer-row"><dt>Subnets</dt><dd>${subnetCount}</dd></div>
-            <div class="vm-list-card__footer-row"><dt>Security groups</dt><dd>${sgCount}</dd></div>
-            <div class="vm-list-card__footer-row"><dt>NAT gateway</dt><dd>${netNatHtml(n, { stacked: false })}</dd></div>
+          <button type="button" class="net-list-card__name" data-open-network="${id}">${name}</button>
+          <div class="net-list-card__body">
+            <dl class="net-list-card__section">
+              <div class="net-list-card__row"><dt>IPv4</dt><dd>${ipv4}</dd></div>
+              <div class="net-list-card__row"><dt>IPv6</dt><dd>${ipv6 === '—' ? '<span class="muted">—</span>' : ipv6}</dd></div>
+            </dl>
+            <dl class="net-list-card__section">
+              <div class="net-list-card__row"><dt>Subnets</dt><dd>${subnetCount}</dd></div>
+              <div class="net-list-card__row"><dt>Security groups</dt><dd>${sgCount}</dd></div>
+            </dl>
+          </div>
+          <dl class="net-list-card__footer">
+            <dt>NAT</dt>
+            <dd>${netNatHtml(n, { inline: true })}</dd>
           </dl>
         </article>
       `;
@@ -16208,13 +16433,6 @@
           gallery.hidden = false;
           gallery.innerHTML = rows.map(renderNetworkListCard).join('');
           bindNetworkOpeners(gallery);
-          gallery.querySelectorAll('[data-net-card]').forEach(card => {
-            card.addEventListener('keydown', e => {
-              if (e.key !== 'Enter' && e.key !== ' ') return;
-              e.preventDefault();
-              openNetworkDetail(card.dataset.netCard);
-            });
-          });
         }
         return;
       }
@@ -16240,7 +16458,7 @@
           <td class="pf-v6-c-table__td">${subnetCount}</td>
           <td class="pf-v6-c-table__td">${sgCount}</td>
           <td class="pf-v6-c-table__td">${netNatHtml(nRow)}</td>
-          <td class="pf-v6-c-table__td"><button type="button" class="kebab" aria-label="Actions for ${name}" disabled title="Not available in this prototype"><i class="fa-solid fa-ellipsis-v"></i></button></td>
+          <td class="pf-v6-c-table__td"><button type="button" class="kebab" data-net-kebab="${id}" aria-label="Actions for ${name}" aria-haspopup="menu" aria-expanded="false"><i class="fa-solid fa-ellipsis-v"></i></button></td>
         </tr>`;
       }).join('');
       bindNetworkOpeners(tbody);
@@ -23631,6 +23849,36 @@
     });
     document.addEventListener('click', e => {
       if (!e.target.closest('#net-status-dd')) closeNetStatusMenu();
+      if (!e.target.closest('#net-kebab-menu') && !e.target.closest('[data-net-kebab]')) closeNetKebabMenu();
+    });
+    document.getElementById('net-table-area')?.addEventListener('click', e => {
+      const kebab = e.target.closest('[data-net-kebab]');
+      if (!kebab) return;
+      e.stopPropagation();
+      openNetKebabMenu(kebab.dataset.netKebab, kebab);
+    });
+    document.getElementById('net-kebab-menu')?.addEventListener('click', e => {
+      const actionBtn = e.target.closest('[data-net-action]');
+      if (!actionBtn) return;
+      e.stopPropagation();
+      const netId = state.kebabNetId;
+      const action = actionBtn.dataset.netAction;
+      closeNetKebabMenu();
+      if (!netId) return;
+      if (action === 'view') {
+        openNetworkDetail(netId);
+        return;
+      }
+      if (action === 'edit') {
+        const net = findNetworkByRef(netId);
+        toast(net ? `Edit “${net.name}” is not available in this prototype.` : 'Edit is not available in this prototype.');
+        return;
+      }
+      if (action === 'delete') {
+        const net = findNetworkByRef(netId);
+        if (!net) return;
+        openDeleteResourceModal({ kind: 'virtual-network', id: net.id, name: net.name });
+      }
     });
     document.getElementById('role-select').addEventListener('change', applyRole);
 
