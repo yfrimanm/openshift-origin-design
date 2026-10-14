@@ -9205,6 +9205,9 @@
       } else if (!d.virtualNetwork || !d.subnet) {
         errors.virtualNetwork = 'Tenant default network is unavailable.';
       }
+      if (!Array.isArray(d.securityGroups) || d.securityGroups.length === 0) {
+        errors.securityGroups = 'Select at least one security group.';
+      }
       return errors;
     }
 
@@ -9223,7 +9226,7 @@
     }
 
     function focusFirstFieldError(errors = state.fieldErrors) {
-      const order = ['catalog', 'name', 'project', 'diskImage', 'osImage', 'virtualNetwork', 'subnet'];
+      const order = ['catalog', 'name', 'project', 'diskImage', 'osImage', 'virtualNetwork', 'subnet', 'securityGroups'];
       const field = order.find(f => errors?.[f]);
       if (!field) return;
       if (field === 'catalog') {
@@ -9235,8 +9238,8 @@
         : field === 'project' ? (document.getElementById('f-tpl-project') ? 'f-tpl-project' : 'f-project')
         : field === 'diskImage' ? 'vm-disk-image-toggle'
         : field === 'osImage' ? 'f-os-image'
-        : field === 'virtualNetwork' ? 'f-virtual-network'
-        : field === 'subnet' ? 'f-subnet'
+        : field === 'virtualNetwork' ? 'f-virtual-network-toggle'
+        : field === 'subnet' ? 'f-subnet-toggle'
         : field === 'securityGroups' ? 'f-security-groups'
         : null;
       const el = id ? document.getElementById(id) : null;
@@ -9261,15 +9264,25 @@
         (key === 'clone-source' && !state.data.cloneSourceName);
     }
 
-    /** After network/subnet choice: auto-pick sole subnet when empty. */
+    function defaultSecurityGroups() {
+      if (CONFIG_SECURITY_GROUPS.includes(DEFAULT_SECURITY_GROUP)) return [DEFAULT_SECURITY_GROUP];
+      return CONFIG_SECURITY_GROUPS[0] ? [CONFIG_SECURITY_GROUPS[0]] : [];
+    }
+
+    /** After network/subnet choice: auto-pick sole subnet and project default SG when empty. */
     function applyNetworkingSmartDefaults(d, { networkChanged = false, subnetChanged = false } = {}) {
       const net = virtualNetworkById(d.virtualNetwork);
       if (!net) return;
       if (networkChanged) {
         d.subnet = '';
+        d.securityGroups = [];
         if (net.subnets.length === 1) d.subnet = net.subnets[0];
       }
-      void subnetChanged;
+      if ((networkChanged || subnetChanged) && d.subnet) {
+        if (!Array.isArray(d.securityGroups) || d.securityGroups.length === 0) {
+          d.securityGroups = defaultSecurityGroups();
+        }
+      }
     }
 
     function applyTenantDefaultNetwork(d = state.data) {
@@ -9278,6 +9291,9 @@
       const net = virtualNetworkById(d.virtualNetwork);
       const preferred = TENANT_DEFAULT_NETWORK.subnet;
       d.subnet = (net?.subnets || []).includes(preferred) ? preferred : (net?.subnets?.[0] || '');
+      if (!Array.isArray(d.securityGroups) || !d.securityGroups.length) {
+        d.securityGroups = defaultSecurityGroups();
+      }
     }
 
     /** Prefill tenant-default network; custom mode keeps user picks. */
@@ -9296,6 +9312,9 @@
       if (!d.virtualNetwork) d.virtualNetwork = active?.id || '';
       const net = virtualNetworkById(d.virtualNetwork) || active;
       if (!d.subnet || !(net?.subnets || []).includes(d.subnet)) d.subnet = net?.subnets?.[0] || '';
+      if (!Array.isArray(d.securityGroups) || d.securityGroups.length === 0) {
+        d.securityGroups = defaultSecurityGroups();
+      }
       return true;
     }
 
@@ -14349,9 +14368,6 @@
 
     function canSaveNetworkModal(m = state.networkModal) {
       if (!m) return false;
-      // Wizard / create-VM add-network: VN + subnet only (Ethan — no security groups).
-      // Overview add/edit still requires security groups.
-      if (m.context === 'wizard') return !!(m.virtualNetwork && m.subnet);
       return !!(m.virtualNetwork && m.subnet && Array.isArray(m.securityGroups) && m.securityGroups.length);
     }
 
@@ -14365,13 +14381,12 @@
       if (m.virtualNetwork && (!m.subnet || !subnetOpts.includes(m.subnet))) {
         m.subnet = subnetOpts[0] || '';
       }
-      const showSecurityGroups = m.context !== 'wizard';
+      const showSecurityGroups = true;
       if (!Array.isArray(m.securityGroups)) m.securityGroups = [];
       m.securityGroups = m.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
-      if (showSecurityGroups && m.subnet && !m.securityGroups.length) {
+      if (m.subnet && !m.securityGroups.length) {
         m.securityGroups = [DEFAULT_SECURITY_GROUP];
       }
-      if (!showSecurityGroups) m.securityGroups = [];
       const canSave = canSaveNetworkModal(m);
       const previewName = m.mode === 'edit' && m.editName
         ? m.editName
@@ -14793,7 +14808,7 @@
         virtualNetwork: defaultNet?.id || '',
         virtualNetworkLabel: defaultNet?.label || '',
         subnet: defaultNet?.subnets?.[0] || '',
-        securityGroups: [],
+        securityGroups: defaultSecurityGroups(),
       });
       renderWizard();
     }
@@ -15982,6 +15997,7 @@
       state.data.autoAttachExternalIp = true;
       applyTenantDefaultNetwork(state.data);
       state.sgMenuOpen = false;
+      state.extraSgMenuOpen = null;
       state.vmComputeMenuOpen = false;
       state.vmComputeFilter = '';
       state.vmShowGpuIts = false;
@@ -18012,6 +18028,57 @@
           const net = virtualNetworkById(d.virtualNetwork);
           const subnetOptsLive = net ? net.subnets : [];
           const subnetEnabledLive = !!d.virtualNetwork;
+          const sgEnabledLive = !!d.virtualNetwork && !!d.subnet;
+          const sgOpenLive = !!state.sgMenuOpen && sgEnabledLive;
+          if (Array.isArray(d.securityGroups)) {
+            d.securityGroups = d.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
+          }
+          if (sgEnabledLive && (!d.securityGroups || !d.securityGroups.length)) {
+            d.securityGroups = defaultSecurityGroups();
+          }
+          const chips = (d.securityGroups || []).map(sg => `
+            <span class="sg-select__chip">
+              ${sg}
+              <button type="button" data-sg-remove="${sg}" aria-label="Remove ${sg}">
+                <i class="fas fa-times" aria-hidden="true"></i>
+              </button>
+            </span>
+          `).join('');
+          const sgField = `
+            <div class="form-field ${state.fieldErrors.securityGroups ? 'pf-m-error' : ''}" data-field="securityGroups" style="margin-top:16px;">
+              <label id="f-sg-label">Security groups <span class="req">*</span></label>
+              <div class="sg-select ${sgEnabledLive ? '' : 'pf-m-disabled'} ${sgOpenLive ? 'pf-m-focus' : ''}"
+                id="f-security-groups" role="combobox" aria-labelledby="f-sg-label"
+                aria-expanded="${sgOpenLive}" aria-disabled="${!sgEnabledLive}"
+                ${state.fieldErrors.securityGroups ? 'aria-invalid="true" aria-describedby="err-securityGroups"' : ''}>
+                ${chips || `<span class="sg-select__placeholder">Select security groups</span>`}
+                <span class="sg-select__actions">
+                  ${(d.securityGroups || []).length ? `
+                    <button type="button" id="f-sg-clear" aria-label="Clear security groups">
+                      <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                  ` : ''}
+                  <button type="button" id="f-sg-toggle" aria-label="Toggle security groups" ${sgEnabledLive ? '' : 'disabled'}>
+                    <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                  </button>
+                </span>
+                ${sgOpenLive ? `
+                  <div class="sg-select__menu" role="listbox" aria-label="Security groups">
+                    ${CONFIG_SECURITY_GROUPS.map(sg => {
+                      const checked = (d.securityGroups || []).includes(sg);
+                      return `
+                        <button type="button" class="sg-select__option" role="option" data-sg-toggle="${sg}" aria-selected="${checked}">
+                          <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
+                          ${sg}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                ` : ''}
+              </div>
+              ${fieldErrorHtml('securityGroups')}
+              ${pfHelperText('Firewall rules for inbound and outbound traffic. A project default is preselected.')}
+            </div>`;
           const defaultVn = virtualNetworkById(TENANT_DEFAULT_NETWORK.virtualNetwork);
           const defaultSummary = `
             <div class="network-path-summary" aria-label="Tenant default network">
@@ -18116,6 +18183,7 @@
                 })}
               </div>
               ${isCustom ? customFields : defaultSummary}
+              ${sgField}
               <div class="network-external-ip">
                 <label class="network-external-ip__heading" for="f-auto-external-ip">External IP</label>
                 <label class="pf-v6-c-switch" for="f-auto-external-ip">
@@ -18135,6 +18203,21 @@
                   if (netItem.virtualNetwork && (!netItem.subnet || !subnetOpts.includes(netItem.subnet))) {
                     netItem.subnet = subnetOpts[0] || '';
                   }
+                  if (!Array.isArray(netItem.securityGroups)) netItem.securityGroups = [];
+                  netItem.securityGroups = netItem.securityGroups.filter(sg => CONFIG_SECURITY_GROUPS.includes(sg));
+                  if (netItem.subnet && !netItem.securityGroups.length) {
+                    netItem.securityGroups = defaultSecurityGroups();
+                  }
+                  const sgEnabled = !!netItem.virtualNetwork && !!netItem.subnet;
+                  const sgOpen = state.extraSgMenuOpen === netItem.id && sgEnabled;
+                  const netChips = (netItem.securityGroups || []).map(sg => `
+                    <span class="sg-select__chip">
+                      ${sg}
+                      <button type="button" data-extra-sg-remove="${netItem.id}" data-sg="${sg}" aria-label="Remove ${sg}">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                      </button>
+                    </span>
+                  `).join('');
                   return `
                   <div class="inline-set" data-network-set="${netItem.id}">
                     <div class="inline-set__header">
@@ -18195,6 +18278,41 @@
                         })),
                       })}
                     </div>
+                    <div class="form-field">
+                      <label id="f-extra-sg-label-${netItem.id}">Security groups <span class="req">*</span></label>
+                      <div class="sg-select ${sgEnabled ? '' : 'pf-m-disabled'} ${sgOpen ? 'pf-m-focus' : ''}"
+                        id="f-extra-sg-${netItem.id}" role="combobox"
+                        aria-labelledby="f-extra-sg-label-${netItem.id}"
+                        aria-expanded="${sgOpen}" aria-disabled="${!sgEnabled}"
+                        data-extra-sg-root="${netItem.id}">
+                        ${netChips || `<span class="sg-select__placeholder">Select security groups</span>`}
+                        <span class="sg-select__actions">
+                          ${(netItem.securityGroups || []).length ? `
+                            <button type="button" data-extra-sg-clear="${netItem.id}" aria-label="Clear security groups">
+                              <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                          ` : ''}
+                          <button type="button" data-extra-sg-toggle="${netItem.id}" aria-label="Toggle security groups" ${sgEnabled ? '' : 'disabled'}>
+                            <svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg>
+                          </button>
+                        </span>
+                        ${sgOpen ? `
+                          <div class="sg-select__menu" role="listbox" aria-label="Security groups">
+                            ${CONFIG_SECURITY_GROUPS.map(sg => {
+                              const checked = (netItem.securityGroups || []).includes(sg);
+                              return `
+                                <button type="button" class="sg-select__option" role="option"
+                                  data-extra-sg-opt="${netItem.id}" data-sg="${sg}" aria-selected="${checked}">
+                                  <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
+                                  ${sg}
+                                </button>
+                              `;
+                            }).join('')}
+                          </div>
+                        ` : ''}
+                      </div>
+                      ${pfHelperText('Firewall rules for inbound and outbound traffic.')}
+                    </div>
                   </div>
                 `;
                 }).join('')}
@@ -18219,6 +18337,9 @@
               }
               clearFieldError('virtualNetwork');
               clearFieldError('subnet');
+              clearFieldError('securityGroups');
+              state.sgMenuOpen = false;
+              state.extraSgMenuOpen = null;
               state.vmVnMenuOpen = false;
               state.vmSubnetMenuOpen = false;
               renderWizard();
@@ -18237,12 +18358,15 @@
               onSelectId: (value) => {
                 d.virtualNetwork = value;
                 applyNetworkingSmartDefaults(d, { networkChanged: true });
+                state.sgMenuOpen = false;
+                state.extraSgMenuOpen = null;
                 state.vmVnMenuOpen = false;
                 state.vmVnFilter = '';
                 state.vmSubnetMenuOpen = false;
                 state.vmSubnetFilter = '';
                 if (d.virtualNetwork) clearFieldError('virtualNetwork');
                 if (d.subnet) clearFieldError('subnet');
+                if (d.securityGroups?.length) clearFieldError('securityGroups');
                 renderWizard();
               },
             });
@@ -18258,13 +18382,74 @@
                 setFilter: (v) => { state.vmSubnetFilter = v; },
                 onSelectId: (value) => {
                   d.subnet = value;
+                  d.securityGroups = [];
+                  applyNetworkingSmartDefaults(d, { subnetChanged: true });
+                  state.sgMenuOpen = false;
+                  state.extraSgMenuOpen = null;
                   state.vmSubnetMenuOpen = false;
                   state.vmSubnetFilter = '';
                   if (d.subnet) clearFieldError('subnet');
+                  if (d.securityGroups?.length) clearFieldError('securityGroups');
                   renderWizard();
                 },
               });
             }
+          }
+          const sgRoot = panel.querySelector('#f-security-groups');
+          if (panel._sgAbort) panel._sgAbort.abort();
+          const ac = new AbortController();
+          panel._sgAbort = ac;
+          document.addEventListener('mousedown', e => {
+            if (sgRoot && sgEnabledLive && !sgRoot.contains(e.target) && state.sgMenuOpen) {
+              state.sgMenuOpen = false;
+              renderWizard();
+              return;
+            }
+            const openExtra = state.extraSgMenuOpen
+              ? panel.querySelector(`[data-extra-sg-root="${state.extraSgMenuOpen}"]`)
+              : null;
+            if (openExtra && !openExtra.contains(e.target)) {
+              state.extraSgMenuOpen = null;
+              renderWizard();
+            }
+          }, { signal: ac.signal });
+          if (sgRoot && sgEnabledLive) {
+            const openMenu = (open) => {
+              state.sgMenuOpen = open;
+              if (open) state.extraSgMenuOpen = null;
+              renderWizard();
+            };
+            panel.querySelector('#f-sg-toggle')?.addEventListener('click', e => {
+              e.stopPropagation();
+              openMenu(!state.sgMenuOpen);
+            });
+            sgRoot.addEventListener('click', e => {
+              if (e.target.closest('[data-sg-remove]') || e.target.closest('#f-sg-clear') || e.target.closest('[data-sg-toggle]')) return;
+              openMenu(!state.sgMenuOpen);
+            });
+            panel.querySelector('#f-sg-clear')?.addEventListener('click', e => {
+              e.stopPropagation();
+              d.securityGroups = [];
+              renderWizard();
+            });
+            panel.querySelectorAll('[data-sg-remove]').forEach(btn => {
+              btn.addEventListener('click', e => {
+                e.stopPropagation();
+                d.securityGroups = (d.securityGroups || []).filter(x => x !== btn.dataset.sgRemove);
+                renderWizard();
+              });
+            });
+            panel.querySelectorAll('[data-sg-toggle]').forEach(btn => {
+              btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const sg = btn.dataset.sgToggle;
+                const set = new Set(d.securityGroups || []);
+                if (set.has(sg)) set.delete(sg); else set.add(sg);
+                d.securityGroups = [...set];
+                if (d.securityGroups.length) clearFieldError('securityGroups');
+                renderWizard();
+              });
+            });
           }
           panel.querySelector('#f-auto-external-ip')?.addEventListener('change', e => {
             d.autoAttachExternalIp = e.target.checked;
@@ -18282,13 +18467,16 @@
               setFilter: (v) => { item.vnFilter = v; },
               onSelectId: (value) => {
                 item.virtualNetwork = value;
+                const cfg = virtualNetworkById(value);
+                item.virtualNetworkLabel = cfg?.label || item.virtualNetwork;
+                item.subnet = cfg?.subnets?.[0] || '';
+                item.securityGroups = item.subnet ? defaultSecurityGroups() : [];
                 item.name = networkAttachmentName(item.virtualNetwork, (d.extraNetworks || []).filter(n => n.id !== item.id));
-                const netCfg = virtualNetworkById(value);
-                item.subnet = netCfg?.subnets?.[0] || '';
                 item.vnMenuOpen = false;
                 item.vnFilter = '';
                 item.subnetMenuOpen = false;
                 item.subnetFilter = '';
+                state.extraSgMenuOpen = null;
                 renderWizard();
               },
             });
@@ -18304,18 +18492,69 @@
                 setFilter: (v) => { item.subnetFilter = v; },
                 onSelectId: (value) => {
                   item.subnet = value;
+                  if (!item.securityGroups?.length) item.securityGroups = defaultSecurityGroups();
                   item.subnetMenuOpen = false;
                   item.subnetFilter = '';
+                  state.extraSgMenuOpen = null;
                   renderWizard();
                 },
               });
             }
+          });
+          panel.querySelectorAll('[data-extra-sg-toggle]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const id = btn.dataset.extraSgToggle;
+              state.sgMenuOpen = false;
+              state.extraSgMenuOpen = state.extraSgMenuOpen === id ? null : id;
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-root]').forEach(root => {
+            root.addEventListener('click', e => {
+              if (e.target.closest('[data-extra-sg-remove]') || e.target.closest('[data-extra-sg-clear]')
+                || e.target.closest('[data-extra-sg-toggle]') || e.target.closest('[data-extra-sg-opt]')) return;
+              const id = root.dataset.extraSgRoot;
+              state.sgMenuOpen = false;
+              state.extraSgMenuOpen = state.extraSgMenuOpen === id ? null : id;
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-clear]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgClear);
+              if (item) item.securityGroups = [];
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-remove]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgRemove);
+              if (!item) return;
+              item.securityGroups = (item.securityGroups || []).filter(x => x !== btn.dataset.sg);
+              renderWizard();
+            });
+          });
+          panel.querySelectorAll('[data-extra-sg-opt]').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const item = (d.extraNetworks || []).find(n => n.id === btn.dataset.extraSgOpt);
+              if (!item) return;
+              const set = new Set(item.securityGroups || []);
+              const sg = btn.dataset.sg;
+              if (set.has(sg)) set.delete(sg); else set.add(sg);
+              item.securityGroups = [...set];
+              renderWizard();
+            });
           });
           panel.querySelector('#f-add-network')?.addEventListener('click', addWizardExtraNetwork);
           panel.querySelectorAll('[data-remove-network]').forEach(btn => {
             btn.addEventListener('click', () => {
               const id = btn.dataset.removeNetwork;
               d.extraNetworks = (d.extraNetworks || []).filter(net => net.id !== id);
+              if (state.extraSgMenuOpen === id) state.extraSgMenuOpen = null;
               renderWizard();
             });
           });
@@ -18866,6 +19105,7 @@
           ? (virtualNetworkById(d.virtualNetwork)?.label || d.virtualNetwork)
           : '—';
         const subnet = d.subnet || '—';
+        const sgs = (d.securityGroups || []).join(', ') || '—';
         const autoExternalIp = d.autoAttachExternalIp ? 'Yes' : 'No';
 
         const reviewRow = (label, value, { block = false } = {}) => `
@@ -18920,12 +19160,14 @@
               ${reviewRow('Network', networkModeLabel)}
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
+              ${reviewRow('Security groups', sgs)}
               ${reviewRow('Auto-attach external IP', autoExternalIp)}
               ${(d.extraNetworks || []).length
                 ? (d.extraNetworks || []).map((net, i) => {
                     const label = (net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;');
                     const sub = (net.subnet || '—').replace(/</g, '&lt;');
-                    return reviewRow(`Network ${i + 1}`, `${label} | ${sub}`);
+                    const netSgs = (net.securityGroups || []).join(', ') || '—';
+                    return reviewRow(`Network ${i + 1}`, `${label} | ${sub} | ${netSgs}`);
                   }).join('')
                 : reviewRow('Additional networks', 'None')}
             `)}
@@ -19123,7 +19365,7 @@
               name: networkAttachmentName(d.virtualNetwork, createdNics),
               virtualNetwork: d.virtualNetwork,
               subnet: d.subnet || primaryNet?.subnets?.[0] || '',
-              securityGroups: [],
+              securityGroups: [...(d.securityGroups || defaultSecurityGroups())],
               ip: mockInternalIp({ name: d.name }),
             });
           }
@@ -19132,7 +19374,7 @@
               name: extra.name || networkAttachmentName(extra.virtualNetwork, createdNics),
               virtualNetwork: extra.virtualNetwork,
               subnet: extra.subnet || '',
-              securityGroups: [],
+              securityGroups: [...(extra.securityGroups || defaultSecurityGroups())],
               ip: '—',
             });
           }
