@@ -6889,7 +6889,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7144</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7145</span>
         </div>
       </div>
       <div class="console__body">
@@ -9734,6 +9734,8 @@
         ipv6Cidr: '',
         type: 'isolated', // list display only — not shown in create wizard
       },
+      netEditId: null, // when set, network wizard saves over this NETWORKS id
+      netEditBaseline: null, // snapshot for dirty check while editing
       selectedVms: new Set(),
       kebabVmName: null,
       kebabNetId: null,
@@ -16226,20 +16228,37 @@
       renderWizard();
     }
 
-    function openNetworkWizard() {
+    function openNetworkWizard(editRef) {
       state.wizard = 'network';
       state.step = 0;
       state.maxVisited = 0;
-      // Prefill matches Ethan Create virtual network demo values
-      state.netData = {
-        name: 'demo-workload',
-        description: 'Prefilled demo virtual network for tenant workloads',
-        project: state.data.project || 'project-a',
-        cidr: '10.60.0.0/16',
-        ipv6Cidr: '2001:db8:60::/48',
-        type: 'isolated',
-      };
-      document.getElementById('wiz-title').textContent = 'Create virtual network';
+      const existing = editRef ? findNetworkByRef(editRef) : null;
+      if (existing) {
+        state.netEditId = existing.id;
+        state.netData = {
+          name: existing.name || '',
+          description: existing.description || '',
+          project: existing.project || state.data.project || 'project-a',
+          cidr: existing.cidr || '',
+          ipv6Cidr: existing.ipv6Cidr || '',
+          type: String(existing.type || 'isolated').toLowerCase(),
+        };
+        state.netEditBaseline = { ...state.netData };
+        document.getElementById('wiz-title').textContent = 'Edit virtual network';
+      } else {
+        state.netEditId = null;
+        state.netEditBaseline = null;
+        // Prefill matches Ethan Create virtual network demo values
+        state.netData = {
+          name: 'demo-workload',
+          description: 'Prefilled demo virtual network for tenant workloads',
+          project: state.data.project || 'project-a',
+          cidr: '10.60.0.0/16',
+          ipv6Cidr: '2001:db8:60::/48',
+          type: 'isolated',
+        };
+        document.getElementById('wiz-title').textContent = 'Create virtual network';
+      }
       document.getElementById('wiz-desc').hidden = true;
       document.getElementById('overlay').classList.add('pf-m-open');
       document.body.style.overflow = 'hidden';
@@ -16472,6 +16491,15 @@
       if (state.step > 0 || state.maxVisited > 0) return true;
       if (state.wizard === 'network') {
         const n = state.netData || {};
+        if (state.netEditId && state.netEditBaseline) {
+          const b = state.netEditBaseline;
+          return n.name !== b.name
+            || n.description !== b.description
+            || n.cidr !== b.cidr
+            || n.ipv6Cidr !== b.ipv6Cidr
+            || state.step > 0
+            || state.maxVisited > 0;
+        }
         // Prefill is Ethan demo defaults — dirty when user changes any field
         return n.name !== 'demo-workload'
           || n.description !== 'Prefilled demo virtual network for tenant workloads'
@@ -16505,7 +16533,7 @@
       const title = document.getElementById('cancel-modal-title-text');
       const desc = document.getElementById('cancel-modal-desc');
       if (state.wizard === 'network') {
-        title.textContent = 'Exit virtual network creation?';
+        title.textContent = state.netEditId ? 'Exit virtual network editing?' : 'Exit virtual network creation?';
         desc.textContent = "If you leave now, any information you’ve entered won’t be saved.";
       } else {
         title.textContent = 'Exit virtual machine creation?';
@@ -16552,6 +16580,10 @@
         if (wizDesc) { wizDesc.hidden = true; wizDesc.textContent = ''; }
         const wizTitle = document.getElementById('wiz-title');
         if (wizTitle) wizTitle.textContent = 'Create virtual machine';
+      }
+      if (state.wizard === 'network') {
+        state.netEditId = null;
+        state.netEditBaseline = null;
       }
       document.getElementById('overlay').classList.remove('pf-m-open');
       document.body.style.overflow = '';
@@ -16875,7 +16907,11 @@
           next.disabled = false;
         }
       } else if (state.wizard === 'network') {
-        next.textContent = key === 'net-review' ? 'Create virtual network' : 'Next';
+        if (key === 'net-review') {
+          next.textContent = state.netEditId ? 'Save' : 'Create virtual network';
+        } else {
+          next.textContent = 'Next';
+        }
         next.disabled = false;
       } else {
         next.textContent = key === 'review' ? 'Create virtual machine' : 'Next';
@@ -19632,7 +19668,51 @@
             toast('Enter an IPv4 CIDR to continue.');
             return;
           }
-          if (!NETWORKS.find(x => x.name === n.name && x.project === n.project)) {
+          const editing = !!state.netEditId;
+          const existing = editing ? findNetworkByRef(state.netEditId) : null;
+          const nameTaken = NETWORKS.some(x =>
+            x.name === n.name
+            && x.project === (n.project || 'project-a')
+            && (!existing || x.id !== existing.id)
+          );
+          if (nameTaken) {
+            toast(`A virtual network named “${n.name}” already exists.`);
+            return;
+          }
+          if (editing && existing) {
+            const prevName = existing.name;
+            existing.name = n.name;
+            existing.description = n.description || '';
+            existing.project = n.project || existing.project || 'project-a';
+            existing.cidr = n.cidr;
+            existing.ipv6Cidr = n.ipv6Cidr || '';
+            existing.type = typeLabel(n.type || 'isolated');
+            if (Array.isArray(existing.subnets) && existing.subnets.length) {
+              existing.subnets[0] = {
+                ...existing.subnets[0],
+                name: existing.subnets[0].name || n.name,
+                cidr: n.cidr,
+                status: existing.subnets[0].status || 'Ready',
+              };
+            } else if (n.cidr) {
+              existing.subnets = [{ name: n.name, status: 'Ready', cidr: n.cidr, vlan: '—' }];
+            }
+            const cfg = CONFIG_VIRTUAL_NETWORKS.find(v => v.id === prevName || v.id === n.name || v.label === prevName);
+            if (cfg) {
+              cfg.id = n.name;
+              cfg.label = n.name;
+              cfg.description = n.description || cfg.description || 'Tenant virtual network';
+            }
+            if (n.cidr) {
+              CONFIG_SUBNET_META[n.name] = {
+                detail: n.ipv6Cidr ? `${n.cidr} · ${n.ipv6Cidr}` : n.cidr,
+              };
+              if (prevName !== n.name && CONFIG_SUBNET_META[prevName]) delete CONFIG_SUBNET_META[prevName];
+            }
+            if (state.selectedNetworkId === existing.id || state.selectedNetworkId === prevName) {
+              state.selectedNetworkId = existing.id;
+            }
+          } else if (!NETWORKS.find(x => x.name === n.name && x.project === n.project)) {
             NETWORKS.unshift({
               id: `net-${Date.now()}`,
               name: n.name,
@@ -19665,7 +19745,9 @@
           closeWizard();
           setView('networks');
           renderNetworks(document.getElementById('net-search')?.value || '');
-          toast(`Virtual network “${n.name}” created. Attach it from Create virtual machine → Network.`);
+          toast(editing
+            ? `Virtual network “${n.name}” saved.`
+            : `Virtual network “${n.name}” created. Attach it from Create virtual machine → Network.`);
           return;
         }
         state.step += 1;
@@ -23870,8 +23952,7 @@
         return;
       }
       if (action === 'edit') {
-        const net = findNetworkByRef(netId);
-        toast(net ? `Edit “${net.name}” is not available in this prototype.` : 'Edit is not available in this prototype.');
+        openNetworkWizard(netId);
         return;
       }
       if (action === 'delete') {
