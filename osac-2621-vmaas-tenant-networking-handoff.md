@@ -12,7 +12,7 @@
 | **Eng epic** | [HPUX-2249](https://redhat.atlassian.net/browse/HPUX-2249) — *VMaaS Tenant Networking* |
 | **Scope of this handoff** | Tenant Networking UX in the shared mock: **Virtual networks** (list / create / edit) + Create VM **Networking** step (Ethan-aligned) + day-2 **Attach external IP** |
 | **Handoff Google Doc** | [OSAC-2621 — VMaaS Tenant Networking (UX handoff)](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7151) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7152) |
 | **Ethan reference (BMaaS)** | [Launch BM → Networking](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=catalog&action=launch-instance&item=bare-metal-general-purpose-server&step=networking) · [Create virtual network](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=networking-virtual-networks&action=create-virtual-network&step=virtual-network) |
 | **Alignment note** | [OSAC-2616 comment](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987) — VMaaS matches BMaaS/Cluster networking; **only VM difference = multiple networks** |
 | **Status** | **Fully covered** for tenant networking surfaces in the mock (Ethan-aligned). Type field removed (no API). |
@@ -33,7 +33,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 ### A. Virtual networks (tenant)
 
-1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7151) as **Tenant Admin**.
+1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7152) as **Tenant Admin**.
 2. Nav: **Networking → Virtual networks**.
 3. Confirm Ethan-style header, filters, cards/list toggle, name link, kebab (Edit → wizard).
 4. **Create virtual network** → Name, Description, IPv4 CIDR, IPv6 CIDR → Review (no Type field).
@@ -42,7 +42,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 1. **Create virtual machine** → continue to **Networking**.
 2. Felt cards: **Tenant default** / **Custom network**.
-3. **Tenant default** — read-only summary: Virtual network + Subnet + **Security groups**; External IP switch (**default off**).
+3. **Tenant default** — read-only summary: Virtual network + Subnet + **Security groups**; External IP switch (**default on**).
 4. **Custom network** — VN → Subnet → Security groups (multi-select); then External IP.
 5. **Additional networks** — Add network (VM-only multi-NIC); same cascade per set.
 6. Review → Networking section shows path, SGs, auto-attach, extras.
@@ -63,7 +63,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 | Tenant default summary includes Security groups | **Covered** | Read-only; not editable on default path |
 | Custom: VN → Subnet → SG together | **Covered** | SG only on Custom |
 | Security groups multi-select | **Covered** | API `securityGroupRefs[]`; rich option desc |
-| Auto-attach external IP default **off** | **Covered** | Opt-in (Ethan / OSAC-1436 PRD FR-3) |
+| Auto-attach external IP default **on** | **Covered** | Product decision for VMaaS Create VM |
 | Step title **Networking** | **Covered** | Nav + panel + Review |
 | VM-only Additional networks | **Covered** | Explicit Ethan exception |
 | Remove Network Type (Alona — no API) | **Covered** | Removed from list/create/detail |
@@ -98,7 +98,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 1. **SG cardinality:** Multi-select (API supports `securityGroupRefs[]`).
 2. **Additional networks SG:** Same multi-select control as primary.
-3. **External IP default:** **Off** (opt-in).
+3. **External IP default:** **On** (auto-attach).
 4. **Step title:** **Networking** (not Network).
 5. **Network Type:** Removed — no API (Alona).
 
@@ -108,7 +108,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 - Ethan sync: [OSAC-2616](https://redhat.atlassian.net/browse/OSAC-2616) / [OSAC-2616 comment 18959987](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987)
 - Feature: [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435)
-- Prototype build: `7151` (includes Networking Ethan alignment from `7149`)
+- Prototype build: `7152` (EIP auto-attach default on; Networking Ethan alignment from `7149`)
 
 ---
 
