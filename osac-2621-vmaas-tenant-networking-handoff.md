@@ -80,7 +80,7 @@ External IP is how users reach the VM with SSH. Day-2 matches Ethan BMaaS **Acce
 | Tenant default + Custom + SG multi + EIP default on | **Covered** | |
 | Additional networks Custom-only | **Covered** | |
 | Day-2 Attach External IP modal | **Covered** | Project pool |
-| External IP prominence (SSH access) | **Covered** | Dedicated panel + SSH sample |
+| External IP prominence (SSH access) | **Covered** | Ethan Access: Host + SSH clipboard |
 | Attach **in progress** | **Covered** | Attaching state |
 | Attach **failure** | **Covered** | Failed + Retry / Choose another |
 | VN list / create / edit | **Out of scope** | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
