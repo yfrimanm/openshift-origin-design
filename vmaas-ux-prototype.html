@@ -14692,6 +14692,11 @@
       if (!vm) return;
       if (!vm.nics) vm.nics = enrichVm(vm).nics.slice();
       vm.nics.push(nic);
+      markVmRestartRequiredChange(
+        vm,
+        { section: 'Network', label: nic.name, focus: 'network' },
+        `Network “${nic.name}” added. Changes apply after the virtual machine is restarted.`,
+      );
       closeAddNicModal();
       renderVmDetail();
       toast(`Network “${nic.name}” added.`);
