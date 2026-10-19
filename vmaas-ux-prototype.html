@@ -6897,7 +6897,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · resize-no-gpu-desc 7151</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · eip-default-on 7152</span>
         </div>
       </div>
       <div class="console__body">
@@ -9586,8 +9586,8 @@
       if (d.networkMode !== 'custom' && d.networkMode !== 'tenant-default') {
         d.networkMode = 'tenant-default';
       }
-      // Align with Ethan / OSAC-1436 PRD FR-3: Auto-attach external IP is opt-in (default off).
-      if (d.autoAttachExternalIp == null) d.autoAttachExternalIp = false;
+      // Auto-attach external IP defaults on (product decision for VMaaS Create VM).
+      if (d.autoAttachExternalIp == null) d.autoAttachExternalIp = true;
       if (d.networkMode !== 'custom') {
         applyTenantDefaultNetwork(d);
         return true;
@@ -9766,7 +9766,7 @@
         virtualNetwork: '',
         subnet: '',
         securityGroups: [],
-        autoAttachExternalIp: false,
+        autoAttachExternalIp: true,
         project: 'project-a',
         group: '',
         sshPublicKey: '',
@@ -16261,7 +16261,7 @@
       state.data.virtualNetwork = '';
       state.data.subnet = '';
       state.data.securityGroups = [];
-      state.data.autoAttachExternalIp = false;
+      state.data.autoAttachExternalIp = true;
       applyTenantDefaultNetwork(state.data);
       state.sgMenuOpen = false;
       state.extraSgMenuOpen = null;
