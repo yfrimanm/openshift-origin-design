@@ -6897,7 +6897,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · ethan-networking 7149</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · resize-no-gpu-desc 7151</span>
         </div>
       </div>
       <div class="console__body">
@@ -7863,7 +7863,7 @@
             <span class="pf-v6-c-modal-box__title-text">Edit instance type</span>
           </h1>
           <div class="pf-v6-c-modal-box__description" id="compute-modal-desc">
-            This virtual machine configuration allows instance types without a GPU.
+            Select a new instance type for this virtual machine.
           </div>
         </div>
         <div class="pf-v6-c-modal-box__body" id="compute-modal-body">
@@ -8490,10 +8490,9 @@
       return Array.isArray(vm?.gpuDevices) && vm.gpuDevices.length > 0;
     }
 
-    function editComputeModalDescription(requireGpu) {
-      return requireGpu
-        ? 'This virtual machine configuration allows instance types with a GPU.'
-        : 'This virtual machine configuration allows instance types without a GPU.';
+    /** Neutral copy — GPU is not explained here (independent of vCPU/memory; OSAC-4864). */
+    function editComputeModalDescription() {
+      return 'Select a new instance type for this virtual machine.';
     }
 
     /** OSAC-4281: boot disk access mode (RWX → hot-plug; RWO / unknown → restart). */
@@ -8537,30 +8536,22 @@
     }
 
     /**
-     * OSAC-4281 resize paths:
-     * - hotplug: RUNNING + RWX
-     * - restart-running: RUNNING + RWO / unknown
-     * - restart-stopped: STOPPED + any
+     * OSAC-4281 (revised): only power state is safe pre-submit.
+     * Do not guess hot-plug vs restart from boot-disk access mode — API
+     * status conditions announce restart need after update.
+     * - stopped: optional “applies on next start” info
+     * - running: no pre-submit restart/hot-plug warning
      */
     function vmResizePath(vm) {
       const kind = vmPowerKind(vm?.status);
-      if (kind === 'stopped') return 'restart-stopped';
-      if (kind === 'running') {
-        return vmBootDiskAccessMode(vm) === 'RWX' ? 'hotplug' : 'restart-running';
-      }
+      if (kind === 'stopped') return 'stopped';
+      if (kind === 'running') return 'running';
       return null;
     }
 
     function editComputeResizeAlertHtml(path, selectionChanged) {
       if (!selectionChanged) return '';
-      if (path === 'restart-running') {
-        return `
-          <div class="pf-v6-c-alert pf-m-inline pf-m-warning compute-resize-alert" role="status">
-            <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
-            <div class="pf-v6-c-alert__title">This resize requires a VM restart. The VM will not be restarted automatically.</div>
-          </div>`;
-      }
-      if (path === 'restart-stopped') {
+      if (path === 'stopped') {
         return `
           <div class="pf-v6-c-alert pf-m-inline pf-m-info compute-resize-alert" role="status">
             <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
@@ -8802,12 +8793,9 @@
       const resizeAlert = editComputeResizeAlertHtml(m.resizePath, selectionChanged);
       const submitErrorAlert = editComputeSubmitErrorAlertHtml(m.submitError);
       const descEl = document.getElementById('compute-modal-desc');
-      if (descEl) descEl.textContent = editComputeModalDescription(requireGpu);
+      if (descEl) descEl.textContent = editComputeModalDescription();
       const saveBtn = document.getElementById('compute-modal-save');
-      if (saveBtn) {
-        // OSAC-4281: hot-plug confirm label; restart paths keep Save
-        saveBtn.textContent = (m.resizePath === 'hotplug' && selectionChanged) ? 'Apply Resize' : 'Save';
-      }
+      if (saveBtn) saveBtn.textContent = 'Save';
         body.innerHTML = `
           ${submitErrorAlert}
           ${resizeAlert}
@@ -8944,6 +8932,21 @@
       const path = state.editComputeModal?.resizePath || vmResizePath(vm);
       const changed = !!state.editComputeModal?.initialId && id !== state.editComputeModal.initialId;
       applyComputeResourceToVm(vm, id);
+      if (changed && path === 'running') {
+        // Demo stand-in for API status condition after resize (not pre-submit UI logic).
+        if (!Array.isArray(vm.alerts)) vm.alerts = [];
+        vm.alerts = [
+          {
+            severity: 'warning',
+            message: 'Restart required to apply the new instance type.',
+          },
+          ...vm.alerts.filter(a => !/Restart required to apply the new instance type/i.test(a.message || '')),
+        ];
+        if (!Array.isArray(vm.conditions)) vm.conditions = [];
+        if (!vm.conditions.some(c => /RestartRequired/i.test(c))) {
+          vm.conditions = ['RestartRequired=True', ...vm.conditions];
+        }
+      }
       closeEditComputeModal();
       renderVmDetail();
       const label = computeResourceLabel(id);
@@ -8951,14 +8954,11 @@
         toast(`Instance type updated to ${label}.`, 'success');
         return;
       }
-      if (path === 'restart-running') {
-        toast(`Instance type updated to ${label}. Restart the virtual machine to apply the resize.`, 'success');
-        return;
-      }
-      if (path === 'restart-stopped') {
+      if (path === 'stopped') {
         toast(`Instance type updated to ${label}. Resize will apply on next start.`, 'success');
         return;
       }
+      // Running: generic success; restart messaging comes from post-update condition/alert.
       toast(`Instance type updated to ${label}.`, 'success');
     }
 

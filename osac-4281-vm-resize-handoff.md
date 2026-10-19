@@ -10,22 +10,20 @@
 | **Parent epic** | [OSAC-5635](https://redhat.atlassian.net/browse/OSAC-5635) — *UIX - VM Resize Instancetype Selection* |
 | **UI design (eng)** | [OSAC-4282](https://redhat.atlassian.net/browse/OSAC-4282) · [enhancement-proposals PR #388](https://github.com/osac-project/enhancement-proposals/pull/388) |
 | **Scope** | Day-2 **Edit instance type** (resize) on VM details Overview |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7148) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7151) |
 | **Companion docs** | [VM details Overview UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Handoff Google Doc** | [OSAC-4281 — VM resize via instance type (UX handoff)](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
-| **Status** | Design approved (`design-approved`, `osac-ux`). Spec covered in the shared prototype. Submit failures use **inline danger alert** in the modal (aligned to PR #388 / AttachExternalIpModal). |
+| **Status** | Revised after eng review: **no pre-submit restart/hot-plug detection** in the UI. Restart need comes from API **status conditions after** update. |
 
 ---
 
 ## Goal
 
-Allow tenants to change a VM’s **instance type** after create, with clear messaging for:
+Allow tenants to change a VM’s **instance type** after create via `ComputeInstances.Update`.
 
-1. **Live hot-plug** (running + RWX boot disk) — mocked; eng ship may defer to [OSAC-5335](https://redhat.atlassian.net/browse/OSAC-5335) until API signals exist
-2. **Restart required** (running + RWO / unknown)
-3. **Apply on next start** (stopped)
+The UI must **not** invent whether a resize will hot-plug or require a restart before submit. The API announces restart necessity through **status conditions after** the resize event — the UI surfaces that transition then (toast + Overview condition), not by reimplementing path logic client-side.
 
-No new API — uses existing `ComputeInstances.Update`. Backend gate: [OSAC-5328](https://redhat.atlassian.net/browse/OSAC-5328) (CEL immutability on `spec.instanceType`).
+Backend gate: [OSAC-5328](https://redhat.atlassian.net/browse/OSAC-5328) (CEL immutability on `spec.instanceType`).
 
 ---
 
@@ -39,17 +37,29 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 
 ---
 
-## Resize paths (spec ↔ mock)
+## Modal behaviour (ship)
 
-| VM state | Boot disk access | Path | Modal behaviour | Demo VM in mock |
-|---|---|---|---|---|
-| Running | **RWX** | Hot-plug live | No warning. Primary CTA = **Apply Resize** (after a different type is selected) | `indigo-quokka-89` |
-| Running | **RWO** / unknown | Restart required | Inline **warning**: *This resize requires a VM restart. The VM will not be restarted automatically.* CTA = **Save** | `azure-baboon-27`, `rhel9-black-gunnysack-58` |
-| Stopped | Any | Restart required | Inline **info**: *Resize will apply on next start.* CTA = **Save** | `windows-golden-eider-58` |
+| VM power state | Pre-submit modal | Primary CTA |
+|---|---|---|
+| **Running** | No restart/hot-plug warning. UI does not predict restart need. | **Save** |
+| **Stopped** | Optional inline **info** (power state only): *Resize will apply on next start.* | **Save** |
 
-Alerts appear only after the user selects a **different** instance type than the current one.
+- Alerts that claim “this resize requires a restart” **before** submit are **out** — the API cannot tell the UI that ahead of time.
+- Boot-disk access mode (RWX/RWO) is **not** used for modal messaging.
+- Hot-plug / **Apply Resize** pre-submit path is **removed** from ship UX (future platform capability; not UI-guessed).
 
-> **Eng note (PR #388):** Current ship scope is **restart-only** (Running warning + Stopped info). Hot-plug is deferred to OSAC-5335 until boot-disk access mode / restart-necessity is API-readable. Mock still shows the hot-plug path for UX preview.
+---
+
+## Feedback after update
+
+| Outcome | Surface | Behaviour |
+|---|---|---|
+| Success (generic) | **Toast** | Instance type updated to {label}. |
+| Success + API condition says restart needed | **Toast** and/or Overview **status condition** | Surface the platform message (e.g. restart required). Do not invent the condition in the client. |
+| Success + VM was stopped | **Toast** | Instance type updated to {label}. Resize will apply on next start. *(power state known up front)* |
+| Submit failure | **Inline danger alert** in modal | Title: *Failed to update the instance type*. Description: error message. Modal stays open. |
+
+**Decision (PR #388):** Submit errors = in-modal inline danger alert (AttachExternalIpModal pattern). Success = toast (+ conditions when the API provides them).
 
 ---
 
@@ -58,61 +68,57 @@ Alerts appear only after the user selects a **different** instance type than the
 | Element | Detail |
 |---|---|
 | Title | Edit instance type |
-| Description | GPU / non-GPU guidance based on current VM configuration |
-| Field | **Instance type** * — typeahead rich select (same catalog as create) |
-| Power-state alert | Inline warning / info (see paths) — only when selection changed |
-| Submit error | Inline **danger** alert inside the modal; modal stays open |
-| Primary | **Apply Resize** (hot-plug + selection changed) or **Save** (restart paths / unchanged) |
+| Description | *Select a new instance type for this virtual machine.* (no GPU/non-GPU copy — GPU is independent of vCPU/memory) |
+| Field | **Instance type** * — typeahead rich select (same ACTIVE catalog as create) |
+| Pre-submit alert | Only optional **Stopped** info (see above). No Running restart warning. |
+| Submit error | Inline **danger** alert; modal stays open |
+| Primary | **Save** |
 | Secondary | Cancel |
-
-GPU VMs stay in the GPU instance-type set; non-GPU VMs stay non-GPU. Client filter + server `FailedPrecondition` backstop.
 
 ---
 
-## Feedback (success vs error)
+## Source of truth (clarified)
 
-| Outcome | Surface | Copy / behaviour |
-|---|---|---|
-| Success — hot-plug | **Toast** (success) | Instance type updated to {label}. |
-| Success — restart (running) | **Toast** (success) | Instance type updated to {label}. Restart the virtual machine to apply the resize. |
-| Success — restart (stopped) | **Toast** (success) | Instance type updated to {label}. Resize will apply on next start. |
-| Submit failure (GPU mismatch, obsolete type, API error, etc.) | **Inline danger alert** in modal | Title: *Failed to update the instance type*. Description: error message (e.g. GPU / OBSOLETE `FailedPrecondition`). Modal stays open. |
-
-**Decision (UXD sign-off for PR #388):** Error toast is replaced by an in-modal inline danger alert, matching AttachExternalIpModal. Success feedback stays as toasts.
+| Artifact | Role |
+|---|---|
+| Original OSAC-4281 ticket “two paths” table | **Historical UX intent** (pre-submit hot-plug vs restart). **Superseded** for ship. |
+| This handoff (revised) | **Current UX contract** for UI design / OSAC-4282 |
+| API status conditions | **Source of truth** for restart-required *after* resize |
+| [OSAC-5335](https://redhat.atlassian.net/browse/OSAC-5335) | Hot-plug **environment / testing** follow-up — not “make restart need API-visible before submit” |
 
 ---
 
 ## How to review in the mock
 
-1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7148) as **Tenant Admin** or **Tenant User**.
-2. Open **indigo-quokka-89** → Instance type pencil → pick another type → confirm **Apply Resize** (no alert).
-3. Open **azure-baboon-27** (Running + RWO) → change type → see **warning** alert.
-4. Open **windows-golden-eider-58** (Stopped) → change type → see **info** alert.
-5. Try a starting/stopping/error VM → edit should be unavailable.
-6. As **Tenant User**, confirm Instance type pencil works, while SSH / Network / Storage edits stay disabled.
-7. Force a GPU-class mismatch (if reachable) → inline **danger** alert in the modal; no error toast.
+1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7151) as **Tenant Admin** or **Tenant User**.
+2. Open a **Running** VM → Instance type pencil → change type → **Save** (no pre-submit restart warning; CTA is Save).
+3. Open a **Stopped** VM → change type → optional **info** “applies on next start” → **Save**.
+4. After a Running resize, Overview may show a **demo status condition** for restart-required (stands in for API conditions).
+5. Starting/stopping/error VMs → edit unavailable.
+6. **Tenant User** → Instance type pencil works; SSH / Network / Storage stay read-only.
+7. Submit failure → inline **danger** alert in the modal.
 
 ---
 
 ## Out of scope (this handoff)
 
-- [OSAC-4864](https://redhat.atlassian.net/browse/OSAC-4864) — Instance type becomes vCPU+memory only; GPU as separate device add-on (future modal section)
+- [OSAC-4864](https://redhat.atlassian.net/browse/OSAC-4864) — Instance type = vCPU+memory only; GPU as separate device add-on
 - Automatic restart after resize
+- Pre-submit detection of hot-plug vs restart (not API-supported)
 - Changing boot disk access mode from this modal
-- Hot-plug delivery in production until [OSAC-5335](https://redhat.atlassian.net/browse/OSAC-5335)
 
 ---
 
 ## Engineering notes
 
 - UI can ship in parallel with OSAC-5328; until that lands, update may be rejected by API.
-- Resize path is derived from **power state** + **boot disk access mode** (`RWX` / `RWO` / unknown) in the mock; eng restart-only scope may use power state alone until OSAC-5335.
-- Submit errors: inline danger alert; success: toast (PR #388).
-- Prototype build: `7148` (*resize-inline-error*).
+- Wire success UX to Update response + **status conditions**; do not reimplement resize-path detection from boot-disk access mode.
+- Submit errors: inline danger alert (PR #388).
+- Prototype build: `7151` (*resize-no-gpu-desc*).
+- Modal description does **not** mention GPU (Jonathan feedback).
 
 ---
 
 ## Open questions
 
-1. **Hot-plug in mock vs eng ship:** Keep **Apply Resize** / RWX path in the mock for UX preview while eng ships restart-only first — or temporarily hide hot-plug in the mock to match PR #388 scope?
-2. **GPU description copy:** PR proposes slightly different modal description wording (“uses a GPU / non-GPU instance type…”). Keep current handoff/mock copy, or adopt PR wording?
+1. **Post-resize condition UX:** Prefer toast copy from the condition message, an Overview inline alert, or both? Align with eng on the exact condition type/name.
