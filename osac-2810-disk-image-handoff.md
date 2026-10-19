@@ -11,7 +11,8 @@
 | **Feature** | [OSAC-2540](https://redhat.atlassian.net/browse/OSAC-2540) — *DiskImage resource for disk image metadata management* |
 | **Scope of this handoff** | Provider **Disk images** UX in the shared mock (list · create · detail · lifecycle), as specified in the Disk images UX tab |
 | **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7161-disk&role=provider) |
-| **UX source tab** | [VMaaS prototype — UX documentation → Disk images](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.uxouanov03p1) |
+| **Handoff Google Doc** | [OSAC-2810 — DiskImage resource UX (handoff)](https://docs.google.com/document/d/1tKrg2Wb2bmD6ny6Iqw87ysnMRwHjj6XmDttc-rv05a4/edit) |
+| **Shared UX tab (pointer)** | [VMaaS prototype — UX documentation → Disk images](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.uxouanov03p1) |
 | **Status** | OSAC-2810 **Closed**. **Fully covered** for provider Disk images UX tab scope. Broader OSAC-2540 UI gaps are deferred (no UX follow-ups for now; delete-if-referenced left to eng). |
 
 ---
@@ -89,14 +90,15 @@ Not required for OSAC-2810 acceptance. Captured for awareness; **no UX follow-up
 
 - Feature PRD: [OSAC-2540](https://redhat.atlassian.net/browse/OSAC-2540)
 - Bootstrap epic: [OSAC-2807](https://redhat.atlassian.net/browse/OSAC-2807)
-- UX tab: [Disk images](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.uxouanov03p1)
+- Handoff Doc: [OSAC-2810 — DiskImage resource UX (handoff)](https://docs.google.com/document/d/1tKrg2Wb2bmD6ny6Iqw87ysnMRwHjj6XmDttc-rv05a4/edit)
+- Shared UX tab (pointer): [Disk images](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.uxouanov03p1)
 - Screenshots: `videos/osac-2810-disk-image-handoff/` · [gh-pages/screenshots/osac-2810](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/osac-2810)
 - Eng PRs: osac-ui PR 164 (list/create), PR 177 (detail)
 - Prototype build: **7161**
 
 ---
 
-## Screenshots (inline in UX tab)
+## Screenshots (inline in dedicated Doc)
 
 | Figure | File |
 |---|---|
