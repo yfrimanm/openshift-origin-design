@@ -7011,7 +7011,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · ethan-access-eip 7160</span><!-- pages:d817+ -->
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · restart-plain-labels 7161</span>
         </div>
       </div>
       <div class="console__body">
@@ -8731,8 +8731,7 @@
       const changes = rr.changes.map(c => {
         const section = String(c.section || 'Details').replace(/</g, '&lt;');
         const label = String(c.label || 'Change').replace(/</g, '&lt;');
-        const focus = String(c.focus || '').replace(/"/g, '&quot;');
-        return `<li>${section} &gt; <button type="button" class="name-link" data-restart-change="${focus}">${label}</button></li>`;
+        return `<li>${section} &gt; ${label}</li>`;
       }).join('');
       return `
         <div class="vm-restart-required" id="vm-restart-required">
@@ -16424,18 +16423,6 @@
         rawVm.restartRequired.expanded = rawVm.restartRequired.expanded === false;
         renderVmDetail();
       });
-      root.querySelectorAll('[data-restart-change]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.preventDefault();
-          const focus = btn.dataset.restartChange;
-          if (focus === 'instance-type') {
-            openEditComputeModal();
-          } else if (focus === 'network') {
-            root.querySelector('#vm-network-title')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-          }
-        });
-      });
-
       root.querySelector('[data-breadcrumb-vms]')?.addEventListener('click', e => {
         e.preventDefault();
         state.selectedVmName = null;
