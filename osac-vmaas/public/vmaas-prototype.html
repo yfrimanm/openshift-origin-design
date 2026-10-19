@@ -1533,119 +1533,62 @@
       font-size: 14px;
       color: var(--vmaas-text, #151515);
     }
-    /* OSAC-2621: External IP is primary SSH access — prominent panel above NICs */
-    .vm-external-ip-panel {
-      margin: 0 0 8px;
-      padding: 16px 18px;
-      border: 1px solid var(--vmaas-border-light, #d2d2d2);
-      border-radius: 8px;
-      background: var(--pf-t--global--background--color--secondary--default, #fafafa);
+    /* OSAC-2621: External IP day-2 — Ethan Access pattern (Host + SSH clipboard) */
+    .vm-access-section {
+      max-width: 40rem;
     }
-    .vm-external-ip-panel__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 6px;
+    .vm-access-section .ethan-detail-col__title {
+      margin-bottom: 16px;
     }
-    .vm-external-ip-panel__title {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--vmaas-text, #151515);
-    }
-    .vm-external-ip-panel__help {
-      margin: 0 0 14px;
-      font-size: 14px;
-      line-height: 1.45;
-      color: var(--vmaas-text-subtle, #6a6e73);
-    }
-    .vm-external-ip-panel__row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-    }
-    .vm-external-ip-panel__value {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-      line-height: 1.3;
-      color: var(--vmaas-text, #151515);
-      font-variant-numeric: tabular-nums;
-    }
-    .vm-external-ip-panel__value--muted {
-      font-weight: 500;
-      font-size: 16px;
-      color: var(--vmaas-text-subtle, #6a6e73);
-    }
-    .vm-external-ip-panel__ssh {
-      margin: 10px 0 0;
-      font-size: 13px;
-      line-height: 1.4;
-      color: var(--vmaas-text, #151515);
-    }
-    .vm-external-ip-panel__ssh code {
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #fff;
-      border: 1px solid var(--vmaas-border-light, #d2d2d2);
-    }
-    .vm-external-ip-panel__error {
-      margin: 8px 0 0;
-      font-size: 13px;
-      color: var(--pf-t--global--color--status--danger--default, #c9190b);
-    }
-    .vm-external-ip-panel__actions {
+    .vm-access-section__host-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
       align-items: center;
-      flex-shrink: 0;
+      gap: 8px 12px;
     }
-    .vm-external-ip-panel__status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.2;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid transparent;
+    .vm-access-section__host-row code {
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
     }
-    .vm-external-ip-panel__status--none {
+    .vm-access-section__meta {
+      margin: 6px 0 0;
+      font-size: 13px;
+      line-height: 1.4;
       color: var(--vmaas-text-subtle, #6a6e73);
-      background: #fff;
-      border-color: var(--vmaas-border-light, #d2d2d2);
     }
-    .vm-external-ip-panel__status--attaching {
-      color: #002952;
-      background: #e0f0ff;
-      border-color: #bee1f4;
+    .vm-access-section__meta--danger {
+      color: var(--pf-t--global--color--status--danger--default, #c9190b);
     }
-    .vm-external-ip-panel__status--attached {
-      color: #1e4f18;
-      background: #e9f7e9;
-      border-color: #bde5b8;
-    }
-    .vm-external-ip-panel__status--failed {
-      color: #5f2120;
-      background: #faeae8;
-      border-color: #f5c2c0;
-    }
-    .vm-external-ip-panel__spinner {
+    .vm-access-section__spinner {
       display: inline-block;
       width: 12px;
       height: 12px;
+      margin-right: 6px;
       border: 2px solid currentColor;
       border-right-color: transparent;
       border-radius: 50%;
+      vertical-align: -1px;
       animation: vm-eip-spin 0.7s linear infinite;
     }
     @keyframes vm-eip-spin {
       to { transform: rotate(360deg); }
+    }
+    .vm-access-section .pf-v6-c-clipboard-copy {
+      max-width: 28rem;
+    }
+    .vm-access-section .pf-v6-c-clipboard-copy__group {
+      display: flex;
+      align-items: stretch;
+      width: 100%;
+    }
+    .vm-access-section .pf-v6-c-clipboard-copy .pf-v6-c-form-control {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .vm-access-section .pf-v6-c-clipboard-copy input {
+      width: 100%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
     }
     .rich-select__menu-footer {
       flex-shrink: 0;
@@ -7068,7 +7011,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · eip-access-states 7159</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · ethan-access-eip 7160</span>
         </div>
       </div>
       <div class="console__body">
@@ -14564,58 +14507,67 @@
       const status = vmExternalIpStatus(vm);
       const attachedIp = status === 'attached' && vm.externalIp ? String(vm.externalIp) : '';
       const pendingIp = vm.externalIpPending ? String(vm.externalIpPending) : '';
-      const statusMeta = {
-        none: { mod: 'none', label: 'Not attached' },
-        attaching: { mod: 'attaching', label: 'Attaching' },
-        attached: { mod: 'attached', label: 'Attached' },
-        failed: { mod: 'failed', label: 'Failed' },
-      }[status] || { mod: 'none', label: 'Not attached' };
-      let valueHtml = '<p class="vm-external-ip-panel__value vm-external-ip-panel__value--muted">—</p>';
-      if (status === 'attaching') {
-        valueHtml = `<p class="vm-external-ip-panel__value">${pendingIp.replace(/</g, '&lt;') || '—'}</p>`;
-      } else if (status === 'attached') {
-        valueHtml = `<p class="vm-external-ip-panel__value">${attachedIp.replace(/</g, '&lt;')}</p>`;
+      const safeIp = (attachedIp || pendingIp).replace(/</g, '&lt;');
+      const sshCmd = attachedIp ? `ssh cloud-user@${attachedIp}` : '';
+      const sshCmdSafe = sshCmd.replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+      let hostValue = '—';
+      let hostMeta = '';
+      if (status === 'attached' && attachedIp) {
+        hostValue = `<code>${safeIp}</code>`;
+      } else if (status === 'attaching') {
+        hostValue = pendingIp
+          ? `<code>${safeIp}</code>`
+          : '<span class="muted">—</span>';
+        hostMeta = `<p class="vm-access-section__meta"><span class="vm-access-section__spinner" aria-hidden="true"></span>Attaching external IP…</p>`;
       } else if (status === 'failed') {
-        valueHtml = `<p class="vm-external-ip-panel__value vm-external-ip-panel__value--muted">${(pendingIp || '—').replace(/</g, '&lt;')}</p>`;
+        hostValue = pendingIp ? `<code>${safeIp}</code>` : '<span class="muted">—</span>';
+        const err = vm.externalIpError
+          ? String(vm.externalIpError).replace(/</g, '&lt;')
+          : 'Failed to attach external IP.';
+        hostMeta = `<p class="vm-access-section__meta vm-access-section__meta--danger" role="alert">${err}</p>`;
       }
-      const sshHtml = status === 'attached' && attachedIp
-        ? `<p class="vm-external-ip-panel__ssh">SSH access: <code>ssh cloud-user@${attachedIp.replace(/</g, '&lt;')}</code></p>`
-        : '';
-      const errHtml = status === 'failed' && vm.externalIpError
-        ? `<p class="vm-external-ip-panel__error" role="alert">${String(vm.externalIpError).replace(/</g, '&lt;')}</p>`
-        : '';
+
       let actions = '';
       if (!canEdit) {
-        actions = `<span class="muted">No configuration edits for this role</span>`;
+        actions = '';
       } else if (status === 'attaching') {
-        actions = `<button type="button" class="pf-v6-c-button pf-m-link" disabled>Attaching…</button>`;
+        actions = '';
       } else if (status === 'attached') {
-        actions = `<button type="button" class="name-link" data-ip-toggle="external">Detach</button>`;
+        actions = `<button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-ip-toggle="external">Detach</button>`;
       } else if (status === 'failed') {
         actions = `
-          <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" data-ip-toggle="external-retry">Retry</button>
-          <button type="button" class="name-link" data-ip-toggle="external">Choose another</button>`;
+          <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-ip-toggle="external-retry">Retry</button>
+          <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-ip-toggle="external">Choose another</button>`;
       } else {
-        actions = `<button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" data-ip-toggle="external">Attach external IP</button>`;
+        actions = `<button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-ip-toggle="external">Attach external IP</button>`;
       }
-      return `
-        <section class="vm-external-ip-panel" aria-labelledby="vm-eip-title">
-          <div class="vm-external-ip-panel__head">
-            <h3 class="vm-external-ip-panel__title" id="vm-eip-title">External IP</h3>
-            <span class="vm-external-ip-panel__status vm-external-ip-panel__status--${statusMeta.mod}">
-              ${status === 'attaching' ? '<span class="vm-external-ip-panel__spinner" aria-hidden="true"></span>' : ''}
-              ${statusMeta.label}
-            </span>
-          </div>
-          <p class="vm-external-ip-panel__help">Use this address to access the virtual machine over SSH from outside the private network.</p>
-          <div class="vm-external-ip-panel__row">
-            <div>
-              ${valueHtml}
-              ${sshHtml}
-              ${errHtml}
+
+      const hostHtml = `
+        <div class="vm-access-section__host-row">
+          <span>${hostValue}</span>
+          ${actions}
+        </div>
+        ${hostMeta}`;
+
+      const sshHtml = status === 'attached' && sshCmd
+        ? `<div class="pf-v6-c-clipboard-copy">
+            <div class="pf-v6-c-clipboard-copy__group">
+              <span class="pf-v6-c-form-control pf-m-readonly">
+                <input type="text" readonly value="${sshCmdSafe}" aria-label="SSH connect command" />
+              </span>
+              <button type="button" class="pf-v6-c-button pf-m-control" aria-label="Copy SSH command" data-copy-text="${sshCmdSafe}">
+                <span class="pf-v6-c-button__icon"><i class="fa-regular fa-copy" aria-hidden="true"></i></span>
+              </button>
             </div>
-            <div class="vm-external-ip-panel__actions">${actions}</div>
-          </div>
+          </div>`
+        : '<span class="muted">—</span>';
+
+      return `
+        <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
+          <h3 class="ethan-detail-col__title" id="vm-access-eip-title">Access</h3>
+          ${itField('Host', hostHtml)}
+          ${itField('SSH command', sshHtml)}
         </section>`;
     }
 
@@ -16315,12 +16267,12 @@
               </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
-            <section class="vm-overview-v2__section" aria-labelledby="vm-eip-title">
+            <section class="vm-overview-v2__section" aria-labelledby="vm-access-eip-title">
               ${vmExternalIpPanelHtml(v, { canEdit: canEditConfig })}
             </section>
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
               <div class="vm-overview-v2__section-head">
-                <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
+                <h3 class="ethan-detail-col__title" id="vm-network-title">Networking</h3>
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net"${addDisabledAttrs}>Add network</button>
                   </div>
               <div class="vm-overview__table-wrap">
@@ -16528,6 +16480,26 @@
           toggleVmIpAttachment(e.currentTarget.dataset.ipToggle);
               });
             });
+      root.querySelectorAll('[data-copy-text]').forEach(btn => {
+        btn.addEventListener('click', async e => {
+          e.preventDefault();
+          const text = e.currentTarget.getAttribute('data-copy-text') || '';
+          try {
+            if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+            else {
+              const ta = document.createElement('textarea');
+              ta.value = text;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              ta.remove();
+            }
+            toast('SSH command copied.', 'success');
+          } catch (_) {
+            toast('Could not copy SSH command.');
+          }
+        });
+      });
       root.querySelectorAll('[data-vm-action]').forEach(b => {
         b.addEventListener('click', () => {
           hidePfTooltip();

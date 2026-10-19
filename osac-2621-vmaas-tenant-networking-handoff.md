@@ -55,16 +55,16 @@ The VMaaS prototype may still show **Networking → Virtual networks** as a **pl
 
 **Screenshots:** `videos/osac-2621-networking-handoff/03-*.png`, `04-*.png`, `05-*.png`
 
-### B. External IP (day-2) — primary SSH access
+### B. External IP (day-2) — Ethan Access pattern
 
-External IP is how users reach the VM with SSH. It is shown as a **prominent panel above the NICs table**.
+External IP is how users reach the VM with SSH. Day-2 matches Ethan BMaaS **Access** (not a card): **Host** + **SSH command** (clipboard-copy), above Networking.
 
 | State | UI |
 |---|---|
-| **Not attached** | Status pill + **Attach external IP** CTA |
-| **Attaching** | Spinner + *Attaching* pill; value shows pending IP; actions disabled |
-| **Attached** | Large IP + *Attached* pill + sample `ssh cloud-user@…` + **Detach** |
-| **Failed** | *Failed* pill + error text + **Retry** / **Choose another** |
+| **Not attached** | Host `—` + **Attach external IP** |
+| **Attaching** | Host shows pending IP + “Attaching external IP…” |
+| **Attached** | Host `<code>IP</code>` + SSH clipboard-copy + **Detach** |
+| **Failed** | Inline error + **Retry** / **Choose another** |
 
 **Demo failure:** in the attach modal, pick `198.51.100.99` (*Demo: simulate attach failure*).
 
