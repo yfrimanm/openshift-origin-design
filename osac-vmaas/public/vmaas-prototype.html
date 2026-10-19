@@ -6897,7 +6897,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · eip-default-on 7152</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · extra-nets-custom-only 7153</span>
         </div>
       </div>
       <div class="console__body">
@@ -9579,6 +9579,8 @@
       if (!Array.isArray(d.securityGroups) || !d.securityGroups.length) {
         d.securityGroups = defaultSecurityGroups();
       }
+      // Additional networks are Custom-only (OSAC-2621).
+      d.extraNetworks = [];
     }
 
     /** Prefill tenant-default network; custom mode keeps user picks. */
@@ -18710,6 +18712,7 @@
                 </label>
                 ${pfHelperText(autoHelp)}
               </div>
+              ${isCustom ? `
               <h3 class="config-sets-title">Additional networks</h3>
               ${(d.extraNetworks || []).length ? `
               <div class="inline-sets" aria-label="Additional networks">
@@ -18845,6 +18848,7 @@
                   icon: 'plus',
                 })}
               </div>
+              ` : ''}
             </div>
           `;
           panel.querySelectorAll('input[name="networkPath"]').forEach(input => {
@@ -18854,6 +18858,7 @@
                 ensureNetworkingDefaults(d);
               } else {
                 applyTenantDefaultNetwork(d);
+                state.extraSgMenuOpen = null;
               }
               clearFieldError('virtualNetwork');
               clearFieldError('subnet');
@@ -19682,14 +19687,16 @@
               ${reviewRow('Subnet', subnet)}
               ${reviewRow('Security groups', sgs)}
               ${reviewRow('Auto-attach external IP', autoExternalIp)}
-              ${(d.extraNetworks || []).length
-                ? (d.extraNetworks || []).map((net, i) => {
-                    const label = (net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;');
-                    const sub = (net.subnet || '—').replace(/</g, '&lt;');
-                    const netSgs = (net.securityGroups || []).join(', ') || '—';
-                    return reviewRow(`Network ${i + 1}`, `${label} | ${sub} | ${netSgs}`);
-                  }).join('')
-                : reviewRow('Additional networks', 'None')}
+              ${d.networkMode === 'custom'
+                ? ((d.extraNetworks || []).length
+                  ? (d.extraNetworks || []).map((net, i) => {
+                      const label = (net.virtualNetworkLabel || net.virtualNetwork || '—').replace(/</g, '&lt;');
+                      const sub = (net.subnet || '—').replace(/</g, '&lt;');
+                      const netSgs = (net.securityGroups || []).join(', ') || '—';
+                      return reviewRow(`Network ${i + 1}`, `${label} | ${sub} | ${netSgs}`);
+                    }).join('')
+                  : reviewRow('Additional networks', 'None'))
+                : ''}
             `)}
             ${reviewNebiusSection('Access & Initial run', 'access-init', `
               ${windowsAccess
