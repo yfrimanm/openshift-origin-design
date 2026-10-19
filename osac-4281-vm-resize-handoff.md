@@ -10,7 +10,7 @@
 | **Parent epic** | [OSAC-5635](https://redhat.atlassian.net/browse/OSAC-5635) — *UIX - VM Resize Instancetype Selection* |
 | **UI design (eng)** | [OSAC-4282](https://redhat.atlassian.net/browse/OSAC-4282) · [enhancement-proposals PR #388](https://github.com/osac-project/enhancement-proposals/pull/388) |
 | **Scope** | Day-2 **Edit instance type** (resize) on VM details Overview |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7157) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7158) |
 | **Companion docs** | [VM details Overview UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Handoff Google Doc** | [OSAC-4281 — VM resize via instance type (UX handoff)](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
 | **Status** | Revised after eng review: **no pre-submit restart/hot-plug detection** in the UI. Restart need comes from API **status conditions after** update. |
@@ -56,7 +56,7 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 | Outcome | Surface | Behaviour |
 |---|---|---|
 | Success (generic) | **Toast** | Instance type updated to {label}. |
-| Success + API condition says restart needed (**Running** or **Paused**) | **Toast** + Overview **Restart required** banner (CNV pattern) | Expandable warning: title *Restart required*, body that changes apply after restart, **Detected changes** list (only changes from this update — e.g. Details > Instance type after resize; other pending updates can aggregate if the API reports them). Cleared after Restart / Start completes. |
+| Success + API condition says restart needed (**Running** or **Paused**) | **Toast** + Overview **Restart required** banner (CNV pattern) | Expandable warning with **Detected changes**. Lists **only what was edited**. Multiple restart-required edits (e.g. Instance type, then Network) **aggregate** into one banner. Cleared after Restart / Start. |
 | Success + VM was stopped | **Toast** | Instance type updated to {label}. Resize will apply on next start. *(power state known up front)* |
 | Submit failure | **Inline danger alert** in modal | Title: *Failed to update the instance type*. Description: error message. Modal stays open. |
 
@@ -91,11 +91,11 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 
 ## How to review in the mock
 
-1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7157) as **Tenant Admin** or **Tenant User**.
+1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7158) as **Tenant Admin** or **Tenant User**.
 2. Open a **Running** VM → Instance type pencil → change type → **Save** (no pre-submit restart warning; CTA is Save).
 3. **Pause** a VM → resize → **Save** → same Overview **Restart required** banner (changes apply after restart).
 4. Open a **Stopped** VM → change type → optional **info** “applies on next start” → **Save**.
-5. After Running/Paused resize, Overview shows CNV-style **Restart required** with **Detected changes** → Details > Instance type only (unless other API pending changes exist).
+5. After Running/Paused resize → **Restart required** with Details > Instance type only. Edit a network while Running/Paused → that Network line is added to the same banner (multi-change aggregation).
 6. Starting/stopping/error VMs → edit unavailable.
 7. **Tenant User** → Instance type pencil works; SSH / Network / Storage stay read-only.
 8. Submit failure → inline **danger** alert in the modal.
@@ -116,9 +116,9 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 - UI can ship in parallel with OSAC-5328; until that lands, update may be rejected by API.
 - Wire success UX to Update response + **status conditions**; do not reimplement resize-path detection from boot-disk access mode.
 - Submit errors: inline danger alert (PR #388).
-- Prototype build: `7157` (*restart-it-only* — Detected changes lists only the edited Instance type).
+- Prototype build: `7158` (*restart-aggregate* — Detected changes lists each real edit; multi-edit aggregates).
 - Modal description does **not** mention GPU (Jonathan feedback).
-- Post-update Restart required banner mirrors CNV (expandable + Detected changes list).
+- Post-update Restart required banner mirrors CNV (expandable + Detected changes list). Resize alone → Instance type only; Network edit while Running/Paused adds a Network line to the same banner.
 
 ---
 

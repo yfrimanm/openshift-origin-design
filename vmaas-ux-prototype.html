@@ -6954,7 +6954,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · restart-it-only 7157</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · restart-aggregate 7158</span>
         </div>
       </div>
       <div class="console__body">
@@ -8606,8 +8606,18 @@
       return null;
     }
 
-    /** Merge a pending restart-required change (CNV-style multi-change list). */
-    function upsertVmRestartRequired(vm, { message, change }) {
+    /** True when day-2 edits surface as Restart required (Running / Paused). */
+    function vmNeedsRestartRequiredBanner(vm) {
+      const kind = vmPowerKind(vm?.status);
+      return kind === 'running' || kind === 'paused';
+    }
+
+    /**
+     * Merge a pending restart-required change (CNV-style multi-change list).
+     * Each real edit that requires restart calls this — Detected changes lists
+     * only what was edited; multiple edits aggregate into one banner.
+     */
+    function upsertVmRestartRequired(vm, { message, change } = {}) {
       if (!vm) return;
       const existing = vm.restartRequired && typeof vm.restartRequired === 'object'
         ? vm.restartRequired
@@ -8619,11 +8629,14 @@
         if (idx >= 0) changes[idx] = { ...changes[idx], ...change };
         else changes.push(change);
       }
+      const multi = changes.length > 1;
       vm.restartRequired = {
         title: 'Restart required',
-        message: message
-          || existing?.message
-          || 'Changes apply after the virtual machine is restarted.',
+        message: multi
+          ? 'Changes apply after the virtual machine is restarted.'
+          : (message
+            || existing?.message
+            || 'Changes apply after the virtual machine is restarted.'),
         changes,
         expanded: existing?.expanded !== false,
       };
@@ -8631,6 +8644,12 @@
       if (!vm.conditions.some(c => /RestartRequired/i.test(c))) {
         vm.conditions = ['RestartRequired=True', ...vm.conditions];
       }
+    }
+
+    /** Record a day-2 edit that requires restart (no-op when Stopped / transitional). */
+    function markVmRestartRequiredChange(vm, change, message) {
+      if (!vm || !vmNeedsRestartRequiredBanner(vm) || !change?.label) return;
+      upsertVmRestartRequired(vm, { message, change });
     }
 
     function clearVmRestartRequired(vm) {
@@ -9061,18 +9080,14 @@
       const changed = !!state.editComputeModal?.initialId && id !== state.editComputeModal.initialId;
       applyComputeResourceToVm(vm, id);
       if (changed && (path === 'running' || path === 'paused')) {
-        // Demo stand-in for API status condition after resize (CNV-style Overview banner).
-        // Running and Paused: changes apply after restart (not hot-plug assumed).
-        upsertVmRestartRequired(vm, {
-          message: path === 'paused'
+        // API status condition stand-in (CNV-style Overview banner).
+        markVmRestartRequiredChange(
+          vm,
+          { section: 'Details', label: 'Instance type', focus: 'instance-type' },
+          path === 'paused'
             ? 'Instance type updated while the virtual machine is paused. Changes apply after restart.'
             : 'Instance type updated. Changes apply after the virtual machine is restarted.',
-          change: {
-            section: 'Details',
-            label: 'Instance type',
-            focus: 'instance-type',
-          },
-        });
+        );
       }
       closeEditComputeModal();
       renderVmDetail();
@@ -15031,6 +15046,11 @@
             subnet: m.subnet,
             securityGroups: [...(m.securityGroups || [])],
           };
+          markVmRestartRequiredChange(
+            vm,
+            { section: 'Network', label: m.editName, focus: 'network' },
+            `Network “${m.editName}” updated. Changes apply after the virtual machine is restarted.`,
+          );
           closeAddNetworkModal();
           renderVmDetail();
           toast(`Network “${m.editName}” updated.`, 'success');
@@ -15044,6 +15064,11 @@
           ip: '—',
         };
         vm.nics.push(nic);
+        markVmRestartRequiredChange(
+          vm,
+          { section: 'Network', label: nic.name, focus: 'network' },
+          `Network “${nic.name}” added. Changes apply after the virtual machine is restarted.`,
+        );
         closeAddNetworkModal();
         renderVmDetail();
         toast(`Network “${nic.name}” added.`, 'success');
