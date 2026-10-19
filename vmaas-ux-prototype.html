@@ -1461,9 +1461,9 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
+      margin: 0 0 16px;
+      padding: 0 0 16px;
+      border-bottom: 1px solid var(--vmaas-border-light, #d2d2d2);
     }
     .vm-network-external__label {
       margin: 0 0 6px;
@@ -6897,7 +6897,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · extra-nets-custom-only 7153</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · eip-above-nics 7154</span>
         </div>
       </div>
       <div class="console__body">
@@ -15916,6 +15916,15 @@
                 <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net"${addDisabledAttrs}>Add network</button>
                   </div>
+              <div class="vm-network-external">
+                <div>
+                  <p class="vm-network-external__label">External IP</p>
+                  <p class="vm-network-external__value">${v.externalIpAttached && v.externalIp ? String(v.externalIp).replace(/</g, '&lt;') : '—'}</p>
+                </div>
+                <button type="button" class="name-link" data-ip-toggle="external"${canEditConfig ? '' : ' disabled title="No configuration edits for this role"'}>
+                  ${v.externalIpAttached ? 'Detach' : 'Attach'}
+                </button>
+              </div>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--network" aria-label="Networks">
                   <colgroup>
@@ -15970,15 +15979,6 @@
                     </tbody>
                   </table>
                 </div>
-              <div class="vm-network-external">
-                <div>
-                  <p class="vm-network-external__label">External IP</p>
-                  <p class="vm-network-external__value">${v.externalIpAttached && v.externalIp ? String(v.externalIp).replace(/</g, '&lt;') : '—'}</p>
-                </div>
-                <button type="button" class="name-link" data-ip-toggle="external"${canEditConfig ? '' : ' disabled title="No configuration edits for this role"'}>
-                  ${v.externalIpAttached ? 'Detach' : 'Attach'}
-                </button>
-              </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">

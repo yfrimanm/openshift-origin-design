@@ -12,7 +12,7 @@
 | **Eng epic** | [HPUX-2249](https://redhat.atlassian.net/browse/HPUX-2249) — *VMaaS Tenant Networking* |
 | **Scope of this handoff** | Tenant Networking UX in the shared mock: **Virtual networks** (list / create / edit) + Create VM **Networking** step (Ethan-aligned) + day-2 **Attach external IP** |
 | **Handoff Google Doc** | [OSAC-2621 — VMaaS Tenant Networking (UX handoff)](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7153) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7154) |
 | **Ethan reference (BMaaS)** | [Launch BM → Networking](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=catalog&action=launch-instance&item=bare-metal-general-purpose-server&step=networking) · [Create virtual network](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=networking-virtual-networks&action=create-virtual-network&step=virtual-network) |
 | **Alignment note** | [OSAC-2616 comment](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987) — VMaaS matches BMaaS/Cluster networking; **only VM difference = multiple networks** |
 | **Status** | **Fully covered** for tenant networking surfaces in the mock (Ethan-aligned). Type field removed (no API). |
@@ -33,7 +33,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 ### A. Virtual networks (tenant)
 
-1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7153) as **Tenant Admin**.
+1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7154) as **Tenant Admin**.
 2. Nav: **Networking → Virtual networks**.
 3. Confirm Ethan-style header, filters, cards/list toggle, name link, kebab (Edit → wizard).
 4. **Create virtual network** → Name, Description, IPv4 CIDR, IPv6 CIDR → Review (no Type field).
@@ -59,10 +59,14 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 ### C. External IP (day-2)
 
-1. Open a VM Overview → Network / external IP actions.
-2. **Attach external IP** modal — pick from project pool (Bat-Zion reopen ask).
+1. Open a VM Overview → **Network** section.
+2. **External IP** value + **Attach** / **Detach** sit **above** the NICs table (not below it).
+3. **Attach** opens the project-pool modal (Bat-Zion reopen ask).
 
-**Screenshot:** Attach external IP modal — `videos/osac-2621-networking-handoff/06-attach-external-ip-modal.png` · [gh-pages](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/gh-pages/screenshots/osac-2621/06-attach-external-ip-modal.png)
+**Screenshots:**
+
+- Overview External IP: `videos/osac-2621-networking-handoff/07-vm-overview-external-ip.png` · [gh-pages](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/gh-pages/screenshots/osac-2621/07-vm-overview-external-ip.png)
+- Attach modal: `videos/osac-2621-networking-handoff/06-attach-external-ip-modal.png` · [gh-pages](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/gh-pages/screenshots/osac-2621/06-attach-external-ip-modal.png)
 
 ---
 
@@ -121,7 +125,7 @@ Give Tenant Admins a unified Networking experience aligned with BMaaS/CaaS:
 
 - Ethan sync: [OSAC-2616](https://redhat.atlassian.net/browse/OSAC-2616) / [OSAC-2616 comment 18959987](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987)
 - Feature: [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435)
-- Prototype build: `7153` (Additional networks Custom-only; EIP default on; Networking Ethan alignment from `7149`)
+- Prototype build: `7154` (External IP above NICs table; Additional networks Custom-only; EIP default on)
 
 ---
 
