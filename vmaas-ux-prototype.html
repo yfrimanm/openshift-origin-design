@@ -2723,11 +2723,19 @@
       max-height: 200px; overflow-y: auto; padding: 4px 0;
     }
     .sg-select__option {
-      display: flex; align-items: center; gap: 8px; width: 100%;
+      display: flex; align-items: flex-start; gap: 8px; width: 100%;
       padding: 8px 12px; border: none; background: none; text-align: left;
       font-size: 14px; cursor: pointer; color: var(--vmaas-text);
     }
     .sg-select__option:hover { background: var(--vmaas-bg-subtle); }
+    .sg-select__option input { margin-top: 2px; flex: 0 0 auto; }
+    .sg-select__option-text {
+      display: flex; flex-direction: column; gap: 2px; min-width: 0;
+    }
+    .sg-select__option-title { font-size: 14px; line-height: 1.3; }
+    .sg-select__option-desc {
+      font-size: 12px; line-height: 1.3; color: var(--vmaas-text-secondary, #6a6e73);
+    }
     .nic-menu {
       position: absolute; inset-block-start: 100%; inset-inline-end: 0; z-index: 20; min-width: 12rem;
       background: #fff; border: 1px solid var(--vmaas-border); border-radius: 4px;
@@ -6889,7 +6897,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 14 · ethan-network 7147</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · ethan-networking 7149</span>
         </div>
       </div>
       <div class="console__body">
@@ -8562,6 +8570,18 @@
       return '';
     }
 
+    /** OSAC-4281 / PR #388: submit failures stay in-modal (not toast). */
+    function editComputeSubmitErrorAlertHtml(message) {
+      const desc = String(message || '').trim();
+      if (!desc) return '';
+      return `
+        <div class="pf-v6-c-alert pf-m-inline pf-m-danger compute-resize-alert" role="alert">
+          <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i></div>
+          <div class="pf-v6-c-alert__title">Failed to update the instance type</div>
+          <div class="pf-v6-c-alert__description">${desc.replace(/</g, '&lt;')}</div>
+        </div>`;
+    }
+
 
     function formatComputeDisplay(id) {
       const specs = computeResourceSpecs(id);
@@ -8780,6 +8800,7 @@
       const vmComputeOptions = filteredVmComputeResources(m.filter, { requireGpu });
       const selectionChanged = !!m.initialId && m.selectedId !== m.initialId;
       const resizeAlert = editComputeResizeAlertHtml(m.resizePath, selectionChanged);
+      const submitErrorAlert = editComputeSubmitErrorAlertHtml(m.submitError);
       const descEl = document.getElementById('compute-modal-desc');
       if (descEl) descEl.textContent = editComputeModalDescription(requireGpu);
       const saveBtn = document.getElementById('compute-modal-save');
@@ -8788,6 +8809,7 @@
         saveBtn.textContent = (m.resizePath === 'hotplug' && selectionChanged) ? 'Apply Resize' : 'Save';
       }
         body.innerHTML = `
+          ${submitErrorAlert}
           ${resizeAlert}
           <div class="form-field">
           <label id="f-edit-compute-resource-label">Instance type <span class="req">*</span></label>
@@ -8845,6 +8867,7 @@
           m.selectedId = id;
           m.menuOpen = false;
           m.filter = '';
+          m.submitError = null;
           renderEditComputeModal('edit-compute-toggle');
         },
       });
@@ -8877,6 +8900,7 @@
         menuOpen: false,
         filter: '',
         requireGpu,
+        submitError: null,
       };
       renderEditComputeModal();
       const overlay = document.getElementById('compute-overlay');
@@ -8892,17 +8916,29 @@
       overlay?.setAttribute('aria-hidden', 'true');
     }
 
+    function setEditComputeSubmitError(message) {
+      if (!state.editComputeModal) return;
+      state.editComputeModal.submitError = message || 'Unable to update the instance type.';
+      state.editComputeModal.menuOpen = false;
+      renderEditComputeModal();
+    }
+
     function saveEditComputeModal() {
       const vm = VMS.find(v => v.name === state.selectedVmName);
       const id = state.editComputeModal?.selectedId
         || document.getElementById('f-edit-compute-resource')?.value;
       if (!vm || !id) return;
+      if (state.editComputeModal) state.editComputeModal.submitError = null;
       if (!canResizeVmInstanceType(vm)) {
-        toast(resizeVmInstanceTypeDisabledReason(vm) || 'Resize is unavailable for this virtual machine.', 'danger');
+        setEditComputeSubmitError(
+          resizeVmInstanceTypeDisabledReason(vm) || 'Resize is unavailable for this virtual machine.',
+        );
         return;
       }
       if (state.editComputeModal && computeResourceHasGpu(id) !== !!state.editComputeModal.requireGpu) {
-        toast('Choose an instance type that matches this virtual machine’s GPU configuration.', 'danger');
+        setEditComputeSubmitError(
+          'cannot change GPU configuration when resizing from the current instance type to the selected type',
+        );
         return;
       }
       const path = state.editComputeModal?.resizePath || vmResizePath(vm);
@@ -9270,6 +9306,12 @@
     };
     const CONFIG_SECURITY_GROUPS = ['allow-ssh-https', 'restricted-egress', 'web-sg', 'db-sg'];
     const DEFAULT_SECURITY_GROUP = 'allow-ssh-https';
+    const CONFIG_SECURITY_GROUP_META = {
+      'allow-ssh-https': 'SSH + HTTPS ingress',
+      'restricted-egress': 'Restricted egress',
+      'web-sg': 'Web tier ingress',
+      'db-sg': 'Database tier ingress',
+    };
 
     function virtualNetworkById(id) {
       return CONFIG_VIRTUAL_NETWORKS.find(n => n.id === id) || null;
@@ -9289,6 +9331,20 @@
 
     function subnetDetail(subnetId) {
       return CONFIG_SUBNET_META[subnetId]?.detail || '';
+    }
+
+    function securityGroupDetail(sgId) {
+      return CONFIG_SECURITY_GROUP_META[sgId] || '';
+    }
+
+    function securityGroupsSummary(sgs) {
+      const list = Array.isArray(sgs) ? sgs.filter(Boolean) : [];
+      if (!list.length) return { name: '—', detail: '' };
+      const details = list.map(securityGroupDetail).filter(Boolean);
+      return {
+        name: list.join(', '),
+        detail: details.length === 1 ? details[0] : (details.join(' · ') || ''),
+      };
     }
 
     function isNetworkingComplete(d = state.data) {
@@ -9530,7 +9586,8 @@
       if (d.networkMode !== 'custom' && d.networkMode !== 'tenant-default') {
         d.networkMode = 'tenant-default';
       }
-      if (d.autoAttachExternalIp == null) d.autoAttachExternalIp = true;
+      // Align with Ethan / OSAC-1436 PRD FR-3: Auto-attach external IP is opt-in (default off).
+      if (d.autoAttachExternalIp == null) d.autoAttachExternalIp = false;
       if (d.networkMode !== 'custom') {
         applyTenantDefaultNetwork(d);
         return true;
@@ -9709,7 +9766,7 @@
         virtualNetwork: '',
         subnet: '',
         securityGroups: [],
-        autoAttachExternalIp: true,
+        autoAttachExternalIp: false,
         project: 'project-a',
         group: '',
         sshPublicKey: '',
@@ -9771,7 +9828,7 @@
       overviewMenuOpen: null, // 'nic:<name>' | 'disk:<index>'
       overviewRowMenuBtn: null,
       overviewRowMenuConfig: null,
-      editComputeModal: null, // { selectedId, initialId, resizePath, menuOpen, filter, requireGpu }
+      editComputeModal: null, // { selectedId, initialId, resizePath, menuOpen, filter, requireGpu, submitError }
       deleteResource: null, // { kind: 'nic'|'disk', name, index? }
       deleteCatalogItemId: null,
       nicModal: null, // { context, view, name, model, network, bootSource, mac, linkState }
@@ -16122,7 +16179,7 @@
           { key: 'details', label: 'Details', navNum: 2 },
           { key: 'config-compute', label: 'Instance type', navNum: 3 },
           { key: 'config-storage', label: 'Storage', navNum: 4 },
-          { key: 'config-network', label: 'Network', navNum: 5 },
+          { key: 'config-network', label: 'Networking', navNum: 5 },
           { key: 'access-init', label: 'Access & Initial run', navNum: 6 },
           { key: 'review', label: 'Review and create', navNum: 7 },
         ];
@@ -16204,7 +16261,7 @@
       state.data.virtualNetwork = '';
       state.data.subnet = '';
       state.data.securityGroups = [];
-      state.data.autoAttachExternalIp = true;
+      state.data.autoAttachExternalIp = false;
       applyTenantDefaultNetwork(state.data);
       state.sgMenuOpen = false;
       state.extraSgMenuOpen = null;
@@ -17625,7 +17682,7 @@
             });
           }
           editableItems.push({ label: 'Access', value: 'SSH key, Cloud-init, or Sysprep', note: 'Access & Initial run step' });
-          editableItems.push({ label: 'Network', value: 'Tenant default or custom network, external IP', note: 'Network step' });
+          editableItems.push({ label: 'Networking', value: 'Tenant default or custom network, external IP', note: 'Networking step' });
           const govList = (items) => `
             <ul class="tpl-drawer__gov-list">
               ${items.map(item => `
@@ -18511,10 +18568,14 @@
                   <div class="sg-select__menu" role="listbox" aria-label="Security groups">
                     ${CONFIG_SECURITY_GROUPS.map(sg => {
                       const checked = (d.securityGroups || []).includes(sg);
+                      const detail = securityGroupDetail(sg);
                       return `
                         <button type="button" class="sg-select__option" role="option" data-sg-toggle="${sg}" aria-selected="${checked}">
                           <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
-                          ${sg}
+                          <span class="sg-select__option-text">
+                            <span class="sg-select__option-title">${sg}</span>
+                            ${detail ? `<span class="sg-select__option-desc">${detail}</span>` : ''}
+                          </span>
                         </button>
                       `;
                     }).join('')}
@@ -18525,6 +18586,9 @@
               ${pfHelperText('Firewall rules for inbound and outbound traffic. A project default is preselected.')}
             </div>`;
           const defaultVn = virtualNetworkById(TENANT_DEFAULT_NETWORK.virtualNetwork);
+          const defaultSgSummary = securityGroupsSummary(d.securityGroups?.length
+            ? d.securityGroups
+            : defaultSecurityGroups());
           const defaultSummary = `
             <div class="network-path-summary" aria-label="Tenant default network">
               <div class="network-path-summary__row">
@@ -18539,6 +18603,13 @@
                 <div>
                   <span class="network-path-summary__name">${escAttr(d.subnet || TENANT_DEFAULT_NETWORK.subnet)}</span>
                   <span class="network-path-summary__detail">${escAttr(subnetDetail(d.subnet || TENANT_DEFAULT_NETWORK.subnet))}</span>
+                </div>
+              </div>
+              <div class="network-path-summary__row">
+                <div class="network-path-summary__term">Security groups</div>
+                <div>
+                  <span class="network-path-summary__name">${escAttr(defaultSgSummary.name)}</span>
+                  <span class="network-path-summary__detail">${escAttr(defaultSgSummary.detail)}</span>
                 </div>
               </div>
             </div>`;
@@ -18597,13 +18668,14 @@
                 })),
               })}
               ${fieldErrorHtml('subnet')}
-            </div>`;
+            </div>
+            ${sgField}`;
           const autoOn = !!d.autoAttachExternalIp;
           const autoHelp = autoOn
             ? 'Attaches an external IP so the instance is reachable outside the private network.'
             : 'No external IP at launch. You can attach one later from the instance.';
           panel.innerHTML = `
-            <h3>Network</h3>
+            <h3>Networking</h3>
             <p class="step-help">Choose a network and whether to auto-attach an external IP.</p>
             <div class="vm-config__fields">
               <div class="form-field">
@@ -18622,13 +18694,12 @@
                     {
                       value: 'custom',
                       title: 'Custom network',
-                      desc: 'Choose a virtual network and subnet.',
+                      desc: 'Choose a virtual network, subnet, and security group.',
                     },
                   ],
                 })}
               </div>
               ${isCustom ? customFields : defaultSummary}
-              ${sgField}
               <div class="network-external-ip">
                 <label class="network-external-ip__heading" for="f-auto-external-ip">External IP</label>
                 <label class="pf-v6-c-switch" for="f-auto-external-ip">
@@ -18745,11 +18816,15 @@
                           <div class="sg-select__menu" role="listbox" aria-label="Security groups">
                             ${CONFIG_SECURITY_GROUPS.map(sg => {
                               const checked = (netItem.securityGroups || []).includes(sg);
+                              const detail = securityGroupDetail(sg);
                               return `
                                 <button type="button" class="sg-select__option" role="option"
                                   data-extra-sg-opt="${netItem.id}" data-sg="${sg}" aria-selected="${checked}">
                                   <input type="checkbox" ${checked ? 'checked' : ''} tabindex="-1" aria-hidden="true" />
-                                  ${sg}
+                                  <span class="sg-select__option-text">
+                                    <span class="sg-select__option-title">${sg}</span>
+                                    ${detail ? `<span class="sg-select__option-desc">${detail}</span>` : ''}
+                                  </span>
                                 </button>
                               `;
                             }).join('')}
@@ -19601,7 +19676,7 @@
                   }).join('')
                 : reviewRow('Additional disks', 'None')}
             `)}
-            ${reviewNebiusSection('Network', 'config-network', `
+            ${reviewNebiusSection('Networking', 'config-network', `
               ${reviewRow('Network', networkModeLabel)}
               ${reviewRow('Virtual network', vnet)}
               ${reviewRow('Subnet', subnet)}
