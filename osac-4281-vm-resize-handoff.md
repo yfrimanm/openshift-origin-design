@@ -10,7 +10,7 @@
 | **Parent epic** | [OSAC-5635](https://redhat.atlassian.net/browse/OSAC-5635) — *UIX - VM Resize Instancetype Selection* |
 | **UI design (eng)** | [OSAC-4282](https://redhat.atlassian.net/browse/OSAC-4282) · [enhancement-proposals PR #388](https://github.com/osac-project/enhancement-proposals/pull/388) |
 | **Scope** | Day-2 **Edit instance type** (resize) on VM details Overview |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7151) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7155) |
 | **Companion docs** | [VM details Overview UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Handoff Google Doc** | [OSAC-4281 — VM resize via instance type (UX handoff)](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
 | **Status** | Revised after eng review: **no pre-submit restart/hot-plug detection** in the UI. Restart need comes from API **status conditions after** update. |
@@ -31,7 +31,7 @@ Backend gate: [OSAC-5328](https://redhat.atlassian.net/browse/OSAC-5328) (CEL im
 
 VM details Overview → **Details** card → **Instance type** pencil → **Edit instance type** modal.
 
-- Enabled when VM is **Running** or **Stopped**
+- Enabled when VM is **Running**, **Paused**, or **Stopped**
 - Disabled during **Starting** / **Stopping** / **Deleting** (tooltip explains why)
 - **Roles:** **Tenant Admin** and **Tenant User** can resize (per [OSAC-4277](https://redhat.atlassian.net/browse/OSAC-4277)). Other Overview config (SSH, Network, Storage) stays read-only for Tenant User.
 
@@ -42,6 +42,7 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 | VM power state | Pre-submit modal | Primary CTA |
 |---|---|---|
 | **Running** | No restart/hot-plug warning. UI does not predict restart need. | **Save** |
+| **Paused** | Same as Running (no pre-submit path guess). | **Save** |
 | **Stopped** | Optional inline **info** (power state only): *Resize will apply on next start.* | **Save** |
 
 - Alerts that claim “this resize requires a restart” **before** submit are **out** — the API cannot tell the UI that ahead of time.
@@ -55,7 +56,7 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 | Outcome | Surface | Behaviour |
 |---|---|---|
 | Success (generic) | **Toast** | Instance type updated to {label}. |
-| Success + API condition says restart needed | **Toast** and/or Overview **status condition** | Surface the platform message (e.g. restart required). Do not invent the condition in the client. |
+| Success + API condition says restart needed (**Running** or **Paused**) | **Toast** + Overview **Restart required** banner (CNV pattern) | Expandable warning: title *Restart required*, body that changes apply after restart, **Detected changes** list (can aggregate multiple pending updates, e.g. Details > Instance type + Network > …). Cleared after Restart / Start completes. |
 | Success + VM was stopped | **Toast** | Instance type updated to {label}. Resize will apply on next start. *(power state known up front)* |
 | Submit failure | **Inline danger alert** in modal | Title: *Failed to update the instance type*. Description: error message. Modal stays open. |
 
@@ -90,13 +91,14 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 
 ## How to review in the mock
 
-1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7151) as **Tenant Admin** or **Tenant User**.
+1. Open [the prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7155) as **Tenant Admin** or **Tenant User**.
 2. Open a **Running** VM → Instance type pencil → change type → **Save** (no pre-submit restart warning; CTA is Save).
-3. Open a **Stopped** VM → change type → optional **info** “applies on next start” → **Save**.
-4. After a Running resize, Overview may show a **demo status condition** for restart-required (stands in for API conditions).
-5. Starting/stopping/error VMs → edit unavailable.
-6. **Tenant User** → Instance type pencil works; SSH / Network / Storage stay read-only.
-7. Submit failure → inline **danger** alert in the modal.
+3. **Pause** a VM → resize → **Save** → same Overview **Restart required** banner (changes apply after restart).
+4. Open a **Stopped** VM → change type → optional **info** “applies on next start” → **Save**.
+5. After Running/Paused resize, Overview shows CNV-style **Restart required** with **Detected changes** (demo aggregates Instance type + Network).
+6. Starting/stopping/error VMs → edit unavailable.
+7. **Tenant User** → Instance type pencil works; SSH / Network / Storage stay read-only.
+8. Submit failure → inline **danger** alert in the modal.
 
 ---
 
@@ -114,8 +116,9 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 - UI can ship in parallel with OSAC-5328; until that lands, update may be rejected by API.
 - Wire success UX to Update response + **status conditions**; do not reimplement resize-path detection from boot-disk access mode.
 - Submit errors: inline danger alert (PR #388).
-- Prototype build: `7151` (*resize-no-gpu-desc*).
+- Prototype build: `7155` (*resize-restart-banner* — CNV Restart required on Running/Paused).
 - Modal description does **not** mention GPU (Jonathan feedback).
+- Post-update Restart required banner mirrors CNV (expandable + Detected changes list).
 
 ---
 

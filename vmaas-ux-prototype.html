@@ -1273,6 +1273,55 @@
     }
     .vm-alerts-list__item:last-child { border-bottom: none; }
     .vm-alerts-list__item i { color: #f0ab00; margin-top: 2px; flex-shrink: 0; }
+    /* OSAC-4281 / CNV-style post-update Restart required banner */
+    .vm-restart-required {
+      margin: 0 0 20px;
+    }
+    .vm-restart-required .pf-v6-c-alert {
+      --pf-v6-c-alert--m-warning--BorderTopColor: #f0ab00;
+    }
+    .vm-restart-required__toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      margin: 0 4px 0 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .vm-restart-required__toggle i {
+      font-size: 12px;
+      transition: transform 0.15s ease;
+    }
+    .vm-restart-required__toggle[aria-expanded="false"] i {
+      transform: rotate(180deg);
+    }
+    .vm-restart-required__body {
+      margin-top: 4px;
+    }
+    .vm-restart-required__changes-label {
+      margin: 8px 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .vm-restart-required__changes {
+      margin: 0;
+      padding-left: 1.25rem;
+      font-size: 14px;
+    }
+    .vm-restart-required__changes li + li {
+      margin-top: 2px;
+    }
+    .vm-restart-required__head {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
     .vm-card__title-row {
       display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;
     }
@@ -6897,7 +6946,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · eip-above-nics 7154</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · resize-restart-banner 7155</span>
         </div>
       </div>
       <div class="console__body">
@@ -8517,10 +8566,10 @@
       return 'other';
     }
 
-    /** Enabled only when RUNNING or STOPPED (ticket); disabled STARTING / STOPPING / DELETING. */
+    /** Enabled when RUNNING, PAUSED, or STOPPED; disabled STARTING / STOPPING / DELETING. */
     function canResizeVmInstanceType(vm) {
       const kind = vmPowerKind(vm?.status);
-      return kind === 'running' || kind === 'stopped';
+      return kind === 'running' || kind === 'paused' || kind === 'stopped';
     }
 
     function resizeVmInstanceTypeDisabledReason(vm) {
@@ -8531,8 +8580,8 @@
       if (kind === 'stopping') {
         return 'Resize is unavailable while the virtual machine is stopping or deleting.';
       }
-      if (kind === 'running' || kind === 'stopped') return '';
-      return 'Resize is available when the virtual machine is running or stopped.';
+      if (kind === 'running' || kind === 'paused' || kind === 'stopped') return '';
+      return 'Resize is available when the virtual machine is running, paused, or stopped.';
     }
 
     /**
@@ -8540,13 +8589,84 @@
      * Do not guess hot-plug vs restart from boot-disk access mode — API
      * status conditions announce restart need after update.
      * - stopped: optional “applies on next start” info
-     * - running: no pre-submit restart/hot-plug warning
+     * - running / paused: no pre-submit restart/hot-plug warning
      */
     function vmResizePath(vm) {
       const kind = vmPowerKind(vm?.status);
       if (kind === 'stopped') return 'stopped';
-      if (kind === 'running') return 'running';
+      if (kind === 'running' || kind === 'paused') return kind;
       return null;
+    }
+
+    /** Merge a pending restart-required change (CNV-style multi-change list). */
+    function upsertVmRestartRequired(vm, { message, change }) {
+      if (!vm) return;
+      const existing = vm.restartRequired && typeof vm.restartRequired === 'object'
+        ? vm.restartRequired
+        : null;
+      const changes = Array.isArray(existing?.changes) ? [...existing.changes] : [];
+      if (change?.label) {
+        const key = `${change.section || ''}::${change.label}`;
+        const idx = changes.findIndex(c => `${c.section || ''}::${c.label}` === key);
+        if (idx >= 0) changes[idx] = { ...changes[idx], ...change };
+        else changes.push(change);
+      }
+      vm.restartRequired = {
+        title: 'Restart required',
+        message: message
+          || existing?.message
+          || 'Changes apply after the virtual machine is restarted.',
+        changes,
+        expanded: existing?.expanded !== false,
+      };
+      if (!Array.isArray(vm.conditions)) vm.conditions = [];
+      if (!vm.conditions.some(c => /RestartRequired/i.test(c))) {
+        vm.conditions = ['RestartRequired=True', ...vm.conditions];
+      }
+    }
+
+    function clearVmRestartRequired(vm) {
+      if (!vm) return;
+      vm.restartRequired = null;
+      if (Array.isArray(vm.conditions)) {
+        vm.conditions = vm.conditions.filter(c => !/RestartRequired/i.test(c));
+      }
+      if (Array.isArray(vm.alerts)) {
+        vm.alerts = vm.alerts.filter(a => !/Restart required/i.test(a.message || a || ''));
+      }
+    }
+
+    function vmRestartRequiredAlertHtml(vm) {
+      const rr = vm?.restartRequired;
+      if (!rr || !Array.isArray(rr.changes) || !rr.changes.length) return '';
+      const expanded = rr.expanded !== false;
+      const msg = String(rr.message || 'Changes apply after the virtual machine is restarted.').replace(/</g, '&lt;');
+      const changes = rr.changes.map(c => {
+        const section = String(c.section || 'Details').replace(/</g, '&lt;');
+        const label = String(c.label || 'Change').replace(/</g, '&lt;');
+        const focus = String(c.focus || '').replace(/"/g, '&quot;');
+        return `<li>${section} &gt; <button type="button" class="name-link" data-restart-change="${focus}">${label}</button></li>`;
+      }).join('');
+      return `
+        <div class="vm-restart-required" id="vm-restart-required">
+          <div class="pf-v6-c-alert pf-m-inline pf-m-warning" role="status">
+            <div class="vm-restart-required__head">
+              <button type="button" class="vm-restart-required__toggle" id="vm-restart-required-toggle"
+                aria-expanded="${expanded}" aria-controls="vm-restart-required-body" aria-label="Toggle restart required details">
+                <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+              </button>
+              <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+              <div class="pf-v6-c-alert__title">Restart required</div>
+            </div>
+            <div class="pf-v6-c-alert__description" id="vm-restart-required-body"${expanded ? '' : ' hidden'}>
+              <div class="vm-restart-required__body">
+                <p style="margin:0;">${msg}</p>
+                <p class="vm-restart-required__changes-label">Detected changes:</p>
+                <ul class="vm-restart-required__changes">${changes}</ul>
+              </div>
+            </div>
+          </div>
+        </div>`;
     }
 
     function editComputeResizeAlertHtml(path, selectionChanged) {
@@ -8932,20 +9052,27 @@
       const path = state.editComputeModal?.resizePath || vmResizePath(vm);
       const changed = !!state.editComputeModal?.initialId && id !== state.editComputeModal.initialId;
       applyComputeResourceToVm(vm, id);
-      if (changed && path === 'running') {
-        // Demo stand-in for API status condition after resize (not pre-submit UI logic).
-        if (!Array.isArray(vm.alerts)) vm.alerts = [];
-        vm.alerts = [
-          {
-            severity: 'warning',
-            message: 'Restart required to apply the new instance type.',
+      if (changed && (path === 'running' || path === 'paused')) {
+        // Demo stand-in for API status condition after resize (CNV-style Overview banner).
+        // Running and Paused: changes apply after restart (not hot-plug assumed).
+        upsertVmRestartRequired(vm, {
+          message: path === 'paused'
+            ? 'Instance type updated while the virtual machine is paused. Changes apply after restart.'
+            : 'Instance type updated. Changes apply after the virtual machine is restarted.',
+          change: {
+            section: 'Details',
+            label: 'Instance type',
+            focus: 'instance-type',
           },
-          ...vm.alerts.filter(a => !/Restart required to apply the new instance type/i.test(a.message || '')),
-        ];
-        if (!Array.isArray(vm.conditions)) vm.conditions = [];
-        if (!vm.conditions.some(c => /RestartRequired/i.test(c))) {
-          vm.conditions = ['RestartRequired=True', ...vm.conditions];
-        }
+        });
+        // Demo: show CNV multi-change aggregation (other pending updates coexist in one banner).
+        upsertVmRestartRequired(vm, {
+          change: {
+            section: 'Network',
+            label: 'default',
+            focus: 'network',
+          },
+        });
       }
       closeEditComputeModal();
       renderVmDetail();
@@ -8958,7 +9085,7 @@
         toast(`Instance type updated to ${label}. Resize will apply on next start.`, 'success');
         return;
       }
-      // Running: generic success; restart messaging comes from post-update condition/alert.
+      // Running / Paused: toast + Overview Restart required banner (API condition stand-in).
       toast(`Instance type updated to ${label}.`, 'success');
     }
 
@@ -15386,6 +15513,8 @@
         toast(`Starting “${label}”…`);
         vmPowerActionTimer = setTimeout(() => {
           setVmStatus(name, 'running');
+          // Starting applies pending restart-required updates (same as CNV restart cycle).
+          clearVmRestartRequired(vm);
           refreshVmStatusViews();
           toast(`“${label}” is Running.`, 'success');
           vmPowerActionTimer = null;
@@ -15393,12 +15522,13 @@
         return;
       }
       if (action === 'restart') {
-        if (vm.status !== 'running') return;
+        if (vm.status !== 'running' && vm.status !== 'paused') return;
         setVmStatus(name, 'starting');
         refreshVmStatusViews();
         toast(`Restarting “${label}”…`);
         vmPowerActionTimer = setTimeout(() => {
           setVmStatus(name, 'running');
+          clearVmRestartRequired(vm);
           refreshVmStatusViews();
           toast(`“${label}” restarted.`, 'success');
           vmPowerActionTimer = null;
@@ -15726,7 +15856,7 @@
       const paused = v.status === 'paused';
       const starting = v.status === 'starting';
       const canStop = (running || paused) && !starting;
-      const canRestart = running && !starting;
+      const canRestart = (running || paused) && !starting;
       const canPause = running && !starting;
       const canStart = !running && !starting;
       const startingReason = 'The virtual machine is starting';
@@ -15788,7 +15918,9 @@
 
       const baseUtil = getVmUtilization(v);
       const u = { ...baseUtil, ...(v.utilizationDisplay || {}) };
-      const alerts = Array.isArray(v.alerts) ? v.alerts : [];
+      // Prefer CNV-style Restart required banner over duplicating in Alerts aside.
+      const alerts = (Array.isArray(v.alerts) ? v.alerts : [])
+        .filter(a => !(v.restartRequired && /Restart required/i.test(a.message || a || '')));
       const role = getActiveRole();
       const canEditConfig = !!role.canEditConfig;
       const noEditReason = 'No configuration edits for this role';
@@ -15880,9 +16012,11 @@
                 </div>
       `;
 
+      const restartRequiredHtml = vmRestartRequiredAlertHtml(v);
       const body = `
         <div class="vm-overview-v2">
           <div class="vm-overview-v2__main">
+            ${restartRequiredHtml}
             <section class="vm-overview-v2__details" aria-label="Details">
               <div class="vm-overview-v2__detail-cols">
                 <section class="ethan-detail-col" aria-labelledby="vm-overview-title">
@@ -16067,6 +16201,26 @@
         `;
 
       root.innerHTML = header + body;
+
+      root.querySelector('#vm-restart-required-toggle')?.addEventListener('click', () => {
+        const rawVm = VMS.find(x => x.name === v.name);
+        if (!rawVm?.restartRequired) return;
+        rawVm.restartRequired.expanded = rawVm.restartRequired.expanded === false;
+        renderVmDetail();
+      });
+      root.querySelectorAll('[data-restart-change]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          const focus = btn.dataset.restartChange;
+          if (focus === 'instance-type') {
+            const editBtn = root.querySelector('[data-edit-compute]');
+            editBtn?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            editBtn?.focus();
+          } else if (focus === 'network') {
+            root.querySelector('#vm-network-title')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          }
+        });
+      });
 
       root.querySelector('[data-breadcrumb-vms]')?.addEventListener('click', e => {
         e.preventDefault();
