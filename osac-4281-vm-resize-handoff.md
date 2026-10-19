@@ -56,7 +56,7 @@ VM details Overview → **Details** card → **Instance type** pencil → **Edit
 | Outcome | Surface | Behaviour |
 |---|---|---|
 | Success (generic) | **Toast** | Instance type updated to {label}. |
-| Success + API condition says restart needed (**Running** or **Paused**) | **Toast** + Overview **Restart required** banner (CNV pattern) | Expandable warning with **Detected changes**. Lists **only what was edited**. Multiple restart-required edits (e.g. Instance type, then Network) **aggregate** into one banner. Cleared after Restart / Start. |
+| Success + API condition says restart needed (**Running** or **Paused**) | **Toast** + Overview **Restart required** banner (CNV pattern) | Expandable warning with **Detected changes** as plain text (not links). Lists **only what was edited**. Multiple restart-required edits (e.g. Instance type, then Network) **aggregate** into one banner. Cleared after Restart / Start. |
 | Success + VM was stopped | **Toast** | Instance type updated to {label}. Resize will apply on next start. *(power state known up front)* |
 | Submit failure | **Inline danger alert** in modal | Title: *Failed to update the instance type*. Description: error message. Modal stays open. |
 
