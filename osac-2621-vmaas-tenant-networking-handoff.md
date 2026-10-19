@@ -12,10 +12,10 @@
 | **Eng epic** | [HPUX-2249](https://redhat.atlassian.net/browse/HPUX-2249) — *VMaaS Tenant Networking* |
 | **Scope of this handoff** | **VMaaS-only:** how a VM connects to shared virtual networks + **External IP** (create + day-2). Virtual network / External IP **list** management is **out of scope** (unified networking). |
 | **Handoff Google Doc** | [OSAC-2621 — VMaaS Tenant Networking (UX handoff)](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7159) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7161-ethan-access) |
 | **Ethan reference (BMaaS)** | [Launch BM → Networking](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=catalog&action=launch-instance&item=bare-metal-general-purpose-server&step=networking) |
 | **Alignment note** | [OSAC-2616 comment](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987) — Create VM **Networking** matches BMaaS/Cluster attachment patterns; **VM-only** difference = Additional networks (Custom path). |
-| **Status** | Scope clarified: VN CRUD + External IPs list → [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433). This ticket = VM attach + External IP UX. |
+| **Status** | Design complete for VM attach + External IP. VN CRUD + External IPs list → [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433). |
 
 ---
 
@@ -24,9 +24,9 @@
 VMaaS networking UX is about **connecting a VM** to the shared networking model and **reaching it over SSH**:
 
 1. At **Create VM → Networking**, choose how the VM attaches to an existing virtual network (Tenant default / Custom), security groups, optional **auto-attach External IP**, and Additional networks (Custom only).
-2. On **VM Overview**, manage **External IP** day-2 (attach / detach) as the primary SSH access path — with clear **attaching** and **failed** states.
+2. On **VM Overview**, manage **External IP** day-2 via Ethan **Access** (Host + SSH command) — with clear **attaching** and **failed** states.
 
-Virtual networks are **shared** across clusters, bare metal, and VMs: create one network and connect different resource types to it. That management UX is **not** duplicated here.
+Virtual networks are **shared** across clusters, bare metal, and VMs. That management UX is **not** duplicated here.
 
 ---
 
@@ -34,11 +34,11 @@ Virtual networks are **shared** across clusters, bare metal, and VMs: create one
 
 | Surface | Owner |
 |---|---|
-| Virtual networks list / create / edit | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) — *Unified Networking Architecture* (UI epic OSAC-2226) |
+| Virtual networks list / create / edit | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
 | External IPs **list** page (Networking → External IPs) | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
 | Subnets / Security groups / NAT / NetworkClasses admin | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
 
-The VMaaS prototype may still show **Networking → Virtual networks** as a **placeholder** for the shared product; it is **not** part of the OSAC-2621 handoff contract.
+The VMaaS prototype may still show **Networking → Virtual networks** as a **placeholder**; it is **not** part of the OSAC-2621 handoff contract.
 
 ---
 
@@ -46,18 +46,16 @@ The VMaaS prototype may still show **Networking → Virtual networks** as a **pl
 
 ### A. Create VM → Networking (Ethan-aligned attachment)
 
-1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7159) as **Tenant Admin**.
+1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7161-ethan-access) as **Tenant Admin**.
 2. **Create virtual machine** → **Networking**.
 3. **Tenant default** / **Custom network** felt cards.
 4. Tenant default: read-only VN + Subnet + Security groups; External IP switch (**default on**). Additional networks **hidden**.
 5. Custom: VN → Subnet → SG multi-select; External IP; **Additional networks** (Add network).
 6. Review → Networking section.
 
-**Screenshots:** `videos/osac-2621-networking-handoff/03-*.png`, `04-*.png`, `05-*.png`
-
 ### B. External IP (day-2) — Ethan Access pattern
 
-External IP is how users reach the VM with SSH. Day-2 matches Ethan BMaaS **Access** (not a card): **Host** + **SSH command** (clipboard-copy), above Networking.
+Day-2 matches Ethan BMaaS **Access** (not a card): **Host** + **SSH command** (clipboard-copy), above Networking.
 
 | State | UI |
 |---|---|
@@ -66,9 +64,7 @@ External IP is how users reach the VM with SSH. Day-2 matches Ethan BMaaS **Acce
 | **Attached** | Host `<code>IP</code>` + SSH clipboard-copy + **Detach** |
 | **Failed** | Inline error + **Retry** / **Choose another** |
 
-**Demo failure:** in the attach modal, pick `198.51.100.99` (*Demo: simulate attach failure*).
-
-**Screenshots:** `videos/osac-2621-networking-handoff/07-vm-overview-external-ip.png`, `06-attach-external-ip-modal.png` (plus attaching/failed when recaptured)
+**Demo failure:** attach modal → pick `198.51.100.99` (*Demo: simulate attach failure*).
 
 ---
 
@@ -104,10 +100,10 @@ External IP is how users reach the VM with SSH. Day-2 matches Ethan BMaaS **Acce
 - Unified networking feature: [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433)
 - Ethan sync: [OSAC-2616](https://redhat.atlassian.net/browse/OSAC-2616)
 - VMaaS networking feature: [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435)
-- Prototype build: `7159` (*eip-access-states*)
+- Prototype build: `7161` (*ethan-access* / restart-plain-labels)
 
 ---
 
-## Open questions
+## Screenshots
 
-1. **Jira status:** OK to move OSAC-2621 toward design-approved once eng UI story exists for VM attach + EIP states?
+Local copies: `videos/osac-2621-networking-handoff/`
