@@ -10,7 +10,7 @@
 | **Parent epic** | [OSAC-2807](https://redhat.atlassian.net/browse/OSAC-2807) — *DiskImage resource… — Bootstrap* |
 | **Feature** | [OSAC-2540](https://redhat.atlassian.net/browse/OSAC-2540) — *DiskImage resource for disk image metadata management* |
 | **Scope of this handoff** | Provider **Disk images** UX in the shared mock (list · create · detail · lifecycle), as specified in the Disk images UX tab |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7147&role=provider) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7161-disk&role=provider) |
 | **UX source tab** | [VMaaS prototype — UX documentation → Disk images](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.uxouanov03p1) |
 | **Status** | OSAC-2810 **Closed**. **Fully covered** for provider Disk images UX tab scope. Broader OSAC-2540 UI gaps are deferred (no UX follow-ups for now; delete-if-referenced left to eng). |
 
@@ -24,29 +24,28 @@ Enable Cloud Provider Admins to manage DiskImage metadata in the console: regist
 
 ## How to review in the mock
 
-1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7147&role=provider) with Role = **Cloud provider admin**.
+1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7161-disk&role=provider) with Role = **Cloud provider admin**.
 2. Nav: **Infrastructure → Disk images**.
 3. Confirm **Show obsolete** is off → `fedora-39` (Obsolete) is hidden; turn it on to reveal.
 4. Open **rhel-9-5** (Available) → Overview + Image columns; Actions: Deprecate / Obsolete.
 5. Open **rhel-9-4** (Deprecated) → Actions: Obsolete / Reactivate.
 6. With Show obsolete on, open **fedora-39** → Actions: Reactivate / Delete.
-7. **Create disk image** → Scope (Global / Tenant) → Configuration (Image, Guest OS, Architecture) → Review → lands on new detail.
+7. **Create disk image** → Scope felt cards (Global / Tenant scoped) → Configuration (Image, Guest OS felt cards, Architecture multi-select) → Review → lands on new detail.
 
 ---
 
-## Coverage vs OSAC-2810 UX tab
-
-Primary acceptance for this ticket is the **Disk images** UX tab (list / create / detail / lifecycle). Against that tab:
+## Coverage vs Disk images UX tab
 
 | Spec item | Status | Notes |
 |---|---|---|
 | List columns: Name, Lifecycle, Guest OS, Architecture, Visibility, Created, Actions | **Covered** | Provider table + kebab |
 | Show obsolete (off by default) | **Covered** | `#di-show-obsolete` |
 | Create CTA | **Covered** | Create disk image |
-| Create: Scope Global / Tenant (felt) + Tenant when scoped | **Covered** | Same pattern as Instance types |
-| Create: Name (DNS), Image (OCI), Guest OS, Architecture multi-select | **Covered** | Also Description + Labels on General (extra vs tab table) |
+| Create General: Scope Global / Tenant (felt) + Tenant when scoped | **Covered** | Same pattern as Instance types |
+| Create General: Name (DNS), Description, Labels | **Covered** | |
+| Create Configuration: Image (OCI), Guest OS felt cards, Architecture multi-select | **Covered** | Guest OS: Linux / Microsoft Windows / Unspecified |
 | Create Review (Nebius sections) → success → detail | **Covered** | |
-| Detail: Overview + Image columns; header Actions | **Covered** | Description not shown on detail (minor) |
+| Detail: Overview + Image columns; header Actions | **Covered** | |
 | Lifecycle: Available→Deprecate/Obsolete; Deprecated→Obsolete/Reactivate; Obsolete→Reactivate/Delete | **Covered** | Mirrors osac-ui actions |
 | Role: Cloud provider admin | **Covered** | Infrastructure nav gated |
 
@@ -90,8 +89,22 @@ Not required for OSAC-2810 acceptance. Captured for awareness; **no UX follow-up
 
 - Feature PRD: [OSAC-2540](https://redhat.atlassian.net/browse/OSAC-2540)
 - Bootstrap epic: [OSAC-2807](https://redhat.atlassian.net/browse/OSAC-2807)
-- Companion screenshot: `videos/vmaas-prototype-ux-doc/15-create-disk-image.png`
-- Aligned eng PRs noted in UX tab: osac-ui PR 164 (list/create), PR 177 (detail)
+- UX tab: [Disk images](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.uxouanov03p1)
+- Screenshots: `videos/osac-2810-disk-image-handoff/` · [gh-pages/screenshots/osac-2810](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/osac-2810)
+- Eng PRs: osac-ui PR 164 (list/create), PR 177 (detail)
+- Prototype build: **7161**
+
+---
+
+## Screenshots (inline in UX tab)
+
+| Figure | File |
+|---|---|
+| Disk images list | `14-disk-images-list.png` |
+| Create — General (Scope felt cards) | `15-create-disk-image.png` |
+| Create — Configuration | `15b-create-disk-image-config.png` |
+| Disk image detail | `16-disk-image-detail.png` |
+| Detail Actions menu | `16b-disk-image-detail-actions.png` |
 
 ---
 
