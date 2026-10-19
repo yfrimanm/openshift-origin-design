@@ -1533,6 +1533,120 @@
       font-size: 14px;
       color: var(--vmaas-text, #151515);
     }
+    /* OSAC-2621: External IP is primary SSH access — prominent panel above NICs */
+    .vm-external-ip-panel {
+      margin: 0 0 8px;
+      padding: 16px 18px;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+      border-radius: 8px;
+      background: var(--pf-t--global--background--color--secondary--default, #fafafa);
+    }
+    .vm-external-ip-panel__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .vm-external-ip-panel__title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--vmaas-text, #151515);
+    }
+    .vm-external-ip-panel__help {
+      margin: 0 0 14px;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .vm-external-ip-panel__row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .vm-external-ip-panel__value {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--vmaas-text, #151515);
+      font-variant-numeric: tabular-nums;
+    }
+    .vm-external-ip-panel__value--muted {
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--vmaas-text-subtle, #6a6e73);
+    }
+    .vm-external-ip-panel__ssh {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--vmaas-text, #151515);
+    }
+    .vm-external-ip-panel__ssh code {
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #fff;
+      border: 1px solid var(--vmaas-border-light, #d2d2d2);
+    }
+    .vm-external-ip-panel__error {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: var(--pf-t--global--color--status--danger--default, #c9190b);
+    }
+    .vm-external-ip-panel__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .vm-external-ip-panel__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+    .vm-external-ip-panel__status--none {
+      color: var(--vmaas-text-subtle, #6a6e73);
+      background: #fff;
+      border-color: var(--vmaas-border-light, #d2d2d2);
+    }
+    .vm-external-ip-panel__status--attaching {
+      color: #002952;
+      background: #e0f0ff;
+      border-color: #bee1f4;
+    }
+    .vm-external-ip-panel__status--attached {
+      color: #1e4f18;
+      background: #e9f7e9;
+      border-color: #bde5b8;
+    }
+    .vm-external-ip-panel__status--failed {
+      color: #5f2120;
+      background: #faeae8;
+      border-color: #f5c2c0;
+    }
+    .vm-external-ip-panel__spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: vm-eip-spin 0.7s linear infinite;
+    }
+    @keyframes vm-eip-spin {
+      to { transform: rotate(360deg); }
+    }
     .rich-select__menu-footer {
       flex-shrink: 0;
       padding: 8px 12px;
@@ -6954,7 +7068,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · restart-aggregate 7158</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 19 · eip-access-states 7159</span>
         </div>
       </div>
       <div class="console__body">
@@ -8101,9 +8215,11 @@
       { address: '198.51.100.14', pool: 'edge-public-a', status: 'in-use', vm: 'indigo-quokka-89' },
       { address: '198.51.100.21', pool: 'edge-public-a', status: 'available', vm: '' },
       { address: '198.51.100.37', pool: 'edge-public-a', status: 'available', vm: '' },
+      { address: '198.51.100.99', pool: 'edge-public-a', status: 'available', vm: '', demoFail: true },
       { address: '203.0.113.18', pool: 'edge-public-b', status: 'available', vm: '' },
       { address: '203.0.113.44', pool: 'edge-public-b', status: 'available', vm: '' },
     ];
+    const EXTERNAL_IP_ATTACH_DEMO_MS = 1400;
 
     function availableExternalIps() {
       return EXTERNAL_IP_POOL.filter(ip => ip.status === 'available');
@@ -8157,6 +8273,7 @@
         internalIp: '10.130.1.191',
         internalIpAttached: true,
         externalIpAttached: true,
+        externalIpStatus: 'attached',
         externalIp: '198.51.100.14',
         guestAgent: true,
         osFull: 'Red Hat Enterprise Linux 9.5',
@@ -14349,11 +14466,20 @@
       const name = state.selectedVmName;
       const vm = VMS.find(v => v.name === name);
       if (!vm) return;
-      if (kind === 'external') {
-        if (vm.externalIpAttached) {
+      if (kind === 'external' || kind === 'external-retry') {
+        if (vmExternalIpStatus(vm) === 'attaching') return;
+        if (kind === 'external-retry' && vm.externalIpPending) {
+          const row = EXTERNAL_IP_POOL.find(ip => ip.address === vm.externalIpPending);
+          beginAttachExternalIp(vm, vm.externalIpPending, !!row?.demoFail);
+          return;
+        }
+        if (vmExternalIpStatus(vm) === 'attached' || vm.externalIpAttached) {
           releaseExternalIp(vm.externalIp);
           vm.externalIpAttached = false;
           vm.externalIp = '';
+          vm.externalIpStatus = 'none';
+          vm.externalIpPending = '';
+          vm.externalIpError = '';
           vm.autoAttachExternalIp = false;
           toast('External IP detached.');
           renderVmDetail();
@@ -14377,6 +14503,120 @@
         }
       }
       renderVmDetail();
+    }
+
+    function vmExternalIpStatus(vm) {
+      if (!vm) return 'none';
+      if (vm.externalIpStatus === 'attaching' || vm.externalIpStatus === 'failed' || vm.externalIpStatus === 'attached') {
+        return vm.externalIpStatus;
+      }
+      if (vm.externalIpAttached && vm.externalIp) return 'attached';
+      return 'none';
+    }
+
+    function beginAttachExternalIp(vm, address, simulateFail = false) {
+      if (!vm || !address) return;
+      if (vm._extIpAttachTimer) {
+        clearTimeout(vm._extIpAttachTimer);
+        vm._extIpAttachTimer = null;
+      }
+      vm.externalIpStatus = 'attaching';
+      vm.externalIpPending = address;
+      vm.externalIpError = '';
+      vm.externalIpAttached = false;
+      closeAttachExternalIpModal();
+      renderVmDetail();
+      toast(`Attaching external IP ${address}…`);
+      vm._extIpAttachTimer = setTimeout(() => {
+        vm._extIpAttachTimer = null;
+        if (simulateFail) {
+          vm.externalIpStatus = 'failed';
+          vm.externalIpPending = address;
+          vm.externalIp = '';
+          vm.externalIpAttached = false;
+          vm.externalIpError = `Failed to attach ${address}. The address may no longer be available. Try again or choose another IP.`;
+          renderVmDetail();
+          toast(`Failed to attach external IP ${address}.`, 'danger');
+          return;
+        }
+        const allocated = allocateExternalIp(address, vm.name);
+        if (!allocated) {
+          vm.externalIpStatus = 'failed';
+          vm.externalIpPending = address;
+          vm.externalIp = '';
+          vm.externalIpAttached = false;
+          vm.externalIpError = `Failed to attach ${address}. The address is no longer available.`;
+          renderVmDetail();
+          toast(`Failed to attach external IP ${address}.`, 'danger');
+          return;
+        }
+        vm.externalIpStatus = 'attached';
+        vm.externalIpAttached = true;
+        vm.externalIp = allocated;
+        vm.externalIpPending = '';
+        vm.externalIpError = '';
+        renderVmDetail();
+        toast(`External IP ${allocated} attached.`, 'success');
+      }, EXTERNAL_IP_ATTACH_DEMO_MS);
+    }
+
+    function vmExternalIpPanelHtml(vm, { canEdit = true } = {}) {
+      const status = vmExternalIpStatus(vm);
+      const attachedIp = status === 'attached' && vm.externalIp ? String(vm.externalIp) : '';
+      const pendingIp = vm.externalIpPending ? String(vm.externalIpPending) : '';
+      const statusMeta = {
+        none: { mod: 'none', label: 'Not attached' },
+        attaching: { mod: 'attaching', label: 'Attaching' },
+        attached: { mod: 'attached', label: 'Attached' },
+        failed: { mod: 'failed', label: 'Failed' },
+      }[status] || { mod: 'none', label: 'Not attached' };
+      let valueHtml = '<p class="vm-external-ip-panel__value vm-external-ip-panel__value--muted">—</p>';
+      if (status === 'attaching') {
+        valueHtml = `<p class="vm-external-ip-panel__value">${pendingIp.replace(/</g, '&lt;') || '—'}</p>`;
+      } else if (status === 'attached') {
+        valueHtml = `<p class="vm-external-ip-panel__value">${attachedIp.replace(/</g, '&lt;')}</p>`;
+      } else if (status === 'failed') {
+        valueHtml = `<p class="vm-external-ip-panel__value vm-external-ip-panel__value--muted">${(pendingIp || '—').replace(/</g, '&lt;')}</p>`;
+      }
+      const sshHtml = status === 'attached' && attachedIp
+        ? `<p class="vm-external-ip-panel__ssh">SSH access: <code>ssh cloud-user@${attachedIp.replace(/</g, '&lt;')}</code></p>`
+        : '';
+      const errHtml = status === 'failed' && vm.externalIpError
+        ? `<p class="vm-external-ip-panel__error" role="alert">${String(vm.externalIpError).replace(/</g, '&lt;')}</p>`
+        : '';
+      let actions = '';
+      if (!canEdit) {
+        actions = `<span class="muted">No configuration edits for this role</span>`;
+      } else if (status === 'attaching') {
+        actions = `<button type="button" class="pf-v6-c-button pf-m-link" disabled>Attaching…</button>`;
+      } else if (status === 'attached') {
+        actions = `<button type="button" class="name-link" data-ip-toggle="external">Detach</button>`;
+      } else if (status === 'failed') {
+        actions = `
+          <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" data-ip-toggle="external-retry">Retry</button>
+          <button type="button" class="name-link" data-ip-toggle="external">Choose another</button>`;
+      } else {
+        actions = `<button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" data-ip-toggle="external">Attach external IP</button>`;
+      }
+      return `
+        <section class="vm-external-ip-panel" aria-labelledby="vm-eip-title">
+          <div class="vm-external-ip-panel__head">
+            <h3 class="vm-external-ip-panel__title" id="vm-eip-title">External IP</h3>
+            <span class="vm-external-ip-panel__status vm-external-ip-panel__status--${statusMeta.mod}">
+              ${status === 'attaching' ? '<span class="vm-external-ip-panel__spinner" aria-hidden="true"></span>' : ''}
+              ${statusMeta.label}
+            </span>
+          </div>
+          <p class="vm-external-ip-panel__help">Use this address to access the virtual machine over SSH from outside the private network.</p>
+          <div class="vm-external-ip-panel__row">
+            <div>
+              ${valueHtml}
+              ${sshHtml}
+              ${errHtml}
+            </div>
+            <div class="vm-external-ip-panel__actions">${actions}</div>
+          </div>
+        </section>`;
     }
 
     function openAttachExternalIpModal() {
@@ -14429,9 +14669,12 @@
             options: available.map(ip => ({
               id: ip.address,
               title: ip.address,
-              desc: `Pool ${ip.pool}`,
+              desc: ip.demoFail
+                ? `Pool ${ip.pool} · Demo: simulate attach failure`
+                : `Pool ${ip.pool}`,
             })),
           })}
+          ${pfHelperText('External IP is how you reach this VM over SSH from outside the private network.')}
         </div>
       `;
       footer.innerHTML = `
@@ -14467,16 +14710,13 @@
       footer.querySelector('#extip-modal-cancel')?.addEventListener('click', closeAttachExternalIpModal);
       footer.querySelector('#extip-modal-attach')?.addEventListener('click', () => {
         const vm = VMS.find(v => v.name === state.selectedVmName);
-        const address = allocateExternalIp(m.selected, state.selectedVmName);
-        if (!vm || !address) {
+        const selected = m.selected;
+        const poolRow = EXTERNAL_IP_POOL.find(ip => ip.address === selected);
+        if (!vm || !selected || !poolRow || poolRow.status !== 'available') {
           toast('Select an available external IP.');
           return;
         }
-        vm.externalIpAttached = true;
-        vm.externalIp = address;
-        closeAttachExternalIpModal();
-        renderVmDetail();
-        toast(`External IP ${address} attached.`, 'success');
+        beginAttachExternalIp(vm, selected, !!poolRow.demoFail);
       });
       focusRichSelectField(focusId);
     }
@@ -16075,20 +16315,14 @@
               </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
+            <section class="vm-overview-v2__section" aria-labelledby="vm-eip-title">
+              ${vmExternalIpPanelHtml(v, { canEdit: canEditConfig })}
+            </section>
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
               <div class="vm-overview-v2__section-head">
                 <h3 class="ethan-detail-col__title" id="vm-network-title">Network (${nics.length})</h3>
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-net"${addDisabledAttrs}>Add network</button>
                   </div>
-              <div class="vm-network-external">
-                <div>
-                  <p class="vm-network-external__label">External IP</p>
-                  <p class="vm-network-external__value">${v.externalIpAttached && v.externalIp ? String(v.externalIp).replace(/</g, '&lt;') : '—'}</p>
-                </div>
-                <button type="button" class="name-link" data-ip-toggle="external"${canEditConfig ? '' : ' disabled title="No configuration edits for this role"'}>
-                  ${v.externalIpAttached ? 'Detach' : 'Attach'}
-                </button>
-              </div>
               <div class="vm-overview__table-wrap">
                 <table class="overview-table overview-table--network" aria-label="Networks">
                   <colgroup>
