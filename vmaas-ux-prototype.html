@@ -459,131 +459,158 @@
     }
     #net-toolbar .tpl-view-toggle { margin-left: auto; }
     #net-toolbar .filter-name-search { max-width: 280px; }
-    /* Ethan Virtual networks — compact cards */
+    /* Ethan cluster-card pattern — Virtual networks */
     #net-cards-gallery.vm-cards {
-      grid-template-columns: repeat(auto-fill, 260px);
+      --ethan-card-width: 20.875rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ethan-card-width)), var(--ethan-card-width)));
       justify-content: start;
-      gap: 16px;
+      gap: var(--pf-t--global--spacer--lg, 24px);
     }
     .net-list-card {
       display: flex;
       flex-direction: column;
-      width: 260px;
+      gap: var(--pf-t--global--spacer--md, 16px);
+      width: 100%;
       max-width: 100%;
       margin: 0;
-      padding: 16px;
-      border: 1px solid var(--vmaas-border-light, #d2d2d2);
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      padding: var(--pf-t--global--spacer--lg, 24px);
+      border: 1px solid var(--pf-t--global--border--color--default, #e0e0e0);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      box-shadow: none;
       box-sizing: border-box;
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .net-list-card:hover {
+      box-shadow: var(--pf-t--global--box-shadow--md, 0 4px 8px 0 rgba(0, 0, 0, 0.12));
+    }
+    .net-list-card .status-badge {
+      padding: 0 8px;
+      min-height: 18px;
+      border-radius: 999px;
+      font-weight: 400;
+      line-height: 1.35;
+    }
+    .net-list-card .status-badge.pf-m-ready {
+      color: #151515;
+      background: var(--pf-t--global--color--nonstatus--green--default, #d1f1bb);
+    }
+    .net-list-card .status-badge.pf-m-provisioning {
+      color: #151515;
+      background: var(--pf-t--global--color--nonstatus--blue--default, #c5e0f8);
     }
     .net-list-card__header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: 0;
     }
     .net-list-card__icon {
-      width: 36px;
-      height: 36px;
+      width: 2.5rem;
+      height: 2.5rem;
       flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      background: var(--vmaas-bg-subtle, #f2f2f2);
-      color: var(--vmaas-text, #151515);
-      font-size: 15px;
+      border-radius: 6px;
+      background: rgba(199, 199, 199, 0.3);
+      color: #1f1f1f;
+      font-size: 1.25rem;
     }
     .net-list-card__header-right {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      margin: -2px -6px 0 0;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin-inline-start: auto;
     }
     .net-list-card__header-right .kebab {
       border-radius: 999px;
     }
+    .net-list-card__title-block {
+      display: flex;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--xs, 4px);
+      min-width: 0;
+      margin: 0;
+    }
     .net-list-card__name {
       display: inline;
       align-self: flex-start;
-      margin: 0 0 12px;
+      margin: 0;
       padding: 0;
       font-size: 16px;
       font-weight: 600;
-      line-height: 1.3;
-      color: var(--vmaas-blue);
+      line-height: 1.35;
+      color: var(--vmaas-blue, #0066cc);
       background: none;
       border: none;
       cursor: pointer;
       text-align: left;
     }
     .net-list-card__name:hover { text-decoration: underline; }
-    .net-list-card__body {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+    .net-list-card__subtitle {
       margin: 0;
-      flex: 1;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--vmaas-text-subtle, #4d4d4d);
     }
-    .net-list-card__section {
+    .net-list-card__specs {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding: 0 0 12px;
-      margin: 0 0 12px;
-      border-bottom: 1px solid var(--vmaas-border-light, #d2d2d2);
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: 0;
+      padding: 0;
     }
-    .net-list-card__section:last-of-type {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-    .net-list-card__row {
-      display: flex;
+    .net-list-card__spec-row {
+      display: grid;
+      grid-template-columns: 6.75rem minmax(0, 1fr);
+      gap: var(--pf-t--global--spacer--sm, 8px);
       align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.35;
     }
-    .net-list-card__row dt {
+    .net-list-card__spec-row dt {
       margin: 0;
       font-weight: 600;
-      color: var(--vmaas-text, #151515);
-      flex: 0 0 auto;
+      color: var(--vmaas-text-subtle, #4d4d4d);
+      white-space: nowrap;
     }
-    .net-list-card__row dd {
+    .net-list-card__spec-row dd {
       margin: 0;
       font-weight: 400;
       color: var(--vmaas-text, #151515);
-      text-align: right;
-      word-break: break-word;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
     .net-list-card__footer {
+      display: grid;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: 0;
+      padding-block-start: var(--pf-t--global--spacer--md, 16px);
+      border-block-start: 1px solid var(--pf-t--global--border--color--default, #e0e0e0);
+    }
+    .net-list-card__footer-row {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 12px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--vmaas-border-light, #d2d2d2);
-      font-size: 13px;
-      line-height: 1.35;
+      gap: var(--pf-t--global--spacer--md, 16px);
     }
-    .net-list-card__footer dt {
+    .net-list-card__footer-row dt {
       margin: 0;
-      font-weight: 600;
-      color: var(--vmaas-text, #151515);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--vmaas-text-subtle, #4d4d4d);
     }
-    .net-list-card__footer dd {
+    .net-list-card__footer-row dd {
       margin: 0;
+      font-size: 14px;
       font-weight: 400;
       color: var(--vmaas-text, #151515);
-      text-align: right;
-      word-break: break-word;
+      text-align: end;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
     #net-kebab-menu:not(.pf-m-open) { display: none; }
     #net-kebab-menu.pf-m-open {
@@ -6121,38 +6148,49 @@
     .tpl-view-toggle button.pf-m-selected {
       background: var(--vmaas-bg-subtle); color: var(--vmaas-text);
     }
-    /* VMs list — card gallery (Ethan-aligned) */
+    /* VMs list — Ethan cluster-card gallery */
     .vm-cards {
+      --ethan-card-width: 20.875rem;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--pf-t--global--spacer--md, 16px);
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--ethan-card-width)), var(--ethan-card-width)));
+      gap: var(--pf-t--global--spacer--lg, 24px);
+      justify-content: start;
       align-items: stretch;
-      padding: 2px 0 8px;
-    }
-    @media (max-width: 1100px) {
-      .vm-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 640px) {
-      .vm-cards { grid-template-columns: 1fr; }
+      padding: 0 0 8px;
     }
     .vm-list-card {
       position: relative;
-      gap: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--md, 16px);
       min-height: 0;
-      padding: 16px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      height: auto;
+      padding: var(--pf-t--global--spacer--lg, 24px);
+      border: 1px solid var(--pf-t--global--border--color--default, #e0e0e0);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      box-shadow: none;
+      cursor: default;
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .vm-list-card:hover {
+      box-shadow: var(--pf-t--global--box-shadow--md, 0 4px 8px 0 rgba(0, 0, 0, 0.12));
+    }
+    .vm-list-card.pf-m-selected {
+      border-color: var(--vmaas-blue);
+      box-shadow: 0 0 0 1px var(--vmaas-blue);
     }
     .vm-list-card__header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: 0;
     }
     .vm-list-card__header-left {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--pf-t--global--spacer--sm, 8px);
       min-width: 0;
     }
     .vm-list-card__header-left .pf-v6-c-check {
@@ -6160,39 +6198,41 @@
       flex: 0 0 auto;
     }
     .vm-list-card__icon {
-      width: 36px;
-      height: 36px;
+      width: 2.5rem;
+      height: 2.5rem;
       flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 1.25rem;
       line-height: 1;
-      border-radius: 8px;
-      background: var(--vmaas-bg-subtle, #f2f2f2);
-      color: var(--vmaas-text, #151515);
+      border-radius: 6px;
+      background: rgba(199, 199, 199, 0.3);
+      color: #1f1f1f;
     }
     .vm-list-card__header-right {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: var(--pf-t--global--spacer--sm, 8px);
       flex: 0 0 auto;
-      margin: -2px -6px 0 0;
+      margin-inline-start: auto;
     }
     .vm-list-card__header-right .kebab {
       margin: 0;
+      border-radius: 999px;
     }
     .vm-list-card__status-pill {
       display: inline-flex;
       align-items: center;
       gap: 0;
       margin: 0;
-      padding: 2px 10px;
+      padding: 0 8px;
+      min-height: 18px;
       border: none;
       border-radius: 999px;
       font: inherit;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 400;
       line-height: 1.35;
       cursor: pointer;
       white-space: nowrap;
@@ -6202,61 +6242,122 @@
       outline-offset: 2px;
     }
     .vm-list-card__status-pill--running {
-      background: #e9f5e9;
-      color: #3e8635;
+      background: var(--pf-t--global--color--nonstatus--green--default, #d1f1bb);
+      color: #151515;
     }
     .vm-list-card__status-pill--stopped {
       background: #f2f2f2;
-      color: #6a6e73;
+      color: #151515;
     }
     .vm-list-card__status-pill--paused {
-      background: #fdf7e7;
-      color: #795600;
+      background: var(--pf-t--global--color--nonstatus--yellow--default, #f9e0a2);
+      color: #151515;
     }
     .vm-list-card__status-pill--error {
-      background: #faeae8;
-      color: #c9190b;
+      background: var(--pf-t--global--color--nonstatus--red--default, #f9a8a8);
+      color: #151515;
     }
     .vm-list-card__status-pill--starting {
-      background: #e7f1fa;
-      color: #002952;
+      background: var(--pf-t--global--color--nonstatus--blue--default, #c5e0f8);
+      color: #151515;
     }
-    .vm-list-card .tpl-card__title {
-      margin: 0 0 16px;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.3;
-    }
-    .vm-list-card__footer {
+    .vm-list-card__title-block {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--pf-t--global--spacer--xs, 4px);
+      min-width: 0;
       margin: 0;
-      padding-top: 12px;
-      border-top: 1px solid var(--vmaas-border-light);
-      font-size: 13px;
+    }
+    .vm-list-card .tpl-card__title,
+    .vm-list-card__name {
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--vmaas-blue, #0066cc);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      align-self: flex-start;
+    }
+    .vm-list-card .tpl-card__title:hover,
+    .vm-list-card__name:hover { text-decoration: underline; }
+    .vm-list-card__subtitle {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.35;
+      color: var(--vmaas-text-subtle, #4d4d4d);
+    }
+    .vm-list-card__specs {
+      display: flex;
+      flex-direction: column;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: 0;
+      padding: 0;
+    }
+    .vm-list-card__spec-row {
+      display: grid;
+      grid-template-columns: 6.75rem minmax(0, 1fr);
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      align-items: baseline;
+      font-size: 12px;
       line-height: 1.35;
     }
-    .vm-list-card__footer--fields {
-      margin-top: 0;
+    .vm-list-card__spec-row dt {
+      margin: 0;
+      font-weight: 600;
+      color: var(--vmaas-text-subtle, #4d4d4d);
+      white-space: nowrap;
+    }
+    .vm-list-card__spec-row dd {
+      margin: 0;
+      font-weight: 400;
+      color: var(--vmaas-text, #151515);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .vm-list-card__footer {
+      display: grid;
+      gap: var(--pf-t--global--spacer--sm, 8px);
+      margin: 0;
+      padding-block-start: var(--pf-t--global--spacer--md, 16px);
+      border-block-start: 1px solid var(--pf-t--global--border--color--default, #e0e0e0);
     }
     .vm-list-card__footer-row {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      gap: 12px;
+      gap: var(--pf-t--global--spacer--md, 16px);
     }
     .vm-list-card__footer-row dt {
       margin: 0;
+      font-size: 12px;
       font-weight: 400;
-      color: var(--vmaas-text-subtle);
+      color: var(--vmaas-text-subtle, #4d4d4d);
     }
     .vm-list-card__footer-row dd {
       margin: 0;
+      font-size: 14px;
       font-weight: 400;
-      color: var(--vmaas-text);
-      text-align: right;
-      word-break: break-word;
+      color: var(--vmaas-text, #151515);
+      text-align: end;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .vm-list-card__cta {
+      margin-block-start: auto;
+    }
+    .vm-list-card__cta-btn {
+      width: 100%;
+      justify-content: center;
+      border-radius: 999px;
+    }
+    .vm-list-card__cta-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
     .table-toolbar__right .tpl-view-toggle {
       margin-left: 0;
@@ -6385,6 +6486,23 @@
     }
     .tpl-card:hover { border-color: #8a8d90; }
     .tpl-card.pf-m-selected {
+      border-color: var(--vmaas-blue);
+      box-shadow: 0 0 0 1px var(--vmaas-blue);
+    }
+    /* Ethan cluster cards — must follow .tpl-card so padding/gap/fill win */
+    .tpl-card.vm-list-card {
+      gap: var(--pf-t--global--spacer--md, 16px);
+      padding: var(--pf-t--global--spacer--lg, 24px);
+      border-color: var(--pf-t--global--border--color--default, #e0e0e0);
+      background: rgba(255, 255, 255, 0.6);
+      cursor: default;
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .tpl-card.vm-list-card:hover {
+      border-color: var(--pf-t--global--border--color--default, #e0e0e0);
+      box-shadow: var(--pf-t--global--box-shadow--md, 0 4px 8px 0 rgba(0, 0, 0, 0.12));
+    }
+    .tpl-card.vm-list-card.pf-m-selected {
       border-color: var(--vmaas-blue);
       box-shadow: 0 0 0 1px var(--vmaas-blue);
     }
@@ -7011,7 +7129,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 20 · eip-section-label 7162</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 21 · ethan-cards 7164</span>
         </div>
       </div>
       <div class="console__body">
@@ -7283,8 +7401,8 @@
                 </div>
                 <button type="button" class="icon-tool" id="btn-manage-columns" aria-label="Manage columns" title="Manage columns"><i class="fa-solid fa-columns" aria-hidden="true"></i></button>
                 <div class="tpl-view-toggle" id="vm-view-toggle" role="group" aria-label="Virtual machines view">
-                  <button type="button" data-vm-view="cards" aria-pressed="false" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
-                  <button type="button" data-vm-view="list" class="pf-m-selected" aria-pressed="true" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
+                  <button type="button" data-vm-view="cards" class="pf-m-selected" aria-pressed="true" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+                  <button type="button" data-vm-view="list" aria-pressed="false" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
                 </div>
                 <div class="pagination" aria-label="Pagination">
                   <span class="pagination__count" id="vm-page-count">1–1 of 1</span>
@@ -7357,8 +7475,8 @@
                 <input type="search" id="net-search" placeholder="Search virtual networks" aria-label="Search virtual networks" />
               </div>
               <div class="tpl-view-toggle" id="net-view-toggle" role="group" aria-label="Virtual networks view">
-                <button type="button" data-net-view="cards" aria-pressed="false" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
-                <button type="button" data-net-view="list" class="pf-m-selected" aria-pressed="true" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
+                <button type="button" data-net-view="cards" class="pf-m-selected" aria-pressed="true" aria-label="Card view" title="Card view"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i></button>
+                <button type="button" data-net-view="list" aria-pressed="false" aria-label="List view" title="List view"><i class="fa-solid fa-list" aria-hidden="true"></i></button>
               </div>
             </div>
             <p class="net-summary" id="net-summary" hidden></p>
@@ -9875,8 +9993,8 @@
       fieldErrors: {},
       tplFilter: '',
       tplView: 'cards', // cards | list
-      vmView: 'list', // list | cards
-      netView: 'list', // list | cards
+      vmView: 'cards', // list | cards — Ethan cluster-card default
+      netView: 'cards', // list | cards
       netStatusFilter: 'all', // all | Ready | Provisioning
       /* Template step filters — Figma Oeu6pCcWLzQWnQfBjwzbsn */
       tplFilters: {
@@ -12289,12 +12407,15 @@
       const enriched = enrichVm(v);
       const selected = state.selectedVms.has(v.name);
       const ip = !v.ip || v.ip === '—' ? '—' : v.ip;
-      const showProject = isAllProjectsView();
       const project = projectDisplayName(v.ns) || v.ns || '—';
+      const subtitle = String(enriched.catalogItem || enriched.osFull || enriched.os || 'Virtual machine')
+        .replace(/</g, '&lt;');
+      const instanceType = String(enriched.computeResource || enriched.instanceType || '—').replace(/</g, '&lt;');
+      const created = String(v.created || '—').replace(/</g, '&lt;');
+      const canConsole = String(v.status || '').toLowerCase() === 'running';
       return `
         <article class="tpl-card vm-list-card${selected ? ' pf-m-selected' : ''}"
-          data-vm-card="${v.name}" role="listitem" tabindex="0"
-          aria-label="${v.name}">
+          data-vm-card="${v.name}" role="listitem" aria-label="${v.name}">
           <div class="vm-list-card__header">
             <div class="vm-list-card__header-left">
               <label class="pf-v6-c-check pf-m-standalone">
@@ -12313,18 +12434,39 @@
               </button>
             </div>
           </div>
-          <button type="button" class="tpl-card__title" data-open-vm="${v.name}">${v.name}</button>
-          <dl class="vm-list-card__footer vm-list-card__footer--fields">
-            ${showProject ? `
-            <div class="vm-list-card__footer-row">
-              <dt>Project</dt>
-              <dd>${String(project).replace(/</g, '&lt;')}</dd>
-            </div>` : ''}
-            <div class="vm-list-card__footer-row">
+          <div class="vm-list-card__title-block">
+            <button type="button" class="vm-list-card__name" data-open-vm="${v.name}">${v.name}</button>
+            <p class="vm-list-card__subtitle">${subtitle}</p>
+          </div>
+          <dl class="vm-list-card__specs">
+            <div class="vm-list-card__spec-row">
+              <dt>Instance type</dt>
+              <dd>${instanceType}</dd>
+            </div>
+            <div class="vm-list-card__spec-row">
               <dt>IP address</dt>
               <dd>${ip === '—' ? '<span class="muted">—</span>' : String(ip).replace(/</g, '&lt;')}</dd>
             </div>
           </dl>
+          <dl class="vm-list-card__footer">
+            <div class="vm-list-card__footer-row">
+              <dt>Project</dt>
+              <dd>${String(project).replace(/</g, '&lt;')}</dd>
+            </div>
+            <div class="vm-list-card__footer-row">
+              <dt>Created</dt>
+              <dd>${created}</dd>
+            </div>
+          </dl>
+          <div class="vm-list-card__cta">
+            <button type="button"
+              class="pf-v6-c-button pf-m-primary vm-list-card__cta-btn"
+              data-vm-console="${v.name}"
+              ${canConsole ? '' : 'disabled'}
+              ${canConsole ? '' : 'title="Console is available when the VM is Running"'}>
+              <span class="pf-v6-c-button__text">Console</span>
+            </button>
+          </div>
         </article>
       `;
     }
@@ -16801,6 +16943,9 @@
       const sgCount = Array.isArray(n.securityGroups) ? n.securityGroups.length : 0;
       const ipv4 = String(n.cidr || '—').replace(/</g, '&lt;');
       const ipv6 = n.ipv6Cidr ? String(n.ipv6Cidr).replace(/</g, '&lt;') : '—';
+      const subtitle = String(n.description || n.type || 'Virtual network').replace(/</g, '&lt;');
+      const project = String(n.project || '—').replace(/</g, '&lt;');
+      const created = String(n.created || '—').replace(/</g, '&lt;');
       return `
         <article class="net-list-card" data-net-card="${id}" role="listitem" aria-label="${name}">
           <div class="net-list-card__header">
@@ -16814,20 +16959,29 @@
               </button>
             </div>
           </div>
-          <button type="button" class="net-list-card__name" data-open-network="${id}">${name}</button>
-          <div class="net-list-card__body">
-            <dl class="net-list-card__section">
-              <div class="net-list-card__row"><dt>IPv4</dt><dd>${ipv4}</dd></div>
-              <div class="net-list-card__row"><dt>IPv6</dt><dd>${ipv6 === '—' ? '<span class="muted">—</span>' : ipv6}</dd></div>
-            </dl>
-            <dl class="net-list-card__section">
-              <div class="net-list-card__row"><dt>Subnets</dt><dd>${subnetCount}</dd></div>
-              <div class="net-list-card__row"><dt>Security groups</dt><dd>${sgCount}</dd></div>
-            </dl>
+          <div class="net-list-card__title-block">
+            <button type="button" class="net-list-card__name" data-open-network="${id}">${name}</button>
+            <p class="net-list-card__subtitle">${subtitle}</p>
           </div>
+          <dl class="net-list-card__specs">
+            <div class="net-list-card__spec-row"><dt>IPv4 CIDR</dt><dd>${ipv4}</dd></div>
+            <div class="net-list-card__spec-row"><dt>IPv6 CIDR</dt><dd>${ipv6 === '—' ? '<span class="muted">—</span>' : ipv6}</dd></div>
+            <div class="net-list-card__spec-row"><dt>Subnets</dt><dd>${subnetCount}</dd></div>
+            <div class="net-list-card__spec-row"><dt>Security groups</dt><dd>${sgCount}</dd></div>
+          </dl>
           <dl class="net-list-card__footer">
-            <dt>NAT</dt>
-            <dd>${netNatHtml(n, { inline: true })}</dd>
+            <div class="net-list-card__footer-row">
+              <dt>Project</dt>
+              <dd>${project}</dd>
+            </div>
+            <div class="net-list-card__footer-row">
+              <dt>Created</dt>
+              <dd>${created}</dd>
+            </div>
+            <div class="net-list-card__footer-row">
+              <dt>NAT</dt>
+              <dd>${netNatHtml(n, { inline: true })}</dd>
+            </div>
           </dl>
         </article>
       `;
@@ -24530,6 +24684,13 @@
       if (kebab) {
       e.stopPropagation();
       openVmKebabMenu(kebab.dataset.vmKebab, kebab);
+        return;
+      }
+      const consoleBtn = e.target.closest('[data-vm-console]');
+      if (consoleBtn) {
+        e.stopPropagation();
+        if (consoleBtn.disabled) return;
+        openVmConsolePlaceholder(consoleBtn.dataset.vmConsole);
         return;
       }
       const openBtn = e.target.closest('[data-open-vm]');
