@@ -1,4 +1,4 @@
-# OSAC-5009 — Create Windows VMs with Unattend.xml / Sysprep (UX handoff)
+# Create Windows VM with sysprep
 
 ### Contact: Yifat Friman Menchik, UXD
 
@@ -12,8 +12,9 @@
 | **Eng stories** | [HPUX-2253](https://redhat.atlassian.net/browse/HPUX-2253) / [HPUX-2254](https://redhat.atlassian.net/browse/HPUX-2254) — *Create Windows VM with Sysprep* |
 | **Scope of this handoff** | Create VM wizard → **Access & Initial run** for Windows (Sysprep Unattend.xml: Attach existing / Create new) |
 | **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7161-sysprep) |
-| **Handoff Google Doc** | [OSAC-5009 — Create Windows VMs with Unattend.xml / Sysprep (UX handoff)](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit) |
-| **Shared UX tab (pointer)** | [Windows Sysprep Create](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.ty4w66xwh2mw) |
+| **Handoff Google Doc** | [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit) |
+| **Shared UX tab (pointer)** | [Create Windows VM with sysprep](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.ty4w66xwh2mw) |
+| **MD handoff** | [osac-5009-windows-sysprep-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-5009-windows-sysprep-handoff.md) |
 | **Status** | Fully covered for Create VM Windows Access & Initial run. Catalog Provide-default Unattend deferred; SSH hidden for Windows; day-2 Sysprep edit out of scope. |
 
 ---

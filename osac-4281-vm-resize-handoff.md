@@ -1,4 +1,4 @@
-# OSAC-4281 — VM resize via instance type (UX handoff)
+# VM resize via instance type
 
 ### Contact: Yifat Friman Menchik, UXD
 
@@ -11,8 +11,9 @@
 | **UI design (eng)** | [OSAC-4282](https://redhat.atlassian.net/browse/OSAC-4282) · [enhancement-proposals PR #388](https://github.com/osac-project/enhancement-proposals/pull/388) |
 | **Scope** | Day-2 **Edit instance type** (resize) on VM details Overview |
 | **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7158) |
-| **Companion docs** | [VM details Overview UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
-| **Handoff Google Doc** | [OSAC-4281 — VM resize via instance type (UX handoff)](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
+| **Companion docs** | [VM Overview](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
+| **Handoff Google Doc** | [VM resize via instance type](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
+| **MD handoff** | [osac-4281-vm-resize-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-4281-vm-resize-handoff.md) |
 | **Status** | Revised after eng review: **no pre-submit restart/hot-plug detection** in the UI. Restart need comes from API **status conditions after** update. |
 
 ---

@@ -8,7 +8,7 @@
 |---|---|
 | **Feature** | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) — *Unified Networking Architecture* (UI Goal: VirtualNetworks / Subnets / SGs / ExternalIPs / NAT) |
 | **Scope of this handoff** | Tenant **Virtual networks** manage UX in the shared VMaaS mock (list · create · detail). Pulled out of VMaaS Tenant Networking so VM attach + External IP stay in [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit). |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7162&nav=networks) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165&nav=networks) |
 | **Handoff Google Doc** | [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) |
 | **Shared UX tab (pointer)** | [VMaaS prototype — UX documentation → Virtual networks](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.j5bvza9g1n7m) |
 | **MD handoff** | [vmaas-virtual-networks-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-virtual-networks-ux-doc.md) |
@@ -25,9 +25,9 @@ Give tenants a shared **Virtual networks** surface (list → create → detail) 
 
 ## How to review in the mock
 
-1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7162&nav=networks) as **Tenant Admin**.
+1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165&nav=networks) as **Tenant Admin**.
 2. Nav: **Networking → Virtual networks**.
-3. Confirm list columns, status filter, search, list/card toggle.
+3. Confirm list / **card** toggle (card is default), status filter, search.
 4. Open **tenant-workload** → Overview / Configuration / NAT / Subnets / Security groups.
 5. **Create virtual network** → Details (Name, Description, IPv4 CIDR, IPv6 CIDR) → Review → create.
 
@@ -37,16 +37,18 @@ Give tenants a shared **Virtual networks** surface (list → create → detail) 
 
 ### List
 
-| Column | Notes |
-|---|---|
-| Name | Link → detail |
-| Status | Ready / Provisioning (+ filter) |
-| IPv4 CIDR · IPv6 CIDR | |
-| Subnets · Security groups | Counts |
-| NAT gateway | Name / IP when attached |
-| Actions | Kebab (delete where enabled) |
+Toolbar: status filter · search · card/list toggle (**card default**). Primary CTA: **Create virtual network**.
 
-Toolbar: status filter · search · card/list toggle. Primary CTA: **Create virtual network**.
+**Card view** (Ethan Clusters pattern — same as Virtual machines):
+
+| Element | Notes |
+|---|---|
+| Header | Network icon · status pill (Ready / Provisioning) · kebab |
+| Title | Blue name → detail · subtitle = description |
+| Specs | IPv4 CIDR · IPv6 CIDR · Subnets · Security groups |
+| Footer | Project · Created · NAT (divider above) |
+
+**Table view** columns: Name · Status · IPv4/IPv6 CIDR · Subnets · Security groups · NAT · Actions kebab.
 
 ### Create virtual network
 
@@ -90,4 +92,5 @@ Toolbar: status filter · search · card/list toggle. Primary CTA: **Create virt
 
 - Feature: [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433)
 - VMaaS attach + EIP: [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit)
-- Prototype build: **7162**
+- Prototype build: **ethan-cards 7165**
+- Ethan card reference: [Clusters cards](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=services-clusters)

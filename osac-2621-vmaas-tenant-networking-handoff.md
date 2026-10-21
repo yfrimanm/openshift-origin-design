@@ -1,4 +1,4 @@
-# OSAC-2621 — VMaaS Tenant Networking (UX handoff)
+# Tenant Networking
 
 ### Contact: Yifat Friman Menchik, UXD
 
@@ -10,12 +10,13 @@
 | **Parent epic** | [OSAC-5652](https://redhat.atlassian.net/browse/OSAC-5652) — *UIX - VMaaS Networking* |
 | **Feature** | [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435) |
 | **Eng epic** | [HPUX-2249](https://redhat.atlassian.net/browse/HPUX-2249) — *VMaaS Tenant Networking* |
-| **Scope of this handoff** | **VMaaS-only:** how a VM connects to shared virtual networks + **External IP** (create + day-2). Virtual network / External IP **list** management is **out of scope** (unified networking). |
-| **Handoff Google Doc** | [OSAC-2621 — VMaaS Tenant Networking (UX handoff)](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
+| **Scope of this handoff** | **VMaaS-only:** how a VM connects to shared virtual networks + **External IP** (create + day-2). Virtual network **list / create / detail** → [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit). External IP **list** page remains OSAC-1433. |
+| **Handoff Google Doc** | [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
 | **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7162-eip-section) |
+| **MD handoff** | [osac-2621-vmaas-tenant-networking-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-2621-vmaas-tenant-networking-handoff.md) |
 | **Ethan reference (BMaaS)** | [Launch BM → Networking](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=catalog&action=launch-instance&item=bare-metal-general-purpose-server&step=networking) |
 | **Alignment note** | [OSAC-2616 comment](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987) — Create VM **Networking** matches BMaaS/Cluster attachment patterns; **VM-only** difference = Additional networks (Custom path). |
-| **Status** | Design complete for VM attach + External IP. VN CRUD + External IPs list → [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433). |
+| **Status** | Design complete for VM attach + External IP. VN manage → [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit). External IPs list → [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433). |
 
 ---
 
@@ -34,11 +35,11 @@ Virtual networks are **shared** across clusters, bare metal, and VMs. That manag
 
 | Surface | Owner |
 |---|---|
-| Virtual networks list / create / edit | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
+| Virtual networks list / create / detail | Dedicated Doc: [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) · feature [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
 | External IPs **list** page (Networking → External IPs) | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
 | Subnets / Security groups / NAT / NetworkClasses admin | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
 
-The VMaaS prototype may still show **Networking → Virtual networks** as a **placeholder**; it is **not** part of the OSAC-2621 handoff contract.
+**Networking → Virtual networks** manage UX is documented separately: [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) / [vmaas-virtual-networks-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-virtual-networks-ux-doc.md).
 
 ---
 
@@ -79,7 +80,7 @@ Section title: **External IP** (avoids colliding with Overview **Access & Initia
 | External IP prominence (SSH access) | **Covered** | Section **External IP**; Host + SSH clipboard |
 | Attach **in progress** | **Covered** | Attaching state |
 | Attach **failure** | **Covered** | Failed + Retry / Choose another |
-| VN list / create / edit | **Out of scope** | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
+| VN list / create / detail | **Separate Doc** | [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) |
 | External IPs list page | **Out of scope** | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433); day-2 attach only here |
 
 ---
@@ -91,12 +92,13 @@ Section title: **External IP** (avoids colliding with Overview **Access & Initia
 3. **External IP default at create:** **On** (auto-attach).
 4. **Step title:** **Networking**.
 5. **Day-2 External IP:** Attach modal only (no EIP list in VMaaS).
-6. **Virtual networks UX:** Owned by unified networking — [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433).
+6. **Virtual networks UX:** Dedicated Doc [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit); feature [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433).
 
 ---
 
 ## Related
 
+- Virtual networks Doc: [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit)
 - Unified networking feature: [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433)
 - Ethan sync: [OSAC-2616](https://redhat.atlassian.net/browse/OSAC-2616)
 - VMaaS networking feature: [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435)

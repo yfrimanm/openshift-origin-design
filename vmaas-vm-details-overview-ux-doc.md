@@ -1,4 +1,4 @@
-# Virtual machine details Overview — UX documentation
+# VM Overview
 
 ### Contact: Yifat Friman Menchik, UXD
 
@@ -7,13 +7,14 @@
 | | |
 |---|---|
 | **Scope of this doc** | Single-VM **details Overview** (day-2) |
-| **Handoff Google Doc** | [Virtual machine details Overview — UX documentation](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
+| **Handoff Google Doc** | [VM Overview](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
 | **Shared UX tab (pointer)** | [VMaaS prototype — UX documentation → VM Overview](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.ut299rnpbsxq) |
-| **Companion Create Doc** | [Create Virtual machine — UX documentation](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
-| **External IP / Networking** | [OSAC-2621 Doc](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit) |
-| **Resize (instance type)** | [OSAC-4281 Doc](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
+| **Companion Create Doc** | [Create Virtual machine](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
+| **External IP / Networking** | [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit) |
+| **Resize (instance type)** | [VM resize via instance type](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
 | **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7162-overview) |
 | **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` · [gh-pages/screenshots/details](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/details) |
+| **MD handoff** | [vmaas-vm-details-overview-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-vm-details-overview-ux-doc.md) |
 | **Entry** | List **Name** link, after Create, or `?vm={name}` |
 
 ---
@@ -62,7 +63,7 @@ Section title: **External IP** (not “Access” — avoids colliding with Acces
 - **SSH command** clipboard-copy when attached
 - States: not attached · attaching · attached · failed
 
-Full contract: [OSAC-2621 Doc](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit).
+Full contract: [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit).
 
 ---
 
