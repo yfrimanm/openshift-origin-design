@@ -7117,7 +7117,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 21 · ethan-cards 7165</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 21 · catalog-no-default 7166</span>
         </div>
       </div>
       <div class="console__body">
@@ -21185,14 +21185,14 @@
       if (!it) {
         return {
           id: '',
-          label: 'Not set',
+          label: 'No default',
           instanceTypeName: '',
           cpu: '—',
           memory: '—',
           gpu: '—',
           rateHour: item.rateHour || '—',
           rateMonth: item.rateMonth || '—',
-          summary: 'Not set',
+          summary: 'No default',
         };
       }
       return {
@@ -21284,7 +21284,7 @@
           return esc(resolveCatalogItemCompute({ instanceTypeId: snapshot.instanceTypeId }).summary);
         case 'runStrategy': {
           const opt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === snapshot.runStrategy);
-          return opt ? esc(opt.label) : 'Not set';
+          return opt ? esc(opt.label) : 'No default';
         }
         case 'bootDiskGiB':
           return snapshot.bootDiskGiB === '' || snapshot.bootDiskGiB == null
@@ -21384,9 +21384,16 @@
       return match?.id || '';
     }
 
+    function catalogNoDefaultCopy(noun) {
+      return {
+        title: 'No default',
+        desc: `Tenants choose ${noun} when creating a virtual machine`,
+      };
+    }
+
     function catalogComputeToggleSummary(id) {
       const it = getCatalogInstanceType(id);
-      if (!it) return { title: 'Not set', desc: 'Tenants choose an instance type when creating a virtual machine' };
+      if (!it) return catalogNoDefaultCopy('an instance type');
       return {
         title: it.label || it.name,
         desc: `${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
@@ -21625,7 +21632,11 @@
         } else {
           c.guestOsFamily = '';
         }
-        const diskToggleLabel = selectedDisk ? selectedDisk.title : 'Not set';
+        const diskNone = catalogNoDefaultCopy('a disk image');
+        const diskToggleTitle = selectedDisk ? selectedDisk.title : diskNone.title;
+        const diskToggleDesc = selectedDisk
+          ? `${selectedDisk.guestOs || selectedDisk.family} · ${selectedDisk.arch}`
+          : diskNone.desc;
         const derivedOsHtml = selectedDisk
           ? `<p class="form-helper" id="ci-derived-os">Guest operating system: <strong>${String(c.guestOsFamily || 'Unspecified').replace(/</g, '&lt;')}</strong> (from disk image)</p>`
           : '<p class="form-helper">Guest operating system is derived from the disk image when one is set.</p>';
@@ -21633,8 +21644,8 @@
                   <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.diskImageId ? 'pf-m-selected' : ''}" data-disk-image="" role="option">
                     <span class="pf-v6-c-menu__item-main">
                       <span class="rich-select__option-body">
-                        <span class="rich-select__option-title">Not set</span>
-                        <span class="rich-select__option-desc">Tenants choose a disk image when creating a virtual machine</span>
+                        <span class="rich-select__option-title">${diskNone.title}</span>
+                        <span class="rich-select__option-desc">${diskNone.desc}</span>
                       </span>
                     </span>
                   </button>
@@ -21682,7 +21693,11 @@
                 id: 'ci-disk-image-toggle',
                 ariaLabelledby: 'ci-disk-image-label',
                 ariaExpanded: c.diskImageMenuOpen,
-                mainHtml: `<span class="rich-select__toggle-label">${diskToggleLabel}</span>`,
+                stacked: true,
+                mainHtml: `
+                  <span class="rich-select__toggle-label">${diskToggleTitle}</span>
+                  <span class="rich-select__toggle-desc">${diskToggleDesc}</span>
+                `,
               })}
               <div class="pf-v6-c-menu rich-select__menu" id="ci-disk-image-menu" role="listbox" ${c.diskImageMenuOpen ? '' : 'hidden'}>
                 <div class="rich-select__search">
@@ -21750,9 +21765,10 @@
           const hay = `${it.label} ${it.cpu} ${it.memoryGiB} ${it.gpuResource} ${opt.rateHour}`.toLowerCase();
           return hay.includes(q);
         });
+        const runNone = catalogNoDefaultCopy('a run strategy');
         const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
-        const runToggleTitle = runOpt ? runOpt.label : 'Not set';
-        const runToggleDesc = runOpt ? runOpt.desc : 'Tenants choose run strategy when creating a virtual machine';
+        const runToggleTitle = runOpt ? runOpt.label : runNone.title;
+        const runToggleDesc = runOpt ? runOpt.desc : runNone.desc;
         const runFiltered = CATALOG_RUN_STRATEGY_OPTIONS.filter(o => {
           const q = (c.runStrategyFilter || '').toLowerCase();
           if (!q) return true;
@@ -21760,7 +21776,7 @@
         });
         panel.innerHTML = `
           <h3>Instance types</h3>
-          <p class="create-resource-wiz__help">Optionally set instance type defaults for this catalog item. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
+          <p class="create-resource-wiz__help">Optionally set instance type defaults for this catalog item. Leave fields as No default if tenants should choose when creating a virtual machine.</p>
           <div class="form-field">
             ${renderCatalogFieldLabelRow({
               labelHtml: 'Instance type',
@@ -21791,7 +21807,7 @@
                   <button type="button" class="pf-v6-c-menu__item rich-select__option ${!instanceTypeId ? 'pf-m-selected' : ''}" data-compute="" role="option">
                     <span class="pf-v6-c-menu__item-main">
                       <span class="rich-select__option-body">
-                        <span class="rich-select__option-title">Not set</span>
+                        <span class="rich-select__option-title">No default</span>
                         <span class="rich-select__option-desc">Tenants choose an instance type when creating a virtual machine</span>
                       </span>
                     </span>
@@ -21843,8 +21859,8 @@
                   <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.runStrategy ? 'pf-m-selected' : ''}" data-run-strategy="" role="option">
                     <span class="pf-v6-c-menu__item-main">
                       <span class="rich-select__option-body">
-                        <span class="rich-select__option-title">Not set</span>
-                        <span class="rich-select__option-desc">Tenants choose run strategy when creating a virtual machine</span>
+                        <span class="rich-select__option-title">${runNone.title}</span>
+                        <span class="rich-select__option-desc">${runNone.desc}</span>
                       </span>
                     </span>
                   </button>
@@ -21906,10 +21922,11 @@
         const bootSizeSet = c.bootDiskGiB != null && c.bootDiskGiB !== '';
         const bootSizeVal = bootSizeSet ? Math.min(diskMax, Math.max(diskMin, Number(c.bootDiskGiB))) : '';
         const selectedTier = tiers.find(t => t.id === c.bootStorageTierId);
-        const bootTierTitle = selectedTier ? selectedTier.name : 'Not set';
+        const bootTierNone = catalogNoDefaultCopy('a storage tier');
+        const bootTierTitle = selectedTier ? selectedTier.name : bootTierNone.title;
         const bootTierDesc = selectedTier
           ? (selectedTier.description || '')
-          : 'Tenants choose storage tier when creating a virtual machine';
+          : bootTierNone.desc;
         const tierFiltered = tiers.filter(t => {
           const q = (c.bootTierFilter || '').toLowerCase();
           if (!q) return true;
@@ -21973,7 +21990,7 @@
         ` : '<p class="form-helper">No additional disks. Add disks if this catalog item should include them by default.</p>';
         panel.innerHTML = `
           <h3>Storage</h3>
-          <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields Not set if tenants should choose when creating a virtual machine.</p>
+          <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields as No default if tenants should choose when creating a virtual machine.</p>
           <div class="vm-config__fields">
             <div class="form-field">
               ${renderCatalogFieldLabelRow({
@@ -21984,9 +22001,9 @@
                 value: c.bootDiskAccess || 'editable',
               })}
               <input type="number" id="ci-boot-disk" class="unit-size-input" value="${bootSizeVal}"
-                min="${diskMin}" max="${diskMax}" step="1" placeholder="Not set"
+                min="${diskMin}" max="${diskMax}" step="1" placeholder="No default"
                 aria-label="Boot disk size in GiB" />
-              <p class="form-helper">Optional. Clear the field to leave as Not set.</p>
+              <p class="form-helper">Optional. Clear the field to leave as No default.</p>
             </div>
             <hr class="form-section-divider" />
             <div class="form-field">
@@ -22017,8 +22034,8 @@
                     <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.bootStorageTierId ? 'pf-m-selected' : ''}" data-boot-tier="" role="option">
                       <span class="pf-v6-c-menu__item-main">
                         <span class="rich-select__option-body">
-                          <span class="rich-select__option-title">Not set</span>
-                          <span class="rich-select__option-desc">Tenants choose storage tier when creating a virtual machine</span>
+                          <span class="rich-select__option-title">${bootTierNone.title}</span>
+                          <span class="rich-select__option-desc">${bootTierNone.desc}</span>
                         </span>
                       </span>
                     </button>
@@ -22600,10 +22617,10 @@
           : 'Global public';
         const diskValue = disk
           ? esc(`${disk.title} (${disk.family} · ${disk.arch})`)
-          : 'Not set';
+          : 'No default';
         const bootSizeValue = c.bootDiskGiB != null && c.bootDiskGiB !== ''
           ? `${c.bootDiskGiB} GiB`
-          : 'Not set';
+          : 'No default';
         const reviewRow = (label, value) => `
           <div class="review-nebius__row">
             <span class="review-nebius__label">${label}</span>
@@ -22632,7 +22649,7 @@
             ${reviewNebiusSection('Instance types', 'ci-access', `
               ${reviewRow('Instance type', esc(compute.summary))}
               ${reviewRow('Instance type access', catalogAccessLabel(c.computeAccess || c.tenantAccess))}
-              ${reviewRow('Run strategy', runOpt ? esc(runOpt.label) : 'Not set')}
+              ${reviewRow('Run strategy', runOpt ? esc(runOpt.label) : 'No default')}
               ${reviewRow('Run strategy access', catalogAccessLabel(c.runStrategyAccess))}
             `, 'ci-review')}
             ${reviewNebiusSection('Visibility', 'ci-visibility', `
@@ -22641,7 +22658,7 @@
             ${reviewNebiusSection('Storage', 'ci-storage', `
               ${reviewRow('Boot disk size', bootSizeValue)}
               ${reviewRow('Boot disk size access', catalogAccessLabel(c.bootDiskAccess))}
-              ${reviewRow('Boot storage tier', bootTier ? esc(bootTier.name) : 'Not set')}
+              ${reviewRow('Boot storage tier', bootTier ? esc(bootTier.name) : 'No default')}
               ${reviewRow('Boot storage tier access', catalogAccessLabel(c.bootStorageTierAccess))}
               ${extraDisksRows}
             `, 'ci-review')}
@@ -23337,7 +23354,7 @@
     function catalogDetailHardwareSpecsHtml(item) {
       const compute = resolveCatalogItemCompute(item);
       const esc = value => String(value || '—').replace(/</g, '&lt;');
-      const diskImage = item.diskImage ? esc(item.diskImage) : 'Not set';
+      const diskImage = item.diskImage ? esc(item.diskImage) : 'No default';
       const computeLocked = item.computeLocked != null
         ? !!item.computeLocked
         : (item.computeAccess ? item.computeAccess === 'locked' : !!item.diskLocked);
@@ -23363,7 +23380,7 @@
 
     function catalogCardSpecsRowsHtml(item) {
       const compute = resolveCatalogItemCompute(item);
-      const diskRaw = String(item.diskImage || 'Not set');
+      const diskRaw = String(item.diskImage || 'No default');
       const diskImage = diskRaw.replace(/</g, '&lt;');
       const diskLocked = item.diskImageAccess
         ? item.diskImageAccess === 'locked'
