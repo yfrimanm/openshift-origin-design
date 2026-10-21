@@ -6347,18 +6347,6 @@
       min-width: 0;
       overflow-wrap: anywhere;
     }
-    .vm-list-card__cta {
-      margin-block-start: auto;
-    }
-    .vm-list-card__cta-btn {
-      width: 100%;
-      justify-content: center;
-      border-radius: 999px;
-    }
-    .vm-list-card__cta-btn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
     .table-toolbar__right .tpl-view-toggle {
       margin-left: 0;
       flex: 0 0 auto;
@@ -7129,7 +7117,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 21 · ethan-cards 7164</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 21 · ethan-cards 7165</span>
         </div>
       </div>
       <div class="console__body">
@@ -12412,7 +12400,6 @@
         .replace(/</g, '&lt;');
       const instanceType = String(enriched.computeResource || enriched.instanceType || '—').replace(/</g, '&lt;');
       const created = String(v.created || '—').replace(/</g, '&lt;');
-      const canConsole = String(v.status || '').toLowerCase() === 'running';
       return `
         <article class="tpl-card vm-list-card${selected ? ' pf-m-selected' : ''}"
           data-vm-card="${v.name}" role="listitem" aria-label="${v.name}">
@@ -12458,15 +12445,6 @@
               <dd>${created}</dd>
             </div>
           </dl>
-          <div class="vm-list-card__cta">
-            <button type="button"
-              class="pf-v6-c-button pf-m-primary vm-list-card__cta-btn"
-              data-vm-console="${v.name}"
-              ${canConsole ? '' : 'disabled'}
-              ${canConsole ? '' : 'title="Console is available when the VM is Running"'}>
-              <span class="pf-v6-c-button__text">Console</span>
-            </button>
-          </div>
         </article>
       `;
     }
@@ -24684,13 +24662,6 @@
       if (kebab) {
       e.stopPropagation();
       openVmKebabMenu(kebab.dataset.vmKebab, kebab);
-        return;
-      }
-      const consoleBtn = e.target.closest('[data-vm-console]');
-      if (consoleBtn) {
-        e.stopPropagation();
-        if (consoleBtn.disabled) return;
-        openVmConsolePlaceholder(consoleBtn.dataset.vmConsole);
         return;
       }
       const openBtn = e.target.closest('[data-open-vm]');
