@@ -886,6 +886,8 @@
     #create-di-panel .tenant-typeahead,
     #create-di-panel .label-chip-input,
     #create-di-panel .felt-select-boxes,
+    #create-ci-panel .name-row,
+    #create-ci-panel .tenant-typeahead,
     #create-ci-panel .felt-select-boxes,
     #create-it-panel .name-row,
     #create-it-panel .tenant-typeahead,
@@ -4217,7 +4219,11 @@
     .form-field label {
       display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px;
     }
-    .form-field label .req { color: #c9190b; margin-left: 2px; }
+    .req,
+    .pf-v6-c-form__label-required {
+      color: var(--pf-t--global--color--status--danger--default, #c9190b);
+      margin-inline-start: 0.25rem;
+    }
     .form-field input[type="text"],
     .form-field input[type="search"],
     .form-field textarea {
@@ -4585,38 +4591,44 @@
       flex-wrap: wrap;
       margin-bottom: 6px;
     }
-    .ci-field-label-row > label,
+    .ci-field-label-row > label:not(.pf-v6-c-switch),
+    .ci-field-label-row > h3,
     .ci-field-label-row > .config-section-title,
     .ci-field-label-row > .config-sets-title {
       margin: 0;
       flex: 1 1 auto;
       min-width: 0;
     }
+    .create-resource-wiz__panel .ci-field-label-row > h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
     .ci-field-label-row .config-section-title,
     .ci-field-label-row .config-sets-title {
       font-size: 14px;
       font-weight: 600;
     }
-    .ci-access-switch {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      flex: 0 0 auto;
-    }
-    .ci-access-switch__locked {
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--vmaas-text-subtle, #6a6e73);
-      line-height: 1;
-    }
-    .ci-access-switch .pf-v6-c-switch {
+    .ci-field-label-row .pf-v6-c-switch {
       --pf-v6-c-switch--FontSize: 13px;
+      flex: 0 0 auto;
       font-weight: 400;
     }
-    /* Don't inherit form-field label bold onto the switch */
-    .create-resource-wiz .form-field .ci-access-switch .pf-v6-c-switch,
-    .create-resource-wiz .form-field .ci-access-switch .pf-v6-c-switch__label {
+    /* Don't inherit form-field label block/bold onto the PF switch */
+    .create-resource-wiz .form-field .ci-field-label-row .pf-v6-c-switch {
+      display: inline-flex;
+      margin-bottom: 0;
       font-weight: 400;
+    }
+    .create-resource-wiz .form-field .ci-field-label-row .pf-v6-c-switch__label {
+      font-weight: 400;
+    }
+    /* Visible cue only; accessible name stays "Editable" (ON). */
+    .ci-field-label-row .pf-v6-c-switch__input:checked ~ .pf-v6-c-switch__label .ci-switch-off {
+      display: none;
+    }
+    .ci-field-label-row .pf-v6-c-switch__input:not(:checked) ~ .pf-v6-c-switch__label .ci-switch-on {
+      display: none;
     }
     .ci-access-help {
       margin: 0 0 8px;
@@ -7117,7 +7129,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 21 · catalog-no-default 7166</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · catalog-vm-fields 7168d</span>
         </div>
       </div>
       <div class="console__body">
@@ -11105,7 +11117,10 @@
       if (returnTarget === 'catalog' && state.catalogCreate) {
         if (created) {
           if (kind === 'ssh') state.catalogCreate.sshSecretId = created.id;
-          else state.catalogCreate.cloudInitSecretId = created.id;
+          else {
+            state.catalogCreate.cloudInitSecretId = created.id;
+            state.catalogCreate.cloudInitSource = 'secret';
+          }
         }
         setView('create-catalog-item');
         renderCreateCatalogItemWizard();
@@ -13056,34 +13071,6 @@
       });
     }
 
-    function renderCatalogInitDefaultSelectBoxes({ name, selected, labelledBy, windows = false }) {
-      const noun = windows ? 'Unattend.xml' : 'Cloud-init';
-      return renderFeltSelectBoxes({
-        name,
-        selected: selected || 'none',
-        labelledBy,
-        extraClass: 'felt-select-boxes--sysprep-mode',
-        options: [
-          {
-            value: 'none',
-            title: 'No default',
-            desc: windows
-              ? 'Tenants set Unattend.xml when creating a VM'
-              : 'Tenants set cloud-init when creating a VM',
-            iconClass: 'fa-solid fa-ban',
-          },
-          {
-            value: 'provide',
-            title: `Provide default ${noun}`,
-            desc: windows
-              ? 'Seed a default Unattend.xml for VMs from this item'
-              : 'Seed default user data for VMs from this item',
-            iconClass: windows ? 'fa-solid fa-file-code' : 'fa-solid fa-file-lines',
-          },
-        ],
-      });
-    }
-
     function renderInitMethodSelectBoxes({ name, selected, labelledBy }) {
       return renderFeltSelectBoxes({
         name,
@@ -13148,6 +13135,91 @@
       }
     }
 
+    function catalogInstanceTypeHasGpu(id) {
+      return Number(getCatalogInstanceType(id)?.gpus) > 0;
+    }
+
+    function filteredCatalogInstanceTypeOptions(filter = '', { requireGpu } = {}) {
+      const q = String(filter || '').toLowerCase();
+      return CATALOG_INSTANCE_TYPE_OPTIONS.filter(opt => {
+        const it = getCatalogInstanceType(opt.id);
+        if (!it) return false;
+        const hasGpu = Number(it.gpus) > 0;
+        if (requireGpu === true && !hasGpu) return false;
+        if (requireGpu === false && hasGpu) return false;
+        if (!q) return true;
+        const hay = `${it.label || ''} ${it.name || ''} ${it.cpu} ${it.memoryGiB} ${it.gpuResource || ''} ${opt.rateHour}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    function catalogInstanceTypeOptionMeta(opt) {
+      const it = getCatalogInstanceType(opt.id);
+      if (!it) return { id: opt.id, title: opt.id, desc: '' };
+      const cpu = Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`;
+      return {
+        id: opt.id,
+        title: it.label || it.name,
+        desc: `${cpu} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)} · ${opt.rateHour}`,
+      };
+    }
+
+    function catalogHasCloudInitValue(c) {
+      if ((c.cloudInitSource || 'inline') === 'secret') return !!String(c.cloudInitSecretId || '').trim();
+      return !!String(c.cloudInit || '').trim();
+    }
+
+    function catalogHasSysprepValue(c) {
+      ensureSysprepState(c);
+      if (c.sysprepMode === 'attach') return !!String(c.sysprepSecretId || '').trim();
+      return !!String(c.sysprep || '').trim();
+    }
+
+    function catalogHasInitValue(c) {
+      if ((c.guestOsFamily || '') === 'Microsoft Windows' || c.initMethod === 'sysprep') {
+        return catalogHasSysprepValue(c);
+      }
+      return catalogHasCloudInitValue(c);
+    }
+
+    function syncCatalogInitForGuestOs(c) {
+      c.initMethod = initMethodForGuestOs(c.guestOsFamily || 'Linux');
+      if (c.initMethod === 'sysprep') {
+        c.cloudInit = '';
+        c.cloudInitSecretId = '';
+        c.cloudInitSource = 'inline';
+        ensureSysprepState(c);
+      } else {
+        c.sysprep = '';
+        c.sysprepFileName = '';
+        c.sysprepSecretId = '';
+        c.sysprepMode = 'create';
+      }
+    }
+
+    function applyDiskImageToCatalog(c, diskImageId) {
+      const disk = getCatalogDiskImage(diskImageId);
+      c.diskImageId = disk ? disk.id : '';
+      if (disk) c.guestOsFamily = guestOsFamilyFromDiskImage(disk);
+      syncCatalogInitForGuestOs(c);
+    }
+
+    function catalogInitReviewValue(c) {
+      const windows = (c.guestOsFamily || '') === 'Microsoft Windows' || c.initMethod === 'sysprep';
+      if (windows) {
+        if (!catalogHasSysprepValue(c)) return 'No default';
+        if (c.sysprepMode === 'attach') {
+          return String(secretDisplayName(c.sysprepSecretId) || c.sysprepSecretId).replace(/</g, '&lt;');
+        }
+        return 'Provided (hidden)';
+      }
+      if (!catalogHasCloudInitValue(c)) return 'No default';
+      if (c.cloudInitSource === 'secret') {
+        return String(secretDisplayName(c.cloudInitSecretId) || c.cloudInitSecretId).replace(/</g, '&lt;');
+      }
+      return 'Configured';
+    }
+
     const CATALOG_ACCESS_HELP_LS = 'vmaas.prototype.catalogAccessHelpSeen';
     const CATALOG_ACCESS_HELP_TEXT =
       'Editable lets tenants change this when creating a VM; Locked keeps your default.';
@@ -13176,29 +13248,28 @@
     }
 
     /**
-     * PF Switch for tenant access. ON = Editable (static label per a11y).
-     * Optional muted "Locked" cue when off (aria-hidden; AT uses switch state).
+     * PF6 Switch. Accessible name is static and describes ON ("Editable").
+     * Visible label is aria-hidden and shows Editable / Locked from :checked.
      */
     function renderCatalogAccessSwitch({ stateKey, value }) {
       const editable = value !== 'locked';
       const id = `ci-access-${stateKey}`;
-      const labelId = `${id}-label`;
       return `
-        <div class="ci-access-switch">
-          <span class="ci-access-switch__locked" aria-hidden="true"${editable ? ' hidden' : ''}>Locked</span>
-          <label class="pf-v6-c-switch" for="${id}">
-            <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="${id}"
-              data-ci-access-state="${stateKey}"
-              aria-labelledby="${labelId}"
-              ${editable ? 'checked' : ''} />
-            <span class="pf-v6-c-switch__toggle" aria-hidden="true">
-              <span class="pf-v6-c-switch__toggle-icon">
-                <i class="fas fa-check" aria-hidden="true"></i>
-              </span>
+        <label class="pf-v6-c-switch" for="${id}">
+          <input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="${id}"
+            data-ci-access-state="${stateKey}"
+            aria-label="Editable"
+            ${editable ? 'checked' : ''} />
+          <span class="pf-v6-c-switch__toggle">
+            <span class="pf-v6-c-switch__toggle-icon">
+              <i class="fas fa-check" aria-hidden="true"></i>
             </span>
-            <span class="pf-v6-c-switch__label" id="${labelId}" aria-hidden="true">Editable</span>
-          </label>
-        </div>`;
+          </span>
+          <span class="pf-v6-c-switch__label" aria-hidden="true">
+            <span class="ci-switch-on">Editable</span>
+            <span class="ci-switch-off">Locked</span>
+          </span>
+        </label>`;
     }
 
     /** Field / section title row with access switch on the right. */
@@ -13217,12 +13288,131 @@
     function bindCatalogAccessSwitches(panel, c) {
       panel.querySelectorAll('input[data-ci-access-state]').forEach(input => {
         input.addEventListener('change', () => {
+          readCatalogCreateFields();
           const key = input.dataset.ciAccessState;
           c[key] = input.checked ? 'editable' : 'locked';
           if (key === 'computeAccess') c.tenantAccess = c[key];
           renderCreateCatalogItemWizard();
         });
       });
+    }
+
+    function catalogReqStar(access) {
+      return access === 'locked'
+        ? ' <span class="pf-v6-c-form__label-required req" aria-hidden="true">*</span>'
+        : '';
+    }
+
+    function bindExpandingTextarea(el, onInput) {
+      if (!el) return;
+      const sync = () => {
+        const hasContent = !!el.value.trim();
+        el.classList.toggle('pf-m-expanded', hasContent);
+        el.rows = hasContent ? 8 : 1;
+        el.style.height = 'auto';
+        if (hasContent) el.style.height = Math.min(el.scrollHeight, 280) + 'px';
+        else el.style.height = '';
+      };
+      sync();
+      el.addEventListener('input', () => {
+        onInput?.(el.value);
+        sync();
+      });
+      el.addEventListener('focus', () => {
+        if (!el.value.trim()) {
+          el.classList.add('pf-m-expanded');
+          el.rows = 4;
+        }
+      });
+      el.addEventListener('blur', () => {
+        if (!el.value.trim()) {
+          el.classList.remove('pf-m-expanded');
+          el.rows = 1;
+          el.style.height = '';
+        }
+      });
+    }
+
+    function bindUnattendFileUpload(panel, d, ids) {
+      const uploadRoot = panel.querySelector(`#${ids.upload}`);
+      const fileInput = panel.querySelector(`#${ids.file}`);
+      const filenameInput = panel.querySelector(`#${ids.filename}`);
+      const xmlArea = panel.querySelector(`#${ids.xml}`);
+      const clearBtn = panel.querySelector(`#${ids.clear}`);
+      const browseBtn = panel.querySelector(`#${ids.browse}`);
+      const syncXmlHeight = () => {
+        if (!xmlArea) return;
+        xmlArea.classList.toggle('pf-m-has-content', !!xmlArea.value.trim());
+        xmlArea.style.height = 'auto';
+        xmlArea.style.height = Math.min(Math.max(xmlArea.scrollHeight, 120), 320) + 'px';
+      };
+      const syncClearEnabled = () => {
+        const filled = !!(d.sysprep?.trim() || filenameInput?.value || xmlArea?.value?.trim());
+        if (clearBtn) clearBtn.disabled = !filled;
+      };
+      const applyUnattend = (text, name = '') => {
+        d.sysprep = text || '';
+        d.sysprepFileName = name || '';
+        if (xmlArea) {
+          xmlArea.value = d.sysprep;
+          xmlArea.classList.toggle('pf-m-has-content', !!d.sysprep.trim());
+        }
+        if (filenameInput) filenameInput.value = d.sysprepFileName;
+        syncXmlHeight();
+        syncClearEnabled();
+        delete state.fieldErrors.ciInit;
+      };
+      xmlArea?.addEventListener('input', e => {
+        d.sysprep = e.target.value;
+        if (!e.target.value.trim()) d.sysprepFileName = '';
+        if (filenameInput && !e.target.value.trim()) filenameInput.value = '';
+        xmlArea.classList.toggle('pf-m-has-content', !!e.target.value.trim());
+        syncXmlHeight();
+        syncClearEnabled();
+        if (String(d.sysprep || '').trim()) delete state.fieldErrors.ciInit;
+      });
+      browseBtn?.addEventListener('click', () => fileInput?.click());
+      filenameInput?.addEventListener('click', () => fileInput?.click());
+      fileInput?.addEventListener('change', e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => applyUnattend(String(reader.result || ''), file.name);
+        reader.onerror = () => toast('Could not read the selected file.');
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+      clearBtn?.addEventListener('click', () => {
+        applyUnattend('', '');
+        if (fileInput) fileInput.value = '';
+      });
+      if (uploadRoot) {
+        ['dragenter', 'dragover'].forEach(evt => {
+          uploadRoot.addEventListener(evt, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadRoot.classList.add('pf-m-drag-hover');
+          });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+          uploadRoot.addEventListener(evt, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadRoot.classList.remove('pf-m-drag-hover');
+            if (evt === 'drop') {
+              const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = () => applyUnattend(String(reader.result || ''), file.name);
+                reader.onerror = () => toast('Could not read the selected file.');
+                reader.readAsText(file);
+              }
+            }
+          });
+        });
+      }
+      syncXmlHeight();
+      syncClearEnabled();
     }
 
     const CATALOG_RUN_STRATEGY_OPTIONS = [
@@ -20632,7 +20822,6 @@
       const steps = [
         { key: 'ci-details', label: 'Details' },
         { key: 'ci-access', label: 'Instance types' },
-        { key: 'ci-visibility', label: 'Visibility' },
         { key: 'ci-storage', label: 'Storage' },
         { key: 'ci-access-init', label: 'Access & Initial run' },
         { key: 'ci-review', label: 'Review' },
@@ -20993,6 +21182,10 @@
 
     /** Catalog wizard options — each maps to an InstanceType (GPU is defined on the instance type). */
     const CATALOG_INSTANCE_TYPE_OPTIONS = [
+      { id: 'vm-type-1-small', instanceTypeName: 'vm-type-1-small', rateHour: '$1.20/hr', rateMonth: '$720/mo per instance' },
+      { id: 'vm-type-1-medium', instanceTypeName: 'vm-type-1-medium', rateHour: '$2.40/hr', rateMonth: '$1,440/mo per instance' },
+      { id: 'vm-type-1-large', instanceTypeName: 'vm-type-1-large', rateHour: '$4.80/hr', rateMonth: '$2,880/mo per instance' },
+      { id: 'vm-type-1-xlarge', instanceTypeName: 'vm-type-1-xlarge', rateHour: '$9.60/hr', rateMonth: '$5,760/mo per instance' },
       { id: 'small', instanceTypeName: 'catalog-small', rateHour: '$5.68/hr', rateMonth: '$3,400/mo per instance' },
       { id: 'medium', instanceTypeName: 'catalog-medium', rateHour: '$8.50/hr', rateMonth: '$5,200/mo per instance' },
       { id: 'large', instanceTypeName: 'catalog-large', rateHour: '$4.25/hr', rateMonth: '$2,850/mo per instance' },
@@ -21047,7 +21240,7 @@
         rateMonth: '$5,200/mo per instance',
         visibility: 'tenant',
         visibilityLabel: 'Tenant scoped',
-        tenants: ['tenant-a', 'tenant-b'],
+        tenants: ['tenant-a'],
         created: 'Aug 22, 2026, 3:42 PM',
       },
       {
@@ -21118,16 +21311,20 @@
         maxVisited: 0,
         name: generateCatalogItemName(),
         description: '',
-        guestOsFamily: '',
+        guestOsFamily: 'Linux',
         diskImageId: '',
         diskImageAccess: 'editable',
         computeAccess: 'editable',
         tenantAccess: 'editable',
         instanceTypeId: '',
+        showGpuIts: false,
         runStrategy: '',
         runStrategyAccess: 'editable',
-        visibility: 'global',
+        visibility: 'tenant',
         tenants: [],
+        isGlobal: false,
+        tenantId: '',
+        fieldErrors: {},
         bootDiskGiB: null,
         bootDiskAccess: 'editable',
         bootStorageTierId: '',
@@ -21140,7 +21337,10 @@
         cloudInitSecretId: '',
         sshSecretId: '',
         sysprep: '',
-        initDefaultMode: 'none', // none | provide — catalog default user data (Option C)
+        sysprepMode: 'create',
+        sysprepSecretId: '',
+        sysprepFileName: '',
+        initDefaultMode: 'none',
         initAccess: 'editable',
         tenantAccessExpanded: false,
         diskImageMenuOpen: false,
@@ -21228,7 +21428,7 @@
       return {
         name: (c.name || '').trim(),
         description: (c.description || '').trim(),
-        guestOsFamily: c.guestOsFamily || '',
+        guestOsFamily: c.guestOsFamily || 'Linux',
         diskImageId: c.diskImageId || '',
         diskImageAccess: c.diskImageAccess || 'editable',
         computeAccess: c.computeAccess || c.tenantAccess || 'editable',
@@ -21252,9 +21452,11 @@
         cloudInit: (c.cloudInit || '').trim(),
         cloudInitSource: c.cloudInitSource === 'secret' ? 'secret' : 'inline',
         cloudInitSecretId: c.cloudInitSecretId || '',
-        sshSecretId: c.sshSecretId || '',
+        sshSecretId: '',
         sysprep: (c.sysprep || '').trim(),
-        initDefaultMode: c.initDefaultMode === 'provide' ? 'provide' : 'none',
+        sysprepMode: c.sysprepMode === 'attach' ? 'attach' : 'create',
+        sysprepSecretId: c.sysprepSecretId || '',
+        initDefaultMode: catalogHasInitValue(c) ? 'provide' : 'none',
         initAccess: c.initAccess || 'editable',
       };
     }
@@ -21266,7 +21468,7 @@
         case 'description':
           return esc(snapshot[field] || '—');
         case 'guestOsFamily':
-          return esc(snapshot.guestOsFamily || 'Not set');
+          return esc(snapshot.guestOsFamily || 'Linux');
         case 'diskImageId': {
           const disk = getCatalogDiskImage(snapshot.diskImageId);
           return disk ? esc(`${disk.title} (${disk.family} · ${disk.arch})`) : '—';
@@ -21297,22 +21499,24 @@
         case 'initMethod':
           return snapshot.initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
         case 'initDefaultMode':
-          return snapshot.initDefaultMode === 'provide' ? 'Provide default' : 'No default';
+          return snapshot.initDefaultMode === 'provide' ? 'Default set' : 'No default';
         case 'cloudInit':
         case 'sysprep':
-          return snapshot[field] ? 'Configured' : 'Not configured';
+          return snapshot[field] ? 'Configured' : 'No default';
         case 'cloudInitSource':
           return snapshot.cloudInitSource === 'secret' ? 'Select secret' : 'Enter value';
         case 'cloudInitSecretId':
-        case 'sshSecretId':
-          return snapshot[field] ? esc(secretDisplayName(snapshot[field]) || snapshot[field]) : 'Not configured';
+        case 'sysprepSecretId':
+          return snapshot[field] ? esc(secretDisplayName(snapshot[field]) || snapshot[field]) : 'No default';
+        case 'sysprepMode':
+          return snapshot.sysprepMode === 'attach' ? 'Attach existing Sysprep' : 'Create new Sysprep';
         case 'visibility':
           if (snapshot.visibility === 'tenant') {
             const tenants = snapshot.tenants ? snapshot.tenants.split('|').filter(Boolean) : [];
             const names = tenants.map(id => providerTenantById(id)?.name || id);
-            return esc(`Tenant scoped (${names.join(', ') || '—'})`);
+            return esc(names[0] || '—');
           }
-          return 'Global public';
+          return 'Global';
         case 'extraDisksJson': {
           const disks = JSON.parse(snapshot.extraDisksJson || '[]');
           return disks.length
@@ -21334,7 +21538,7 @@
       { key: 'computeAccess', label: 'Instance type access' },
       { key: 'runStrategy', label: 'Run strategy' },
       { key: 'runStrategyAccess', label: 'Run strategy access' },
-      { key: 'visibility', label: 'Visibility' },
+      { key: 'visibility', label: 'Scope' },
       { key: 'bootDiskGiB', label: 'Boot disk size' },
       { key: 'bootDiskAccess', label: 'Boot disk size access' },
       { key: 'bootStorageTierId', label: 'Boot storage tier' },
@@ -21342,12 +21546,12 @@
       { key: 'extraDisksJson', label: 'Additional disks' },
       { key: 'extraDisksAccess', label: 'Additional disks access' },
       { key: 'initMethod', label: 'Initialization' },
-      { key: 'initDefaultMode', label: 'User data default' },
       { key: 'cloudInit', label: 'Cloud-init' },
       { key: 'cloudInitSource', label: 'Cloud-init source' },
       { key: 'cloudInitSecretId', label: 'Cloud-init secret' },
-      { key: 'sshSecretId', label: 'SSH public key' },
+      { key: 'sysprepMode', label: 'Sysprep mode' },
       { key: 'sysprep', label: 'Sysprep' },
+      { key: 'sysprepSecretId', label: 'Sysprep secret' },
       { key: 'initAccess', label: 'User data access' },
     ];
 
@@ -21370,12 +21574,52 @@
     }
 
     function catalogPublishScopeFields(c) {
+      hydrateCatalogScope(c);
+      applyCatalogScope(c);
       const visibility = c.visibility === 'tenant' ? 'tenant' : 'global';
       return {
         visibility,
         visibilityLabel: visibility === 'tenant' ? 'Tenant scoped' : 'Global public',
         tenants: visibility === 'tenant' ? [...(c.tenants || [])] : [],
       };
+    }
+
+    function hydrateCatalogScope(c) {
+      if (!c) return;
+      if (typeof c.isGlobal !== 'boolean') {
+        c.isGlobal = (c.visibility || 'global') !== 'tenant';
+      }
+      if (!c.tenantId) c.tenantId = (c.tenants || [])[0] || '';
+      if (!c.fieldErrors) c.fieldErrors = {};
+    }
+
+    function applyCatalogScope(c) {
+      if (!c) return;
+      if (c.isGlobal) {
+        c.visibility = 'global';
+        c.tenants = [];
+      } else {
+        c.visibility = 'tenant';
+        c.tenants = c.tenantId ? [c.tenantId] : [];
+      }
+    }
+
+    function catalogScopeReviewValue(c) {
+      hydrateCatalogScope(c);
+      if (c.isGlobal) return 'Global';
+      return providerTenantById(c.tenantId)?.name || '—';
+    }
+
+    function catalogNameConflicts(name, c) {
+      if (!name) return false;
+      const scopedTenant = c.isGlobal ? null : (c.tenantId || '');
+      return PROVIDER_CATALOG_ITEMS.some(item => {
+        if (state.catalogEditId && item.id === state.catalogEditId) return false;
+        if (item.name !== name) return false;
+        const itemGlobal = item.visibility !== 'tenant';
+        if (c.isGlobal) return itemGlobal;
+        return !itemGlobal && ((item.tenants || [])[0] || '') === scopedTenant;
+      });
     }
 
     function findCatalogDiskImageIdByTitle(title) {
@@ -21388,15 +21632,6 @@
       return {
         title: 'No default',
         desc: `Tenants choose ${noun} when creating a virtual machine`,
-      };
-    }
-
-    function catalogComputeToggleSummary(id) {
-      const it = getCatalogInstanceType(id);
-      if (!it) return catalogNoDefaultCopy('an instance type');
-      return {
-        title: it.label || it.name,
-        desc: `${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)}`,
       };
     }
 
@@ -21441,21 +21676,27 @@
         || (item.computeLocked === false ? 'editable' : (item.instanceTypeId ? 'locked' : 'editable'));
       const diskImageAccess = item.diskImageAccess
         || (item.diskLocked === false ? 'editable' : (diskImageId ? 'locked' : 'editable'));
+      const visibility = item.visibility === 'tenant' ? 'tenant' : 'global';
+      const tenantId = visibility === 'tenant' ? ((item.tenants || [])[0] || '') : '';
       state.catalogCreate = {
         step: 0,
-        maxVisited: 5,
+        maxVisited: catalogStepsForRole().length - 1,
         name: item.name,
         description: item.description || '',
-        guestOsFamily: item.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : ''),
+        guestOsFamily: item.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : 'Linux'),
         diskImageId,
         diskImageAccess,
         computeAccess,
         tenantAccess: computeAccess,
         instanceTypeId: item.instanceTypeId || item.computeResourceId || '',
+        showGpuIts: catalogInstanceTypeHasGpu(item.instanceTypeId || item.computeResourceId || ''),
         runStrategy: item.runStrategy || '',
         runStrategyAccess: item.runStrategyAccess || 'editable',
-        visibility: item.visibility || 'global',
-        tenants: [...(item.tenants || [])],
+        visibility,
+        tenants: tenantId ? [tenantId] : [],
+        isGlobal: visibility !== 'tenant',
+        tenantId,
+        fieldErrors: {},
         bootDiskGiB: item.bootDiskGiB != null ? item.bootDiskGiB : null,
         bootDiskAccess: item.bootDiskAccess || 'editable',
         bootStorageTierId: item.bootStorageTierId || '',
@@ -21466,10 +21707,16 @@
         cloudInit: item.cloudInit || '',
         cloudInitSource: item.cloudInitSource === 'secret' ? 'secret' : 'inline',
         cloudInitSecretId: item.cloudInitSecretId || '',
-        sshSecretId: item.sshSecretId || '',
+        sshSecretId: '',
         sysprep: item.sysprep || '',
+        sysprepMode: item.sysprepMode === 'attach' ? 'attach' : 'create',
+        sysprepSecretId: item.sysprepSecretId || '',
+        sysprepFileName: item.sysprepFileName || '',
         initDefaultMode: (
-          String(item.sysprep || '').trim() || String(item.cloudInit || '').trim() || item.cloudInitSecretId
+          String(item.sysprep || '').trim()
+          || String(item.cloudInit || '').trim()
+          || item.cloudInitSecretId
+          || item.sysprepSecretId
         ) ? 'provide' : 'none',
         initAccess: item.initAccess || (item.initLocked ? 'locked' : 'editable'),
         tenantAccessExpanded: false,
@@ -21622,46 +21869,33 @@
       if (key === 'ci-details') {
         beginCatalogAccessSwitchRender();
         if (!c.diskImageAccess) c.diskImageAccess = 'editable';
-        const diskImages = filteredCatalogDiskImages('', c.diskImageFilter);
+        if (!c.guestOsFamily) c.guestOsFamily = 'Linux';
+        if (c.diskImageMenuOpen == null) c.diskImageMenuOpen = false;
+        if (c.diskImageFilter == null) c.diskImageFilter = '';
         if (c.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(d => d.id === c.diskImageId)) {
           c.diskImageId = '';
         }
-        const selectedDisk = getCatalogDiskImage(c.diskImageId);
-        if (selectedDisk) {
-          c.guestOsFamily = guestOsFamilyFromDiskImage(selectedDisk);
-        } else {
-          c.guestOsFamily = '';
+        const filteredForFamily = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
+        if (c.diskImageId && !filteredForFamily.some(x => x.id === c.diskImageId)) {
+          c.diskImageId = '';
         }
-        const diskNone = catalogNoDefaultCopy('a disk image');
-        const diskToggleTitle = selectedDisk ? selectedDisk.title : diskNone.title;
-        const diskToggleDesc = selectedDisk
-          ? `${selectedDisk.guestOs || selectedDisk.family} · ${selectedDisk.arch}`
-          : diskNone.desc;
-        const derivedOsHtml = selectedDisk
-          ? `<p class="form-helper" id="ci-derived-os">Guest operating system: <strong>${String(c.guestOsFamily || 'Unspecified').replace(/</g, '&lt;')}</strong> (from disk image)</p>`
-          : '<p class="form-helper">Guest operating system is derived from the disk image when one is set.</p>';
-        const diskOptionsHtml = `
-                  <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.diskImageId ? 'pf-m-selected' : ''}" data-disk-image="" role="option">
-                    <span class="pf-v6-c-menu__item-main">
-                      <span class="rich-select__option-body">
-                        <span class="rich-select__option-title">${diskNone.title}</span>
-                        <span class="rich-select__option-desc">${diskNone.desc}</span>
-                      </span>
-                    </span>
-                  </button>
-                  ${diskImages.map(d => `
-                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${d.id === c.diskImageId ? 'pf-m-selected' : ''}" data-disk-image="${d.id}" role="option">
-                      <span class="pf-v6-c-menu__item-main">
-                        <span class="rich-select__option-body">
-                          <span class="rich-select__option-title">${d.title}</span>
-                          <span class="rich-select__option-desc">${d.guestOs || d.family} · ${d.arch}</span>
-                        </span>
-                      </span>
-                    </button>
-                  `).join('') || ''}`;
+        const providerScope = isProviderCatalogRole();
+        if (providerScope) {
+          hydrateCatalogScope(c);
+          c.fieldErrors = {
+            ...(c.fieldErrors || {}),
+            name: state.fieldErrors.ciName,
+            tenant: state.fieldErrors.ciTenants,
+          };
+        }
+        const detailsHelp = providerScope
+          ? 'Assign the catalog item to a tenant (or make it global), then enter a name. Names are unique per tenant.'
+          : 'Name this catalog item and optionally choose a default disk image.';
+        const scopeHtml = providerScope ? renderTenantEditor('ci', c) : '';
         panel.innerHTML = `
           <h3>Details</h3>
-          <p class="create-resource-wiz__help">Set the catalog item identity and optionally a default disk image for tenants.</p>
+          <p class="create-resource-wiz__help">${detailsHelp}</p>
+          ${scopeHtml}
           <div class="form-field ${state.fieldErrors.ciName ? 'pf-m-error' : ''}">
             <label for="ci-name">Name <span class="req">*</span></label>
             <div class="name-row">
@@ -21680,72 +21914,100 @@
             <textarea id="ci-description" rows="3">${String(c.description || '').replace(/</g, '&lt;')}</textarea>
           </div>
           <hr class="form-section-divider" />
-          <div class="form-field ${state.fieldErrors.ciDiskImage ? 'pf-m-error' : ''}">
-            ${renderCatalogFieldLabelRow({
-              labelHtml: 'Disk image',
-              labelId: 'ci-disk-image-label',
-              tag: 'label',
-              stateKey: 'diskImageAccess',
-              value: c.diskImageAccess || 'editable',
+          ${renderCatalogFieldLabelRow({
+            labelHtml: 'Disk image',
+            labelId: 'ci-disk-image-heading',
+            tag: 'h3',
+            stateKey: 'diskImageAccess',
+            value: c.diskImageAccess || 'editable',
+          })}
+          <p class="step-help">Choose the guest operating system and disk image for this catalog item.</p>
+          <div class="form-field" id="ci-guest-os-field">
+            <label id="ci-guest-os-label">Select guest operating system</label>
+            ${renderGuestOsSelectBoxes({
+              name: 'ciGuestOs',
+              selected: c.guestOsFamily || 'Linux',
+              labelledBy: 'ci-guest-os-label',
             })}
-            <div class="rich-select rich-select--typeahead ${c.diskImageMenuOpen ? 'pf-m-expanded' : ''}" id="ci-disk-image-select">
-              ${pfRichSelectToggle({
-                id: 'ci-disk-image-toggle',
-                ariaLabelledby: 'ci-disk-image-label',
-                ariaExpanded: c.diskImageMenuOpen,
-                stacked: true,
-                mainHtml: `
-                  <span class="rich-select__toggle-label">${diskToggleTitle}</span>
-                  <span class="rich-select__toggle-desc">${diskToggleDesc}</span>
-                `,
-              })}
-              <div class="pf-v6-c-menu rich-select__menu" id="ci-disk-image-menu" role="listbox" ${c.diskImageMenuOpen ? '' : 'hidden'}>
-                <div class="rich-select__search">
-                  <i class="fa-solid fa-search" aria-hidden="true"></i>
-                  <input type="search" id="ci-disk-image-search" placeholder="Search disk images" value="${String(c.diskImageFilter || '').replace(/"/g, '&quot;')}" aria-label="Search disk images" />
-                </div>
-                <hr class="rich-select__menu-divider" />
-                <div class="rich-select__menu-list">
-                  ${diskOptionsHtml}
-                </div>
-              </div>
-            </div>
-            ${derivedOsHtml}
+          </div>
+          <div class="form-field ${state.fieldErrors.ciDiskImage ? 'pf-m-error' : ''}" data-field="ciDiskImage" style="margin-top:16px;">
+            <label id="ci-disk-image-label">Select the image reference${catalogReqStar(c.diskImageAccess)}</label>
+            ${renderTypeaheadRichSelectHtml({
+              rootId: 'ci-disk-image-select',
+              toggleId: 'ci-disk-image-toggle',
+              menuId: 'ci-disk-image-menu',
+              searchId: 'ci-disk-image-search',
+              labelId: 'ci-disk-image-label',
+              open: !!c.diskImageMenuOpen,
+              filter: c.diskImageFilter || '',
+              searchPlaceholder: 'Search disk images',
+              selectedId: c.diskImageId || '',
+              placeholder: 'Select a disk image',
+              optionAttr: 'data-ci-disk-image',
+              emptyNoun: 'disk images',
+              invalid: !!state.fieldErrors.ciDiskImage,
+              describedBy: state.fieldErrors.ciDiskImage ? 'err-ciDiskImage' : 'ci-disk-image-help',
+              options: filteredForFamily.map(img => ({
+                id: img.id,
+                title: img.title,
+                desc: `${img.family} · ${img.arch}`,
+              })),
+            })}
+            <p class="form-helper" id="ci-disk-image-help">Guest operating system is derived from the disk image when one is set.</p>
             ${providerFieldErrorHtml(state.fieldErrors.ciDiskImage, 'err-ciDiskImage')}
           </div>
         `;
         panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
           c.name = generateCatalogItemName();
           delete state.fieldErrors.ciName;
+          if (c.fieldErrors) delete c.fieldErrors.name;
           const input = panel.querySelector('#ci-name');
           if (input) input.value = c.name;
           renderCreateCatalogItemWizard();
         });
-        bindCatalogAccessSwitches(panel, c);
-        bindRichSelect(panel.querySelector('#ci-disk-image-select'), {
-          toggleSel: '#ci-disk-image-toggle',
-          menuSel: '#ci-disk-image-menu',
-          optionSel: '[data-disk-image]',
-          onOpen: () => { c.diskImageMenuOpen = true; },
-          onClose: () => { c.diskImageMenuOpen = false; },
-          onSelect: opt => {
-            c.diskImageId = opt.dataset.diskImage || '';
-            const disk = getCatalogDiskImage(c.diskImageId);
-            if (disk) {
-              c.guestOsFamily = guestOsFamilyFromDiskImage(disk);
-              c.initMethod = initMethodForGuestOs(c.guestOsFamily);
-            } else {
-              c.guestOsFamily = '';
+        if (providerScope) {
+          bindTenantEditor('ci', c, () => {
+            applyCatalogScope(c);
+            if (c.isGlobal || c.tenantId) {
+              delete state.fieldErrors.ciTenants;
+              if (c.fieldErrors) delete c.fieldErrors.tenant;
             }
+            renderCreateCatalogItemWizard();
+          });
+        }
+        bindCatalogAccessSwitches(panel, c);
+        panel.querySelectorAll('input[name="ciGuestOs"]').forEach(r => {
+          r.addEventListener('change', () => {
+            readCatalogCreateFields();
+            c.guestOsFamily = r.value;
+            const options = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
+            if (c.diskImageId && !options.some(o => o.id === c.diskImageId)) {
+              c.diskImageId = '';
+            }
+            syncCatalogInitForGuestOs(c);
+            c.diskImageMenuOpen = false;
+            renderCreateCatalogItemWizard();
+          });
+        });
+        wireTypeaheadRichSelect(panel, {
+          rootId: 'ci-disk-image-select',
+          toggleId: 'ci-disk-image-toggle',
+          menuId: 'ci-disk-image-menu',
+          searchId: 'ci-disk-image-search',
+          optionSel: '[data-ci-disk-image]',
+          getOptionId: opt => opt.dataset.ciDiskImage,
+          setOpen: (open) => { c.diskImageMenuOpen = open; },
+          setFilter: (v) => { c.diskImageFilter = v; },
+          onSelectId: (id) => {
+            applyDiskImageToCatalog(c, id);
+            c.diskImageMenuOpen = false;
+            c.diskImageFilter = '';
             delete state.fieldErrors.ciDiskImage;
             renderCreateCatalogItemWizard();
           },
+          rerender: renderCreateCatalogItemWizard,
         });
-        panel.querySelector('#ci-disk-image-search')?.addEventListener('input', e => {
-          c.diskImageFilter = e.target.value;
-          renderCreateCatalogItemWizard();
-          panel.querySelector('#ci-disk-image-search')?.focus();
-        });
+        restoreRichSearchFocus(panel);
         return;
       }
 
@@ -21756,15 +22018,13 @@
         if (!c.runStrategyAccess) c.runStrategyAccess = 'editable';
         const instanceTypeId = c.instanceTypeId || c.computeResourceId || '';
         c.instanceTypeId = instanceTypeId;
-        const computeToggle = catalogComputeToggleSummary(instanceTypeId);
-        const computeOptions = CATALOG_INSTANCE_TYPE_OPTIONS.filter(opt => {
-          const it = getCatalogInstanceType(opt.id);
-          if (!it) return false;
-          const q = (c.computeFilter || '').toLowerCase();
-          if (!q) return true;
-          const hay = `${it.label} ${it.cpu} ${it.memoryGiB} ${it.gpuResource} ${opt.rateHour}`.toLowerCase();
-          return hay.includes(q);
-        });
+        const showGpuIts = !!c.showGpuIts;
+        const requireGpu = showGpuIts;
+        const gpuPool = filteredCatalogInstanceTypeOptions('', { requireGpu });
+        if (c.instanceTypeId && !gpuPool.some(o => o.id === c.instanceTypeId)) {
+          c.instanceTypeId = '';
+        }
+        const computeOptions = filteredCatalogInstanceTypeOptions(c.computeFilter, { requireGpu });
         const runNone = catalogNoDefaultCopy('a run strategy');
         const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
         const runToggleTitle = runOpt ? runOpt.label : runNone.title;
@@ -21774,64 +22034,50 @@
           if (!q) return true;
           return `${o.label} ${o.desc}`.toLowerCase().includes(q);
         });
+        const computeLocked = c.computeAccess === 'locked';
+        const computeHelp = computeLocked
+          ? 'Choose an instance type. Use the GPU checkbox to switch between instance types with and without a GPU.'
+          : 'Choose an instance type, or leave empty for no default. Use the GPU checkbox to switch between instance types with and without a GPU.';
         panel.innerHTML = `
           <h3>Instance types</h3>
-          <p class="create-resource-wiz__help">Optionally set instance type defaults for this catalog item. Leave fields as No default if tenants should choose when creating a virtual machine.</p>
-          <div class="form-field">
+          <p class="create-resource-wiz__help">${computeHelp}</p>
+          <div class="form-field ${state.fieldErrors.ciInstanceType ? 'pf-m-error' : ''}">
             ${renderCatalogFieldLabelRow({
-              labelHtml: 'Instance type',
+              labelHtml: `Instance type${catalogReqStar(c.computeAccess)}`,
               labelId: 'ci-compute-section-label',
               tag: 'h4',
               labelClass: 'config-section-title config-section-title--first',
               stateKey: 'computeAccess',
               value: c.computeAccess || 'editable',
             })}
-            <div class="rich-select rich-select--typeahead ${c.computeMenuOpen ? 'pf-m-expanded' : ''}" id="ci-compute-select">
-              ${pfRichSelectToggle({
-                id: 'ci-compute-toggle',
-                ariaLabelledby: 'ci-compute-section-label',
-                ariaExpanded: c.computeMenuOpen,
-                stacked: true,
-                mainHtml: `
-                  <span class="rich-select__toggle-label">${computeToggle.title}</span>
-                  ${computeToggle.desc ? `<span class="rich-select__toggle-desc">${computeToggle.desc}</span>` : ''}
-                `,
-              })}
-              <div class="pf-v6-c-menu rich-select__menu" id="ci-compute-menu" role="listbox" ${c.computeMenuOpen ? '' : 'hidden'}>
-                <div class="rich-select__search">
-                  <i class="fa-solid fa-search" aria-hidden="true"></i>
-                  <input type="search" id="ci-compute-search" placeholder="Search instance types" value="${String(c.computeFilter || '').replace(/"/g, '&quot;')}" aria-label="Search instance types" />
-                </div>
-                <hr class="rich-select__menu-divider" />
-                <div class="rich-select__menu-list">
-                  <button type="button" class="pf-v6-c-menu__item rich-select__option ${!instanceTypeId ? 'pf-m-selected' : ''}" data-compute="" role="option">
-                    <span class="pf-v6-c-menu__item-main">
-                      <span class="rich-select__option-body">
-                        <span class="rich-select__option-title">No default</span>
-                        <span class="rich-select__option-desc">Tenants choose an instance type when creating a virtual machine</span>
-                      </span>
-                    </span>
-                  </button>
-                  ${computeOptions.length ? computeOptions.map(opt => {
-                    const it = getCatalogInstanceType(opt.id);
-                    return `
-                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${opt.id === instanceTypeId ? 'pf-m-selected' : ''}" data-compute="${opt.id}" role="option">
-                      <span class="pf-v6-c-menu__item-main">
-                        <span class="rich-select__option-body">
-                          <span class="rich-select__option-title">${it.label}</span>
-                          <span class="rich-select__option-desc">${Number(it.cpu) === 1 ? '1 vCPU' : `${it.cpu} vCPUs`} · ${it.memoryGiB} GB · ${formatCatalogInstanceTypeGpu(it)} · ${opt.rateHour}</span>
-                        </span>
-                      </span>
-                    </button>`;
-                  }).join('') : emptyStateMenuSearchHtml('instance types')}
-                </div>
-              </div>
-            </div>
+            <label class="form-check form-check--gpu-filter" for="ci-show-gpu-its">
+              <input type="checkbox" id="ci-show-gpu-its" ${showGpuIts ? 'checked' : ''} />
+              Show instance types with GPU
+            </label>
+            ${renderTypeaheadRichSelectHtml({
+              rootId: 'ci-compute-select',
+              toggleId: 'ci-compute-toggle',
+              menuId: 'ci-compute-menu',
+              searchId: 'ci-compute-search',
+              labelId: 'ci-compute-section-label',
+              open: !!c.computeMenuOpen,
+              filter: c.computeFilter || '',
+              searchPlaceholder: 'Search instance types',
+              selectedId: c.instanceTypeId || '',
+              placeholder: 'Select an instance type',
+              optionAttr: 'data-ci-compute',
+              emptyNoun: 'instance types',
+              stacked: true,
+              invalid: !!state.fieldErrors.ciInstanceType,
+              describedBy: state.fieldErrors.ciInstanceType ? 'err-ciInstanceType' : '',
+              options: computeOptions.map(catalogInstanceTypeOptionMeta),
+            })}
+            ${providerFieldErrorHtml(state.fieldErrors.ciInstanceType, 'err-ciInstanceType')}
           </div>
           <hr class="form-section-divider" />
-          <div class="form-field">
+          <div class="form-field ${state.fieldErrors.ciRunStrategy ? 'pf-m-error' : ''}">
             ${renderCatalogFieldLabelRow({
-              labelHtml: 'Run strategy',
+              labelHtml: `Run strategy${catalogReqStar(c.runStrategyAccess)}`,
               labelId: 'ci-run-strategy-label',
               tag: 'h4',
               labelClass: 'config-section-title',
@@ -21877,21 +22123,37 @@
                 </div>
               </div>
             </div>
+            ${providerFieldErrorHtml(state.fieldErrors.ciRunStrategy, 'err-ciRunStrategy')}
           </div>
         `;
         bindCatalogAccessSwitches(panel, c);
-        bindRichSelect(panel.querySelector('#ci-compute-select'), {
-          toggleSel: '#ci-compute-toggle',
-          menuSel: '#ci-compute-menu',
-          optionSel: '[data-compute]',
-          onOpen: () => { c.computeMenuOpen = true; },
-          onClose: () => { c.computeMenuOpen = false; },
-          onSelect: opt => { c.instanceTypeId = opt.dataset.compute || ''; renderCreateCatalogItemWizard(); },
-        });
-        panel.querySelector('#ci-compute-search')?.addEventListener('input', e => {
-          c.computeFilter = e.target.value;
+        panel.querySelector('#ci-show-gpu-its')?.addEventListener('change', e => {
+          c.showGpuIts = !!e.target.checked;
+          c.computeMenuOpen = false;
+          c.computeFilter = '';
+          const pool = filteredCatalogInstanceTypeOptions('', { requireGpu: c.showGpuIts });
+          if (c.instanceTypeId && !pool.some(o => o.id === c.instanceTypeId)) {
+            c.instanceTypeId = '';
+          }
           renderCreateCatalogItemWizard();
-          panel.querySelector('#ci-compute-search')?.focus();
+        });
+        wireTypeaheadRichSelect(panel, {
+          rootId: 'ci-compute-select',
+          toggleId: 'ci-compute-toggle',
+          menuId: 'ci-compute-menu',
+          searchId: 'ci-compute-search',
+          optionSel: '[data-ci-compute]',
+          getOptionId: opt => opt.dataset.ciCompute,
+          setOpen: (open) => { c.computeMenuOpen = open; },
+          setFilter: (v) => { c.computeFilter = v; },
+          onSelectId: (id) => {
+            c.instanceTypeId = id || '';
+            c.computeMenuOpen = false;
+            c.computeFilter = '';
+            delete state.fieldErrors.ciInstanceType;
+            renderCreateCatalogItemWizard();
+          },
+          rerender: renderCreateCatalogItemWizard,
         });
         bindRichSelect(panel.querySelector('#ci-run-strategy-select'), {
           toggleSel: '#ci-run-strategy-toggle',
@@ -21899,13 +22161,18 @@
           optionSel: '[data-run-strategy]',
           onOpen: () => { c.runStrategyMenuOpen = true; },
           onClose: () => { c.runStrategyMenuOpen = false; },
-          onSelect: opt => { c.runStrategy = opt.dataset.runStrategy || ''; renderCreateCatalogItemWizard(); },
+          onSelect: opt => {
+            c.runStrategy = opt.dataset.runStrategy || '';
+            delete state.fieldErrors.ciRunStrategy;
+            renderCreateCatalogItemWizard();
+          },
         });
         panel.querySelector('#ci-run-strategy-search')?.addEventListener('input', e => {
           c.runStrategyFilter = e.target.value;
           renderCreateCatalogItemWizard();
           panel.querySelector('#ci-run-strategy-search')?.focus();
         });
+        restoreRichSearchFocus(panel);
         return;
       }
 
@@ -21992,23 +22259,26 @@
           <h3>Storage</h3>
           <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields as No default if tenants should choose when creating a virtual machine.</p>
           <div class="vm-config__fields">
-            <div class="form-field">
+            <div class="form-field ${state.fieldErrors.ciBootDisk ? 'pf-m-error' : ''}">
               ${renderCatalogFieldLabelRow({
-                labelHtml: 'Boot disk size (GiB)',
+                labelHtml: `Boot disk size (GiB)${catalogReqStar(c.bootDiskAccess)}`,
                 labelId: 'ci-boot-disk-label',
                 forId: 'ci-boot-disk',
                 stateKey: 'bootDiskAccess',
                 value: c.bootDiskAccess || 'editable',
               })}
               <input type="number" id="ci-boot-disk" class="unit-size-input" value="${bootSizeVal}"
-                min="${diskMin}" max="${diskMax}" step="1" placeholder="No default"
-                aria-label="Boot disk size in GiB" />
-              <p class="form-helper">Optional. Clear the field to leave as No default.</p>
+                min="${diskMin}" max="${diskMax}" step="1"
+                placeholder="${c.bootDiskAccess === 'locked' ? '' : 'No default'}"
+                aria-label="Boot disk size in GiB"
+                ${state.fieldErrors.ciBootDisk ? 'aria-invalid="true" aria-describedby="err-ciBootDisk"' : ''} />
+              <p class="form-helper">${c.bootDiskAccess === 'locked' ? 'Required when Locked.' : 'Optional. Clear the field to leave as No default.'}</p>
+              ${providerFieldErrorHtml(state.fieldErrors.ciBootDisk, 'err-ciBootDisk')}
             </div>
             <hr class="form-section-divider" />
-            <div class="form-field">
+            <div class="form-field ${state.fieldErrors.ciBootTier ? 'pf-m-error' : ''}">
               ${renderCatalogFieldLabelRow({
-                labelHtml: 'Boot storage tier',
+                labelHtml: `Boot storage tier${catalogReqStar(c.bootStorageTierAccess)}`,
                 labelId: 'ci-boot-tier-label',
                 stateKey: 'bootStorageTierAccess',
                 value: c.bootStorageTierAccess || 'editable',
@@ -22052,6 +22322,7 @@
                   </div>
                 </div>
               </div>
+              ${providerFieldErrorHtml(state.fieldErrors.ciBootTier, 'err-ciBootTier')}
             </div>
             <hr class="form-section-divider" />
             ${extraDisks.length ? renderCatalogFieldLabelRow({
@@ -22157,385 +22428,257 @@
       }
 
 
-      if (key === 'ci-visibility') {
-        const tenants = typeof PROVIDER_TENANTS !== 'undefined' ? PROVIDER_TENANTS : [];
-        const filter = (c.tenantFilter || '').trim().toLowerCase();
-        const tenantOptions = tenants.filter(t =>
-          !filter || `${t.name} ${t.domain} ${t.id}`.toLowerCase().includes(filter)
-        );
-        const selectedTenants = new Set(c.tenants || []);
-        const selectedList = (c.tenants || [])
-          .map(id => providerTenantById(id) || { id, name: id, domain: '' });
-        const chipsHtml = selectedList.length ? `
-          <div class="tenant-multi__chips" id="ci-tenants-chips" aria-label="Selected tenants">
-            ${selectedList.map(t => `
-              <span class="label-chip">
-                ${escAttr(t.name)}
-                <button type="button" class="label-chip__remove" data-tenant-remove="${escAttr(t.id)}"
-                  aria-label="Remove ${escAttr(t.name)}">×</button>
-              </span>`).join('')}
-          </div>` : '';
-        const listHtml = c.tenantMenuOpen ? `
-          <ul class="tenant-typeahead__list" role="listbox" id="ci-tenant-list" aria-multiselectable="true">
-            ${tenantOptions.length ? tenantOptions.map(t => {
-              const selected = selectedTenants.has(t.id);
-              return `
-              <li role="none">
-                <button type="button" class="tenant-typeahead__option${selected ? ' pf-m-selected' : ''}"
-                  role="option" data-tenant-id="${escAttr(t.id)}"
-                  aria-selected="${selected ? 'true' : 'false'}">
-                  <span class="tenant-multi__option-row">
-                    <span class="tenant-multi__check" aria-hidden="true"><i class="fas fa-check"></i></span>
-                    <span>
-                      <span class="tenant-typeahead__option-title">${escAttr(t.name)}</span>
-                      <span class="tenant-typeahead__option-sub">${escAttr(t.domain)}</span>
-                    </span>
-                  </span>
-                </button>
-              </li>`;
-            }).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No tenants found</span></li>'}
-          </ul>` : '';
-        panel.innerHTML = `
-          <h3 id="ci-visibility-label">Visibility</h3>
-          <p class="create-resource-wiz__help">Control which tenants can discover and order this catalog item.</p>
-          <div class="form-field">
-            ${renderVisibilitySelectBoxes({
-              name: 'ciVisibility',
-              selected: c.visibility || 'global',
-              labelledBy: 'ci-visibility-label',
-            })}
-          </div>
-          ${c.visibility === 'tenant' ? `
-          <div class="form-field ${state.fieldErrors.ciTenants ? 'pf-m-error' : ''}" style="margin-top:20px;">
-            <label for="ci-tenant-search">Tenants <span class="req">*</span></label>
-            ${chipsHtml}
-            <div class="tenant-typeahead${c.tenantMenuOpen ? ' pf-m-expanded' : ''}" id="ci-tenants-multi">
-              <div class="tenant-typeahead__control">
-                <input type="text" id="ci-tenant-search" class="tenant-typeahead__input"
-                  value="${escAttr(c.tenantFilter || '')}"
-                  placeholder="Search and select tenants" autocomplete="off"
-                  aria-autocomplete="list" aria-expanded="${c.tenantMenuOpen ? 'true' : 'false'}"
-                  aria-controls="ci-tenant-list" />
-                <button type="button" class="tenant-typeahead__toggle" id="ci-tenants-toggle"
-                  aria-label="Toggle tenant list" aria-expanded="${c.tenantMenuOpen ? 'true' : 'false'}">
-                  <i class="fas fa-angle-down" aria-hidden="true"></i>
-                </button>
-              </div>
-              ${listHtml}
-            </div>
-            ${state.fieldErrors.ciTenants
-              ? providerFieldErrorHtml(state.fieldErrors.ciTenants, 'err-ciTenants')
-              : '<p class="form-helper">Search scales for large tenant lists. Select one or more tenants.</p>'}
-          </div>` : ''}
-        `;
-        panel.querySelectorAll('input[name="ciVisibility"]').forEach(r => {
-          r.addEventListener('change', () => {
-            c.visibility = r.value;
-            if (c.visibility === 'global') {
-              c.tenants = [];
-              c.tenantFilter = '';
-              c.tenantMenuOpen = false;
-            }
-            delete state.fieldErrors.ciTenants;
-            renderCreateCatalogItemWizard();
-          });
-        });
-        const openTenantMenu = (clearFilter = false) => {
-          c.tenantMenuOpen = true;
-          if (clearFilter) c.tenantFilter = '';
-          renderCreateCatalogItemWizard();
-          requestAnimationFrame(() => panel.querySelector('#ci-tenant-search')?.focus());
-        };
-        panel.querySelector('#ci-tenants-toggle')?.addEventListener('mousedown', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (c.tenantMenuOpen) {
-            c.tenantMenuOpen = false;
-            renderCreateCatalogItemWizard();
-          } else {
-            openTenantMenu(false);
-          }
-        });
-        const search = panel.querySelector('#ci-tenant-search');
-        search?.addEventListener('focus', () => {
-          if (!c.tenantMenuOpen) openTenantMenu(false);
-        });
-        search?.addEventListener('input', e => {
-          c.tenantFilter = e.target.value;
-          c.tenantMenuOpen = true;
-          renderCreateCatalogItemWizard();
-          requestAnimationFrame(() => {
-            const el = panel.querySelector('#ci-tenant-search');
-            if (el) {
-              el.focus();
-              const len = el.value.length;
-              el.setSelectionRange(len, len);
-            }
-          });
-        });
-        panel.querySelectorAll('#ci-tenant-list [data-tenant-id]').forEach(btn => {
-          btn.addEventListener('mousedown', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            const id = btn.dataset.tenantId;
-            const set = new Set(c.tenants || []);
-            if (set.has(id)) set.delete(id);
-            else set.add(id);
-            c.tenants = [...set];
-            if (c.tenants.length) delete state.fieldErrors.ciTenants;
-            renderCreateCatalogItemWizard();
-            requestAnimationFrame(() => panel.querySelector('#ci-tenant-search')?.focus());
-          });
-        });
-        panel.querySelectorAll('[data-tenant-remove]').forEach(btn => {
-          btn.addEventListener('click', e => {
-            e.preventDefault();
-            const id = btn.dataset.tenantRemove;
-            c.tenants = (c.tenants || []).filter(t => t !== id);
-            renderCreateCatalogItemWizard();
-          });
-        });
-        if (c.tenantMenuOpen) {
-          const onDoc = e => {
-            const root = panel.querySelector('#ci-tenants-multi');
-            if (root && !root.contains(e.target)) {
-              c.tenantMenuOpen = false;
-              document.removeEventListener('mousedown', onDoc, true);
-              renderCreateCatalogItemWizard();
-            }
-          };
-          setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
-        }
-        return;
-      }
-
       if (key === 'ci-access-init') {
         beginCatalogAccessSwitchRender();
         if (c.cloudInit == null) c.cloudInit = '';
         if (c.sysprep == null) c.sysprep = '';
         if (!c.initAccess) c.initAccess = 'editable';
+        if (!c.guestOsFamily) c.guestOsFamily = 'Linux';
         const windowsCatalog = c.guestOsFamily === 'Microsoft Windows';
-        if (!c.initMethod) {
-          c.initMethod = c.guestOsFamily
-            ? initMethodForGuestOs(c.guestOsFamily)
-            : 'cloud-init';
-        }
-        // Align with OSAC-5009: Windows catalog defaults use Unattend.xml only
-        if (windowsCatalog) c.initMethod = 'sysprep';
-        else c.initMethod = 'cloud-init';
-        if (c.initDefaultMode !== 'provide' && c.initDefaultMode !== 'none') {
-          const hasDefault = windowsCatalog
-            ? !!(c.sysprep && String(c.sysprep).trim())
-            : !!(c.cloudInit && String(c.cloudInit).trim());
-          c.initDefaultMode = hasDefault ? 'provide' : 'none';
-        }
+        c.initMethod = windowsCatalog ? 'sysprep' : 'cloud-init';
         if (!c.cloudInitSource) c.cloudInitSource = 'inline';
-        const provideDefault = c.initDefaultMode === 'provide';
+        ensureSysprepState(c);
+        const initLocked = c.initAccess === 'locked';
         const source = c.cloudInitSource === 'secret' ? 'secret' : 'inline';
-        const initValue = windowsCatalog ? (c.sysprep || '') : (c.cloudInit || '');
-        const initExpanded = !!(initValue && String(initValue).trim());
-        const initLabel = windowsCatalog ? 'Unattend.xml' : 'Cloud-init';
-        const initPlaceholder = windowsCatalog
-          ? 'Paste Unattend.xml content'
-          : 'Add cloud-init configuration';
-        const initHelp = windowsCatalog
-          ? 'Optional Windows answer file default for tenants. Max 1 MiB. Stored as a secret at create time; never returned on GET. Attach existing secrets only when creating a VM.'
-          : 'Optional user data applied when the virtual machine starts.';
         const catalogProject = 'project-a';
-        const linuxSshHtml = windowsCatalog ? '' : `
-          <div class="form-field" style="margin-top:16px;">
-            <label id="ci-ssh-secret-label">SSH public key</label>
-            ${renderProjectSecretSelectHtml({
-              kind: 'ssh',
-              project: catalogProject,
-              selectedId: c.sshSecretId || '',
-              open: !!state.ciSshSecretMenuOpen,
-              filter: state.ciSshSecretFilter || '',
-              rootId: 'ci-ssh-secret-select',
-              toggleId: 'ci-ssh-secret-toggle',
-              menuId: 'ci-ssh-secret-menu',
-              searchId: 'ci-ssh-secret-search',
-              labelId: 'ci-ssh-secret-label',
-              optionAttr: 'data-ssh-secret',
-              hiddenInputId: 'ci-ssh-secret',
-              placeholder: 'Select an SSH public key',
-              searchPlaceholder: 'Search SSH secrets',
-              emptyNoun: 'SSH secrets',
+        const optionalBadge = initLocked ? '' : `
+            <span class="pf-v6-c-label pf-m-outline">
+              <span class="pf-v6-c-label__content">
+                <span class="pf-v6-c-label__text">Optional</span>
+              </span>
+            </span>`;
+        let initHtml = '';
+        if (windowsCatalog) {
+          const mode = c.sysprepMode === 'attach' ? 'attach' : 'create';
+          const secrets = sysprepSecretsForProject(catalogProject);
+          const hasUnattend = !!(c.sysprep && String(c.sysprep).trim());
+          const unattendName = c.sysprepFileName || '';
+          const secretOptions = secrets.map(s => ({
+            id: s.id,
+            title: s.name,
+            desc: s.project ? `Project: ${s.project}` : '',
+          }));
+          const sysprepHelp = initLocked
+            ? 'Supply an Unattend.xml for first-boot customization.'
+            : 'Supply an Unattend.xml for first-boot customization, or leave unset to boot without one.';
+          const createPanel = `
+            <div class="form-field ${state.fieldErrors.ciInit ? 'pf-m-error' : ''}" style="margin-top:16px;">
+              <label for="ci-unattend-xml">Unattend.xml${catalogReqStar(c.initAccess)}</label>
+              <div class="pf-v6-c-file-upload pf-m-show-details" id="ci-unattend-upload">
+                <div class="pf-v6-c-file-upload__file-select">
+                  <div class="pf-v6-c-input-group">
+                    <div class="pf-v6-c-input-group__item pf-m-fill">
+                      <span class="pf-v6-c-form-control">
+                        <input class="pf-v6-c-form-control__input" type="text" id="ci-unattend-filename" readonly
+                          value="${(unattendName || '').replace(/"/g, '&quot;')}"
+                          placeholder="Drag a file here or browse to upload"
+                          aria-label="Drag a file here or browse to upload" />
+                      </span>
+                    </div>
+                    <div class="pf-v6-c-input-group__item">
+                      <button type="button" class="pf-v6-c-button pf-m-control" id="ci-unattend-browse">Browse...</button>
+                    </div>
+                    <div class="pf-v6-c-input-group__item">
+                      <button type="button" class="pf-v6-c-button pf-m-control" id="ci-unattend-clear"
+                        ${hasUnattend || unattendName ? '' : 'disabled'}>Clear</button>
+                    </div>
+                  </div>
+                  <input type="file" id="ci-unattend-file" accept=".xml,text/xml,application/xml,text/plain" hidden
+                    aria-hidden="true" tabindex="-1" />
+                </div>
+                <div class="pf-v6-c-file-upload__file-details" id="ci-unattend-details">
+                  <span class="pf-v6-c-form-control pf-m-resize-vertical">
+                    <textarea id="ci-unattend-xml" class="pf-m-unattend${hasUnattend ? ' pf-m-has-content' : ''}" rows="8"
+                      aria-label="Unattend.xml" aria-describedby="ci-unattend-help"
+                      placeholder="Paste XML content">${String(c.sysprep || '').replace(/</g, '&lt;')}</textarea>
+                  </span>
+                </div>
+              </div>
+              <p class="form-helper" id="ci-unattend-help">Max size 1 MiB.</p>
+              ${providerFieldErrorHtml(state.fieldErrors.ciInit, 'err-ciInit')}
+            </div>
+          `;
+          const attachPanel = `
+            <div class="form-field ${state.fieldErrors.ciInit ? 'pf-m-error' : ''}" style="margin-top:16px;">
+              <label id="ci-sysprep-secret-label">Sysprep secret${catalogReqStar(c.initAccess)}</label>
+              ${secrets.length ? renderTypeaheadRichSelectHtml({
+                rootId: 'ci-sysprep-secret-select',
+                toggleId: 'ci-sysprep-secret-toggle',
+                menuId: 'ci-sysprep-secret-menu',
+                searchId: 'ci-sysprep-secret-search',
+                labelId: 'ci-sysprep-secret-label',
+                open: !!state.ciSysprepSecretMenuOpen,
+                filter: state.ciSysprepSecretFilter || '',
+                searchPlaceholder: 'Search Sysprep secrets',
+                selectedId: c.sysprepSecretId || '',
+                placeholder: 'Select a Sysprep secret',
+                optionAttr: 'data-ci-sysprep-secret',
+                hiddenInputId: 'ci-sysprep-secret',
+                describedBy: state.fieldErrors.ciInit ? 'err-ciInit' : 'ci-sysprep-secret-help',
+                emptyNoun: 'Sysprep secrets',
+                stacked: true,
+                invalid: !!state.fieldErrors.ciInit,
+                options: secretOptions,
+              }) : `<p class="sysprep-attach-empty" id="ci-sysprep-secret-help">No saved Sysprep secrets in this project yet. Create one when creating a VM with <strong>Save as secret</strong>.</p>`}
+              ${secrets.length && c.sysprepSecretId ? `
+                <div style="margin-top:8px;">
+                  <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="ci-sysprep-secret-clear">Clear selection</button>
+                </div>` : ''}
+              ${secrets.length ? `<p class="form-helper" id="ci-sysprep-secret-help">Contents are write-only and never shown in the UI.</p>` : ''}
+              ${providerFieldErrorHtml(state.fieldErrors.ciInit, 'err-ciInit')}
+            </div>
+          `;
+          initHtml = `
+            ${renderCatalogFieldLabelRow({
+              labelHtml: `Sysprep<span class="pf-v6-c-label pf-m-outline" style="margin-inline-start:8px;"><span class="pf-v6-c-label__content"><span class="pf-v6-c-label__text">Windows only</span></span></span>`,
+              labelId: 'ci-sysprep-mode-label',
+              tag: 'label',
+              stateKey: 'initAccess',
+              value: c.initAccess || 'editable',
             })}
-            ${c.sshSecretId ? `<div style="margin-top:8px;"><button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="ci-ssh-secret-clear">Clear selection</button></div>` : ''}
-            <p class="form-helper">Optional default SSH secret for VMs created from this catalog item.</p>
-          </div>
-        `;
-        const linuxProvideHtml = !windowsCatalog && provideDefault ? `
-          <div class="form-field" style="margin-top:16px;">
-            <label id="ci-cloud-source-label">Cloud-init</label>
+            <p class="form-helper" id="ci-sysprep-mode-help" style="margin-bottom:12px;">${sysprepHelp}</p>
+            ${renderSysprepModeSelectBoxes({
+              name: 'ciSysprepMode',
+              selected: mode,
+              labelledBy: 'ci-sysprep-mode-label',
+            })}
+            ${mode === 'attach' ? attachPanel : createPanel}
+          `;
+        } else {
+          const initValue = c.cloudInit || '';
+          const initExpanded = !!(initValue && String(initValue).trim());
+          const cloudHelp = initLocked
+            ? 'User data applied when the virtual machine starts.'
+            : 'Optional user data applied when the virtual machine starts.';
+          const textareaHelp = initLocked
+            ? 'User data applied when the virtual machine starts. Supported on Fedora and RHEL images.'
+            : 'Optional user data applied when the virtual machine starts. Supported on Fedora and RHEL images.';
+          const secretHelp = initLocked
+            ? 'Choose a USER_DATA secret from this project, or create one.'
+            : 'Optional. Choose a USER_DATA secret from this project, or create one.';
+          const inlinePanel = `
+            <div class="form-field ${state.fieldErrors.ciInit ? 'pf-m-error' : ''}" style="margin-top:16px;">
+              <label for="ci-init-config">Cloud-init${catalogReqStar(c.initAccess)}</label>
+              <textarea id="ci-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
+                rows="${initExpanded ? 8 : 1}"
+                placeholder="Add cloud-init configuration"
+                aria-label="Cloud-init"
+                aria-describedby="${state.fieldErrors.ciInit ? 'err-ciInit' : 'ci-init-help'}">${String(initValue).replace(/</g, '&lt;')}</textarea>
+              <p class="form-helper" id="ci-init-help">${textareaHelp}</p>
+              ${providerFieldErrorHtml(state.fieldErrors.ciInit, 'err-ciInit')}
+            </div>
+          `;
+          const secretPanel = `
+            <div class="form-field ${state.fieldErrors.ciInit ? 'pf-m-error' : ''}" style="margin-top:16px;">
+              <label id="ci-ud-secret-label">Cloud-init secret${catalogReqStar(c.initAccess)}</label>
+              ${renderProjectSecretSelectHtml({
+                kind: 'userdata',
+                project: catalogProject,
+                selectedId: c.cloudInitSecretId || '',
+                open: !!state.ciCloudInitSecretMenuOpen,
+                filter: state.ciCloudInitSecretFilter || '',
+                rootId: 'ci-ud-secret-select',
+                toggleId: 'ci-ud-secret-toggle',
+                menuId: 'ci-ud-secret-menu',
+                searchId: 'ci-ud-secret-search',
+                labelId: 'ci-ud-secret-label',
+                optionAttr: 'data-ud-secret',
+                hiddenInputId: 'ci-ud-secret',
+                placeholder: 'Select a USER_DATA secret',
+                searchPlaceholder: 'Search secrets',
+                emptyNoun: 'USER_DATA secrets',
+              })}
+              ${c.cloudInitSecretId ? `<div style="margin-top:8px;"><button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="ci-ud-secret-clear">Clear selection</button></div>` : ''}
+              <p class="form-helper">${secretHelp}</p>
+              ${providerFieldErrorHtml(state.fieldErrors.ciInit, 'err-ciInit')}
+            </div>
+          `;
+          initHtml = `
+            ${renderCatalogFieldLabelRow({
+              labelHtml: 'Cloud-init',
+              labelId: 'ci-cloud-source-label',
+              tag: 'label',
+              stateKey: 'initAccess',
+              value: c.initAccess || 'editable',
+            })}
+            <p class="form-helper" style="margin-bottom:12px;">${cloudHelp}</p>
             ${renderCloudInitSourceSelectBoxes({
               name: 'ciCloudInitSource',
               selected: source,
               labelledBy: 'ci-cloud-source-label',
             })}
-          </div>
-          ${source === 'secret' ? `
-          <div class="form-field" style="margin-top:16px;">
-            ${renderCatalogFieldLabelRow({
-              labelHtml: 'Cloud-init secret',
-              labelId: 'ci-ud-secret-label',
-              forId: 'ci-ud-secret-toggle',
-              stateKey: 'initAccess',
-              value: c.initAccess || 'editable',
-            })}
-            ${renderProjectSecretSelectHtml({
-              kind: 'userdata',
-              project: catalogProject,
-              selectedId: c.cloudInitSecretId || '',
-              open: !!state.ciCloudInitSecretMenuOpen,
-              filter: state.ciCloudInitSecretFilter || '',
-              rootId: 'ci-ud-secret-select',
-              toggleId: 'ci-ud-secret-toggle',
-              menuId: 'ci-ud-secret-menu',
-              searchId: 'ci-ud-secret-search',
-              labelId: 'ci-ud-secret-label',
-              optionAttr: 'data-ud-secret',
-              hiddenInputId: 'ci-ud-secret',
-              placeholder: 'Select a USER_DATA secret',
-              searchPlaceholder: 'Search secrets',
-              emptyNoun: 'USER_DATA secrets',
-            })}
-            ${c.cloudInitSecretId ? `<div style="margin-top:8px;"><button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="ci-ud-secret-clear">Clear selection</button></div>` : ''}
-          </div>` : `
-          <div class="form-field" style="margin-top:16px;">
-            ${renderCatalogFieldLabelRow({
-              labelHtml: initLabel,
-              labelId: 'ci-init-config-label',
-              forId: 'ci-init-config',
-              stateKey: 'initAccess',
-              value: c.initAccess || 'editable',
-            })}
-            <textarea id="ci-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
-              rows="${initExpanded ? 8 : 1}"
-              placeholder="${initPlaceholder}"
-              aria-label="${initLabel}"
-              aria-describedby="ci-init-help">${String(initValue).replace(/</g, '&lt;')}</textarea>
-            <p class="form-helper" id="ci-init-help">${initHelp}</p>
-          </div>`}
-        ` : '';
-        const windowsProvideHtml = windowsCatalog && provideDefault ? `
-          <div class="form-field" style="margin-top:16px;">
-            ${renderCatalogFieldLabelRow({
-              labelHtml: initLabel,
-              labelId: 'ci-init-config-label',
-              forId: 'ci-init-config',
-              stateKey: 'initAccess',
-              value: c.initAccess || 'editable',
-            })}
-            <textarea id="ci-init-config" class="cloud-init-input ${initExpanded ? 'pf-m-expanded' : ''}"
-              rows="${initExpanded ? 8 : 1}"
-              placeholder="${initPlaceholder}"
-              aria-label="${initLabel}"
-              aria-describedby="ci-init-help">${String(initValue).replace(/</g, '&lt;')}</textarea>
-            <p class="form-helper" id="ci-init-help">${initHelp}</p>
-          </div>` : '';
+            ${source === 'secret' ? secretPanel : inlinePanel}
+          `;
+        }
+
         panel.innerHTML = `
           <h3 class="label-with-optional">
             Access &amp; Initial run
-            <span class="pf-v6-c-label pf-m-outline">
-              <span class="pf-v6-c-label__content">
-                <span class="pf-v6-c-label__text">Optional</span>
-              </span>
-            </span>
+            ${optionalBadge}
           </h3>
           <p class="create-resource-wiz__help">${windowsCatalog
-            ? 'Choose whether this catalog item seeds a default Unattend.xml for Windows VMs. Tenants can still Attach or Create Sysprep when creating a VM.'
-            : 'Optionally seed an SSH public key and default cloud-init user data for virtual machines created from this catalog item.'}</p>
-          ${linuxSshHtml}
-          ${linuxSshHtml ? '<hr class="form-section-divider" />' : ''}
-          <div class="form-field" style="margin-top:16px;">
-            <label id="ci-init-default-label">${windowsCatalog ? 'Unattend.xml default' : 'Cloud-init default'}</label>
-            ${renderCatalogInitDefaultSelectBoxes({
-              name: 'ciInitDefault',
-              selected: c.initDefaultMode || 'none',
-              labelledBy: 'ci-init-default-label',
-              windows: windowsCatalog,
-            })}
-          </div>
-          ${windowsCatalog ? windowsProvideHtml : linuxProvideHtml}
+            ? 'Configure first-boot customization for Windows virtual machines created from this catalog item.'
+            : 'Configure first-boot initialization for virtual machines created from this catalog item.'}</p>
+          ${initHtml}
         `;
-        panel.querySelectorAll('input[name="ciInitDefault"]').forEach(r => {
-          r.addEventListener('change', () => {
-            c.initDefaultMode = r.value === 'provide' ? 'provide' : 'none';
-            if (c.initDefaultMode === 'none') {
-              if (windowsCatalog) c.sysprep = '';
-              else {
-                c.cloudInit = '';
-                c.cloudInitSecretId = '';
-              }
-            }
-            renderCreateCatalogItemWizard();
-          });
-        });
-        panel.querySelectorAll('input[name="ciCloudInitSource"]').forEach(r => {
-          r.addEventListener('change', () => {
-            c.cloudInitSource = r.value === 'secret' ? 'secret' : 'inline';
-            renderCreateCatalogItemWizard();
-          });
-        });
-        if (!windowsCatalog) {
-          wireTypeaheadRichSelect(panel, {
-            rootId: 'ci-ssh-secret-select',
-            toggleId: 'ci-ssh-secret-toggle',
-            menuId: 'ci-ssh-secret-menu',
-            searchId: 'ci-ssh-secret-search',
-            optionSel: '[data-ssh-secret]',
-            getOptionId: opt => opt.dataset.sshSecret,
-            setOpen: (open) => { state.ciSshSecretMenuOpen = open; },
-            setFilter: (v) => { state.ciSshSecretFilter = v; },
-            onSelectId: (value) => {
-              c.sshSecretId = value || '';
-              state.ciSshSecretMenuOpen = false;
-              state.ciSshSecretFilter = '';
+        bindCatalogAccessSwitches(panel, c);
+        if (windowsCatalog) {
+          panel.querySelectorAll('input[name="ciSysprepMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+              readCatalogCreateFields();
+              c.sysprepMode = r.value === 'attach' ? 'attach' : 'create';
+              state.ciSysprepSecretMenuOpen = false;
+              state.ciSysprepSecretFilter = '';
               renderCreateCatalogItemWizard();
-            },
-            rerender: renderCreateCatalogItemWizard,
-          });
-          panel.querySelector('#ci-ssh-secret-clear')?.addEventListener('click', () => {
-            c.sshSecretId = '';
-            renderCreateCatalogItemWizard();
-          });
-          bindCreateSecretButtons(panel, 'ssh', 'catalog', catalogProject);
-        }
-        if (provideDefault) {
-          bindCatalogAccessSwitches(panel, c);
-          const initEl = panel.querySelector('#ci-init-config');
-          if (initEl) {
-            const syncInitHeight = () => {
-              const hasContent = !!initEl.value.trim();
-              initEl.classList.toggle('pf-m-expanded', hasContent);
-              initEl.rows = hasContent ? 8 : 1;
-              initEl.style.height = 'auto';
-              if (hasContent) initEl.style.height = Math.min(initEl.scrollHeight, 280) + 'px';
-              else initEl.style.height = '';
-            };
-            syncInitHeight();
-            initEl.addEventListener('input', () => {
-              if (windowsCatalog) c.sysprep = initEl.value;
-              else c.cloudInit = initEl.value;
-              syncInitHeight();
             });
-            initEl.addEventListener('focus', () => {
-              if (!initEl.value.trim()) {
-                initEl.classList.add('pf-m-expanded');
-                initEl.rows = 4;
-              }
+          });
+          if (c.sysprepMode === 'attach' && sysprepSecretsForProject(catalogProject).length) {
+            wireTypeaheadRichSelect(panel, {
+              rootId: 'ci-sysprep-secret-select',
+              toggleId: 'ci-sysprep-secret-toggle',
+              menuId: 'ci-sysprep-secret-menu',
+              searchId: 'ci-sysprep-secret-search',
+              optionSel: '[data-ci-sysprep-secret]',
+              getOptionId: opt => opt.dataset.ciSysprepSecret,
+              setOpen: (open) => { state.ciSysprepSecretMenuOpen = open; },
+              setFilter: (v) => { state.ciSysprepSecretFilter = v; },
+              onSelectId: (value) => {
+                c.sysprepSecretId = value || '';
+                state.ciSysprepSecretMenuOpen = false;
+                state.ciSysprepSecretFilter = '';
+                delete state.fieldErrors.ciInit;
+                renderCreateCatalogItemWizard();
+              },
+              rerender: renderCreateCatalogItemWizard,
             });
-            initEl.addEventListener('blur', () => {
-              if (!initEl.value.trim()) {
-                initEl.classList.remove('pf-m-expanded');
-                initEl.rows = 1;
-                initEl.style.height = '';
-              }
+            panel.querySelector('#ci-sysprep-secret-clear')?.addEventListener('click', () => {
+              c.sysprepSecretId = '';
+              renderCreateCatalogItemWizard();
             });
           }
-          if (!windowsCatalog && source === 'secret') {
+          if (c.sysprepMode !== 'attach') {
+            bindUnattendFileUpload(panel, c, {
+              upload: 'ci-unattend-upload',
+              file: 'ci-unattend-file',
+              filename: 'ci-unattend-filename',
+              xml: 'ci-unattend-xml',
+              clear: 'ci-unattend-clear',
+              browse: 'ci-unattend-browse',
+            });
+          }
+        } else {
+          panel.querySelectorAll('input[name="ciCloudInitSource"]').forEach(r => {
+            r.addEventListener('change', () => {
+              readCatalogCreateFields();
+              c.cloudInitSource = r.value === 'secret' ? 'secret' : 'inline';
+              renderCreateCatalogItemWizard();
+            });
+          });
+          bindExpandingTextarea(panel.querySelector('#ci-init-config'), (value) => {
+            c.cloudInit = value;
+            if (String(value || '').trim()) delete state.fieldErrors.ciInit;
+          });
+          if (source === 'secret') {
             wireTypeaheadRichSelect(panel, {
               rootId: 'ci-ud-secret-select',
               toggleId: 'ci-ud-secret-toggle',
@@ -22549,6 +22692,7 @@
                 c.cloudInitSecretId = value || '';
                 state.ciCloudInitSecretMenuOpen = false;
                 state.ciCloudInitSecretFilter = '';
+                delete state.fieldErrors.ciInit;
                 renderCreateCatalogItemWizard();
               },
               rerender: renderCreateCatalogItemWizard,
@@ -22569,22 +22713,8 @@
       const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
       const bootTier = (c.bootStorageTierId && getStorageTiers().find(t => t.id === c.bootStorageTierId)) || null;
       const initMethod = c.initMethod === 'sysprep' || c.guestOsFamily === 'Microsoft Windows' ? 'sysprep' : 'cloud-init';
-      const provideDefault = c.initDefaultMode === 'provide';
-      const initConfigured = provideDefault && (initMethod === 'sysprep'
-        ? !!(c.sysprep && String(c.sysprep).trim())
-        : (c.cloudInitSource === 'secret' ? !!c.cloudInitSecretId : !!(c.cloudInit && String(c.cloudInit).trim())));
-      const initLabel = initMethod === 'sysprep' ? 'Unattend.xml' : 'Cloud-init';
-      const initDefaultLabel = initMethod === 'sysprep' ? 'Unattend.xml default' : 'Cloud-init default';
-      const initReviewVal = !provideDefault
-        ? 'No default'
-        : (c.cloudInitSource === 'secret' && c.cloudInitSecretId
-          ? String(secretDisplayName(c.cloudInitSecretId) || c.cloudInitSecretId).replace(/</g, '&lt;')
-          : (initConfigured
-            ? (initMethod === 'sysprep' ? 'Provided (hidden)' : 'Configured')
-            : 'Provide default (empty)'));
-      const sshReviewVal = c.sshSecretId
-        ? String(secretDisplayName(c.sshSecretId) || c.sshSecretId).replace(/</g, '&lt;')
-        : 'Not configured';
+      const initLabel = initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
+      const initReviewVal = catalogInitReviewValue(c);
       const esc = value => String(value ?? '—').replace(/</g, '&lt;');
       if (state.catalogEditId) {
         readCatalogCreateFields();
@@ -22612,9 +22742,7 @@
           </div>
         `;
       } else {
-        const visibilityValue = c.visibility === 'tenant'
-          ? `Tenant scoped (${(c.tenants || []).map(id => providerTenantById(id)?.name || id).join(', ') || '—'})`
-          : 'Global public';
+        const scopeValue = isProviderCatalogRole() ? catalogScopeReviewValue(c) : '';
         const diskValue = disk
           ? esc(`${disk.title} (${disk.family} · ${disk.arch})`)
           : 'No default';
@@ -22639,11 +22767,12 @@
           <p class="create-resource-wiz__help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it. Click a section title to edit.</p>
           <div class="review-nebius">
             ${reviewNebiusSection('Details', 'ci-details', `
+              ${isProviderCatalogRole() ? reviewRow('Scope', esc(scopeValue)) : ''}
               ${reviewRow('Name', esc(c.name))}
               ${reviewRow('Description', c.description ? esc(c.description) : '—')}
               ${reviewRow('Disk image', diskValue)}
               ${reviewRow('Disk image access', catalogAccessLabel(c.diskImageAccess))}
-              ${reviewRow('Guest operating system', c.guestOsFamily ? esc(c.guestOsFamily) : 'Not set')}
+              ${reviewRow('Guest operating system', esc(c.guestOsFamily || 'Linux'))}
               ${reviewRow('Status', 'Unpublished')}
             `, 'ci-review')}
             ${reviewNebiusSection('Instance types', 'ci-access', `
@@ -22651,9 +22780,6 @@
               ${reviewRow('Instance type access', catalogAccessLabel(c.computeAccess || c.tenantAccess))}
               ${reviewRow('Run strategy', runOpt ? esc(runOpt.label) : 'No default')}
               ${reviewRow('Run strategy access', catalogAccessLabel(c.runStrategyAccess))}
-            `, 'ci-review')}
-            ${reviewNebiusSection('Visibility', 'ci-visibility', `
-              ${reviewRow('Visibility', esc(visibilityValue))}
             `, 'ci-review')}
             ${reviewNebiusSection('Storage', 'ci-storage', `
               ${reviewRow('Boot disk size', bootSizeValue)}
@@ -22663,9 +22789,8 @@
               ${extraDisksRows}
             `, 'ci-review')}
             ${reviewNebiusSection('Access & Initial run', 'ci-access-init', `
-              ${initMethod === 'sysprep' ? '' : reviewRow('SSH public key', sshReviewVal)}
-              ${reviewRow(initDefaultLabel, initReviewVal)}
-              ${provideDefault ? reviewRow('User data access', catalogAccessLabel(c.initAccess)) : ''}
+              ${reviewRow(initLabel, initReviewVal)}
+              ${reviewRow('User data access', catalogAccessLabel(c.initAccess))}
             `, 'ci-review')}
           </div>
         `;
@@ -22693,57 +22818,100 @@
       if (desc) c.description = desc.value.trim();
       document.querySelectorAll('[data-ci-access-state]').forEach(sel => {
         const key = sel.dataset.ciAccessState;
-        c[key] = sel.value;
-        if (key === 'computeAccess') c.tenantAccess = sel.value;
+        c[key] = sel.type === 'checkbox'
+          ? (sel.checked ? 'editable' : 'locked')
+          : sel.value;
+        if (key === 'computeAccess') c.tenantAccess = c[key];
       });
+      const guestOs = document.querySelector('input[name="ciGuestOs"]:checked');
+      if (guestOs) c.guestOsFamily = guestOs.value;
       const initMethod = document.querySelector('input[name="ciInitMethod"]:checked');
       if (initMethod) c.initMethod = initMethod.value === 'sysprep' ? 'sysprep' : 'cloud-init';
-      const initDefault = document.querySelector('input[name="ciInitDefault"]:checked');
-      if (initDefault) c.initDefaultMode = initDefault.value === 'provide' ? 'provide' : 'none';
       const initConfig = document.getElementById('ci-init-config');
-      if (initConfig) {
-        if (c.initMethod === 'sysprep') c.sysprep = initConfig.value;
-        else c.cloudInit = initConfig.value;
-      }
-      const ciSsh = document.getElementById('ci-ssh-secret');
-      if (ciSsh) c.sshSecretId = ciSsh.value;
+      if (initConfig) c.cloudInit = initConfig.value;
       const ciUd = document.getElementById('ci-ud-secret');
       if (ciUd) c.cloudInitSecretId = ciUd.value;
       const ciSource = document.querySelector('input[name="ciCloudInitSource"]:checked');
       if (ciSource) c.cloudInitSource = ciSource.value === 'secret' ? 'secret' : 'inline';
-      if (c.initDefaultMode === 'none') {
-        if (c.initMethod === 'sysprep') c.sysprep = '';
-        else c.cloudInit = '';
-      }
+      const sysprepMode = document.querySelector('input[name="ciSysprepMode"]:checked');
+      if (sysprepMode) c.sysprepMode = sysprepMode.value === 'attach' ? 'attach' : 'create';
+      const unattend = document.getElementById('ci-unattend-xml');
+      if (unattend) c.sysprep = unattend.value;
+      const sysprepSecret = document.getElementById('ci-sysprep-secret');
+      if (sysprepSecret) c.sysprepSecretId = sysprepSecret.value;
+      c.initDefaultMode = catalogHasInitValue(c) ? 'provide' : 'none';
+      c.sshSecretId = '';
       const boot = document.getElementById('ci-boot-disk');
       if (boot) {
         const raw = boot.value.trim();
         c.bootDiskGiB = raw === '' ? null : Number(raw);
         if (c.bootDiskGiB != null && Number.isNaN(c.bootDiskGiB)) c.bootDiskGiB = null;
       }
-      const vis = document.querySelector('input[name="ciVisibility"]:checked');
-      if (vis) c.visibility = vis.value;
-      // Tenants / selects are maintained live by their controls.
+      const scopeEl = document.querySelector('input[name="ciScope"]:checked');
+      if (scopeEl) {
+        c.isGlobal = scopeEl.value === 'global';
+        applyCatalogScope(c);
+      }
+      // Tenant is maintained live by bindTenantEditor.
     }
 
     function validateCatalogCreateStep(key) {
       const c = state.catalogCreate;
       if (!c) return true;
+      const errors = {};
       if (key === 'ci-details') {
-        if (!c.name?.trim() || !isValidDnsLabel(c.name.trim())) {
-          state.fieldErrors = { ciName: 'Enter a valid DNS-style name (lowercase letters, numbers, hyphens).' };
-          renderCreateCatalogItemWizard();
-          toast('Enter a valid name to continue.');
-          return false;
+        const name = (c.name || '').trim();
+        if (!name || !isValidDnsLabel(name)) {
+          errors.ciName = 'Enter a valid DNS-style name (lowercase letters, numbers, hyphens).';
+        } else if (isProviderCatalogRole() && catalogNameConflicts(name, c)) {
+          errors.ciName = `${name} already exists.`;
+        }
+        if (isProviderCatalogRole()) {
+          hydrateCatalogScope(c);
+          applyCatalogScope(c);
+          if (!c.isGlobal && !c.tenantId) {
+            errors.ciTenants = 'Select a tenant, or choose Global scope.';
+          }
+        }
+        if (c.diskImageAccess === 'locked' && !c.diskImageId) {
+          errors.ciDiskImage = 'Select a disk image to continue.';
         }
       }
-      if (key === 'ci-visibility' && c.visibility === 'tenant' && !(c.tenants || []).length) {
-        state.fieldErrors = { ciTenants: 'Select at least one tenant.' };
+      if (key === 'ci-access') {
+        if ((c.computeAccess || 'editable') === 'locked' && !(c.instanceTypeId || c.computeResourceId)) {
+          errors.ciInstanceType = 'Select an instance type to continue.';
+        }
+        if ((c.runStrategyAccess || 'editable') === 'locked' && !c.runStrategy) {
+          errors.ciRunStrategy = 'Select a run strategy to continue.';
+        }
+      }
+      if (key === 'ci-storage') {
+        if ((c.bootDiskAccess || 'editable') === 'locked' && (c.bootDiskGiB == null || c.bootDiskGiB === '')) {
+          errors.ciBootDisk = 'Enter a boot disk size to continue.';
+        }
+        if ((c.bootStorageTierAccess || 'editable') === 'locked' && !c.bootStorageTierId) {
+          errors.ciBootTier = 'Select a boot storage tier to continue.';
+        }
+      }
+      if (key === 'ci-access-init') {
+        if ((c.initAccess || 'editable') === 'locked' && !catalogHasInitValue(c)) {
+          errors.ciInit = c.guestOsFamily === 'Microsoft Windows'
+            ? 'Enter Unattend.xml, or attach a Sysprep secret.'
+            : 'Enter cloud-init user data, or select a secret.';
+        }
+      }
+      if (Object.keys(errors).length) {
+        state.fieldErrors = errors;
+        if (c.fieldErrors) {
+          c.fieldErrors.name = errors.ciName;
+          c.fieldErrors.tenant = errors.ciTenants;
+        }
         renderCreateCatalogItemWizard();
-        toast('Select at least one tenant for tenant-scoped visibility.');
+        toast(Object.values(errors)[0] || 'Fix the highlighted fields.');
         return false;
       }
       state.fieldErrors = {};
+      if (c.fieldErrors) c.fieldErrors = {};
       return true;
     }
 
@@ -22789,11 +22957,14 @@
         })),
         extraDisksAccess: (c.extraDisks || []).length ? (c.extraDisksAccess || 'editable') : 'editable',
         initMethod,
-        cloudInit: (c.initDefaultMode === 'provide' && initMethod === 'cloud-init' && c.cloudInitSource !== 'secret') ? (c.cloudInit || '') : '',
+        cloudInit: (initMethod === 'cloud-init' && c.cloudInitSource !== 'secret') ? (c.cloudInit || '') : '',
         cloudInitSource: initMethod === 'cloud-init' ? (c.cloudInitSource || 'inline') : '',
-        cloudInitSecretId: (c.initDefaultMode === 'provide' && initMethod === 'cloud-init' && c.cloudInitSource === 'secret') ? (c.cloudInitSecretId || '') : '',
-        sshSecretId: c.sshSecretId || '',
-        sysprep: (c.initDefaultMode === 'provide' && initMethod === 'sysprep') ? (c.sysprep || '') : '',
+        cloudInitSecretId: (initMethod === 'cloud-init' && c.cloudInitSource === 'secret') ? (c.cloudInitSecretId || '') : '',
+        sshSecretId: '',
+        sysprep: (initMethod === 'sysprep' && c.sysprepMode !== 'attach') ? (c.sysprep || '') : '',
+        sysprepMode: initMethod === 'sysprep' ? (c.sysprepMode === 'attach' ? 'attach' : 'create') : '',
+        sysprepSecretId: (initMethod === 'sysprep' && c.sysprepMode === 'attach') ? (c.sysprepSecretId || '') : '',
+        sysprepFileName: (initMethod === 'sysprep' && c.sysprepMode !== 'attach') ? (c.sysprepFileName || '') : '',
         initAccess: c.initAccess || 'editable',
         initLocked: (c.initAccess || 'editable') === 'locked',
       };
@@ -25092,6 +25263,12 @@
     bindNavExpandable('nav-infrastructure-toggle', 'nav-infrastructure');
     bindNavExpandable('nav-platform-toggle', 'nav-platform');
 
+    try {
+      const roleParam = new URLSearchParams(window.location.search).get('role');
+      if (roleParam && ROLES[roleParam]) {
+        document.getElementById('role-select').value = roleParam;
+      }
+    } catch (e) { /* ignore */ }
     applyRole();
     if (getActiveRole().canManageProviderCatalog) renderCatalogTenantFilter();
     if (document.getElementById('view-templates')?.classList.contains('pf-m-active')) renderCatalog();
