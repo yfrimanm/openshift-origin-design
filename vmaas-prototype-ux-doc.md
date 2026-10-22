@@ -44,7 +44,7 @@ One coherent product surface for engineering and stakeholders: tenant Create / O
 |---|---|
 | **IA (Create)** | Select template → Details → Instance type → Storage → **Networking** → Access & Initial run → Review and create |
 | **Details** | Name, description, Guest OS felt cards + disk image typeahead. Project context-only. |
-| **Access & Initial run** | Optional. Linux: SSH + Cloud-init. Windows: Sysprep Unattend.xml (Attach existing / Create new felt cards). |
+| **Access & Initial run** | Optional. Linux: SSH + Cloud-init. Windows: Sysprep Unattend.xml (Enter value / Select secret felt cards). |
 | **Create dropdowns** | Typeahead rich-select for Project, Instance type, Storage tier, Virtual network, Subnet. Security groups = multi-select chips. |
 | **Form width** | Wizard fields / cards / uploads / helpers = **40rem** column |
 | **After create** | New VM Overview + success toast |

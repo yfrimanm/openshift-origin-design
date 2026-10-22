@@ -71,7 +71,7 @@ Document the tenant Create Virtual machine flow in the shared VMaaS mock: entry 
 | Instance type | Typeahead rich-select (or locked by template) |
 | Storage | Boot disk + tier; Additional disks (inline Add disk) |
 | Network | VN / Subnet / SG; Additional networks (see OSAC-2621) |
-| Access & Initial run | Linux: SSH + Cloud-init · Windows: Sysprep (OSAC-5009) |
+| Access & Initial run | Linux: SSH + Cloud-init · Windows: Sysprep Enter value / Select secret (OSAC-5009) |
 | Review and create | Nebius sections · cost estimate · Start after create (default on) |
 
 ---

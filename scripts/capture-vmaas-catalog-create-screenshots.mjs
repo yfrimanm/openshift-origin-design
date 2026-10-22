@@ -31,9 +31,13 @@ async function clickNext(page) {
 async function main() {
   await mkdir(outDir, { recursive: true });
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+  const page = await browser.newPage({ viewport: { width: 1600, height: 1200 } });
   await page.goto(fileUrl, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(500);
+
+  await page.locator('#role-select').selectOption('admin');
+  await page.waitForTimeout(400);
+  await shot(page, '00-tenant-admin-nav');
 
   await page.locator('#role-select').selectOption('provider');
   await page.waitForTimeout(500);
@@ -43,9 +47,21 @@ async function main() {
   await page.waitForSelector('#create-ci-panel', { timeout: 8000 });
   await page.waitForTimeout(400);
   await waitStep(page, 'Details');
+  await page.locator('#ci-disk-image-select').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(250);
   await shot(page, '02-details');
 
-  // Fill required name so we can advance freely
+  const tenantCard = page.locator('input[name="ciScope"][value="tenant"]').locator('xpath=ancestor::label[1]');
+  const globalCard = page.locator('input[name="ciScope"][value="global"]').locator('xpath=ancestor::label[1]');
+  if (await tenantCard.count()) {
+    await shot(page, '04b-visibility-tenant');
+  }
+  if (await globalCard.count()) {
+    await globalCard.click();
+    await page.waitForTimeout(350);
+    await shot(page, '04-visibility-global');
+  }
+
   await page.locator('#ci-regen-name').click();
   await page.waitForTimeout(200);
 
@@ -54,28 +70,19 @@ async function main() {
   await shot(page, '03-instance-types');
 
   await clickNext(page);
-  await waitStep(page, 'Visibility');
-  await shot(page, '04-visibility-global');
-
-  // Tenant scoped view
-  const tenantCard = page.locator('input[name="ciVisibility"][value="tenant"]').locator('xpath=ancestor::label[1]');
-  if (await tenantCard.count()) {
-    await tenantCard.click();
-    await page.waitForTimeout(350);
-    await shot(page, '04b-visibility-tenant');
-    // back to global for easier continue
-    const globalCard = page.locator('input[name="ciVisibility"][value="global"]').locator('xpath=ancestor::label[1]');
-    if (await globalCard.count()) await globalCard.click();
-    await page.waitForTimeout(250);
-  }
-
-  await clickNext(page);
   await waitStep(page, 'Storage');
   await shot(page, '05-storage');
 
   await clickNext(page);
   await waitStep(page, 'Access & Initial run');
   await shot(page, '06-access-init');
+
+  const selectSecret = page.locator('#create-ci-panel .felt-select-box').filter({ hasText: 'Select secret' }).first();
+  if (await selectSecret.count()) {
+    await selectSecret.click();
+    await page.waitForTimeout(350);
+    await shot(page, '06b-access-provide-default');
+  }
 
   await clickNext(page);
   await waitStep(page, 'Review');

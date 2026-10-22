@@ -121,15 +121,15 @@ async function main() {
   await shotPage(page, '02b-select-template-empty');
   await selectTplProject(page, 'project-a');
 
-  const lockedCard = page.locator('.tpl-card').filter({ hasNotText: 'Editable' }).first();
+  const lockedCard = page.locator('#overlay .tpl-card').filter({ hasNotText: 'Editable' }).first();
   if (await lockedCard.count()) await lockedCard.click();
-  else await page.locator('.tpl-card').first().click();
+  else await page.locator('#overlay .tpl-card').first().click();
   await page.waitForSelector('#tpl-drawer', { timeout: 5000 });
   await page.waitForTimeout(400);
   await shotEl(page, '#tpl-drawer', '03-template-drawer-locked');
   await closeDrawer(page);
 
-  const editableCard = page.locator('.tpl-card').filter({ hasText: 'Editable' }).first();
+  const editableCard = page.locator('#overlay .tpl-card').filter({ hasText: 'Editable' }).first();
   if (await editableCard.count()) {
     await editableCard.click();
     await page.waitForSelector('#tpl-drawer', { timeout: 5000 });
@@ -169,10 +169,13 @@ async function main() {
   await page.waitForTimeout(300);
   await shotPage(page, '09-network');
 
-  await page.locator('#f-add-network').click();
-  await page.waitForSelector('.inline-set[data-network-set]', { timeout: 5000 });
-  await page.waitForTimeout(350);
-  await shotPage(page, '09b-additional-network-set');
+  const addNet = page.locator('#f-add-network');
+  if (await addNet.count() && await addNet.isVisible()) {
+    await addNet.click();
+    await page.waitForSelector('.inline-set[data-network-set]', { timeout: 5000 });
+    await page.waitForTimeout(350);
+    await shotPage(page, '09b-additional-network-set');
+  }
 
   await clickNext(page);
   await waitStep(page, 'Access & Initial run');
@@ -185,13 +188,26 @@ async function main() {
   await waitStep(page, 'Details');
   await page.waitForTimeout(300);
   await selectGuestOs(page, 'Microsoft Windows');
-  await ensureDiskImage(page);
+  await page.waitForTimeout(300);
+  const winToggle = page.locator('#vm-disk-image-toggle');
+  const winSelected = await page.locator('#vm-disk-image-select .rich-select__toggle-label').textContent().catch(() => '');
+  if (!/windows/i.test(winSelected || '')) {
+    if (await winToggle.count()) {
+      await winToggle.click();
+      await page.waitForTimeout(250);
+      const winOpt = page.locator('[data-vm-disk-image="windows-2022"]');
+      if (await winOpt.count()) await winOpt.click();
+      else await ensureDiskImage(page);
+      await page.waitForTimeout(300);
+    }
+  }
+  await shotPage(page, '05-details-windows');
   await page.locator('.pf-v6-c-wizard__nav-link').filter({ hasText: /Access/ }).first().click();
   await waitStep(page, 'Access & Initial run');
   await page.waitForTimeout(400);
   await shotPage(page, '09d-access-windows-sysprep');
 
-  // Attach existing card selected
+  // Select secret card selected
   const attachCard = page.locator('input[name="sysprepMode"][value="attach"]').locator('xpath=ancestor::label[1]');
   if (await attachCard.count()) {
     await attachCard.click();
@@ -199,9 +215,26 @@ async function main() {
     await shotPage(page, '09e-access-windows-attach');
   }
 
+  // Restore Enter value with sample Unattend so Review shows Provided (hidden)
+  const createCard = page.locator('input[name="sysprepMode"][value="create"]').locator('xpath=ancestor::label[1]');
+  if (await createCard.count()) {
+    await createCard.click();
+    await page.waitForTimeout(250);
+  }
+  const xml = page.locator('#f-unattend-xml');
+  if (await xml.count()) {
+    await xml.fill('<unattend xmlns="urn:schemas-microsoft-com:unattend"><settings pass="specialize"></settings></unattend>');
+    await page.waitForTimeout(200);
+  }
+
   await clickNext(page);
   await waitStep(page, 'Review and create');
   await page.waitForTimeout(300);
+  const accessReview = page.locator('#review-access-init');
+  if (await accessReview.count()) {
+    await accessReview.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
+  }
   await shotPage(page, '10-review');
 
   await page.locator('#wiz-cancel').click();
