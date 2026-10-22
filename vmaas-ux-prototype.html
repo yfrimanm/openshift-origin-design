@@ -7129,7 +7129,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · catalog-vm-fields 7168d</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · sysprep-cards 7169</span>
         </div>
       </div>
       <div class="console__body">
@@ -8186,7 +8186,7 @@
   </div>
 
   <script>
-    /** Saved Unattend.xml secrets available for Attach existing Sysprep (OSAC-5009). */
+    /** Saved Unattend.xml secrets available for Select secret (OSAC-5009). */
     const SYSPREP_SECRETS = [
       { id: 'sysprep-corp-std', name: 'corp-windows-unattend', project: 'project-a' },
       { id: 'sysprep-oobe-skip', name: 'skip-oobe-unattend', project: 'project-a' },
@@ -9751,7 +9751,7 @@
       const entry = { id, name: safe, project: d.project || 'project-a' };
       SYSPREP_SECRETS.unshift(entry);
       d.sysprepSecretId = id;
-      toast(`Sysprep secret “${safe}” saved for Attach existing.`, 'success');
+      toast(`Sysprep secret “${safe}” saved for Select secret.`, 'success');
       return entry;
     }
 
@@ -13056,16 +13056,16 @@
         extraClass: 'felt-select-boxes--sysprep-mode',
         options: [
           {
-            value: 'attach',
-            title: 'Attach existing Sysprep',
-            desc: 'Use a saved Unattend.xml secret',
-            iconClass: 'fa-solid fa-link',
+            value: 'create',
+            title: 'Enter value',
+            desc: 'Upload or paste Unattend.xml',
+            iconClass: 'fa-solid fa-keyboard',
           },
           {
-            value: 'create',
-            title: 'Create new Sysprep',
-            desc: 'Upload or paste an Unattend.xml file',
-            iconClass: 'fa-solid fa-file-arrow-up',
+            value: 'attach',
+            title: 'Select secret',
+            desc: 'Use a Sysprep secret from this project',
+            iconClass: 'fa-solid fa-key',
           },
         ],
       });
@@ -19905,7 +19905,7 @@
                 emptyNoun: 'Sysprep secrets',
                 stacked: true,
                 options: secretOptions,
-              }) : `<p class="sysprep-attach-empty" id="f-sysprep-secret-help">No saved Sysprep secrets in this project yet. Create one with <strong>Create new Sysprep</strong> and enable <strong>Save as secret</strong>.</p>`}
+              }) : `<p class="sysprep-attach-empty" id="f-sysprep-secret-help">No saved Sysprep secrets in this project yet. Enter a value and enable <strong>Save as secret</strong>.</p>`}
               ${secrets.length && d.sysprepSecretId ? `
                 <div style="margin-top:8px;">
                   <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="f-sysprep-secret-clear">Clear selection</button>
@@ -20320,7 +20320,7 @@
         const initLabel = windowsAccess ? 'Sysprep (Unattend.xml)' : 'Cloud-init';
         const sysprepModeLabel = !windowsAccess
           ? ''
-          : (d.sysprepMode === 'attach' ? 'Attach existing' : 'Create new');
+          : (d.sysprepMode === 'attach' ? 'Select secret' : 'Enter value');
         ensureNetworkingDefaults(d);
         const networkModeLabel = d.networkMode === 'custom' ? 'Custom network' : 'Tenant default';
         const vnet = d.virtualNetwork
@@ -21509,7 +21509,7 @@
         case 'sysprepSecretId':
           return snapshot[field] ? esc(secretDisplayName(snapshot[field]) || snapshot[field]) : 'No default';
         case 'sysprepMode':
-          return snapshot.sysprepMode === 'attach' ? 'Attach existing Sysprep' : 'Create new Sysprep';
+          return snapshot.sysprepMode === 'attach' ? 'Select secret' : 'Enter value';
         case 'visibility':
           if (snapshot.visibility === 'tenant') {
             const tenants = snapshot.tenants ? snapshot.tenants.split('|').filter(Boolean) : [];
