@@ -199,6 +199,10 @@
     .pf-v6-c-form-control.pf-m-placeholder > select option[value=""] {
       color: var(--pf-t--global--text--color--placeholder, var(--vmaas-text-subtle));
     }
+    .pf-v6-c-form-control.pf-m-placeholder .rich-select__toggle-label {
+      color: var(--pf-t--global--text--color--placeholder, #8a8d90);
+      font-weight: 400;
+    }
     .pf-v6-c-form-control.pf-m-disabled > select {
       cursor: not-allowed;
       color: var(--pf-t--global--text--color--on-disabled, #6a6e73);
@@ -2247,6 +2251,13 @@
       width: min(100vw - 24px, 20rem);
     }
     #util-help-popover.pf-m-open { display: block; }
+    #form-help-popover {
+      position: fixed;
+      z-index: 10100;
+      display: none;
+      width: min(100vw - 24px, 24rem);
+    }
+    #form-help-popover.pf-m-open { display: block; }
     .pf-v6-c-button.pf-m-small {
       font-size: 13px; padding: 4px 12px; min-height: 28px;
     }
@@ -2662,6 +2673,10 @@
       background: #fff;
       color: var(--vmaas-text);
       text-align: start;
+    }
+    .form-field input.unit-size-input::placeholder,
+    .form-field input[type="number"].unit-size-input::placeholder {
+      color: var(--pf-t--global--text--color--placeholder, #8a8d90);
     }
     .form-field input[type="number"].unit-size-input:hover:not(:disabled) {
       border-color: var(--pf-t--global--border--color--hover, #2b9af3);
@@ -4218,6 +4233,35 @@
     .form-field label {
       display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px;
     }
+    .form-label-with-help {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .form-label-with-help > label,
+    .create-resource-wiz .form-label-with-help > label {
+      display: inline;
+      margin-bottom: 0;
+    }
+    .form-label-help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      padding: 0;
+      border: 0;
+      border-radius: var(--pf-t--global--border--radius--small, 4px);
+      background: transparent;
+      color: var(--pf-t--global--icon--color--regular, #6a6e73);
+      cursor: pointer;
+    }
+    .form-label-help:hover,
+    .form-label-help:focus-visible {
+      color: var(--pf-t--global--color--brand--default, #0066cc);
+    }
+    .form-label-help i { font-size: 14px; }
     .req,
     .pf-v6-c-form__label-required {
       color: var(--pf-t--global--color--status--danger--default, #c9190b);
@@ -5998,6 +6042,19 @@
       word-break: break-word;
       min-width: 0;
     }
+    .catalog-gov-value {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .review-nebius__value .catalog-gov-value,
+    .ethan-detail-field__value .catalog-gov-value {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
     .review-nebius__pre {
       display: block;
       margin: 0;
@@ -7093,7 +7150,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · sysprep 7170</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · catalog 7172</span>
         </div>
       </div>
       <div class="console__body">
@@ -12930,6 +12987,23 @@
       return '<span class="catalog-gov-badge">Locked</span>';
     }
 
+    function catalogGovValueHtml(valueHtml, access) {
+      const kind = access === 'locked' ? 'locked' : 'editable';
+      return `<span class="catalog-gov-value">${valueHtml}${catalogGovBadge(kind)}</span>`;
+    }
+
+    const CATALOG_PROVISIONING_TEMPLATES = [
+      { id: 'ocp_virt_vm', label: 'ocp_virt_vm' },
+      { id: 'vsphere_vm', label: 'vsphere_vm' },
+    ];
+    const CATALOG_PROVISIONING_TEMPLATE_HELP =
+      'Infrastructure automation that fulfills a VM request by resolving infrastructure dependencies, creating VM and storage resources, applying provider-specific integrations, and exposing the status.';
+
+    function catalogProvisioningTemplateLabel(id) {
+      const match = CATALOG_PROVISIONING_TEMPLATES.find(t => t.id === id);
+      return match ? match.label : (id || '—');
+    }
+
     function renderFeltSelectBoxes({ name, selected, labelledBy, options, extraClass = '' }) {
       const current = selected ?? options[0]?.value;
       const rootClass = ['felt-select-boxes', extraClass].filter(Boolean).join(' ');
@@ -13149,13 +13223,13 @@
     function catalogInitReviewValue(c) {
       const windows = (c.guestOsFamily || '') === 'Microsoft Windows' || c.initMethod === 'sysprep';
       if (windows) {
-        if (!catalogHasSysprepValue(c)) return 'No default';
+        if (!catalogHasSysprepValue(c)) return 'Not set';
         if (c.sysprepMode === 'attach') {
           return String(secretDisplayName(c.sysprepSecretId) || c.sysprepSecretId).replace(/</g, '&lt;');
         }
         return 'Provided (hidden)';
       }
-      if (!catalogHasCloudInitValue(c)) return 'No default';
+      if (!catalogHasCloudInitValue(c)) return 'Not set';
       if (c.cloudInitSource === 'secret') {
         return String(secretDisplayName(c.cloudInitSecretId) || c.cloudInitSecretId).replace(/</g, '&lt;');
       }
@@ -14568,6 +14642,89 @@
       document.getElementById('util-help-popover-close')?.addEventListener('click', () => closeUtilHelpPopover());
       window.addEventListener('resize', closeUtilHelpPopover);
       window.addEventListener('scroll', closeUtilHelpPopover, true);
+    }
+
+    const FORM_HELP_CONTENT = {
+      'provisioning-template': {
+        title: 'Provisioning template',
+        body: CATALOG_PROVISIONING_TEMPLATE_HELP,
+      },
+    };
+
+    let formHelpPopoverTrigger = null;
+
+    function closeFormHelpPopover() {
+      const pop = document.getElementById('form-help-popover');
+      if (!pop) return;
+      pop.classList.remove('pf-m-open');
+      pop.hidden = true;
+      if (formHelpPopoverTrigger) {
+        formHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
+        formHelpPopoverTrigger = null;
+      }
+    }
+
+    function openFormHelpPopover(trigger) {
+      const pop = document.getElementById('form-help-popover');
+      const titleEl = document.getElementById('form-help-popover-title-text');
+      const bodyEl = document.getElementById('form-help-popover-body');
+      if (!pop || !trigger) return;
+      const help = FORM_HELP_CONTENT[trigger.dataset.formHelp];
+      if (!help) return;
+      if (formHelpPopoverTrigger === trigger && pop.classList.contains('pf-m-open')) {
+        closeFormHelpPopover();
+        return;
+      }
+      closeFsHelpPopover();
+      closeUtilHelpPopover();
+      if (formHelpPopoverTrigger && formHelpPopoverTrigger !== trigger) {
+        formHelpPopoverTrigger.setAttribute('aria-expanded', 'false');
+      }
+      formHelpPopoverTrigger = trigger;
+      trigger.setAttribute('aria-expanded', 'true');
+      if (titleEl) titleEl.textContent = help.title;
+      if (bodyEl) bodyEl.textContent = help.body;
+      pop.setAttribute('aria-label', help.title);
+      pop.hidden = false;
+      pop.classList.add('pf-m-open');
+      pop.classList.add('pf-m-right');
+      pop.classList.remove('pf-m-left');
+      const rect = trigger.getBoundingClientRect();
+      const gap = 12;
+      requestAnimationFrame(() => {
+        const pr = pop.getBoundingClientRect();
+        let left = rect.right + gap;
+        let top = rect.top + (rect.height / 2) - (pr.height / 2);
+        if (left + pr.width > window.innerWidth - 8) {
+          pop.classList.remove('pf-m-right');
+          pop.classList.add('pf-m-left');
+          left = rect.left - pr.width - gap;
+        }
+        pop.style.left = `${Math.max(8, left)}px`;
+        pop.style.top = `${Math.max(8, Math.min(top, window.innerHeight - pr.height - 8))}px`;
+      });
+      document.getElementById('form-help-popover-close')?.focus();
+    }
+
+    function wireFormHelpPopover() {
+      if (document.body.dataset.formHelpPopoverWired) return;
+      document.body.dataset.formHelpPopoverWired = '1';
+      document.addEventListener('click', e => {
+        const trigger = e.target.closest('[data-form-help]');
+        if (trigger) {
+          e.preventDefault();
+          e.stopPropagation();
+          openFormHelpPopover(trigger);
+          return;
+        }
+        if (e.target.closest('#form-help-popover')) return;
+        closeFormHelpPopover();
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeFormHelpPopover();
+      });
+      document.getElementById('form-help-popover-close')?.addEventListener('click', () => closeFormHelpPopover());
+      window.addEventListener('resize', closeFormHelpPopover);
     }
 
     function enrichVm(v) {
@@ -20737,7 +20894,7 @@
     function catalogStepsForRole() {
       const steps = [
         { key: 'ci-details', label: 'Details' },
-        { key: 'ci-access', label: 'Instance types' },
+        { key: 'ci-access', label: 'Compute configuration' },
         { key: 'ci-storage', label: 'Storage' },
         { key: 'ci-access-init', label: 'Access & Initial run' },
         { key: 'ci-review', label: 'Review' },
@@ -21212,6 +21369,15 @@
       },
     ];
 
+    PROVIDER_CATALOG_ITEMS.forEach(item => {
+      if (!item.provisioningTemplate) item.provisioningTemplate = 'ocp_virt_vm';
+      if (!item.guestOsFamily) {
+        item.guestOsFamily = /win/i.test(String(item.diskImage || ''))
+          ? 'Microsoft Windows'
+          : 'Linux';
+      }
+    });
+
     /** Tenant-owned catalog items — editable by tenant admin only. */
     let TENANT_CATALOG_ITEMS = [];
 
@@ -21227,6 +21393,7 @@
         maxVisited: 0,
         name: generateCatalogItemName(),
         description: '',
+        provisioningTemplate: 'ocp_virt_vm',
         guestOsFamily: 'Linux',
         diskImageId: '',
         diskImageAccess: 'editable',
@@ -21301,14 +21468,14 @@
       if (!it) {
         return {
           id: '',
-          label: 'No default',
+          label: 'Not set',
           instanceTypeName: '',
           cpu: '—',
           memory: '—',
           gpu: '—',
           rateHour: item.rateHour || '—',
           rateMonth: item.rateMonth || '—',
-          summary: 'No default',
+          summary: 'Not set',
         };
       }
       return {
@@ -21344,6 +21511,7 @@
       return {
         name: (c.name || '').trim(),
         description: (c.description || '').trim(),
+        provisioningTemplate: c.provisioningTemplate || 'ocp_virt_vm',
         guestOsFamily: c.guestOsFamily || 'Linux',
         diskImageId: c.diskImageId || '',
         diskImageAccess: c.diskImageAccess || 'editable',
@@ -21383,6 +21551,8 @@
         case 'name':
         case 'description':
           return esc(snapshot[field] || '—');
+        case 'provisioningTemplate':
+          return esc(catalogProvisioningTemplateLabel(snapshot.provisioningTemplate));
         case 'guestOsFamily':
           return esc(snapshot.guestOsFamily || 'Linux');
         case 'diskImageId': {
@@ -21402,7 +21572,7 @@
           return esc(resolveCatalogItemCompute({ instanceTypeId: snapshot.instanceTypeId }).summary);
         case 'runStrategy': {
           const opt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === snapshot.runStrategy);
-          return opt ? esc(opt.label) : 'No default';
+          return opt ? esc(opt.label) : 'Not set';
         }
         case 'bootDiskGiB':
           return snapshot.bootDiskGiB === '' || snapshot.bootDiskGiB == null
@@ -21415,15 +21585,15 @@
         case 'initMethod':
           return snapshot.initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
         case 'initDefaultMode':
-          return snapshot.initDefaultMode === 'provide' ? 'Default set' : 'No default';
+          return snapshot.initDefaultMode === 'provide' ? 'Default set' : 'Not set';
         case 'cloudInit':
         case 'sysprep':
-          return snapshot[field] ? 'Configured' : 'No default';
+          return snapshot[field] ? 'Configured' : 'Not set';
         case 'cloudInitSource':
           return snapshot.cloudInitSource === 'secret' ? 'Select secret' : 'Enter value';
         case 'cloudInitSecretId':
         case 'sysprepSecretId':
-          return snapshot[field] ? esc(secretDisplayName(snapshot[field]) || snapshot[field]) : 'No default';
+          return snapshot[field] ? esc(secretDisplayName(snapshot[field]) || snapshot[field]) : 'Not set';
         case 'sysprepMode':
           return snapshot.sysprepMode === 'attach' ? 'Select secret' : 'Enter value';
         case 'visibility':
@@ -21447,13 +21617,12 @@
     const CATALOG_EDIT_TRACKED_FIELDS = [
       { key: 'name', label: 'Name' },
       { key: 'description', label: 'Description' },
+      { key: 'provisioningTemplate', label: 'Provisioning template' },
       { key: 'diskImageId', label: 'Disk image' },
       { key: 'diskImageAccess', label: 'Disk image access' },
       { key: 'guestOsFamily', label: 'Guest operating system' },
       { key: 'instanceTypeId', label: 'Instance type' },
       { key: 'computeAccess', label: 'Instance type access' },
-      { key: 'runStrategy', label: 'Run strategy' },
-      { key: 'runStrategyAccess', label: 'Run strategy access' },
       { key: 'visibility', label: 'Scope' },
       { key: 'bootDiskGiB', label: 'Boot disk size' },
       { key: 'bootDiskAccess', label: 'Boot disk size access' },
@@ -21544,13 +21713,6 @@
       return match?.id || '';
     }
 
-    function catalogNoDefaultCopy(noun) {
-      return {
-        title: 'No default',
-        desc: `Tenants choose ${noun} when creating a virtual machine`,
-      };
-    }
-
     function filteredCatalogDiskImages(guestOsFamily, filter = '') {
       const q = (filter || '').toLowerCase();
       return CATALOG_DISK_IMAGE_OPTIONS.filter(d => {
@@ -21599,6 +21761,7 @@
         maxVisited: catalogStepsForRole().length - 1,
         name: item.name,
         description: item.description || '',
+        provisioningTemplate: item.provisioningTemplate || 'ocp_virt_vm',
         guestOsFamily: item.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : 'Linux'),
         diskImageId,
         diskImageAccess,
@@ -21783,18 +21946,7 @@
       if (!c) return;
 
       if (key === 'ci-details') {
-        beginCatalogAccessSwitchRender();
-        if (!c.diskImageAccess) c.diskImageAccess = 'editable';
-        if (!c.guestOsFamily) c.guestOsFamily = 'Linux';
-        if (c.diskImageMenuOpen == null) c.diskImageMenuOpen = false;
-        if (c.diskImageFilter == null) c.diskImageFilter = '';
-        if (c.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(d => d.id === c.diskImageId)) {
-          c.diskImageId = '';
-        }
-        const filteredForFamily = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
-        if (c.diskImageId && !filteredForFamily.some(x => x.id === c.diskImageId)) {
-          c.diskImageId = '';
-        }
+        if (!c.provisioningTemplate) c.provisioningTemplate = 'ocp_virt_vm';
         const providerScope = isProviderCatalogRole();
         if (providerScope) {
           hydrateCatalogScope(c);
@@ -21805,9 +21957,12 @@
           };
         }
         const detailsHelp = providerScope
-          ? 'Assign the catalog item to a tenant (or make it global), then enter a name. Names are unique per tenant.'
-          : 'Name this catalog item and optionally choose a default disk image.';
+          ? 'Assign the catalog item to a tenant (or make it global), then enter a name and choose a provisioning template. Names are unique per tenant.'
+          : 'Name this catalog item and choose a provisioning template.';
         const scopeHtml = providerScope ? renderTenantEditor('ci', c) : '';
+        const templateOptionsHtml = CATALOG_PROVISIONING_TEMPLATES.map(t =>
+          `<option value="${t.id}" ${c.provisioningTemplate === t.id ? 'selected' : ''}>${t.label}</option>`
+        ).join('');
         panel.innerHTML = `
           <h3>Details</h3>
           <p class="create-resource-wiz__help">${detailsHelp}</p>
@@ -21829,7 +21984,75 @@
             <label for="ci-description">Description</label>
             <textarea id="ci-description" rows="3">${String(c.description || '').replace(/</g, '&lt;')}</textarea>
           </div>
-          <hr class="form-section-divider" />
+          <div class="form-field">
+            <div class="form-label-with-help">
+              <label for="ci-provisioning-template">Provisioning template <span class="req">*</span></label>
+              <button type="button" class="form-label-help" id="ci-provisioning-template-help"
+                data-form-help="provisioning-template"
+                aria-label="More information for Provisioning template"
+                aria-expanded="false" aria-haspopup="dialog">
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+              </button>
+            </div>
+            ${pfSelect({
+              id: 'ci-provisioning-template',
+              required: true,
+              ariaLabel: 'Provisioning template',
+              optionsHtml: templateOptionsHtml,
+            })}
+          </div>
+        `;
+        panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
+          c.name = generateCatalogItemName();
+          delete state.fieldErrors.ciName;
+          if (c.fieldErrors) delete c.fieldErrors.name;
+          const input = panel.querySelector('#ci-name');
+          if (input) input.value = c.name;
+          renderCreateCatalogItemWizard();
+        });
+        panel.querySelector('#ci-provisioning-template')?.addEventListener('change', e => {
+          c.provisioningTemplate = e.target.value || 'ocp_virt_vm';
+        });
+        if (providerScope) {
+          bindTenantEditor('ci', c, () => {
+            applyCatalogScope(c);
+            if (c.isGlobal || c.tenantId) {
+              delete state.fieldErrors.ciTenants;
+              if (c.fieldErrors) delete c.fieldErrors.tenant;
+            }
+            renderCreateCatalogItemWizard();
+          });
+        }
+        return;
+      }
+
+      if (key === 'ci-access') {
+        beginCatalogAccessSwitchRender();
+        if (!c.diskImageAccess) c.diskImageAccess = 'editable';
+        if (!c.guestOsFamily) c.guestOsFamily = 'Linux';
+        if (c.diskImageMenuOpen == null) c.diskImageMenuOpen = false;
+        if (c.diskImageFilter == null) c.diskImageFilter = '';
+        if (c.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(d => d.id === c.diskImageId)) {
+          c.diskImageId = '';
+        }
+        const filteredForFamily = filteredCatalogDiskImages(c.guestOsFamily, c.diskImageFilter);
+        if (c.diskImageId && !filteredForFamily.some(x => x.id === c.diskImageId)) {
+          c.diskImageId = '';
+        }
+        if (!c.computeAccess) c.computeAccess = 'editable';
+        c.tenantAccess = c.computeAccess;
+        const instanceTypeId = c.instanceTypeId || c.computeResourceId || '';
+        c.instanceTypeId = instanceTypeId;
+        const showGpuIts = !!c.showGpuIts;
+        const requireGpu = showGpuIts;
+        const gpuPool = filteredCatalogInstanceTypeOptions('', { requireGpu });
+        if (c.instanceTypeId && !gpuPool.some(o => o.id === c.instanceTypeId)) {
+          c.instanceTypeId = '';
+        }
+        const computeOptions = filteredCatalogInstanceTypeOptions(c.computeFilter, { requireGpu });
+        panel.innerHTML = `
+          <h3>Compute configuration</h3>
+          <p class="create-resource-wiz__help">Choose a guest operating system, disk image, and instance type. Use the GPU checkbox to switch between instance types with and without a GPU.</p>
           ${renderCatalogFieldLabelRow({
             labelHtml: 'Disk image',
             labelId: 'ci-disk-image-heading',
@@ -21837,7 +22060,6 @@
             stateKey: 'diskImageAccess',
             value: c.diskImageAccess || 'editable',
           })}
-          <p class="step-help">Choose the guest operating system and disk image for this catalog item.</p>
           <div class="form-field" id="ci-guest-os-field">
             <label id="ci-guest-os-label">Select guest operating system</label>
             ${renderGuestOsSelectBoxes({
@@ -21862,35 +22084,50 @@
               optionAttr: 'data-ci-disk-image',
               emptyNoun: 'disk images',
               invalid: !!state.fieldErrors.ciDiskImage,
-              describedBy: state.fieldErrors.ciDiskImage ? 'err-ciDiskImage' : 'ci-disk-image-help',
+              describedBy: state.fieldErrors.ciDiskImage ? 'err-ciDiskImage' : '',
               options: filteredForFamily.map(img => ({
                 id: img.id,
                 title: img.title,
                 desc: `${img.family} · ${img.arch}`,
               })),
             })}
-            <p class="form-helper" id="ci-disk-image-help">Guest operating system is derived from the disk image when one is set.</p>
             ${providerFieldErrorHtml(state.fieldErrors.ciDiskImage, 'err-ciDiskImage')}
           </div>
+          <hr class="form-section-divider" />
+          <div class="form-field ${state.fieldErrors.ciInstanceType ? 'pf-m-error' : ''}">
+            ${renderCatalogFieldLabelRow({
+              labelHtml: `Instance type${catalogReqStar(c.computeAccess)}`,
+              labelId: 'ci-compute-section-label',
+              tag: 'h4',
+              labelClass: 'config-section-title',
+              stateKey: 'computeAccess',
+              value: c.computeAccess || 'editable',
+            })}
+            <label class="form-check form-check--gpu-filter" for="ci-show-gpu-its">
+              <input type="checkbox" id="ci-show-gpu-its" ${showGpuIts ? 'checked' : ''} />
+              Show instance types with GPU
+            </label>
+            ${renderTypeaheadRichSelectHtml({
+              rootId: 'ci-compute-select',
+              toggleId: 'ci-compute-toggle',
+              menuId: 'ci-compute-menu',
+              searchId: 'ci-compute-search',
+              labelId: 'ci-compute-section-label',
+              open: !!c.computeMenuOpen,
+              filter: c.computeFilter || '',
+              searchPlaceholder: 'Search instance types',
+              selectedId: c.instanceTypeId || '',
+              placeholder: 'Select an instance type',
+              optionAttr: 'data-ci-compute',
+              emptyNoun: 'instance types',
+              stacked: true,
+              invalid: !!state.fieldErrors.ciInstanceType,
+              describedBy: state.fieldErrors.ciInstanceType ? 'err-ciInstanceType' : '',
+              options: computeOptions.map(catalogInstanceTypeOptionMeta),
+            })}
+            ${providerFieldErrorHtml(state.fieldErrors.ciInstanceType, 'err-ciInstanceType')}
+          </div>
         `;
-        panel.querySelector('#ci-regen-name')?.addEventListener('click', () => {
-          c.name = generateCatalogItemName();
-          delete state.fieldErrors.ciName;
-          if (c.fieldErrors) delete c.fieldErrors.name;
-          const input = panel.querySelector('#ci-name');
-          if (input) input.value = c.name;
-          renderCreateCatalogItemWizard();
-        });
-        if (providerScope) {
-          bindTenantEditor('ci', c, () => {
-            applyCatalogScope(c);
-            if (c.isGlobal || c.tenantId) {
-              delete state.fieldErrors.ciTenants;
-              if (c.fieldErrors) delete c.fieldErrors.tenant;
-            }
-            renderCreateCatalogItemWizard();
-          });
-        }
         bindCatalogAccessSwitches(panel, c);
         panel.querySelectorAll('input[name="ciGuestOs"]').forEach(r => {
           r.addEventListener('change', () => {
@@ -21923,126 +22160,6 @@
           },
           rerender: renderCreateCatalogItemWizard,
         });
-        restoreRichSearchFocus(panel);
-        return;
-      }
-
-      if (key === 'ci-access') {
-        beginCatalogAccessSwitchRender();
-        if (!c.computeAccess) c.computeAccess = 'editable';
-        c.tenantAccess = c.computeAccess;
-        if (!c.runStrategyAccess) c.runStrategyAccess = 'editable';
-        const instanceTypeId = c.instanceTypeId || c.computeResourceId || '';
-        c.instanceTypeId = instanceTypeId;
-        const showGpuIts = !!c.showGpuIts;
-        const requireGpu = showGpuIts;
-        const gpuPool = filteredCatalogInstanceTypeOptions('', { requireGpu });
-        if (c.instanceTypeId && !gpuPool.some(o => o.id === c.instanceTypeId)) {
-          c.instanceTypeId = '';
-        }
-        const computeOptions = filteredCatalogInstanceTypeOptions(c.computeFilter, { requireGpu });
-        const runNone = catalogNoDefaultCopy('a run strategy');
-        const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
-        const runToggleTitle = runOpt ? runOpt.label : runNone.title;
-        const runToggleDesc = runOpt ? runOpt.desc : runNone.desc;
-        const runFiltered = CATALOG_RUN_STRATEGY_OPTIONS.filter(o => {
-          const q = (c.runStrategyFilter || '').toLowerCase();
-          if (!q) return true;
-          return `${o.label} ${o.desc}`.toLowerCase().includes(q);
-        });
-        const computeLocked = c.computeAccess === 'locked';
-        const computeHelp = computeLocked
-          ? 'Choose an instance type. Use the GPU checkbox to switch between instance types with and without a GPU.'
-          : 'Choose an instance type, or leave empty for no default. Use the GPU checkbox to switch between instance types with and without a GPU.';
-        panel.innerHTML = `
-          <h3>Instance types</h3>
-          <p class="create-resource-wiz__help">${computeHelp}</p>
-          <div class="form-field ${state.fieldErrors.ciInstanceType ? 'pf-m-error' : ''}">
-            ${renderCatalogFieldLabelRow({
-              labelHtml: `Instance type${catalogReqStar(c.computeAccess)}`,
-              labelId: 'ci-compute-section-label',
-              tag: 'h4',
-              labelClass: 'config-section-title config-section-title--first',
-              stateKey: 'computeAccess',
-              value: c.computeAccess || 'editable',
-            })}
-            <label class="form-check form-check--gpu-filter" for="ci-show-gpu-its">
-              <input type="checkbox" id="ci-show-gpu-its" ${showGpuIts ? 'checked' : ''} />
-              Show instance types with GPU
-            </label>
-            ${renderTypeaheadRichSelectHtml({
-              rootId: 'ci-compute-select',
-              toggleId: 'ci-compute-toggle',
-              menuId: 'ci-compute-menu',
-              searchId: 'ci-compute-search',
-              labelId: 'ci-compute-section-label',
-              open: !!c.computeMenuOpen,
-              filter: c.computeFilter || '',
-              searchPlaceholder: 'Search instance types',
-              selectedId: c.instanceTypeId || '',
-              placeholder: 'Select an instance type',
-              optionAttr: 'data-ci-compute',
-              emptyNoun: 'instance types',
-              stacked: true,
-              invalid: !!state.fieldErrors.ciInstanceType,
-              describedBy: state.fieldErrors.ciInstanceType ? 'err-ciInstanceType' : '',
-              options: computeOptions.map(catalogInstanceTypeOptionMeta),
-            })}
-            ${providerFieldErrorHtml(state.fieldErrors.ciInstanceType, 'err-ciInstanceType')}
-          </div>
-          <hr class="form-section-divider" />
-          <div class="form-field ${state.fieldErrors.ciRunStrategy ? 'pf-m-error' : ''}">
-            ${renderCatalogFieldLabelRow({
-              labelHtml: `Run strategy${catalogReqStar(c.runStrategyAccess)}`,
-              labelId: 'ci-run-strategy-label',
-              tag: 'h4',
-              labelClass: 'config-section-title',
-              stateKey: 'runStrategyAccess',
-              value: c.runStrategyAccess || 'editable',
-            })}
-            <div class="rich-select rich-select--typeahead ${c.runStrategyMenuOpen ? 'pf-m-expanded' : ''}" id="ci-run-strategy-select">
-              ${pfRichSelectToggle({
-                id: 'ci-run-strategy-toggle',
-                ariaLabelledby: 'ci-run-strategy-label',
-                ariaExpanded: c.runStrategyMenuOpen,
-                stacked: true,
-                mainHtml: `
-                  <span class="rich-select__toggle-label">${runToggleTitle}</span>
-                  <span class="rich-select__toggle-desc">${runToggleDesc}</span>
-                `,
-              })}
-              <div class="pf-v6-c-menu rich-select__menu" id="ci-run-strategy-menu" role="listbox" ${c.runStrategyMenuOpen ? '' : 'hidden'}>
-                <div class="rich-select__search">
-                  <i class="fa-solid fa-search" aria-hidden="true"></i>
-                  <input type="search" id="ci-run-strategy-search" placeholder="Search run strategies" value="${String(c.runStrategyFilter || '').replace(/"/g, '&quot;')}" aria-label="Search run strategies" />
-                </div>
-                <hr class="rich-select__menu-divider" />
-                <div class="rich-select__menu-list">
-                  <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.runStrategy ? 'pf-m-selected' : ''}" data-run-strategy="" role="option">
-                    <span class="pf-v6-c-menu__item-main">
-                      <span class="rich-select__option-body">
-                        <span class="rich-select__option-title">${runNone.title}</span>
-                        <span class="rich-select__option-desc">${runNone.desc}</span>
-                      </span>
-                    </span>
-                  </button>
-                  ${runFiltered.map(o => `
-                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${o.id === c.runStrategy ? 'pf-m-selected' : ''}" data-run-strategy="${o.id}" role="option">
-                      <span class="pf-v6-c-menu__item-main">
-                        <span class="rich-select__option-body">
-                          <span class="rich-select__option-title">${o.label}</span>
-                          <span class="rich-select__option-desc">${o.desc}</span>
-                        </span>
-                      </span>
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-            </div>
-            ${providerFieldErrorHtml(state.fieldErrors.ciRunStrategy, 'err-ciRunStrategy')}
-          </div>
-        `;
-        bindCatalogAccessSwitches(panel, c);
         panel.querySelector('#ci-show-gpu-its')?.addEventListener('change', e => {
           c.showGpuIts = !!e.target.checked;
           c.computeMenuOpen = false;
@@ -22071,23 +22188,6 @@
           },
           rerender: renderCreateCatalogItemWizard,
         });
-        bindRichSelect(panel.querySelector('#ci-run-strategy-select'), {
-          toggleSel: '#ci-run-strategy-toggle',
-          menuSel: '#ci-run-strategy-menu',
-          optionSel: '[data-run-strategy]',
-          onOpen: () => { c.runStrategyMenuOpen = true; },
-          onClose: () => { c.runStrategyMenuOpen = false; },
-          onSelect: opt => {
-            c.runStrategy = opt.dataset.runStrategy || '';
-            delete state.fieldErrors.ciRunStrategy;
-            renderCreateCatalogItemWizard();
-          },
-        });
-        panel.querySelector('#ci-run-strategy-search')?.addEventListener('input', e => {
-          c.runStrategyFilter = e.target.value;
-          renderCreateCatalogItemWizard();
-          panel.querySelector('#ci-run-strategy-search')?.focus();
-        });
         restoreRichSearchFocus(panel);
         return;
       }
@@ -22104,17 +22204,6 @@
         const tiers = getStorageTiers();
         const bootSizeSet = c.bootDiskGiB != null && c.bootDiskGiB !== '';
         const bootSizeVal = bootSizeSet ? Math.min(diskMax, Math.max(diskMin, Number(c.bootDiskGiB))) : '';
-        const selectedTier = tiers.find(t => t.id === c.bootStorageTierId);
-        const bootTierNone = catalogNoDefaultCopy('a storage tier');
-        const bootTierTitle = selectedTier ? selectedTier.name : bootTierNone.title;
-        const bootTierDesc = selectedTier
-          ? (selectedTier.description || '')
-          : bootTierNone.desc;
-        const tierFiltered = tiers.filter(t => {
-          const q = (c.bootTierFilter || '').toLowerCase();
-          if (!q) return true;
-          return `${t.name} ${t.description || ''}`.toLowerCase().includes(q);
-        });
         const extraDisks = c.extraDisks;
         const diskSetsHtml = extraDisks.length ? `
           <div class="inline-sets" aria-label="Additional disks">
@@ -22173,7 +22262,7 @@
         ` : '<p class="form-helper">No additional disks. Add disks if this catalog item should include them by default.</p>';
         panel.innerHTML = `
           <h3>Storage</h3>
-          <p class="create-resource-wiz__help">Optionally set boot disk defaults. Leave fields as No default if tenants should choose when creating a virtual machine.</p>
+          <p class="create-resource-wiz__help">Set the default boot disk size and storage tier for this catalog item. Leave a field editable and unset if users must choose a value when they create a virtual machine. Lock a field to apply its configured value and prevent users from changing it.</p>
           <div class="vm-config__fields">
             <div class="form-field ${state.fieldErrors.ciBootDisk ? 'pf-m-error' : ''}">
               ${renderCatalogFieldLabelRow({
@@ -22185,10 +22274,9 @@
               })}
               <input type="number" id="ci-boot-disk" class="unit-size-input" value="${bootSizeVal}"
                 min="${diskMin}" max="${diskMax}" step="1"
-                placeholder="${c.bootDiskAccess === 'locked' ? '' : 'No default'}"
+                placeholder="Select boot disk size"
                 aria-label="Boot disk size in GiB"
                 ${state.fieldErrors.ciBootDisk ? 'aria-invalid="true" aria-describedby="err-ciBootDisk"' : ''} />
-              <p class="form-helper">${c.bootDiskAccess === 'locked' ? 'Required when Locked.' : 'Optional. Clear the field to leave as No default.'}</p>
               ${providerFieldErrorHtml(state.fieldErrors.ciBootDisk, 'err-ciBootDisk')}
             </div>
             <hr class="form-section-divider" />
@@ -22199,45 +22287,32 @@
                 stateKey: 'bootStorageTierAccess',
                 value: c.bootStorageTierAccess || 'editable',
               })}
-              <div class="rich-select rich-select--typeahead ${c.bootTierMenuOpen ? 'pf-m-expanded' : ''}" id="ci-boot-tier-select">
-                ${pfRichSelectToggle({
-                  id: 'ci-boot-tier-toggle',
-                  ariaLabelledby: 'ci-boot-tier-label',
-                  ariaExpanded: c.bootTierMenuOpen,
-                  stacked: true,
-                  mainHtml: `
-                    <span class="rich-select__toggle-label">${bootTierTitle}</span>
-                    <span class="rich-select__toggle-desc">${bootTierDesc}</span>
-                  `,
-                })}
-                <div class="pf-v6-c-menu rich-select__menu" id="ci-boot-tier-menu" role="listbox" ${c.bootTierMenuOpen ? '' : 'hidden'}>
-                  <div class="rich-select__search">
-                    <i class="fa-solid fa-search" aria-hidden="true"></i>
-                    <input type="search" id="ci-boot-tier-search" placeholder="Search storage tiers" value="${String(c.bootTierFilter || '').replace(/"/g, '&quot;')}" aria-label="Search storage tiers" />
-                  </div>
-                  <hr class="rich-select__menu-divider" />
-                  <div class="rich-select__menu-list">
-                    <button type="button" class="pf-v6-c-menu__item rich-select__option ${!c.bootStorageTierId ? 'pf-m-selected' : ''}" data-boot-tier="" role="option">
-                      <span class="pf-v6-c-menu__item-main">
-                        <span class="rich-select__option-body">
-                          <span class="rich-select__option-title">${bootTierNone.title}</span>
-                          <span class="rich-select__option-desc">${bootTierNone.desc}</span>
-                        </span>
-                      </span>
-                    </button>
-                    ${tierFiltered.map(t => `
-                      <button type="button" class="pf-v6-c-menu__item rich-select__option ${t.id === c.bootStorageTierId ? 'pf-m-selected' : ''}" data-boot-tier="${t.id}" role="option">
-                        <span class="pf-v6-c-menu__item-main">
-                          <span class="rich-select__option-body">
-                            <span class="rich-select__option-title">${t.name}</span>
-                            <span class="rich-select__option-desc">${t.description || ''}</span>
-                          </span>
-                        </span>
-                      </button>
-                    `).join('') || emptyStateMenuSearchHtml('storage tiers')}
-                  </div>
-                </div>
-              </div>
+              ${renderTypeaheadRichSelectHtml({
+                rootId: 'ci-boot-tier-select',
+                toggleId: 'ci-boot-tier-toggle',
+                menuId: 'ci-boot-tier-menu',
+                searchId: 'ci-boot-tier-search',
+                labelId: 'ci-boot-tier-label',
+                open: !!c.bootTierMenuOpen,
+                filter: c.bootTierFilter || '',
+                searchPlaceholder: 'Search storage tiers',
+                selectedId: c.bootStorageTierId || '',
+                placeholder: 'Select boot storage tier',
+                stacked: true,
+                optionAttr: 'data-boot-tier',
+                emptyNoun: 'storage tiers',
+                invalid: !!state.fieldErrors.ciBootTier,
+                describedBy: state.fieldErrors.ciBootTier ? 'err-ciBootTier' : '',
+                options: tiers.map(t => ({
+                  id: t.id,
+                  title: t.name,
+                  desc: t.description || '',
+                })),
+              })}
+              ${c.bootStorageTierId ? `
+                <div style="margin-top:8px;">
+                  <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="ci-boot-tier-clear">Clear selection</button>
+                </div>` : ''}
               ${providerFieldErrorHtml(state.fieldErrors.ciBootTier, 'err-ciBootTier')}
             </div>
             <hr class="form-section-divider" />
@@ -22270,21 +22345,29 @@
         panel.querySelector('#ci-boot-disk')?.addEventListener('change', syncBootSize);
         panel.querySelector('#ci-boot-disk')?.addEventListener('input', syncBootSize);
         bindCatalogAccessSwitches(panel, c);
-        bindRichSelect(panel.querySelector('#ci-boot-tier-select'), {
-          toggleSel: '#ci-boot-tier-toggle',
-          menuSel: '#ci-boot-tier-menu',
+        wireTypeaheadRichSelect(panel, {
+          rootId: 'ci-boot-tier-select',
+          toggleId: 'ci-boot-tier-toggle',
+          menuId: 'ci-boot-tier-menu',
+          searchId: 'ci-boot-tier-search',
           optionSel: '[data-boot-tier]',
-          onOpen: () => { c.bootTierMenuOpen = true; },
-          onClose: () => { c.bootTierMenuOpen = false; },
-          onSelect: opt => {
-            c.bootStorageTierId = opt.dataset.bootTier || '';
+          getOptionId: opt => opt.dataset.bootTier,
+          setOpen: (open) => { c.bootTierMenuOpen = open; },
+          setFilter: (v) => { c.bootTierFilter = v; },
+          onSelectId: (id) => {
+            c.bootStorageTierId = id || '';
+            c.bootTierMenuOpen = false;
+            c.bootTierFilter = '';
+            delete state.fieldErrors.ciBootTier;
             renderCreateCatalogItemWizard();
           },
+          rerender: renderCreateCatalogItemWizard,
         });
-        panel.querySelector('#ci-boot-tier-search')?.addEventListener('input', e => {
-          c.bootTierFilter = e.target.value;
+        panel.querySelector('#ci-boot-tier-clear')?.addEventListener('click', () => {
+          c.bootStorageTierId = '';
+          c.bootTierMenuOpen = false;
+          c.bootTierFilter = '';
           renderCreateCatalogItemWizard();
-          panel.querySelector('#ci-boot-tier-search')?.focus();
         });
         panel.querySelector('#ci-add-disk')?.addEventListener('click', e => {
           e.preventDefault();
@@ -22533,8 +22616,8 @@
             ${optionalBadge}
           </h3>
           <p class="create-resource-wiz__help">${windowsCatalog
-            ? 'Configure first-boot customization for Windows virtual machines created from this catalog item.'
-            : 'Configure first-boot initialization for virtual machines created from this catalog item.'}</p>
+            ? 'Provide Unattend.xml for first-boot customization, or skip this step to continue.'
+            : 'Add optional user data, or skip this step to continue.'}</p>
           ${initHtml}
         `;
         bindCatalogAccessSwitches(panel, c);
@@ -22626,7 +22709,6 @@
 
       const disk = getCatalogDiskImage(c.diskImageId);
       const compute = resolveCatalogItemCompute({ instanceTypeId: c.instanceTypeId || c.computeResourceId });
-      const runOpt = CATALOG_RUN_STRATEGY_OPTIONS.find(o => o.id === c.runStrategy);
       const bootTier = (c.bootStorageTierId && getStorageTiers().find(t => t.id === c.bootStorageTierId)) || null;
       const initMethod = c.initMethod === 'sysprep' || c.guestOsFamily === 'Microsoft Windows' ? 'sysprep' : 'cloud-init';
       const initLabel = initMethod === 'sysprep' ? 'Sysprep' : 'Cloud-init';
@@ -22661,10 +22743,10 @@
         const scopeValue = isProviderCatalogRole() ? catalogScopeReviewValue(c) : '';
         const diskValue = disk
           ? esc(`${disk.title} (${disk.family} · ${disk.arch})`)
-          : 'No default';
+          : 'Not set';
         const bootSizeValue = c.bootDiskGiB != null && c.bootDiskGiB !== ''
           ? `${c.bootDiskGiB} GiB`
-          : 'No default';
+          : 'Not set';
         const reviewRow = (label, value) => `
           <div class="review-nebius__row">
             <span class="review-nebius__label">${label}</span>
@@ -22672,12 +22754,15 @@
           </div>
         `;
         const extraDisksRows = (c.extraDisks || []).length
-          ? (c.extraDisks || []).map((d, i) => {
-              const tier = (d.storageTierLabel || getStorageTiers().find(t => t.id === d.storageTierId)?.name || '—')
-                .replace(/</g, '&lt;');
-              return reviewRow(`Disk set ${i + 1}`, `${d.size} GiB · ${tier}`);
-            }).join('') + reviewRow('Additional disks access', catalogAccessLabel(c.extraDisksAccess))
-          : reviewRow('Additional disks', 'Not set');
+          ? catalogGovValueHtml(
+              (c.extraDisks || []).map((d, i) => {
+                const tier = (d.storageTierLabel || getStorageTiers().find(t => t.id === d.storageTierId)?.name || '—')
+                  .replace(/</g, '&lt;');
+                return `Disk set ${i + 1}: ${d.size} GiB · ${tier}`;
+              }).join('<br>'),
+              c.extraDisksAccess
+            )
+          : 'Not set';
         panel.innerHTML = `
           <h3>Review and create</h3>
           <p class="create-resource-wiz__help">Confirm your settings before creating the catalog item. It will be saved as unpublished until you publish it. Click a section title to edit.</p>
@@ -22686,27 +22771,21 @@
               ${isProviderCatalogRole() ? reviewRow('Scope', esc(scopeValue)) : ''}
               ${reviewRow('Name', esc(c.name))}
               ${reviewRow('Description', c.description ? esc(c.description) : '—')}
-              ${reviewRow('Disk image', diskValue)}
-              ${reviewRow('Disk image access', catalogAccessLabel(c.diskImageAccess))}
-              ${reviewRow('Guest operating system', esc(c.guestOsFamily || 'Linux'))}
+              ${reviewRow('Provisioning template', esc(catalogProvisioningTemplateLabel(c.provisioningTemplate)))}
               ${reviewRow('Status', 'Unpublished')}
             `, 'ci-review')}
-            ${reviewNebiusSection('Instance types', 'ci-access', `
-              ${reviewRow('Instance type', esc(compute.summary))}
-              ${reviewRow('Instance type access', catalogAccessLabel(c.computeAccess || c.tenantAccess))}
-              ${reviewRow('Run strategy', runOpt ? esc(runOpt.label) : 'No default')}
-              ${reviewRow('Run strategy access', catalogAccessLabel(c.runStrategyAccess))}
+            ${reviewNebiusSection('Compute configuration', 'ci-access', `
+              ${reviewRow('Guest operating system', esc(c.guestOsFamily || 'Linux'))}
+              ${reviewRow('Disk image', catalogGovValueHtml(diskValue, c.diskImageAccess))}
+              ${reviewRow('Instance type', catalogGovValueHtml(esc(compute.summary), c.computeAccess || c.tenantAccess))}
             `, 'ci-review')}
             ${reviewNebiusSection('Storage', 'ci-storage', `
-              ${reviewRow('Boot disk size', bootSizeValue)}
-              ${reviewRow('Boot disk size access', catalogAccessLabel(c.bootDiskAccess))}
-              ${reviewRow('Boot storage tier', bootTier ? esc(bootTier.name) : 'No default')}
-              ${reviewRow('Boot storage tier access', catalogAccessLabel(c.bootStorageTierAccess))}
-              ${extraDisksRows}
+              ${reviewRow('Boot disk size', catalogGovValueHtml(bootSizeValue, c.bootDiskAccess))}
+              ${reviewRow('Boot storage tier', catalogGovValueHtml(bootTier ? esc(bootTier.name) : 'Not set', c.bootStorageTierAccess))}
+              ${reviewRow('Additional disks', extraDisksRows)}
             `, 'ci-review')}
             ${reviewNebiusSection('Access & Initial run', 'ci-access-init', `
-              ${reviewRow(initLabel, initReviewVal)}
-              ${reviewRow('User data access', catalogAccessLabel(c.initAccess))}
+              ${reviewRow(initLabel, catalogGovValueHtml(initReviewVal, c.initAccess))}
             `, 'ci-review')}
           </div>
         `;
@@ -22732,6 +22811,8 @@
       if (name) c.name = name.value.trim();
       const desc = document.getElementById('ci-desc') || document.getElementById('ci-description');
       if (desc) c.description = desc.value.trim();
+      const tpl = document.getElementById('ci-provisioning-template');
+      if (tpl) c.provisioningTemplate = tpl.value || 'ocp_virt_vm';
       document.querySelectorAll('[data-ci-access-state]').forEach(sel => {
         const key = sel.dataset.ciAccessState;
         c[key] = sel.type === 'checkbox'
@@ -22789,16 +22870,16 @@
             errors.ciTenants = 'Select a tenant, or choose Global scope.';
           }
         }
-        if (c.diskImageAccess === 'locked' && !c.diskImageId) {
-          errors.ciDiskImage = 'Select a disk image to continue.';
+        if (!c.provisioningTemplate) {
+          errors.ciProvisioningTemplate = 'Select a provisioning template.';
         }
       }
       if (key === 'ci-access') {
+        if (c.diskImageAccess === 'locked' && !c.diskImageId) {
+          errors.ciDiskImage = 'Select a disk image to continue.';
+        }
         if ((c.computeAccess || 'editable') === 'locked' && !(c.instanceTypeId || c.computeResourceId)) {
           errors.ciInstanceType = 'Select an instance type to continue.';
-        }
-        if ((c.runStrategyAccess || 'editable') === 'locked' && !c.runStrategy) {
-          errors.ciRunStrategy = 'Select a run strategy to continue.';
         }
       }
       if (key === 'ci-storage') {
@@ -22846,6 +22927,7 @@
       const baseItem = {
         name: c.name.trim(),
         description: c.description || '',
+        provisioningTemplate: c.provisioningTemplate || 'ocp_virt_vm',
         instanceTypeId,
         diskImage: disk ? disk.title : '',
         diskLocked: diskImageAccess === 'locked',
@@ -22856,8 +22938,6 @@
         rateMonth: inst?.rateMonth || '—',
         guestOsFamily: c.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : ''),
         tenantAccess: computeAccess,
-        runStrategy: c.runStrategy || '',
-        runStrategyAccess: c.runStrategyAccess || 'editable',
         bootDiskGiB: c.bootDiskGiB != null && c.bootDiskGiB !== '' ? Number(c.bootDiskGiB) : null,
         bootDiskAccess: c.bootDiskAccess || 'editable',
         bootStorageTierId: c.bootStorageTierId || '',
@@ -23438,36 +23518,41 @@
       return '<i class="fa-brands fa-redhat catalog-disk-image-value__icon" aria-hidden="true"></i>';
     }
 
+    function catalogItemFieldAccess(item, accessKey, lockedKey) {
+      if (item[accessKey]) return item[accessKey] === 'locked' ? 'locked' : 'editable';
+      if (lockedKey && item[lockedKey] != null) return item[lockedKey] ? 'locked' : 'editable';
+      return 'editable';
+    }
+
     function catalogDetailHardwareSpecsHtml(item) {
       const compute = resolveCatalogItemCompute(item);
       const esc = value => String(value || '—').replace(/</g, '&lt;');
-      const diskImage = item.diskImage ? esc(item.diskImage) : 'No default';
-      const computeLocked = item.computeLocked != null
-        ? !!item.computeLocked
-        : (item.computeAccess ? item.computeAccess === 'locked' : !!item.diskLocked);
-      const diskLocked = item.diskImageAccess
-        ? item.diskImageAccess === 'locked'
-        : (!!item.diskImage && !!item.diskLocked);
-      const computeBadge = catalogGovBadge(computeLocked ? 'locked' : 'editable');
-      const diskBadge = catalogGovBadge(diskLocked ? 'locked' : 'editable');
-      const sizeLabel = esc(compute.label);
+      const diskImage = item.diskImage ? esc(item.diskImage) : 'Not set';
+      const computeAccess = catalogItemFieldAccess(item, 'computeAccess', 'computeLocked');
+      const diskAccess = catalogItemFieldAccess(item, 'diskImageAccess', 'diskLocked');
+      const itName = compute.instanceTypeName || compute.label || 'Not set';
       const diskIcon = catalogDiskImageIconHtml(item.diskImage);
-      const field = (label, valueHtml) => `
-        <div class="catalog-hw-specs__field">
-          <dt class="catalog-hw-specs__label">${label}</dt>
-          <dd class="catalog-hw-specs__value">${valueHtml}</dd>
-        </div>`;
+      const it = getCatalogInstanceType(item.instanceTypeId || item.computeResourceId || '');
+      const hasGpu = Number(it?.gpus) > 0;
+      const gpuFields = hasGpu
+        ? `${itField('GPU count', String(it.gpus).replace(/</g, '&lt;'))}
+           ${itField('GPU type', esc(it.gpuResource || compute.gpu))}`
+        : '';
       return `
-        ${field('Size', `<span>${sizeLabel}</span>${computeBadge}`)}
-        ${field('vCPUs', esc(compute.cpu))}
-        ${field('Memory', esc(compute.memory))}
-        ${field('GPU', esc(compute.gpu))}
-        ${field('Disk image', `${diskIcon}<span>${diskImage}</span>${diskBadge}`)}`;
+        ${itField('Guest operating system family', esc(item.guestOsFamily || 'Linux'))}
+        ${itField('Disk image', catalogGovValueHtml(`${diskIcon}<span>${diskImage}</span>`, diskAccess))}
+        <div class="ethan-detail-col__subtitle-row">
+          <h4 class="ethan-detail-col__subtitle">Instance type</h4>
+        </div>
+        ${itField('Name', catalogGovValueHtml(esc(itName), computeAccess))}
+        ${itField('vCPUs', esc(compute.cpu))}
+        ${itField('Memory', esc(compute.memory))}
+        ${gpuFields}`;
     }
 
     function catalogCardSpecsRowsHtml(item) {
       const compute = resolveCatalogItemCompute(item);
-      const diskRaw = String(item.diskImage || 'No default');
+      const diskRaw = String(item.diskImage || 'Not set');
       const diskImage = diskRaw.replace(/</g, '&lt;');
       const diskLocked = item.diskImageAccess
         ? item.diskImageAccess === 'locked'
@@ -23708,48 +23793,60 @@
           </div>
         </div>
         <div class="ethan-detail-panel catalog-detail-panel">
-          ${isProvider ? `
-          <div class="catalog-detail-grid catalog-detail-grid--provider">
+          <div class="vm-overview-v2__detail-cols">
             <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
               <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
               ${itField('Service', 'Virtual machines')}
-              ${itField('Status', publishLabelHtml(item.publishState))}
+              ${isProvider ? itField('Status', publishLabelHtml(item.publishState)) : ''}
               ${itField('Rate', catalogRateLine(item))}
-            </section>
-            <section class="ethan-detail-col" aria-labelledby="ci-publishing-title">
-              <h3 class="ethan-detail-col__title" id="ci-publishing-title">Publishing</h3>
-              ${itField('Visibility', `<span class="catalog-detail-visibility"><i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i><span>${scopeLabel}</span></span>`)}
+              ${itField('Provisioning template', String(catalogProvisioningTemplateLabel(item.provisioningTemplate)).replace(/</g, '&lt;'))}
+              ${isProvider
+                ? itField('Visibility', `<span class="catalog-detail-visibility"><i class="fa-solid fa-${scopeIcon}" aria-hidden="true"></i><span>${scopeLabel}</span></span>`)
+                : itField('Project', String(item.project || '—').replace(/</g, '&lt;'))}
               ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
             </section>
-            <section class="catalog-hw-specs" aria-labelledby="ci-hardware-title">
-              <h3 class="catalog-hw-specs__title" id="ci-hardware-title">Hardware specifications</h3>
-              <dl class="catalog-hw-specs__list">
-                ${catalogDetailHardwareSpecsHtml(item)}
-              </dl>
+            <section class="ethan-detail-col" aria-labelledby="ci-config-title">
+              <h3 class="ethan-detail-col__title" id="ci-config-title">Configuration</h3>
+              ${catalogDetailHardwareSpecsHtml(item)}
+            </section>
+            <section class="ethan-detail-col" aria-labelledby="ci-access-title">
+              <h3 class="ethan-detail-col__title" id="ci-access-title">Access &amp; Initial run</h3>
+              ${itField(
+                (item.guestOsFamily || '') === 'Microsoft Windows' ? 'Sysprep (Unattend.xml)' : 'Cloud-init',
+                catalogGovValueHtml(catalogInitReviewValue(item), catalogItemFieldAccess(item, 'initAccess', 'initLocked'))
+              )}
             </section>
           </div>
-          ` : `
-          <div class="catalog-detail-grid">
-            <div class="catalog-detail-grid__meta">
-              <section class="ethan-detail-col" aria-labelledby="ci-overview-title">
-                <h3 class="ethan-detail-col__title" id="ci-overview-title">Overview</h3>
-                ${itField('Service', 'Virtual machines')}
-                ${itField('Rate', catalogRateLine(item))}
-              </section>
-              <section class="ethan-detail-col" aria-labelledby="ci-project-title">
-                <h3 class="ethan-detail-col__title" id="ci-project-title">Project</h3>
-                ${itField('Project', String(item.project || '—').replace(/</g, '&lt;'))}
-                ${itField('Created', String(item.created || '—').replace(/</g, '&lt;'))}
-              </section>
-            </div>
-            <section class="catalog-hw-specs" aria-labelledby="ci-hardware-title">
-              <h3 class="catalog-hw-specs__title" id="ci-hardware-title">Hardware specifications</h3>
-              <dl class="catalog-hw-specs__list">
-                ${catalogDetailHardwareSpecsHtml(item)}
-              </dl>
-            </section>
-          </div>
-          `}
+          <hr class="vm-overview-v2__divider" aria-hidden="true" />
+          <section class="vm-overview-v2__section" aria-labelledby="ci-storage-title">
+            <h3 class="ethan-detail-col__title" id="ci-storage-title">Storage</h3>
+            ${itField(
+              'Boot disk size',
+              catalogGovValueHtml(
+                item.bootDiskGiB != null && item.bootDiskGiB !== '' ? `${item.bootDiskGiB} GiB` : 'Not set',
+                catalogItemFieldAccess(item, 'bootDiskAccess')
+              )
+            )}
+            ${itField(
+              'Boot storage tier',
+              catalogGovValueHtml(
+                String(item.bootStorageTierLabel || 'Not set').replace(/</g, '&lt;'),
+                catalogItemFieldAccess(item, 'bootStorageTierAccess')
+              )
+            )}
+            ${itField(
+              'Additional disks',
+              (item.extraDisks || []).length
+                ? catalogGovValueHtml(
+                    (item.extraDisks || []).map((d, i) => {
+                      const tier = String(d.storageTierLabel || '—').replace(/</g, '&lt;');
+                      return `Disk set ${i + 1}: ${d.size} ${d.unit || 'GiB'} · ${tier}`;
+                    }).join('<br>'),
+                    catalogItemFieldAccess(item, 'extraDisksAccess')
+                  )
+                : 'Not set'
+            )}
+          </section>
         </div>
       `;
 
@@ -25198,6 +25295,7 @@
     wireVmConfigPopovers();
     wireFsHelpPopover();
     wireUtilHelpPopover();
+    wireFormHelpPopover();
     wirePfTooltips();
     renderNetworks();
 
@@ -25313,6 +25411,25 @@
         </span>
       </button>
       <div class="pf-v6-c-popover__body" id="util-help-popover-body">Donut charts represent current values.<br>Sparkline charts represent data over time.</div>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-popover pf-m-right" id="form-help-popover" role="dialog" aria-modal="true" aria-labelledby="form-help-popover-title" aria-describedby="form-help-popover-body" hidden>
+    <div class="pf-v6-c-popover__arrow"></div>
+    <div class="pf-v6-c-popover__content">
+      <button type="button" class="pf-v6-c-button pf-m-plain pf-v6-c-popover__close" id="form-help-popover-close" aria-label="Close">
+        <span class="pf-v6-c-button__icon">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </span>
+      </button>
+      <header class="pf-v6-c-popover__header">
+        <div class="pf-v6-c-popover__title" id="form-help-popover-title">
+          <h1 class="pf-v6-c-title pf-m-md">
+            <span class="pf-v6-c-popover__title-text" id="form-help-popover-title-text">Help</span>
+          </h1>
+        </div>
+      </header>
+      <div class="pf-v6-c-popover__body" id="form-help-popover-body"></div>
     </div>
   </div>
 
