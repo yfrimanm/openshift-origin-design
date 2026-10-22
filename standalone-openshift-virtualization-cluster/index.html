@@ -1232,6 +1232,7 @@
     .review-nebius__value {
       color: var(--vmaas-text); font-weight: 400; word-break: break-word; min-width: 0;
     }
+    #review-dns-records { white-space: pre-line; }
     .review-nebius__edit { display: none; }
 
     /* —— Add credential modal wizard —— */
@@ -3324,7 +3325,7 @@
       if (title) title.textContent = errors.length ? 'Complete the configuration' : 'Ready to create';
       if (description) description.textContent = errors.length
         ? `${errors[0].message}${errors.length > 1 ? ` ${errors.length - 1} more ${errors.length === 2 ? 'item needs' : 'items need'} attention before the cluster can be created.` : ''}`
-        : isBridgeNetworking() ? 'DNS checked during installation · typically 30–40 minutes' : 'Installation typically takes 30–40 minutes';
+        : isBridgeNetworking() ? 'DNS will be checked during installation · typically 30–40 minutes' : 'Installation typically takes 30–40 minutes';
       if (icon) icon.className = errors.length ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
       const createButton = document.getElementById('create-btn');
       if (createButton) createButton.disabled = errors.length > 0;
@@ -3520,7 +3521,7 @@
       set('review-api-vips', isBridgeNetworking() ? valueOf('api-vip') || '—' : '—');
       set('review-ingress-vip', isBridgeNetworking() ? document.getElementById('ingress-vip')?.value.trim() || '—' : '—');
       set('review-dns-records', isBridgeNetworking()
-        ? `api.${valueOf('cname')}.${valueOf('domain')} → ${valueOf('api-vip') || '—'} · *.apps.${valueOf('cname')}.${valueOf('domain')} → ${valueOf('ingress-vip') || '—'}`
+        ? `api.${valueOf('cname')}.${valueOf('domain')} → ${valueOf('api-vip') || '—'}\n*.apps.${valueOf('cname')}.${valueOf('domain')} → ${valueOf('ingress-vip') || '—'}`
         : '—');
       set('review-secondary', selectText('secondary-network-select', 'None'));
       const csiReviewRow = document.getElementById('review-csi-storage-row');
