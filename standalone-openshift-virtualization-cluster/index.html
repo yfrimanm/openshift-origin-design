@@ -1390,7 +1390,7 @@
             <select id="screen-select" aria-label="Mockup screen">
               <option value="cp-type">1. Control plane type</option>
               <option value="details">2. Cluster details</option>
-              <option value="workers">3. Node pools</option>
+              <option value="workers">3. Worker groups</option>
               <option value="network">4. Networking &amp; services</option>
               <option value="review">5. Review and create</option>
               <option value="monitor">6. Installation</option>
@@ -1463,8 +1463,8 @@
                   Runs the control plane and worker nodes as virtual machines on the infrastructure cluster.
                 </p>
                 <ul class="cp-card__benefits">
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Dedicated control plane and etcd</span></li>
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Manage the cluster from within the tenant after installation</span></li>
+                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Fully featured OpenShift cluster with a dedicated control plane</span></li>
+                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Manage the cluster from within the cluster after installation</span></li>
                   <li>
                     <i class="fas fa-check cp-card__check" aria-hidden="true"></i>
                     <span>Flexible topology
@@ -1499,7 +1499,7 @@
                           <div class="pf-v6-c-card__title"><h3 class="pf-v6-c-card__title-text">Hosted</h3></div>
                         </div>
                         <div class="pf-v6-c-card__body">
-                          <p class="compare-best"><strong>Best for</strong>Many clusters on shared infrastructure; lower cost and faster create.</p>
+                          <p class="compare-best"><strong>Best for</strong>Many clusters on shared infrastructure; lower resource footprint and faster provisioning.</p>
                         </div>
                       </div>
                     </li>
@@ -1533,7 +1533,7 @@
                         <tr>
                           <th scope="row">Isolation</th>
                           <td class="subtle">Shared hosting infrastructure</td>
-                          <td>Dedicated control plane and etcd</td>
+                          <td>Dedicated control plane</td>
                         </tr>
                         <tr>
                           <th scope="row">Resources</th>
@@ -1646,7 +1646,7 @@
                 <span class="pf-v6-c-form-control">
                   <select id="wizard-mobile-select">
                     <option value="details">1. Cluster details</option>
-                    <option value="workers">2. Node pools</option>
+                    <option value="workers">2. Worker groups</option>
                     <option value="network">3. Networking &amp; services</option>
                     <option value="review">4. Review and create</option>
                   </select>
@@ -1664,7 +1664,7 @@
                   <li data-step="workers">
                     <button type="button" class="wiz-nav-btn">
                       <span class="wiz-nav-num" aria-hidden="true">2</span>
-                      <span class="wiz-nav-label">Node pools</span>
+                      <span class="wiz-nav-label">Worker groups</span>
                     </button>
                   </li>
                   <li data-step="network">
@@ -1716,11 +1716,11 @@
                     </span>
                   </span>
                 </button>
-                <button type="button" class="pf-v6-c-menu__item rich-select__option" data-option="ocpvirt-mgmt-kubeconfig" role="option">
+                <button type="button" class="pf-v6-c-menu__item rich-select__option" data-option="ocpvirt-mgmt-creds" role="option">
                   <span class="pf-v6-c-menu__item-main">
                     <span class="rich-select__option-body">
-                      <span class="rich-select__option-title">ocpvirt-mgmt-kubeconfig</span>
-                      <span class="rich-select__option-desc">Kubeconfig · openshift-cnv</span>
+                      <span class="rich-select__option-title">ocpvirt-mgmt-creds</span>
+                      <span class="rich-select__option-desc">Kubeconfig + pull secret · openshift-cnv</span>
                     </span>
                   </span>
                 </button>
@@ -1730,7 +1730,7 @@
                           </button></div>
                       </div>
                     </div>
-                    <p class="hint" id="credential-default-hint">Selected from the current infrastructure cluster. Change if needed.</p>
+                    <p class="hint" id="credential-default-hint">This secret provides the infrastructure cluster kubeconfig and pull secret. Both are required; the SSH key is optional.</p>
                   </div>
                   <div class="form-field">
                     <label for="cname">Cluster name <span class="req">*</span></label>
@@ -1787,14 +1787,14 @@
                   <div class="form-field">
                     <label for="domain">Base domain <span class="req">*</span></label>
                     <input class="pf-v6-c-form-control" id="domain" type="text" value="apps.mgmt-cluster.example.com" placeholder="apps.mgmt-cluster.example.com" />
-                    <p class="hint" id="domain-default-hint">Suggested from the selected infrastructure cluster. Change if needed.</p>
+                    <p class="hint" id="domain-default-hint">Pod networking uses the infrastructure cluster's apps domain. DNS is handled by the infrastructure cluster.</p>
                   </div>
                   <div class="form-field">
                     <label id="pull-label">Pull secret <span class="req">*</span></label>
                     <div class="pull-secret-summary">
                       <div class="pull-secret-summary__value">
                         <strong class="pull-secret-summary__name" id="pull-summary-name">pull-secret</strong>
-                        <span class="pull-secret-summary__source" id="pull-summary-source">Inherited from kubevirt-infra-creds</span>
+                        <span class="pull-secret-summary__source" id="pull-summary-source">From kubevirt-infra-creds</span>
                       </div>
                       <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="pull-change-toggle" aria-expanded="false" aria-controls="pull-change-panel">Change</button>
                     </div>
@@ -1809,7 +1809,7 @@
                           <span class="pf-v6-c-form-control rich-select__control ">
                             <button type="button" class="rich-select__toggle" id="pull-toggle"
                               aria-labelledby="pull-existing-label" aria-expanded="false" aria-haspopup="listbox" aria-controls="pull-menu">
-                              <span class="rich-select__toggle-main rich-select__toggle-main--stacked"><span class="rich-select__toggle-label">pull-secret</span><span class="rich-select__toggle-desc">Inherited from kubevirt-infra-creds</span></span>
+                              <span class="rich-select__toggle-main rich-select__toggle-main--stacked"><span class="rich-select__toggle-label">pull-secret</span><span class="rich-select__toggle-desc">From kubevirt-infra-creds</span></span>
                             </button>
                             <span class="pf-v6-c-form-control__utilities">
                               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
@@ -1823,7 +1823,7 @@
                             <hr class="rich-select__menu-divider" />
                             <div class="rich-select__menu-list">
                               <button type="button" class="pf-v6-c-menu__item rich-select__option pf-m-selected" data-option="pull-secret" role="option" aria-selected="true">
-                                <span class="pf-v6-c-menu__item-main"><span class="rich-select__option-body"><span class="rich-select__option-title">pull-secret</span><span class="rich-select__option-desc">Inherited from kubevirt-infra-creds</span></span></span>
+                                <span class="pf-v6-c-menu__item-main"><span class="rich-select__option-body"><span class="rich-select__option-title">pull-secret</span><span class="rich-select__option-desc">From kubevirt-infra-creds</span></span></span>
                               </button>
                               <button type="button" class="pf-v6-c-menu__item rich-select__option" data-option="shared-pull-secret" role="option" aria-selected="false">
                                 <span class="pf-v6-c-menu__item-main"><span class="rich-select__option-body"><span class="rich-select__option-title">shared-pull-secret</span><span class="rich-select__option-desc">Stored secret · openshift-config</span></span></span>
@@ -1937,9 +1937,9 @@
                   </div>
                 </div>
 
-                <!-- Node pools -->
+                <!-- Worker groups -->
                 <div class="wizard-step" id="step-workers" hidden>
-                  <h2 class="wiz-step-title">Node pools</h2>
+                  <h2 class="wiz-step-title">Worker groups</h2>
                   <p class="wiz-step-desc">Configure the control plane and worker nodes. Use the recommended sizes or customize them.</p>
 
                   <div class="wiz-fields">
@@ -1961,6 +1961,7 @@
                     </div>
                     <p class="size-summary" id="cp-size-summary">Control plane VM size: <strong>8 cores · 16 GiB · 100 GiB root</strong> · ocs-storagecluster-ceph-rbd</p>
                     <p class="hint storage-guidance"><strong>Control plane storage:</strong> Choose a storage class that meets etcd performance and access requirements.</p>
+                    <p class="hint" id="cp-minimum-hint">Minimum per control plane VM: 4 cores, 16 GiB memory, and 100 GiB root storage.</p>
                     <details class="adv-disclose" id="cp-customize" data-disclosure-context="control plane size">
                       <summary id="cp-size-options-toggle" aria-controls="cp-size-options-content" aria-expanded="false" aria-label="Customize control plane size">
                         <i class="fas fa-angle-right" aria-hidden="true"></i>
@@ -1974,11 +1975,11 @@
                           </div>
                           <div class="form-field">
                             <label for="cp-mem">Memory (GiB) <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="cp-mem" type="number" value="16" min="8" />
+                            <input class="pf-v6-c-form-control" id="cp-mem" type="number" value="16" min="16" />
                           </div>
                           <div class="form-field">
                             <label for="cp-disk">Root volume size (GiB) <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="cp-disk" type="number" value="100" min="50" />
+                            <input class="pf-v6-c-form-control" id="cp-disk" type="number" value="100" min="100" />
                           </div>
                           <div class="form-field">
                             <label id="cp-sc-label" for="cp-sc-toggle">Root volume storage class <span class="req">*</span></label>
@@ -2024,18 +2025,18 @@
                     </details>
                   </section>
 
-                  <h3 class="subsection-title">Worker node pools</h3>
+                  <h3 class="subsection-title">Worker groups</h3>
                   <div class="worker-group" id="pool-compute">
                     <div class="worker-group__head">
                       <h3>compute</h3>
-                      <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline pf-m-danger" id="btn-remove-pool" aria-label="Remove compute pool">
+                      <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline pf-m-danger" id="btn-remove-pool" aria-label="Remove compute worker group">
                         <span class="pf-v6-c-button__icon pf-m-start"><svg class="pf-v6-svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true" role="img" width="1em" height="1em"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zM124 296c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h264c6.6 0 12 5.4 12 12v56c0 6.6-5.4 12-12 12H124z"></path></svg></span>
                         <span class="pf-v6-c-button__text">Remove</span>
                       </button>
                     </div>
                     <div class="form-row">
                       <div class="form-field">
-                        <label for="pool-compute-name">Node pool name <span class="req">*</span></label>
+                        <label for="pool-compute-name">Worker group name <span class="req">*</span></label>
                         <input class="pf-v6-c-form-control" id="pool-compute-name" type="text" value="compute" />
                       </div>
                       <div class="form-field">
@@ -2044,7 +2045,7 @@
                       </div>
                     </div>
                     <p class="size-summary" id="pool-compute-size-summary">Worker VM size: <strong>4 cores · 8 GiB · 100 GiB root</strong> · ocs-storagecluster-ceph-rbd</p>
-                    <details class="adv-disclose" id="pool-compute-customize" data-disclosure-context="compute node pool size">
+                    <details class="adv-disclose" id="pool-compute-customize" data-disclosure-context="compute worker group size">
                       <summary id="pool-compute-size-options-toggle" aria-controls="pool-compute-size-options-content" aria-expanded="false" aria-label="Customize worker VM size for compute">
                         <i class="fas fa-angle-right" aria-hidden="true"></i>
                         <span class="adv-disclose__toggle-text">Customize worker VM size</span>
@@ -2053,15 +2054,15 @@
                         <div class="form-row">
                           <div class="form-field">
                             <label for="pool-compute-cores">Cores <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="pool-compute-cores" type="number" value="4" min="1" />
+                            <input class="pf-v6-c-form-control" id="pool-compute-cores" type="number" value="4" min="2" />
                           </div>
                           <div class="form-field">
                             <label for="pool-compute-mem">Memory (GiB) <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="pool-compute-mem" type="number" value="8" min="1" />
+                            <input class="pf-v6-c-form-control" id="pool-compute-mem" type="number" value="8" min="8" />
                           </div>
                           <div class="form-field">
                             <label for="pool-compute-disk">Root volume size (GiB) <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="pool-compute-disk" type="number" value="100" min="1" />
+                            <input class="pf-v6-c-form-control" id="pool-compute-disk" type="number" value="100" min="100" />
                           </div>
                           <div class="form-field">
                             <label id="pool-compute-sc-label" for="pool-compute-sc-toggle">Root volume storage class <span class="req">*</span></label>
@@ -2111,14 +2112,14 @@
                   <div class="worker-group" id="pool-extra" hidden>
                     <div class="worker-group__head">
                       <h3>memory-optimized</h3>
-                      <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline pf-m-danger" id="btn-hide-extra" aria-label="Remove memory-optimized pool">
+                      <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline pf-m-danger" id="btn-hide-extra" aria-label="Remove memory-optimized worker group">
                         <span class="pf-v6-c-button__icon pf-m-start"><svg class="pf-v6-svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true" role="img" width="1em" height="1em"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zM124 296c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h264c6.6 0 12 5.4 12 12v56c0 6.6-5.4 12-12 12H124z"></path></svg></span>
                         <span class="pf-v6-c-button__text">Remove</span>
                       </button>
                     </div>
                     <div class="form-row">
                       <div class="form-field">
-                        <label for="pool-extra-name">Node pool name <span class="req">*</span></label>
+                        <label for="pool-extra-name">Worker group name <span class="req">*</span></label>
                         <input class="pf-v6-c-form-control" id="pool-extra-name" type="text" value="memory-optimized" />
                       </div>
                       <div class="form-field">
@@ -2127,7 +2128,7 @@
                       </div>
                     </div>
                     <p class="size-summary" id="pool-extra-size-summary">Worker VM size: <strong>4 cores · 32 GiB · 100 GiB root</strong> · ocs-storagecluster-ceph-rbd</p>
-                    <details class="adv-disclose" id="pool-extra-customize" data-disclosure-context="memory-optimized node pool size">
+                    <details class="adv-disclose" id="pool-extra-customize" data-disclosure-context="memory-optimized worker group size">
                       <summary id="pool-extra-size-options-toggle" aria-controls="pool-extra-size-options-content" aria-expanded="false" aria-label="Customize worker VM size for memory-optimized">
                         <i class="fas fa-angle-right" aria-hidden="true"></i>
                         <span class="adv-disclose__toggle-text">Customize worker VM size</span>
@@ -2136,15 +2137,15 @@
                         <div class="form-row">
                           <div class="form-field">
                             <label for="pool-extra-cores">Cores <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="pool-extra-cores" type="number" value="4" min="1" />
+                            <input class="pf-v6-c-form-control" id="pool-extra-cores" type="number" value="4" min="2" />
                           </div>
                           <div class="form-field">
                             <label for="pool-extra-mem">Memory (GiB) <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="pool-extra-mem" type="number" value="32" min="1" />
+                            <input class="pf-v6-c-form-control" id="pool-extra-mem" type="number" value="32" min="8" />
                           </div>
                           <div class="form-field">
                             <label for="pool-extra-disk">Root volume size (GiB) <span class="req">*</span></label>
-                            <input class="pf-v6-c-form-control" id="pool-extra-disk" type="number" value="100" min="1" />
+                            <input class="pf-v6-c-form-control" id="pool-extra-disk" type="number" value="100" min="100" />
                           </div>
                           <div class="form-field">
                             <label id="pool-extra-sc-label" for="pool-extra-sc-toggle">Root volume storage class <span class="req">*</span></label>
@@ -2191,17 +2192,17 @@
                     </details>
                   </div>
 
-<p class="pool-empty" id="pool-empty" hidden><strong>No worker node pools configured.</strong><br />Application workloads will run on the schedulable control plane nodes. Add a worker node pool when workloads need dedicated worker capacity.</p>
+<p class="pool-empty" id="pool-empty" hidden><strong>No worker groups configured.</strong><br />Application workloads will run on the schedulable control plane nodes. Add a worker group when workloads need dedicated worker capacity.</p>
 
                   <div class="add-pool-action">
-                    <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="btn-add-pool" aria-label="Add worker node pool">
+                    <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="btn-add-pool" aria-label="Add worker group">
                       <span class="pf-v6-c-button__icon pf-m-start"><svg class="pf-v6-svg" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true" role="img" width="1em" height="1em"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"></path></svg></span>
-                      <span class="pf-v6-c-button__text">Add worker node pool</span>
+                      <span class="pf-v6-c-button__text">Add worker group</span>
                     </button>
                   </div>
                   <div class="pf-v6-c-alert pf-m-warning pf-m-inline contextual-readiness" id="node-pools-readiness" role="status" aria-live="polite" hidden>
                     <div class="pf-v6-c-alert__icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
-                    <h4 class="pf-v6-c-alert__title" id="node-pools-readiness-title">Complete node pool requirements</h4>
+                    <h4 class="pf-v6-c-alert__title" id="node-pools-readiness-title">Complete worker group requirements</h4>
                     <div class="pf-v6-c-alert__description" id="node-pools-readiness-description"></div>
                   </div>
                   </div>
@@ -2287,11 +2288,11 @@
                         </div>
                         <div id="bridge-options" hidden>
                           <div class="form-row">
-                            <div class="form-field" style="grid-column:1/-1;"><label>API VIPs <span class="req">*</span></label><div id="api-vips" class="repeatable-fields"><div class="vip-row"><input class="pf-v6-c-form-control api-vip" type="text" placeholder="192.168.1.100" aria-label="API VIP" /><button type="button" class="pf-v6-c-button pf-m-link pf-m-danger remove-api-vip" aria-label="Remove API VIP" hidden><i class="fas fa-minus-circle remove-icon" aria-hidden="true"></i>Remove</button></div></div><button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="add-api-vip">Add API VIP</button></div>
-                            <div class="form-field"><label for="ingress-vip">Ingress VIP <span class="req">*</span></label><input class="pf-v6-c-form-control" id="ingress-vip" type="text" placeholder="192.168.1.101" /></div>
+                            <div class="form-field"><label for="api-vip">API VIP <span class="req">*</span></label><input class="pf-v6-c-form-control api-vip" id="api-vip" type="text" placeholder="192.168.1.100" /><p class="hint" id="api-dns-hint">Create an API DNS record pointing to this VIP.</p></div>
+                            <div class="form-field"><label for="ingress-vip">Ingress VIP <span class="req">*</span></label><input class="pf-v6-c-form-control" id="ingress-vip" type="text" placeholder="192.168.1.101" /><p class="hint" id="ingress-dns-hint">Create a wildcard ingress DNS record pointing to this VIP.</p></div>
                             <div class="form-field" style="grid-column:1/-1;"><label for="machine-cidr">Machine network CIDR <span class="req">*</span></label><input class="pf-v6-c-form-control" id="machine-cidr" type="text" placeholder="192.168.1.0/24" /></div>
                           </div>
-                          <p class="hint">Use one or more stable API addresses for the tenant control plane.</p>
+                          <p class="hint">In bridge mode, create both DNS records before installation. DNS resolution is checked after the VMs boot; the UI cannot verify it before creation.</p>
                         </div>
                       </div>
 
@@ -2323,14 +2324,14 @@
                       <div class="adv-disclose__section">
                         <h3 class="adv-disclose__section-title">Cluster services</h3>
                         <p class="hint" style="margin-top:0;">Required infrastructure integration is configured automatically. Persistent storage remains optional.</p>
-                        <div class="form-field">
+                        <div class="form-field" id="ccm-field">
                           <span class="switch-field-title" id="ccm-title">Cloud controller manager (CCM)</span>
                           <label class="pf-v6-c-switch" for="ccm">
                             <input class="pf-v6-c-switch__input" type="checkbox" id="ccm" role="switch" checked data-smart-default="true" aria-labelledby="ccm-title ccm-switch-label" aria-describedby="ccm-help" />
                             <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
                             <span class="pf-v6-c-switch__label" id="ccm-switch-label" aria-hidden="true">Install cloud controller manager</span>
                           </label>
-                          <p class="hint" id="ccm-help" aria-live="polite">Provides infrastructure-aware node information. Enabled by default.</p>
+                          <p class="hint" id="ccm-help" aria-live="polite">Recommended for LoadBalancer services with pod networking. Optional.</p>
                         </div>
                         <div class="form-field">
                           <span class="switch-field-title" id="csi-title">Container storage interface (CSI) driver</span>
@@ -2480,7 +2481,7 @@
                     <section class="review-nebius__section" aria-labelledby="review-workers">
                       <div class="review-nebius__head">
                         <h3 class="review-nebius__title" id="review-workers">
-                          <button type="button" class="review-nebius__title-link" data-goto="workers" aria-label="Edit node pools">Node pools</button>
+                          <button type="button" class="review-nebius__title-link" data-goto="workers" aria-label="Edit worker groups">Worker groups</button>
                         </h3>
                       </div>
                       <div class="review-nebius__card">
@@ -2503,7 +2504,7 @@
                         <div class="review-nebius__row"><span class="review-nebius__label">Cloud controller manager</span><span class="review-nebius__value" id="review-ccm">Enabled</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">CSI driver</span><span class="review-nebius__value" id="review-csi">Enabled</span></div>
                         <div class="review-nebius__row" id="review-bridge-row"><span class="review-nebius__label">Bridge network / localnet</span><span class="review-nebius__value" id="review-bridge">—</span></div>
-                        <div class="review-nebius__row" id="review-api-vips-row"><span class="review-nebius__label">API VIPs</span><span class="review-nebius__value" id="review-api-vips">—</span></div>
+                        <div class="review-nebius__row" id="review-api-vips-row"><span class="review-nebius__label">API VIP</span><span class="review-nebius__value" id="review-api-vips">—</span></div>
                         <div class="review-nebius__row" id="review-ingress-vip-row"><span class="review-nebius__label">Ingress VIP</span><span class="review-nebius__value" id="review-ingress-vip">—</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Secondary network</span><span class="review-nebius__value" id="review-secondary">None</span></div>
                         <div class="review-nebius__row" id="review-csi-storage-row"><span class="review-nebius__label">Infrastructure storage class for CSI</span><span class="review-nebius__value" id="review-csi-storage">—</span></div>
@@ -2571,7 +2572,7 @@
 
             <div class="post-install-banner" id="post-install-banner">
               <strong>Installation complete</strong>
-              <span style="font-size:14px;">Download kubeconfig, open the console, or scale node pools.</span>
+              <span style="font-size:14px;">Download kubeconfig, open the console, or scale worker groups.</span>
             </div>
 
             <div class="status-row">
@@ -2593,7 +2594,7 @@
               <div class="page-header__actions">
                 <button type="button" class="pf-v6-c-button pf-m-secondary" id="btn-kubeconfig" disabled>Download kubeconfig</button>
                 <button type="button" class="pf-v6-c-button pf-m-secondary" id="btn-console" disabled>Open console</button>
-                <button type="button" class="pf-v6-c-button pf-m-secondary" id="btn-scale" disabled>Scale node pools</button>
+                <button type="button" class="pf-v6-c-button pf-m-secondary" id="btn-scale" disabled>Scale worker groups</button>
                 <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-danger" id="btn-cancel-install">Cancel installation</button>
               </div>
             </div>
@@ -2672,12 +2673,12 @@
 
             <div class="workers-day2" id="workers-day2">
               <div class="workers-day2__head">
-                <h3>Node pools</h3>
-                <button type="button" class="pf-v6-c-button pf-m-secondary" id="btn-scale-inline">Scale node pools</button>
+                <h3>Worker groups</h3>
+                <button type="button" class="pf-v6-c-button pf-m-secondary" id="btn-scale-inline">Scale worker groups</button>
               </div>
               <div class="pf-v6-c-alert pf-m-info pf-m-inline scaling-status" id="scale-status" role="status" aria-live="polite" hidden>
                 <div class="pf-v6-c-alert__icon"><i class="fas fa-sync" aria-hidden="true"></i></div>
-                <h4 class="pf-v6-c-alert__title" id="scale-status-title">Scaling node pools</h4>
+                <h4 class="pf-v6-c-alert__title" id="scale-status-title">Scaling worker groups</h4>
                 <div class="pf-v6-c-alert__description" id="scale-status-description">Requested worker counts are being applied.</div>
               </div>
               <table class="data-table">
@@ -2889,22 +2890,22 @@
           </button>
         </div>
         <h1 class="pf-v6-c-modal-box__title" id="scale-title">
-          <span class="pf-v6-c-modal-box__title-text">Scale node pools</span>
+          <span class="pf-v6-c-modal-box__title-text">Scale worker groups</span>
         </h1>
         <div class="pf-v6-c-modal-box__description">
-          Set the target number of worker nodes for each node pool. Changes are applied asynchronously.
+          Set the target number of worker nodes for each worker group. Changes are applied asynchronously.
         </div>
       </div>
       <div class="pf-v6-c-modal-box__body">
         <div id="scale-groups"></div>
-        <div class="pool-empty" id="scale-empty" hidden><strong>No worker node pools are configured.</strong><br />Add a node pool in the cluster configuration before scaling workers.</div>
+        <div class="pool-empty" id="scale-empty" hidden><strong>No worker groups are configured.</strong><br />Add a worker group in the cluster configuration before scaling workers.</div>
         <div class="scale-delta" id="scale-delta">
           No changes. Update a node count to preview the resource impact.
         </div>
         <div class="scale-warning" id="scale-warning" role="alert" tabindex="-1" hidden><strong>Confirm scale down</strong><br />Removing worker nodes can interrupt workloads that cannot be rescheduled. Review the resource change, then confirm.</div>
       </div>
       <div class="pf-v6-c-modal-box__footer">
-        <button type="button" class="pf-v6-c-button pf-m-primary" id="scale-apply">Scale node pools</button>
+        <button type="button" class="pf-v6-c-button pf-m-primary" id="scale-apply">Scale worker groups</button>
         <button type="button" class="pf-v6-c-button pf-m-link" id="scale-cancel">Cancel</button>
       </div>
     </div>
@@ -3046,7 +3047,7 @@
       const states = {
         waiting: { label: 'Waiting for hosts', pct: '5% — Waiting for hosts', value: 5, text: 'Waiting for virtual machines to register. Review infrastructure resources and events if this state does not advance.' },
         preparing: { label: 'Preparing', pct: '12% — Preparing', value: 12, text: 'Preparing the release image and installation resources.' },
-        action: { label: 'Action required', pct: '63% — Action required', value: 63, text: 'User action required: review the installation conditions before provisioning can continue.' },
+        action: { label: 'Action required', pct: '63% — Action required', value: 63, text: isBridgeNetworking() ? `DNS preflight failed after the VMs registered. Confirm that api.${valueOf('cname')}.${valueOf('domain')} resolves to ${valueOf('api-vip')} and *.apps.${valueOf('cname')}.${valueOf('domain')} resolves to ${valueOf('ingress-vip')}.` : 'Review the installation conditions before provisioning can continue.' },
         error: { label: 'Error', pct: '63% — Error', value: 63, text: 'Installation stopped. Open the event details to review the reported condition and retry.' },
         installing: { label: 'Installing', pct: '63% — Installing', value: 63, text: '' },
         finalizing: { label: 'Finalizing', pct: '97% — Finalizing', value: 97, text: 'Finishing cluster operators and worker node provisioning.' },
@@ -3161,7 +3162,11 @@
       }
 
       if (!selectText('cp-sc-select', '')) issues.push(issue('workers', 'cp-sc-select', 'Select a control plane storage class.'));
-      [['cp-cores', 4, 'Control plane cores must be at least 4.'], ['cp-mem', 8, 'Control plane memory must be at least 8 GiB.'], ['cp-disk', 50, 'Control plane root storage must be at least 50 GiB.']].forEach(([id, min, message]) => {
+      const singleNode = document.querySelector('#cp-replicas .radio-card.is-selected')?.dataset.val === '1';
+      const version = selectText('ver-select', '4.22.2');
+      const singleNodeCpuMinimum = /^4\.(20|21)\./.test(version) ? 8 : 4;
+      const cpCpuMinimum = singleNode ? singleNodeCpuMinimum : 4;
+      [['cp-cores', cpCpuMinimum, `Control plane cores must be at least ${cpCpuMinimum} for this topology and version.`], ['cp-mem', 16, 'Control plane memory must be at least 16 GiB.'], ['cp-disk', 100, 'Control plane root storage must be at least 100 GiB.']].forEach(([id, min, message]) => {
         if (numberValue(id) < min) issues.push(issue('workers', id, message));
       });
       const poolNames = new Map();
@@ -3170,18 +3175,18 @@
         const id = group.id;
         const nameInput = document.getElementById(`${id}-name`);
         const name = nameInput?.value.trim() || '';
-        if (!name) issues.push(issue('workers', nameInput, 'Enter a node pool name or remove this pool.'));
+        if (!name) issues.push(issue('workers', nameInput, 'Enter a worker group name or remove this pool.'));
         else {
-          if (!/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(name)) issues.push(issue('workers', nameInput, 'Use lowercase letters, numbers, or hyphens for the node pool name.'));
-          if (poolNames.has(name)) issues.push(issue('workers', nameInput, `Node pool name “${name}” must be unique.`));
+          if (!/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(name)) issues.push(issue('workers', nameInput, 'Use lowercase letters, numbers, or hyphens for the worker group name.'));
+          if (poolNames.has(name)) issues.push(issue('workers', nameInput, `Worker group name “${name}” must be unique.`));
           poolNames.set(name, true);
         }
-        [['replicas', 1, 'Enter at least 1 worker node for this pool.'], ['cores', 1, 'Cores must be at least 1.'], ['mem', 1, 'Memory must be at least 1 GiB.'], ['disk', 1, 'Root storage must be at least 1 GiB.']].forEach(([suffix, min, message]) => {
+        [['replicas', 1, 'Enter at least 1 worker node for this group.'], ['cores', 2, 'Worker cores must be at least 2.'], ['mem', 8, 'Worker memory must be at least 8 GiB.'], ['disk', 100, 'Worker root storage must be at least 100 GiB.']].forEach(([suffix, min, message]) => {
           const fieldId = `${id}-${suffix}`;
           if (numberValue(fieldId) < min) issues.push(issue('workers', fieldId, message));
         });
         const storage = selectText(`${id}-sc-select`, '');
-        if (!storage) issues.push(issue('workers', `${id}-sc-select`, `Select a storage class for the ${name || 'unnamed'} node pool.`));
+        if (!storage) issues.push(issue('workers', `${id}-sc-select`, `Select a storage class for the ${name || 'unnamed'} worker group.`));
         else if (storage === 'lvms-vg1') issues.push(issue('workers', `${id}-sc-select`, `${storage} uses local storage and does not support live migration. Choose a storage class that supports RWX.`));
       });
       if (isBridgeNetworking()) {
@@ -3190,24 +3195,15 @@
         const cidr = parseCidr(cidrValue);
         if (!cidrValue) issues.push(issue('network', 'machine-cidr', 'Enter a machine network CIDR.'));
         else if (!cidr) issues.push(issue('network', 'machine-cidr', 'Enter a valid IPv4 CIDR, such as 192.168.1.0/24.'));
-        const vipInputs = [...document.querySelectorAll('#api-vips .api-vip')];
-        if (!vipInputs.some(input => input.value.trim())) issues.push(issue('network', vipInputs[0], 'Enter at least one API VIP.'));
-        const seen = new Set();
-        vipInputs.forEach(input => {
-          const value = input.value.trim();
-          if (!value) return;
-          if (!validIpv4(value)) issues.push(issue('network', input, 'Enter a valid IPv4 address.'));
-          else {
-            if (seen.has(value)) issues.push(issue('network', input, 'Each API VIP must be unique.'));
-            if (cidr && !ipInCidr(value, cidr)) issues.push(issue('network', input, 'API VIP must be inside the machine network CIDR.'));
-            seen.add(value);
-          }
-        });
+        const apiVip = valueOf('api-vip');
+        if (!apiVip) issues.push(issue('network', 'api-vip', 'Enter an API VIP.'));
+        else if (!validIpv4(apiVip)) issues.push(issue('network', 'api-vip', 'Enter a valid IPv4 address.'));
+        else if (cidr && !ipInCidr(apiVip, cidr)) issues.push(issue('network', 'api-vip', 'API VIP must be inside the machine network CIDR.'));
         const ingressVip = valueOf('ingress-vip');
         if (!ingressVip) issues.push(issue('network', 'ingress-vip', 'Enter an Ingress VIP.'));
         else if (!validIpv4(ingressVip)) issues.push(issue('network', 'ingress-vip', 'Enter a valid IPv4 address.'));
         else {
-          if (seen.has(ingressVip)) issues.push(issue('network', 'ingress-vip', 'Ingress VIP must be different from every API VIP.'));
+          if (ingressVip === apiVip) issues.push(issue('network', 'ingress-vip', 'Ingress VIP must be different from the API VIP.'));
           if (cidr && !ipInCidr(ingressVip, cidr)) issues.push(issue('network', 'ingress-vip', 'Ingress VIP must be inside the machine network CIDR.'));
         }
       } else {
@@ -3311,7 +3307,7 @@
       const description = document.getElementById('node-pools-readiness-description');
       readiness.hidden = missing.length === 0;
       if (!missing.length) return;
-      if (title) title.textContent = 'Complete node pool requirements';
+      if (title) title.textContent = 'Complete worker group requirements';
       if (description) description.textContent = `${missing[0].message}${missing.length > 1 ? ` ${missing.length - 1} more ${missing.length === 2 ? 'item needs' : 'items need'} attention.` : ''}`;
     }
     function syncPreflightSummary() {
@@ -3323,7 +3319,7 @@
       const icon = summary.querySelector('.review-readiness__icon i');
       summary.classList.toggle('pf-m-success', errors.length === 0);
       summary.classList.toggle('pf-m-warning', errors.length > 0);
-      if (title) title.textContent = errors.length ? 'Preflight checks need attention' : 'Ready to create';
+      if (title) title.textContent = errors.length ? 'Complete the configuration' : 'Ready to create';
       if (description) description.textContent = errors.length
         ? `${errors[0].message}${errors.length > 1 ? ` ${errors.length - 1} more ${errors.length === 2 ? 'item needs' : 'items need'} attention before the cluster can be created.` : ''}`
         : 'Installation typically takes 30–40 minutes';
@@ -3446,8 +3442,7 @@
       lines.push(`    mode: ${isBridgeNetworking() ? 'bridge' : 'pod'}`);
       if (isBridgeNetworking()) {
         lines.push(`    bridgeNetwork: ${yamlScalar(selectText('bridge-network-select'))}`);
-        lines.push('    apiVIPs:');
-        apiVipValues().forEach(vip => lines.push(`      - ${yamlScalar(vip)}`));
+        lines.push(`    apiVIP: ${yamlScalar(valueOf('api-vip'))}`);
         lines.push(`    ingressVIP: ${yamlScalar(valueOf('ingress-vip'))}`);
         lines.push(`    machineNetworkCIDR: ${yamlScalar(valueOf('machine-cidr'))}`);
       } else {
@@ -3466,6 +3461,11 @@
     }
     function syncReview() {
       const cp = document.querySelector('#cp-replicas .radio-card.is-selected')?.dataset.val || '3';
+      const cpCpuMinimum = cp === '1' && /^4\.(20|21)\./.test(selectText('ver-select', '4.22.2')) ? 8 : 4;
+      const cpCoresInput = document.getElementById('cp-cores');
+      if (cpCoresInput) cpCoresInput.min = String(cpCpuMinimum);
+      const cpMinimumHint = document.getElementById('cp-minimum-hint');
+      if (cpMinimumHint) cpMinimumHint.textContent = `Minimum per control plane VM: ${cpCpuMinimum} cores, 16 GiB memory, and 100 GiB root storage${cp === '1' ? ' for this OpenShift version' : ''}.`;
       const cpCores = numberValue('cp-cores', 8);
       const cpMem = numberValue('cp-mem', 16);
       const cpDisk = numberValue('cp-disk', 100);
@@ -3509,13 +3509,13 @@
       const rows = document.getElementById('review-resource-rows');
       if (rows) rows.innerHTML = `<tr><td>Control plane</td><td>${cp}</td><td>${cpCores}</td><td>${cpMem} GiB</td><td>${cpDisk} GiB</td></tr>` + pools.map(pool => `<tr><td>Worker — ${pool.name}</td><td>${pool.replicas}</td><td>${pool.cores}</td><td>${pool.memory} GiB</td><td>${pool.disk} GiB</td></tr>`).join('');
       const groups = document.getElementById('review-worker-groups');
-      if (groups) groups.innerHTML = pools.length ? pools.map(pool => `<div class="review-nebius__row"><span class="review-nebius__label">${pool.name}</span><span class="review-nebius__value">${pool.replicas} worker nodes · ${pool.cores} cores · ${pool.memory} GiB · ${pool.disk} GiB root · ${pool.storage}</span></div>`).join('') : '<div class="review-nebius__row"><span class="review-nebius__label">Worker node pools</span><span class="review-nebius__value">None — workloads run on schedulable control plane nodes</span></div>';
+      if (groups) groups.innerHTML = pools.length ? pools.map(pool => `<div class="review-nebius__row"><span class="review-nebius__label">${pool.name}</span><span class="review-nebius__value">${pool.replicas} worker nodes · ${pool.cores} cores · ${pool.memory} GiB · ${pool.disk} GiB root · ${pool.storage}</span></div>`).join('') : '<div class="review-nebius__row"><span class="review-nebius__label">Worker groups</span><span class="review-nebius__value">None — workloads run on schedulable control plane nodes</span></div>';
       set('review-net-mode', isBridgeNetworking() ? 'Bridge networking' : 'Pod networking');
       set('review-net-ovn', `MTU ${numberValue('mtu', 1300)} · Geneve port ${numberValue('geneve', 9880)}`);
-      set('review-ccm', document.getElementById('ccm')?.checked ? 'Enabled' : 'Disabled');
+      set('review-ccm', isBridgeNetworking() ? 'Not installed in bridge mode' : document.getElementById('ccm')?.checked ? 'Enabled' : 'Disabled');
       set('review-csi', document.getElementById('csi')?.checked ? 'Enabled' : 'Disabled');
       set('review-bridge', isBridgeNetworking() ? selectText('bridge-network-select') : '—');
-      set('review-api-vips', isBridgeNetworking() ? apiVipValues().join(', ') || '—' : '—');
+      set('review-api-vips', isBridgeNetworking() ? valueOf('api-vip') || '—' : '—');
       set('review-ingress-vip', isBridgeNetworking() ? document.getElementById('ingress-vip')?.value.trim() || '—' : '—');
       set('review-secondary', selectText('secondary-network-select', 'None'));
       const csiReviewRow = document.getElementById('review-csi-storage-row');
@@ -3539,6 +3539,9 @@
     const netModeValue = document.getElementById('net-mode-value');
     const netModeCards = document.getElementById('net-mode-cards');
     const netAdvanced = document.getElementById('net-advanced');
+    let lastNetworkingMode = null;
+    let podCcmChoice = true;
+    let bridgeDomain = 'example.com';
     function isBridgeNetworking() { return netModeValue?.value === 'bridge'; }
     function syncNetworkingCustomizationCount() {
       const indicator = document.getElementById('network-settings-changed');
@@ -3547,7 +3550,7 @@
       const selectedOption = id => document.querySelector(`#${id} .rich-select__option.pf-m-selected`)?.dataset.option || '';
       const ccm = document.getElementById('ccm');
       const ccmDefault = ccm?.dataset.smartDefault !== 'false';
-      if (Boolean(ccm?.checked) !== ccmDefault) count += 1;
+      if (!isBridgeNetworking() && Boolean(ccm?.checked) !== ccmDefault) count += 1;
       const csi = document.getElementById('csi');
       const csiDefault = csi?.dataset.smartDefault !== 'false';
       if (Boolean(csi?.checked) !== csiDefault) count += 1;
@@ -3568,6 +3571,30 @@
     }
     function syncNetMode() {
       const bridge = isBridgeNetworking();
+      const mode = bridge ? 'bridge' : 'pod';
+      const domain = document.getElementById('domain');
+      const ccm = document.getElementById('ccm');
+      if (mode !== lastNetworkingMode) {
+        if (bridge && ccm) { podCcmChoice = ccm.checked; ccm.checked = false; }
+        if (bridge && domain) domain.value = bridgeDomain;
+        if (!bridge && lastNetworkingMode === 'bridge' && domain) bridgeDomain = domain.value;
+        if (!bridge && ccm && lastNetworkingMode) ccm.checked = podCcmChoice;
+        if (!bridge && domain?.dataset.podDomain) domain.value = domain.dataset.podDomain;
+        lastNetworkingMode = mode;
+      }
+      if (domain) domain.readOnly = !bridge;
+      const domainHint = document.getElementById('domain-default-hint');
+      if (domainHint) domainHint.textContent = bridge
+        ? 'Use the domain configured in your DNS records. You can change it for this cluster.'
+        : 'Uses the infrastructure cluster’s apps domain. No DNS records need to be created.';
+      const ccmField = document.getElementById('ccm-field');
+      if (ccmField) ccmField.hidden = bridge;
+      const cluster = valueOf('cname') || '<cluster-name>';
+      const base = valueOf('domain') || '<base-domain>';
+      const apiHint = document.getElementById('api-dns-hint');
+      const ingressHint = document.getElementById('ingress-dns-hint');
+      if (apiHint) apiHint.textContent = `Create api.${cluster}.${base} → API VIP before installation.`;
+      if (ingressHint) ingressHint.textContent = `Create *.apps.${cluster}.${base} → Ingress VIP before installation.`;
       if (bridgeOptions) bridgeOptions.hidden = !bridge;
       if (bridgeSection) bridgeSection.hidden = !bridge;
       if (ovnOptions) ovnOptions.hidden = bridge;
@@ -3618,8 +3645,8 @@
       const ccmHelp = document.getElementById('ccm-help');
       const csiHelp = document.getElementById('csi-help');
       if (ccmHelp) ccmHelp.textContent = ccmToggle?.checked
-        ? 'Provides infrastructure-aware node information. Enabled by default.'
-        : 'The cloud controller manager will not be installed. The cluster will not receive infrastructure-aware node information.';
+        ? 'LoadBalancer services can use the infrastructure cluster. Recommended for pod networking.'
+        : 'LoadBalancer services will not be provided by the infrastructure cloud controller manager.';
       if (csiHelp && !hasCompatibleCsiStorage) csiHelp.textContent = 'No compatible infrastructure storage class was found, so the CSI driver cannot be enabled.';
       else if (csiHelp) csiHelp.textContent = csiToggle?.checked
         ? 'Lets workloads in the new cluster create persistent volumes using storage from the infrastructure cluster.'
@@ -3658,9 +3685,6 @@
       syncReview();
     });
     syncSecondaryNetworkDisclosure();
-    function apiVipValues() {
-      return [...document.querySelectorAll('#api-vips .api-vip')].map(input => input.value.trim()).filter(Boolean);
-    }
     const pullChangePanel = document.getElementById('pull-change-panel');
     const pullExistingMode = document.getElementById('pull-existing-mode');
     const pullNewMode = document.getElementById('pull-new-mode');
@@ -3701,17 +3725,6 @@
       return [...document.querySelectorAll('#additional-label-list .dismiss-label')]
         .map(button => `${button.dataset.key}=${button.dataset.value}`);
     }
-    function syncRepeatableRemoveButtons() {
-      const hasMultipleVips = document.querySelectorAll('#api-vips .vip-row').length > 1;
-      document.querySelectorAll('#api-vips .remove-api-vip').forEach(button => {
-        button.hidden = !hasMultipleVips;
-        button.disabled = false;
-      });
-    }
-    document.getElementById('add-api-vip')?.addEventListener('click', () => {
-      document.getElementById('api-vips')?.insertAdjacentHTML('beforeend', '<div class="vip-row"><input class="pf-v6-c-form-control api-vip" type="text" placeholder="192.168.1.100" aria-label="API VIP" /><button type="button" class="pf-v6-c-button pf-m-link pf-m-danger remove-api-vip" aria-label="Remove API VIP"><i class="fas fa-minus-circle remove-icon" aria-hidden="true"></i>Remove</button></div>');
-      syncRepeatableRemoveButtons();
-    });
     function addLabelChip(key, value) {
       const list = document.getElementById('additional-label-list');
       if (!list) return;
@@ -3763,13 +3776,10 @@
       else commitLabelDraft();
     }));
     document.addEventListener('click', event => {
-      const removeVip = event.target.closest('.remove-api-vip');
       const removeLabel = event.target.closest('.dismiss-label');
-      if (removeVip) removeVip.closest('.vip-row')?.remove();
       if (removeLabel) removeLabel.closest('.pf-v6-c-label-group__list-item')?.remove();
-      if (removeVip || removeLabel) { syncRepeatableRemoveButtons(); syncReview(); }
+      if (removeLabel) syncReview();
     });
-    syncRepeatableRemoveButtons();
     document.addEventListener('input', event => {
       if (event.target.closest('#view-wizard')) syncReview();
     });
@@ -3870,7 +3880,7 @@
       closeAllHelp();
     });
 
-    // Node pools: zero or more groups; the prototype starts with one example group.
+    // Worker groups: zero or more groups; the prototype starts with one example group.
     const poolExtra = document.getElementById('pool-extra');
     const poolCompute = document.getElementById('pool-compute');
     const poolEmpty = document.getElementById('pool-empty');
@@ -3891,7 +3901,7 @@
     }
     function syncPoolIdentity(group) {
       const nameInput = group?.querySelector('input[id$="-name"]');
-      const name = nameInput?.value.trim() || 'Unnamed node pool';
+      const name = nameInput?.value.trim() || 'Unnamed worker group';
       const heading = group?.querySelector('.worker-group__head h3');
       const removeButton = group?.querySelector('button[aria-label^="Remove"]');
       const sizeToggle = group?.querySelector('.adv-disclose summary');
@@ -4128,7 +4138,7 @@
         mtu: 1300,
         geneve: 9880,
       },
-      'ocpvirt-mgmt-kubeconfig': {
+      'ocpvirt-mgmt-creds': {
         clusterName: 'virt-mgmt-cluster-01',
         baseDomain: 'apps.ocpvirt-mgmt.example.com',
         pullSecret: 'pull-secret',
@@ -4156,7 +4166,10 @@
       const nameInput = document.getElementById('cname');
       if (nameInput && !clusterNameManuallyEdited) nameInput.value = defaults.clusterName;
       const domainInput = document.getElementById('domain');
-      if (domainInput) domainInput.value = defaults.baseDomain;
+      if (domainInput) {
+        domainInput.dataset.podDomain = defaults.baseDomain;
+        if (!isBridgeNetworking()) domainInput.value = defaults.baseDomain;
+      }
       const mtuInput = document.getElementById('mtu');
       if (mtuInput) {
         mtuInput.value = defaults.mtu;
@@ -4168,7 +4181,7 @@
         geneveInput.dataset.smartDefault = String(defaults.geneve);
       }
 
-      setRichSelectValue('pull-select', defaults.pullSecret, `Inherited from ${credentialKey}`);
+      setRichSelectValue('pull-select', defaults.pullSecret, `From ${credentialKey}`);
       setRichSelectValue('cp-sc-select', defaults.storageClass);
       document.querySelectorAll('.worker-group .rich-select[id$="-sc-select"]').forEach(select => {
         setRichSelectValue(select.id, defaults.storageClass);
@@ -4188,8 +4201,8 @@
       if (bridgeSelect) bridgeSelect.dataset.smartDefault = defaults.bridgeNetwork;
 
       const setText = (id, text) => { const element = document.getElementById(id); if (element) element.textContent = text; };
-      setText('credential-default-hint', `Selected for the ${credentialKey} infrastructure cluster. Change if needed.`);
-      setText('domain-default-hint', `Suggested from ${credentialKey}. Change if needed.`);
+      setText('credential-default-hint', `The ${credentialKey} secret provides the infrastructure kubeconfig and pull secret. Both are required; the SSH key is optional.`);
+      syncNetMode();
       setText('mtu-default-hint', `Suggested from ${credentialKey} and adjusted for OVN encapsulation.`);
       setText('geneve-default-hint', `Suggested to avoid ${credentialKey}’s Geneve port.`);
       syncPullSecretUi();
@@ -4356,7 +4369,7 @@
       const tbody = document.getElementById('worker-groups-body');
       if (!tbody) return;
       const pools = activePoolData();
-      tbody.innerHTML = pools.length ? pools.map(pool => `<tr data-group="${escapeHtml(pool.id)}"><td>${escapeHtml(pool.name)}</td><td class="target">${pool.replicas}</td><td class="ready">${allReady ? pool.replicas : 0}</td><td>${pool.cores}</td><td>${pool.memory} GiB</td><td>${pool.disk} GiB</td></tr>`).join('') : '<tr><td colspan="6" class="muted">No worker node pools configured</td></tr>';
+      tbody.innerHTML = pools.length ? pools.map(pool => `<tr data-group="${escapeHtml(pool.id)}"><td>${escapeHtml(pool.name)}</td><td class="target">${pool.replicas}</td><td class="ready">${allReady ? pool.replicas : 0}</td><td>${pool.cores}</td><td>${pool.memory} GiB</td><td>${pool.disk} GiB</td></tr>`).join('') : '<tr><td colspan="6" class="muted">No worker groups configured</td></tr>';
     }
     function setScaleState(state) {
       const status = document.getElementById('scale-status');
@@ -4370,7 +4383,7 @@
       status.classList.toggle('pf-m-success', state === 'complete');
       status.classList.toggle('pf-m-danger', state === 'failure');
       if (state === 'scaling') {
-        if (title) title.textContent = 'Scaling node pools';
+        if (title) title.textContent = 'Scaling worker groups';
         if (description) description.textContent = 'Requested worker counts are being applied asynchronously.';
         if (icon) icon.className = 'fas fa-sync fa-spin';
       } else if (state === 'complete') {
@@ -4396,14 +4409,14 @@
       const pools = activePoolData();
       scaleDownArmed = false;
       document.getElementById('scale-warning').hidden = true;
-      document.getElementById('scale-apply').textContent = 'Scale node pools';
+      document.getElementById('scale-apply').textContent = 'Scale worker groups';
       if (groups) {
         groups.innerHTML = '';
         pools.forEach(pool => {
           groups.insertAdjacentHTML('beforeend', `<div class="scale-group"><div class="scale-group__meta"><p class="name">${escapeHtml(pool.name)}</p><p class="spec">${pool.cores} cores · ${pool.memory} GiB · ${pool.disk} GiB root</p></div><div class="scale-group__field"><label for="scale-${pool.id}">Requested worker nodes</label><input class="pf-v6-c-form-control" id="scale-${pool.id}" type="number" min="0" required value="${pool.replicas}" data-base="${pool.replicas}" data-cores="${pool.cores}" data-mem="${pool.memory}" data-disk="${pool.disk}" data-pool-id="${pool.id}" /></div></div>`);
         });
         scaleInputs = [...groups.querySelectorAll('input')];
-        scaleInputs.forEach(input => input.addEventListener('input', () => { scaleDownArmed = false; document.getElementById('scale-warning').hidden = true; document.getElementById('scale-apply').textContent = 'Scale node pools'; updateScaleDelta(); }));
+        scaleInputs.forEach(input => input.addEventListener('input', () => { scaleDownArmed = false; document.getElementById('scale-warning').hidden = true; document.getElementById('scale-apply').textContent = 'Scale worker groups'; updateScaleDelta(); }));
       }
       document.getElementById('scale-empty').hidden = pools.length > 0;
       document.getElementById('scale-delta').hidden = pools.length === 0;
