@@ -1944,7 +1944,7 @@
 
                   <div class="wiz-fields">
                   <section aria-labelledby="control-plane-pool-title">
-                    <h3 class="subsection-title" id="control-plane-pool-title">Control plane pool</h3>
+                    <h3 class="subsection-title" id="control-plane-pool-title">Control plane</h3>
                     <div class="form-field">
                       <label>Control plane configuration <span class="req">*</span></label>
                       <div class="radio-cards" id="cp-replicas">
@@ -2241,13 +2241,13 @@
                     </div>
                     <div class="help-popover" id="help-net-mode" role="dialog" aria-labelledby="help-net-mode-title">
                       <p class="help-popover__title" id="help-net-mode-title">Pod networking or bridge networking</p>
-                      <p><strong>Pod networking</strong> (recommended) exposes API and Ingress through Routes without virtual IP addresses (VIPs). Use <strong>Bridge networking</strong> when API and Ingress need dedicated VIPs on a bridged network.</p>
+                      <p><strong>Pod networking</strong> (recommended) uses an API Route and the infrastructure cluster’s DNS for ingress. No VIPs or new DNS records are needed. Use <strong>Bridge networking</strong> when API and ingress need dedicated VIPs.</p>
                     </div>
                     <div class="radio-cards" id="net-mode-cards" role="radiogroup" aria-labelledby="net-mode-label">
                       <button type="button" class="radio-card is-selected" id="net-mode-pod" data-val="pod" role="radio" aria-checked="true">
                         <span class="recommended-badge">Recommended</span>
                         <strong>Pod networking</strong>
-                        <span>Uses the infrastructure pod network. API and Ingress are exposed through Routes, so virtual IP addresses (VIPs) are not required.</span>
+                        <span>Uses the infrastructure pod network. The API uses a Route; ingress uses infrastructure DNS. No VIPs or new DNS records are needed.</span>
                       </button>
                       <button type="button" class="radio-card" id="net-mode-bridge" data-val="bridge" role="radio" aria-checked="false">
                         <strong>Bridge networking</strong>
@@ -2506,6 +2506,7 @@
                         <div class="review-nebius__row" id="review-bridge-row"><span class="review-nebius__label">Bridge network / localnet</span><span class="review-nebius__value" id="review-bridge">—</span></div>
                         <div class="review-nebius__row" id="review-api-vips-row"><span class="review-nebius__label">API VIP</span><span class="review-nebius__value" id="review-api-vips">—</span></div>
                         <div class="review-nebius__row" id="review-ingress-vip-row"><span class="review-nebius__label">Ingress VIP</span><span class="review-nebius__value" id="review-ingress-vip">—</span></div>
+                        <div class="review-nebius__row" id="review-dns-row"><span class="review-nebius__label">DNS to create</span><span class="review-nebius__value" id="review-dns-records">—</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Secondary network</span><span class="review-nebius__value" id="review-secondary">None</span></div>
                         <div class="review-nebius__row" id="review-csi-storage-row"><span class="review-nebius__label">Infrastructure storage class for CSI</span><span class="review-nebius__value" id="review-csi-storage">—</span></div>
                       </div>
@@ -2807,8 +2808,9 @@
               </div>
             </div>
             <div class="form-field">
-              <label for="cred-dns">Base DNS domain</label>
-              <input class="pf-v6-c-form-control" id="cred-dns" type="text" placeholder="Enter the base DNS domain" />
+              <label for="cred-dns">Infrastructure apps domain <span class="req">*</span></label>
+              <input class="pf-v6-c-form-control" id="cred-dns" type="text" placeholder="apps.mgmt-cluster.example.com" required />
+              <p class="hint">Used for pod-networked clusters. Enter the apps domain of this infrastructure cluster.</p>
             </div>
           </div>
           <div class="cred-step" data-cred-panel="1" hidden>
@@ -2865,7 +2867,7 @@
                 <div class="review-nebius__row"><span class="review-nebius__label">Credential type</span><span class="review-nebius__value">OpenShift Virtualization</span></div>
                 <div class="review-nebius__row"><span class="review-nebius__label">Credential name</span><span class="review-nebius__value" id="cred-review-name">—</span></div>
                 <div class="review-nebius__row"><span class="review-nebius__label">Namespace</span><span class="review-nebius__value" id="cred-review-ns">—</span></div>
-                <div class="review-nebius__row"><span class="review-nebius__label">Base DNS domain</span><span class="review-nebius__value" id="cred-review-dns">—</span></div>
+                <div class="review-nebius__row"><span class="review-nebius__label">Infrastructure apps domain</span><span class="review-nebius__value" id="cred-review-dns">—</span></div>
               </div>
             </div>
           </div>
@@ -3322,7 +3324,7 @@
       if (title) title.textContent = errors.length ? 'Complete the configuration' : 'Ready to create';
       if (description) description.textContent = errors.length
         ? `${errors[0].message}${errors.length > 1 ? ` ${errors.length - 1} more ${errors.length === 2 ? 'item needs' : 'items need'} attention before the cluster can be created.` : ''}`
-        : 'Installation typically takes 30–40 minutes';
+        : isBridgeNetworking() ? 'DNS checked during installation · typically 30–40 minutes' : 'Installation typically takes 30–40 minutes';
       if (icon) icon.className = errors.length ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
       const createButton = document.getElementById('create-btn');
       if (createButton) createButton.disabled = errors.length > 0;
@@ -3517,10 +3519,13 @@
       set('review-bridge', isBridgeNetworking() ? selectText('bridge-network-select') : '—');
       set('review-api-vips', isBridgeNetworking() ? valueOf('api-vip') || '—' : '—');
       set('review-ingress-vip', isBridgeNetworking() ? document.getElementById('ingress-vip')?.value.trim() || '—' : '—');
+      set('review-dns-records', isBridgeNetworking()
+        ? `api.${valueOf('cname')}.${valueOf('domain')} → ${valueOf('api-vip') || '—'} · *.apps.${valueOf('cname')}.${valueOf('domain')} → ${valueOf('ingress-vip') || '—'}`
+        : '—');
       set('review-secondary', selectText('secondary-network-select', 'None'));
       const csiReviewRow = document.getElementById('review-csi-storage-row');
       if (csiReviewRow) csiReviewRow.hidden = !csiToggle?.checked;
-      const bridgeOnlyRows = ['review-bridge-row', 'review-api-vips-row', 'review-ingress-vip-row'];
+      const bridgeOnlyRows = ['review-bridge-row', 'review-api-vips-row', 'review-ingress-vip-row', 'review-dns-row'];
       bridgeOnlyRows.forEach(id => { const row = document.getElementById(id); if (row) row.hidden = !isBridgeNetworking(); });
       const ovnRow = document.getElementById('review-ovn-row');
       if (ovnRow) ovnRow.hidden = isBridgeNetworking();
@@ -4278,6 +4283,9 @@
         if (!valueOf('cred-name')) { errors.push('Enter a credential name.'); target = document.getElementById('cred-name'); }
         else if (!/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(valueOf('cred-name'))) { errors.push('Use lowercase letters, numbers, or hyphens for the credential name.'); target = document.getElementById('cred-name'); }
         if (!selectText('cred-ns-select', '')) { errors.push('Select a namespace.'); target ||= document.querySelector('#cred-ns-select .rich-select__toggle'); }
+        const appsDomain = valueOf('cred-dns');
+        if (!appsDomain) { errors.push('Enter the infrastructure apps domain.'); target ||= document.getElementById('cred-dns'); }
+        else if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(appsDomain)) { errors.push('Enter a valid apps domain, such as apps.mgmt-cluster.example.com.'); target ||= document.getElementById('cred-dns'); }
       } else if (step === 1 && !valueOf('cred-kubeconfig')) {
         errors.push('Paste the infrastructure cluster kubeconfig.'); target = document.getElementById('cred-kubeconfig');
       } else if (step === 2) {
@@ -4333,7 +4341,7 @@
         const derivedName = `${name.replace(/-(?:cred|credential)s?$/, '')}-cluster-01`.slice(0, 63).replace(/-+$/, '');
         CREDENTIAL_DEFAULTS[name] = {
           clusterName: derivedName,
-          baseDomain: document.getElementById('cred-dns').value.trim() || 'apps.mgmt-cluster.example.com',
+          baseDomain: valueOf('cred-dns'),
           pullSecret: 'pull-secret',
           storageClass: 'ocs-storagecluster-ceph-rbd',
           bridgeNetwork: 'tenant-localnet',
