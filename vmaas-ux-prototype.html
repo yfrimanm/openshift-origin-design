@@ -4204,7 +4204,6 @@
     #overlay #wiz-panel .add-disk-action,
     #overlay #wiz-panel .add-network-action,
     #overlay #wiz-panel .inline-sets,
-    #overlay #wiz-panel .sysprep-save-secret,
     #overlay #wiz-panel .sysprep-attach-empty,
     #overlay #wiz-panel .section-block > .form-field ~ .config-section-title {
       max-width: 40rem;
@@ -4412,32 +4411,6 @@
     }
     @media (max-width: 640px) {
       .felt-select-boxes.felt-select-boxes--sysprep-mode { grid-template-columns: 1fr; }
-    }
-    .sysprep-save-secret {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-      max-width: 560px;
-      min-height: 24px;
-      cursor: pointer;
-    }
-    .sysprep-save-secret input[type="checkbox"] {
-      margin: 0;
-      padding: 0;
-      width: 16px;
-      height: 16px;
-      flex: 0 0 16px;
-      align-self: center;
-      accent-color: var(--vmaas-blue, #0066cc);
-      cursor: pointer;
-    }
-    .sysprep-save-secret .sysprep-save-secret__text {
-      margin: 0;
-      font-size: 14px;
-      line-height: 16px;
-      color: var(--vmaas-text, #151515);
-      cursor: pointer;
     }
     .sysprep-attach-empty {
       margin: 8px 0 0;
@@ -4657,15 +4630,6 @@
       margin: 0 0 16px;
       font-weight: 400;
     }
-    .sysprep-save-secret,
-    .form-field > label.sysprep-save-secret,
-    .create-resource-wiz .form-field label.sysprep-save-secret {
-      font-weight: 400;
-    }
-    .sysprep-save-secret .sysprep-save-secret__text {
-      font-weight: 400;
-    }
-
     /* PF6 Felt selectable boxes (cards-as-tiles) — Guest OS, tenant access, etc. */
     .felt-select-boxes {
       display: grid;
@@ -7129,7 +7093,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · sysprep-cards 7169</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · sysprep 7170</span>
         </div>
       </div>
       <div class="console__body">
@@ -9688,8 +9652,6 @@
       if (d.sysprep == null) d.sysprep = '';
       if (d.sysprepSecretId == null) d.sysprepSecretId = '';
       if (d.sysprepFileName == null) d.sysprepFileName = '';
-      if (d.sysprepSaveAsSecret == null) d.sysprepSaveAsSecret = false;
-      if (d.sysprepSecretName == null) d.sysprepSecretName = '';
     }
 
     function sysprepSecretsForProject(project) {
@@ -9737,22 +9699,6 @@
         return `Provided (hidden) · ${name}`;
       }
       return 'Provided (hidden)';
-    }
-
-    function persistSysprepSecretIfRequested(d = state.data) {
-      ensureSysprepState(d);
-      if (d.sysprepMode !== 'create' || !d.sysprepSaveAsSecret) return null;
-      const xml = String(d.sysprep || '').trim();
-      if (!xml) return null;
-      const base = String(d.sysprepSecretName || '').trim()
-        || `${String(d.name || 'vm').trim() || 'vm'}-unattend`;
-      const safe = base.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || 'unattend';
-      const id = `sysprep-${safe}-${Math.floor(Math.random() * 90 + 10)}`;
-      const entry = { id, name: safe, project: d.project || 'project-a' };
-      SYSPREP_SECRETS.unshift(entry);
-      d.sysprepSecretId = id;
-      toast(`Sysprep secret “${safe}” saved for Select secret.`, 'success');
-      return entry;
     }
 
     function fieldErrorHtml(field) {
@@ -10070,8 +10016,6 @@
         sysprepMode: 'create', // create | attach (Windows Unattend.xml)
         sysprepSecretId: '',
         sysprepFileName: '',
-        sysprepSaveAsSecret: false,
-        sysprepSecretName: '',
         initMethod: 'cloud-init',
         osImage: 'rhel.10',
         diskImageId: '',
@@ -13128,8 +13072,6 @@
         d.sysprep = '';
         d.sysprepFileName = '';
         d.sysprepSecretId = '';
-        d.sysprepSaveAsSecret = false;
-        d.sysprepSecretName = '';
         d.sysprepMode = 'create';
         if (syncInit) d.initMethod = initMethodForGuestOs(d.guestOsFamily || 'Linux');
       }
@@ -16938,8 +16880,6 @@
       state.data.sysprepMode = 'create';
       state.data.sysprepSecretId = '';
       state.data.sysprepFileName = '';
-      state.data.sysprepSaveAsSecret = false;
-      state.data.sysprepSecretName = '';
       state.data.initMethod = 'cloud-init';
       state.data.sshPublicKey = '';
       state.data.sshKeyFileName = '';
@@ -17877,8 +17817,6 @@
                 d.sysprep = '';
                 d.sysprepFileName = '';
                 d.sysprepSecretId = '';
-                d.sysprepSaveAsSecret = false;
-                d.sysprepSecretName = '';
                 d.sysprepMode = 'create';
               }
               d.diskImageMenuOpen = false;
@@ -19873,16 +19811,6 @@
               <p class="form-helper" id="f-unattend-help">
                 Max size 1 MiB. Stored as a secret; never shown again after create.
               </p>
-              <label class="sysprep-save-secret">
-                <input type="checkbox" id="f-sysprep-save-secret" ${d.sysprepSaveAsSecret ? 'checked' : ''} />
-                <span class="sysprep-save-secret__text">Save as secret for future VM deployments</span>
-              </label>
-              <div class="form-field" id="f-sysprep-secret-name-wrap" style="margin-top:12px;${d.sysprepSaveAsSecret ? '' : 'display:none;'}">
-                <label for="f-sysprep-secret-name">Secret name</label>
-                <input type="text" id="f-sysprep-secret-name"
-                  value="${(d.sysprepSecretName || '').replace(/"/g, '&quot;')}"
-                  placeholder="Optional — defaults from the VM name" />
-              </div>
             </div>
           `;
           const attachPanel = `
@@ -19905,7 +19833,7 @@
                 emptyNoun: 'Sysprep secrets',
                 stacked: true,
                 options: secretOptions,
-              }) : `<p class="sysprep-attach-empty" id="f-sysprep-secret-help">No saved Sysprep secrets in this project yet. Enter a value and enable <strong>Save as secret</strong>.</p>`}
+              }) : `<p class="sysprep-attach-empty" id="f-sysprep-secret-help">No saved Sysprep secrets in this project yet.</p>`}
               ${secrets.length && d.sysprepSecretId ? `
                 <div style="margin-top:8px;">
                   <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="f-sysprep-secret-clear">Clear selection</button>
@@ -20040,17 +19968,6 @@
               renderWizard();
             });
           }
-          const saveChk = panel.querySelector('#f-sysprep-save-secret');
-          const nameWrap = panel.querySelector('#f-sysprep-secret-name-wrap');
-          const nameInput = panel.querySelector('#f-sysprep-secret-name');
-          saveChk?.addEventListener('change', () => {
-            d.sysprepSaveAsSecret = !!saveChk.checked;
-            if (nameWrap) nameWrap.style.display = d.sysprepSaveAsSecret ? '' : 'none';
-          });
-          nameInput?.addEventListener('input', () => {
-            d.sysprepSecretName = nameInput.value;
-          });
-
           const uploadRoot = panel.querySelector('#f-unattend-upload');
           const fileInput = panel.querySelector('#f-unattend-file');
           const filenameInput = panel.querySelector('#f-unattend-filename');
@@ -20677,7 +20594,6 @@
             || '';
           const windowsVm = isWindowsOs(d);
           if (windowsVm) {
-            persistSysprepSecretIfRequested(d);
             d.sshPublicKey = '';
             d.sshKeyFileName = '';
           }
@@ -22519,7 +22435,7 @@
                 stacked: true,
                 invalid: !!state.fieldErrors.ciInit,
                 options: secretOptions,
-              }) : `<p class="sysprep-attach-empty" id="ci-sysprep-secret-help">No saved Sysprep secrets in this project yet. Create one when creating a VM with <strong>Save as secret</strong>.</p>`}
+              }) : `<p class="sysprep-attach-empty" id="ci-sysprep-secret-help">No saved Sysprep secrets in this project yet.</p>`}
               ${secrets.length && c.sysprepSecretId ? `
                 <div style="margin-top:8px;">
                   <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="ci-sysprep-secret-clear">Clear selection</button>
