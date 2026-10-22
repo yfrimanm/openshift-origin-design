@@ -47,7 +47,7 @@ async function main() {
   await page.waitForSelector('#create-ci-panel', { timeout: 8000 });
   await page.waitForTimeout(400);
   await waitStep(page, 'Details');
-  await page.locator('#ci-disk-image-select').scrollIntoViewIfNeeded();
+  await page.locator('#ci-provisioning-template').scrollIntoViewIfNeeded();
   await page.waitForTimeout(250);
   await shot(page, '02-details');
 
@@ -66,7 +66,7 @@ async function main() {
   await page.waitForTimeout(200);
 
   await clickNext(page);
-  await waitStep(page, 'Instance types');
+  await waitStep(page, 'Compute configuration');
   await shot(page, '03-instance-types');
 
   await clickNext(page);
