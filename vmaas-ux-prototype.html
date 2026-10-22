@@ -7184,7 +7184,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · catalog 7174</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · catalog 7176</span>
         </div>
       </div>
       <div class="console__body">
@@ -9842,13 +9842,12 @@
     function validateDetailsFields(d = state.data) {
       const errors = {};
       if (!String(d.name || '').trim()) errors.name = 'Enter a name or generate one.';
-      if (!d.diskImageId) errors.diskImage = 'Select a disk image to continue.';
       return errors;
     }
 
     function validateConfigureFields(d = state.data) {
       const errors = {};
-      // Image is always locked by the template; no Configure gate for OS.
+      if (!d.diskImageId) errors.diskImage = 'Select a disk image to continue.';
       return errors;
     }
 
@@ -17039,11 +17038,11 @@
         ];
       }
       if (state.createType === 'template') {
-        /* Details (disk image) → Compute → Storage → Network → Access & Initial run → Review */
+        /* Details → Compute configuration → Storage → Network → Access & Initial run → Review */
         return [
           { key: 'catalog', label: 'Select template', navNum: 1 },
           { key: 'details', label: 'Details', navNum: 2 },
-          { key: 'config-compute', label: 'Instance type', navNum: 3 },
+          { key: 'config-compute', label: 'Compute configuration', navNum: 3 },
           { key: 'config-storage', label: 'Storage', navNum: 4 },
           { key: 'config-network', label: 'Networking', navNum: 5 },
           { key: 'access-init', label: 'Access & Initial run', navNum: 6 },
@@ -17877,61 +17876,6 @@
       if (key === 'details' || key === 'deploy') {
         const isClone = state.createType === 'clone';
         const isCatalogFlow = key === 'details';
-        let diskImageSection = '';
-        if (isCatalogFlow) {
-          if (d.diskImageMenuOpen == null) d.diskImageMenuOpen = false;
-          if (d.diskImageFilter == null) d.diskImageFilter = '';
-          if (!d.guestOsFamily) d.guestOsFamily = 'Linux';
-          if (d.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(x => x.id === d.diskImageId)) {
-            d.diskImageId = '';
-            d.osImage = '';
-            d.osType = '';
-          }
-          const filteredForFamily = filteredCatalogDiskImages(d.guestOsFamily, d.diskImageFilter);
-          if (d.diskImageId && !filteredForFamily.some(x => x.id === d.diskImageId)) {
-            d.diskImageId = '';
-            d.osImage = '';
-            d.osType = '';
-          }
-          diskImageSection = `
-            <hr class="form-section-divider" />
-            <h3>Disk image</h3>
-            <p class="step-help">Choose the guest operating system and disk image for this virtual machine.</p>
-            <div class="form-field" id="vm-guest-os-field">
-              <label id="vm-guest-os-label">Select guest operating system</label>
-              ${renderGuestOsSelectBoxes({
-                name: 'vmGuestOs',
-                selected: d.guestOsFamily || 'Linux',
-                labelledBy: 'vm-guest-os-label',
-              })}
-            </div>
-            <div class="form-field ${state.fieldErrors.diskImage ? 'pf-m-error' : ''}" data-field="diskImage" style="margin-top:16px;">
-              <label id="vm-disk-image-label">Select the image reference <span class="req">*</span></label>
-              ${renderTypeaheadRichSelectHtml({
-                rootId: 'vm-disk-image-select',
-                toggleId: 'vm-disk-image-toggle',
-                menuId: 'vm-disk-image-menu',
-                searchId: 'vm-disk-image-search',
-                labelId: 'vm-disk-image-label',
-                open: !!d.diskImageMenuOpen,
-                filter: d.diskImageFilter || '',
-                searchPlaceholder: 'Search disk images',
-                selectedId: d.diskImageId || '',
-                placeholder: 'Select a disk image',
-                optionAttr: 'data-vm-disk-image',
-                emptyNoun: 'disk images',
-                invalid: !!state.fieldErrors.diskImage,
-                describedBy: state.fieldErrors.diskImage ? 'err-diskImage' : '',
-                options: filteredForFamily.map(img => ({
-                  id: img.id,
-                  title: img.title,
-                  desc: `${img.family} · ${img.arch}`,
-                })),
-              })}
-              ${fieldErrorHtml('diskImage')}
-                    </div>
-          `;
-        }
         panel.innerHTML = `
           ${isCatalogFlow ? '' : `
           <div class="section-block">
@@ -17948,7 +17892,7 @@
           <div class="section-block">
             ${isCatalogFlow ? `
             <h3>Details</h3>
-            <p class="step-help">Name your virtual machine and choose a disk image.</p>
+            <p class="step-help">Name your virtual machine.</p>
             <div class="project-context pf-v6-c-alert pf-m-inline pf-m-info" role="status">
               <div class="pf-v6-c-alert__icon"><i class="fa-solid fa-circle-info" aria-hidden="true"></i></div>
               <div class="pf-v6-c-alert__title">
@@ -17978,7 +17922,6 @@
               <label>Description</label>
               <textarea id="f-desc" placeholder="">${d.description}</textarea>
             </div>
-            ${diskImageSection}
           </div>
           `}
           ${isCatalogFlow ? '' : `
@@ -18032,53 +17975,6 @@
           if (isCatalogFlow) syncWizardNextDisabled();
         });
         panel.querySelector('#f-desc')?.addEventListener('input', e => { d.description = e.target.value; });
-        if (isCatalogFlow) {
-          panel.querySelectorAll('input[name="vmGuestOs"]').forEach(r => {
-            r.addEventListener('change', () => {
-              d.guestOsFamily = r.value;
-              const options = filteredCatalogDiskImages(d.guestOsFamily, d.diskImageFilter);
-              if (d.diskImageId && !options.some(o => o.id === d.diskImageId)) {
-                d.diskImageId = '';
-                d.osImage = '';
-                d.osType = '';
-              }
-              d.osFamily = d.guestOsFamily === 'Microsoft Windows' ? 'windows'
-                : (d.guestOsFamily === 'Linux' ? 'linux' : '');
-              d.initMethod = initMethodForGuestOs(d.guestOsFamily);
-              if (d.guestOsFamily === 'Microsoft Windows') {
-                d.sshPublicKey = '';
-                d.sshKeyFileName = '';
-                d.cloudInit = '';
-                ensureSysprepState(d);
-              } else {
-                d.sysprep = '';
-                d.sysprepFileName = '';
-                d.sysprepSecretId = '';
-                d.sysprepMode = 'create';
-              }
-              d.diskImageMenuOpen = false;
-              renderWizard();
-            });
-          });
-          wireTypeaheadRichSelect(panel, {
-            rootId: 'vm-disk-image-select',
-            toggleId: 'vm-disk-image-toggle',
-            menuId: 'vm-disk-image-menu',
-            searchId: 'vm-disk-image-search',
-            optionSel: '[data-vm-disk-image]',
-            getOptionId: opt => opt.dataset.vmDiskImage,
-            setOpen: (open) => { d.diskImageMenuOpen = open; },
-            setFilter: (v) => { d.diskImageFilter = v; },
-            onSelectId: (id) => {
-              applyDiskImageToForm(d, id, { syncInit: true });
-              d.diskImageMenuOpen = false;
-              d.diskImageFilter = '';
-              clearFieldError('diskImage');
-              renderWizard();
-            },
-          });
-          restoreRichSearchFocus(panel);
-        }
         if (!isCatalogFlow && document.getElementById('f-project')) {
           wireCreatableSearch({
             id: 'f-project',
@@ -18524,7 +18420,7 @@
             fixedItems.push({
               label: 'Disk image',
               value: templateDefaultDiskImage(selected)?.title || '—',
-              note: 'Starting default · editable on Details',
+              note: 'Starting default · editable on Compute configuration',
             });
           }
           if (fieldBeh.compute === 'locked') {
@@ -18537,7 +18433,7 @@
           if (!hasDefaultDiskImage) {
             editableItems.push({
               label: 'Disk image',
-              value: 'Not set (Select on Details step)',
+              value: 'Not set (Select on Compute configuration step)',
               note: '',
             });
           }
@@ -18545,7 +18441,7 @@
             editableItems.push({
               label: 'Compute',
               value: `${selSpecs.cpu} · ${selSpecs.mem}`,
-              note: 'Starting default · Instance type step',
+              note: 'Starting default · Compute configuration step',
             });
           }
           if (fieldBeh.bootDisk === 'editable') {
@@ -19039,9 +18935,9 @@
               </label>
           ` : '';
           const computeFieldHtml = computeEditable ? `
-              ${gpuFilterHtml}
               <div class="form-field">
                 <label id="f-compute-resource-label">Instance type <span class="req">*</span></label>
+                ${gpuFilterHtml}
                 <div class="rich-select rich-select--typeahead ${state.vmComputeMenuOpen ? 'pf-m-expanded' : ''}" id="vm-compute-select">
                   ${pfRichSelectToggle({
                     id: 'f-compute-resource-toggle',
@@ -19092,17 +18988,111 @@
                 <p class="form-helper" id="f-compute-locked-help">This size is set by the template and can’t be changed during create. You can edit the instance type after the virtual machine is created.</p>
               </div>
           `;
-          const stepHelp = computeEditable
-            ? WIZARD_HELP.instanceType
-            : 'Instance type is locked by the template.';
+          if (d.diskImageMenuOpen == null) d.diskImageMenuOpen = false;
+          if (d.diskImageFilter == null) d.diskImageFilter = '';
+          if (!d.guestOsFamily) d.guestOsFamily = 'Linux';
+          if (d.diskImageId && !CATALOG_DISK_IMAGE_OPTIONS.some(x => x.id === d.diskImageId)) {
+            d.diskImageId = '';
+            d.osImage = '';
+            d.osType = '';
+          }
+          const filteredForFamily = filteredCatalogDiskImages(d.guestOsFamily, d.diskImageFilter);
+          if (d.diskImageId && !filteredForFamily.some(x => x.id === d.diskImageId)) {
+            d.diskImageId = '';
+            d.osImage = '';
+            d.osType = '';
+          }
+          const diskImageHtml = `
+            <h3>Disk image</h3>
+            <div class="form-field" id="vm-guest-os-field">
+              <label id="vm-guest-os-label">Select guest operating system</label>
+              ${renderGuestOsSelectBoxes({
+                name: 'vmGuestOs',
+                selected: d.guestOsFamily || 'Linux',
+                labelledBy: 'vm-guest-os-label',
+              })}
+            </div>
+            <div class="form-field ${state.fieldErrors.diskImage ? 'pf-m-error' : ''}" data-field="diskImage" style="margin-top:16px;">
+              <label id="vm-disk-image-label">Select the image reference <span class="req">*</span></label>
+              ${renderTypeaheadRichSelectHtml({
+                rootId: 'vm-disk-image-select',
+                toggleId: 'vm-disk-image-toggle',
+                menuId: 'vm-disk-image-menu',
+                searchId: 'vm-disk-image-search',
+                labelId: 'vm-disk-image-label',
+                open: !!d.diskImageMenuOpen,
+                filter: d.diskImageFilter || '',
+                searchPlaceholder: 'Search disk images',
+                selectedId: d.diskImageId || '',
+                placeholder: 'Select a disk image',
+                optionAttr: 'data-vm-disk-image',
+                emptyNoun: 'disk images',
+                invalid: !!state.fieldErrors.diskImage,
+                describedBy: state.fieldErrors.diskImage ? 'err-diskImage' : '',
+                options: filteredForFamily.map(img => ({
+                  id: img.id,
+                  title: img.title,
+                  desc: `${img.family} · ${img.arch}`,
+                })),
+              })}
+              ${fieldErrorHtml('diskImage')}
+            </div>
+          `;
 
           panel.innerHTML = `
-            <h3>Instance type</h3>
-            <p class="step-help">${stepHelp}</p>
+            <h3>Compute configuration</h3>
+            <p class="step-help">${WIZARD_HELP.computeCatalog}</p>
+            ${diskImageHtml}
+            <hr class="form-section-divider" />
             <div class="vm-config__fields">
               ${computeFieldHtml}
             </div>
           `;
+
+          panel.querySelectorAll('input[name="vmGuestOs"]').forEach(r => {
+            r.addEventListener('change', () => {
+              d.guestOsFamily = r.value;
+              const options = filteredCatalogDiskImages(d.guestOsFamily, d.diskImageFilter);
+              if (d.diskImageId && !options.some(o => o.id === d.diskImageId)) {
+                d.diskImageId = '';
+                d.osImage = '';
+                d.osType = '';
+              }
+              d.osFamily = d.guestOsFamily === 'Microsoft Windows' ? 'windows'
+                : (d.guestOsFamily === 'Linux' ? 'linux' : '');
+              d.initMethod = initMethodForGuestOs(d.guestOsFamily);
+              if (d.guestOsFamily === 'Microsoft Windows') {
+                d.sshPublicKey = '';
+                d.sshKeyFileName = '';
+                d.cloudInit = '';
+                ensureSysprepState(d);
+              } else {
+                d.sysprep = '';
+                d.sysprepFileName = '';
+                d.sysprepSecretId = '';
+                d.sysprepMode = 'create';
+              }
+              d.diskImageMenuOpen = false;
+              renderWizard();
+            });
+          });
+          wireTypeaheadRichSelect(panel, {
+            rootId: 'vm-disk-image-select',
+            toggleId: 'vm-disk-image-toggle',
+            menuId: 'vm-disk-image-menu',
+            searchId: 'vm-disk-image-search',
+            optionSel: '[data-vm-disk-image]',
+            getOptionId: opt => opt.dataset.vmDiskImage,
+            setOpen: (open) => { d.diskImageMenuOpen = open; },
+            setFilter: (v) => { d.diskImageFilter = v; },
+            onSelectId: (id) => {
+              applyDiskImageToForm(d, id, { syncInit: true });
+              d.diskImageMenuOpen = false;
+              d.diskImageFilter = '';
+              clearFieldError('diskImage');
+              renderWizard();
+            },
+          });
 
           if (computeEditable) {
             panel.querySelector('#f-show-gpu-its')?.addEventListener('change', e => {
@@ -19131,10 +19121,11 @@
             });
             panel.querySelector('#vm-compute-search')?.addEventListener('input', e => {
               state.vmComputeFilter = e.target.value;
+              state.focusRichSearchId = 'vm-compute-search';
               renderWizard();
-              panel.querySelector('#vm-compute-search')?.focus();
             });
           }
+          restoreRichSearchFocus(panel);
         } else if (stepKey === 'config-storage') {
           const diskMin = 1;
           const diskMax = 16384;
@@ -19230,7 +19221,7 @@
           `;
           const bootTierFieldHtml = bootEditable ? `
               <div class="form-field">
-                <label id="f-boot-tier-label">Storage tier <span class="req">*</span></label>
+                <label id="f-boot-tier-label">Boot storage tier <span class="req">*</span></label>
                 ${renderTypeaheadRichSelectHtml({
                   rootId: 'vm-boot-tier-select',
                   toggleId: 'f-boot-tier-toggle',
@@ -19241,7 +19232,7 @@
                   filter: state.vmBootTierFilter || '',
                   searchPlaceholder: 'Search storage tiers',
                   selectedId: d.bootStorageTierId || '',
-                  placeholder: 'Select storage tier',
+                  placeholder: 'Select boot storage tier',
                   stacked: true,
                   optionAttr: 'data-boot-tier',
                   hiddenInputId: 'f-boot-tier',
@@ -19257,7 +19248,7 @@
           ` : `
               <div class="form-field">
                 <label id="f-boot-tier-label" class="label-with-optional">
-                  <span>Storage tier</span>
+                  <span>Boot storage tier</span>
                   ${fieldGovBadge('locked')}
                 </label>
                 ${renderTypeaheadRichSelectHtml({
@@ -19267,7 +19258,7 @@
                   searchId: 'vm-boot-tier-search',
                   labelId: 'f-boot-tier-label',
                   selectedId: d.bootStorageTierId || '',
-                  placeholder: 'Storage tier',
+                  placeholder: 'Select boot storage tier',
                   stacked: true,
                   disabled: true,
                   describedBy: 'f-boot-tier-locked-help',
@@ -19278,7 +19269,7 @@
                     desc: t.description || '',
                   })),
                 })}
-                ${pfHelperText('Storage tier is set by the template and can’t be changed during create.', 'f-boot-tier-locked-help')}
+                ${pfHelperText('Boot storage tier is set by the template and can’t be changed during create.', 'f-boot-tier-locked-help')}
               </div>
           `;
           const bootFieldHtml = `${bootSizeFieldHtml}${bootTierFieldHtml}`;
@@ -19293,7 +19284,7 @@
           `;
           const storageStepHelp = bootEditable
             ? WIZARD_HELP.storage
-            : 'Boot disk size and storage tier are locked by the template. Add additional disks below if needed.';
+            : 'Boot disk size and boot storage tier are locked by the template. Add additional disks below if needed.';
 
           panel.innerHTML = `
             <h3>Storage</h3>
@@ -20508,10 +20499,10 @@
               ${reviewRow('Name', d.name || '—')}
               ${reviewRow('Description', d.description || '—')}
               ${reviewRow('Project', d.project || '—')}
-              ${reviewRow('Guest OS', guestOsLabel)}
-              ${reviewRow('Disk image', reviewValue(diskImageLabel, diskImageChanged))}
             `)}
-            ${reviewNebiusSection('Instance type', 'config-compute', `
+            ${reviewNebiusSection('Compute configuration', 'config-compute', `
+              ${reviewRow('Guest operating system', guestOsLabel)}
+              ${reviewRow('Disk image', reviewValue(diskImageLabel, diskImageChanged))}
               ${reviewRow('Instance type', reviewValue(compute, computeChanged))}
             `)}
             ${reviewNebiusSection('Storage', 'config-storage', `
