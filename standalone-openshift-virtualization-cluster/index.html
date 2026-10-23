@@ -2985,6 +2985,27 @@
       }, 0);
     }
 
+    function renderMachineRows(state) {
+      const cpTarget = Number(document.querySelector('#cp-replicas .radio-card.is-selected')?.dataset.val || 3);
+      const pools = activePoolData();
+      const cpReady = state === 'ready' || state === 'finalizing' ? cpTarget : ['installing', 'action', 'error', 'unknown'].includes(state) ? Math.max(0, cpTarget - 1) : 0;
+      const workersReady = state === 'ready' ? pools.reduce((sum, pool) => sum + pool.replicas, 0) : 0;
+      const workerTarget = pools.reduce((sum, pool) => sum + pool.replicas, 0);
+      const label = (text, color) => `<span class="pf-v6-c-label pf-m-${color} pf-m-outline"><span class="pf-v6-c-label__content">${text}</span></span>`;
+      const cpRows = Array.from({ length: cpTarget }, (_, index) => {
+        const ready = index < cpReady;
+        return `<tr><td>kubevirt-tenant-cp-${index + 1}</td><td>Control plane</td><td>${label(ready ? 'Ready' : 'Provisioning', ready ? 'green' : 'blue')}</td><td>${ready ? 'Running' : 'Pending'}</td><td>${ready ? `10.128.2.${15 + index}` : '—'}</td><td>${ready ? '' : 'Waiting for the VM to become ready'}</td></tr>`;
+      });
+      let workerIndex = 0;
+      const workerRows = pools.flatMap(pool => Array.from({ length: pool.replicas }, (_, index) => {
+        const ready = state === 'ready';
+        return `<tr><td>kubevirt-tenant-${escapeHtml(pool.name)}-${index}</td><td>Worker (${escapeHtml(pool.name)})</td><td>${ready ? label('Ready', 'green') : '—'}</td><td>${ready ? 'Running' : '—'}</td><td>${ready ? `10.128.2.${20 + workerIndex++}` : '—'}</td><td>${ready ? '' : 'Created after control plane install'}</td></tr>`;
+      }));
+      document.getElementById('machines-body').innerHTML = [...cpRows, ...workerRows].join('');
+      document.getElementById('meta-cp').innerHTML = `Control plane <strong>${cpReady}/${cpTarget} Ready</strong>`;
+      document.getElementById('meta-workers').innerHTML = `Workers <strong>${workersReady}/${workerTarget} Ready</strong>`;
+    }
+
     function setReadyState(ready) {
       const label = document.getElementById('status-label');
       const banner = document.getElementById('post-install-banner');
@@ -2994,8 +3015,6 @@
       const cancelInstallButton = document.getElementById('btn-cancel-install');
 
       const secondary = document.getElementById('install-secondary');
-      const cpTarget = Number(document.querySelector('#cp-replicas .radio-card.is-selected')?.dataset.val || 3);
-      const workerTarget = [...document.querySelectorAll('.worker-group:not([hidden])')].reduce((sum, group) => sum + numberValue(`${group.id}-replicas`), 0);
       if (ready) {
         label.className = 'pf-v6-c-label pf-m-green';
         label.innerHTML = '<span class="pf-v6-c-label__content">Ready</span>';
@@ -3008,16 +3027,8 @@
           cancelInstallButton.hidden = true;
           cancelInstallButton.disabled = true;
         }
-        document.getElementById('meta-cp').innerHTML = `Control plane <strong>${cpTarget}/${cpTarget} Ready</strong>`;
-        document.getElementById('meta-workers').innerHTML = `Workers <strong>${workerTarget}/${workerTarget} Ready</strong>`;
+        renderMachineRows('ready');
         document.getElementById('meta-created').innerHTML = 'Created <strong>38 minutes ago</strong>';
-        document.getElementById('machines-body').innerHTML = `
-          <tr><td>kubevirt-tenant-abc12</td><td>Control plane</td><td><span class="pf-v6-c-label pf-m-green pf-m-outline"><span class="pf-v6-c-label__content">Ready</span></span></td><td>Running</td><td>10.128.2.15</td><td></td></tr>
-          <tr><td>kubevirt-tenant-def34</td><td>Control plane</td><td><span class="pf-v6-c-label pf-m-green pf-m-outline"><span class="pf-v6-c-label__content">Ready</span></span></td><td>Running</td><td>10.128.2.16</td><td></td></tr>
-          <tr><td>kubevirt-tenant-ghi56</td><td>Control plane</td><td><span class="pf-v6-c-label pf-m-green pf-m-outline"><span class="pf-v6-c-label__content">Ready</span></span></td><td>Running</td><td>10.128.2.17</td><td></td></tr>
-          <tr><td>kubevirt-tenant-compute-0</td><td>Worker (compute)</td><td><span class="pf-v6-c-label pf-m-green pf-m-outline"><span class="pf-v6-c-label__content">Ready</span></span></td><td>Running</td><td>10.128.2.20</td><td></td></tr>
-          <tr><td>kubevirt-tenant-compute-1</td><td>Worker (compute)</td><td><span class="pf-v6-c-label pf-m-green pf-m-outline"><span class="pf-v6-c-label__content">Ready</span></span></td><td>Running</td><td>10.128.2.21</td><td></td></tr>
-          <tr><td>kubevirt-tenant-mem-0</td><td>Worker (memory-optimized)</td><td><span class="pf-v6-c-label pf-m-green pf-m-outline"><span class="pf-v6-c-label__content">Ready</span></span></td><td>Running</td><td>10.128.2.22</td><td></td></tr>`;
         rebuildWorkerGroupsTable(true);
         setScaleState('idle');
       } else {
@@ -3034,14 +3045,14 @@
           cancelInstallButton.textContent = 'Cancel installation';
           cancelInstallButton.removeAttribute('title');
         }
-        document.getElementById('meta-cp').innerHTML = `Control plane <strong>${Math.max(0, cpTarget - 1)}/${cpTarget} Ready</strong>`;
-        document.getElementById('meta-workers').innerHTML = `Workers <strong>0/${workerTarget} Ready</strong>`;
+        renderMachineRows('installing');
         document.getElementById('meta-created').innerHTML = 'Created <strong>12 minutes ago</strong>';
       }
     }
     function setInstallState(state) {
       if (state === 'ready') { setReadyState(true); return; }
       setReadyState(false);
+      renderMachineRows(state);
       const label = document.getElementById('status-label');
       const pct = document.getElementById('progress-pct');
       const message = document.getElementById('install-status-message');
@@ -3050,7 +3061,7 @@
       const states = {
         waiting: { label: 'Waiting for hosts', pct: '5% — Waiting for hosts', value: 5, text: 'Waiting for virtual machines to register. Review infrastructure resources and events if this state does not advance.' },
         preparing: { label: 'Preparing', pct: '12% — Preparing', value: 12, text: 'Preparing the release image and installation resources.' },
-        action: { label: 'Action required', pct: '63% — Action required', value: 63, text: isBridgeNetworking() ? `DNS preflight failed after the VMs registered. Confirm that api.${valueOf('cname')}.${valueOf('domain')} resolves to ${valueOf('api-vip')} and *.apps.${valueOf('cname')}.${valueOf('domain')} resolves to ${valueOf('ingress-vip')}.` : 'Review the installation conditions before provisioning can continue.' },
+        action: { label: 'Action required', pct: '63% — Action required', value: 63, text: isBridgeNetworking() ? 'The required DNS records did not resolve after the VMs registered. Check the expected records in installation conditions.' : 'The infrastructure storage class could not provision a control plane volume. Check the selected storage class in installation conditions.' },
         error: { label: 'Error', pct: '63% — Error', value: 63, text: 'Installation stopped. Open the event details to review the reported condition and retry.' },
         installing: { label: 'Installing', pct: '63% — Installing', value: 63, text: '' },
         finalizing: { label: 'Finalizing', pct: '97% — Finalizing', value: 97, text: 'Finishing cluster operators and worker node provisioning.' },
@@ -3077,7 +3088,22 @@
         message.innerHTML = current.text ? `${current.text}${actions}` : '';
       }
       const conditions = document.getElementById('install-conditions');
-      if (conditions) conditions.hidden = state !== 'action';
+      if (conditions) {
+        conditions.hidden = state !== 'action';
+        const title = document.getElementById('install-conditions-title');
+        const description = conditions.querySelector('.pf-v6-c-alert__description');
+        if (isBridgeNetworking()) {
+          if (title) title.textContent = 'Required DNS records did not resolve';
+          const cluster = valueOf('cname') || 'virt-cluster-01';
+          const domain = valueOf('domain') || 'example.com';
+          const apiVip = valueOf('api-vip') || '192.168.1.100';
+          const ingressVip = valueOf('ingress-vip') || '192.168.1.101';
+          if (description) description.textContent = `Create or correct api.${cluster}.${domain} → ${apiVip} and *.apps.${cluster}.${domain} → ${ingressVip}, then retry installation.`;
+        } else {
+          if (title) title.textContent = 'Control plane volume could not be provisioned';
+          if (description) description.textContent = 'Check that the selected infrastructure storage class is available and has capacity, then retry installation.';
+        }
+      }
       const phaseOrder = ['waiting', 'preparing', 'installing', 'finalizing', 'ready'];
       const phaseIndex = state === 'action' || state === 'error' || state === 'unknown' ? 2 : phaseOrder.indexOf(state);
       document.querySelectorAll('#phase-stepper li').forEach((item, index) => {
