@@ -3084,7 +3084,7 @@
         message.hidden = !current.text;
         const actions = state === 'error'
           ? ' <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-install-action="events">View events</button><button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-install-action="retry">Retry installation</button>'
-          : (state === 'action' ? ' <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-install-action="conditions">View installation conditions</button>' : '');
+          : (state === 'action' ? ' <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-install-action="conditions">View installation conditions</button><button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" data-install-action="retry">Retry installation</button>' : '');
         message.innerHTML = current.text ? `${current.text}${actions}` : '';
       }
       const conditions = document.getElementById('install-conditions');
