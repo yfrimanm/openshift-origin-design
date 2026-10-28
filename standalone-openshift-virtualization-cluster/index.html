@@ -162,6 +162,57 @@
       }
     }
 
+    /* Match the provider control-plane chooser without changing wizard screens. */
+    .console.is-control-plane-selection .console__body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      padding: 0;
+      column-gap: 0;
+      background: #e7e7e7;
+    }
+    .console.is-control-plane-selection .console__nav { display: none; }
+    .console.is-control-plane-selection .console__content {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .console.is-control-plane-selection #view-cp-type.is-active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .cp-page-head {
+      padding: 20px 32px 18px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
+      z-index: 1;
+    }
+    .cp-page-head .page-header { margin-bottom: 0; }
+    .cp-page-body {
+      flex: 1;
+      padding: 32px 32px 48px;
+      background: #e7e7e7;
+    }
+    #view-cp-type > .footer-actions {
+      position: sticky;
+      bottom: 0;
+      margin-top: 0;
+      padding: 16px 32px;
+      background: #fff;
+      z-index: 1;
+    }
+    @media (max-width: 640px) {
+      .cp-page-head { padding: 16px; }
+      .cp-page-body { padding: 20px 16px 32px; }
+      #view-cp-type > .footer-actions { padding: 12px 16px; }
+    }
+
     .view { display: none; }
     .view.is-active { display: block; }
 
@@ -203,23 +254,27 @@
     /* —— Control plane cards —— */
     .cp-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
-      margin: 8px 0 0;
+      width: 100%; max-width: 80rem; margin: 0;
     }
-    @media (max-width: 960px) { .cp-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 960px) {
+      .cp-grid { grid-template-columns: 1fr; }
+      .cp-grid .cp-card { min-height: 0; }
+    }
     .cp-section {
-      margin-top: 32px;
+      margin-top: 48px;
     }
     .cp-card {
       position: relative; text-align: left; width: 100%; cursor: pointer;
-      padding: 24px 24px 24px 52px;
-      border: 1px solid var(--vmaas-border-light);
+      padding: 32px 40px;
+      border: 1px solid transparent;
       border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
-      background: rgba(255,255,255,.85);
+      background: #f7f7f7;
       transition: border-color .15s, box-shadow .15s;
       color: inherit; font: inherit;
-      min-height: 100%;
+      min-height: 360px;
     }
     .cp-card:hover { border-color: var(--vmaas-border); }
+    .cp-card:focus-visible { outline: 2px solid var(--vmaas-blue); outline-offset: 3px; }
     .cp-card.is-selected {
       border-color: var(--vmaas-blue);
       box-shadow: inset 0 0 0 1px var(--vmaas-blue);
@@ -234,9 +289,9 @@
       border-color: var(--vmaas-blue);
       box-shadow: inset 0 0 0 3px var(--vmaas-blue);
     }
-    .cp-card__title { font-size: 18px; font-weight: 700; margin: 0 0 10px; }
+    .cp-card__title { font-size: 20px; font-weight: 700; margin: 0 0 24px; }
     .cp-card__desc {
-      font-size: 14px; line-height: 1.55; margin: 0 0 16px; color: var(--vmaas-text);
+      font-size: 15px; line-height: 1.55; margin: 0 0 28px; color: var(--vmaas-text);
     }
     .cp-card__benefits { list-style: none; margin: 0; padding: 0; }
     .cp-card__benefits > li {
@@ -254,6 +309,10 @@
       margin-bottom: 2px; padding-left: 12px; position: relative;
     }
     .cp-card__sub li::before { content: '–'; position: absolute; left: 0; }
+    @media (max-width: 640px) {
+      .cp-card { min-height: 0; padding: 24px; }
+      .cp-card__title { margin-bottom: 16px; }
+    }
 
     .section-head {
       display: flex; align-items: baseline; justify-content: space-between;
@@ -360,6 +419,22 @@
       border-radius: 12px;
       background: var(--pf-t--global--background--color--primary--default, #fff);
       overflow: hidden;
+    }
+    #view-cp-type > .cp-page-body > .cp-section > .compare-arch {
+      margin-top: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      overflow: visible;
+    }
+    #view-cp-type > .cp-page-body > .cp-section > .compare-arch > summary {
+      width: fit-content;
+      padding: 0;
+      font-weight: 400;
+    }
+    #view-cp-type > .cp-page-body > .cp-section > .compare-arch > .compare-arch__body {
+      padding: 12px 0 0;
+      border-top: 0;
     }
     .compare-arch summary,
     .adv-disclose summary {
@@ -1378,7 +1453,7 @@
 </head>
 <body>
   <div class="mockup-shell">
-    <div class="console">
+    <div class="console is-control-plane-selection">
       <div class="console__masthead">
         <div class="console__masthead-left">
           <span class="console__masthead-title">Standalone OpenShift Virtualization mockup</span>
@@ -1418,6 +1493,7 @@
 
           <!-- 1. Control plane type (pre-wizard routing) -->
           <div class="view is-active" id="view-cp-type">
+            <div class="cp-page-head">
             <nav class="pf-v6-c-breadcrumb" aria-label="Breadcrumb">
               <ol class="pf-v6-c-breadcrumb__list">
                 <li class="pf-v6-c-breadcrumb__item">
@@ -1443,7 +1519,9 @@
                 <p class="page-desc">Choose a control plane type for your cluster.</p>
               </div>
             </div>
+            </div>
 
+            <div class="cp-page-body">
             <div class="cp-grid">
               <button type="button" class="cp-card" id="card-hosted" data-goto="hosted" aria-label="Create a Hosted cluster">
                 <h2 class="cp-card__title">Hosted</h2>
@@ -1580,6 +1658,7 @@
                   </details>
                 </div>
               </details>
+            </div>
             </div>
 
             <div class="footer-actions">
@@ -2944,6 +3023,8 @@
       const isWizard = WIZARD.includes(view);
       const isReady = view === 'ready';
       const monitorKey = (view === 'monitor' || isReady) ? 'monitor' : view;
+
+      document.querySelector('.console').classList.toggle('is-control-plane-selection', view === 'cp-type');
 
       document.querySelectorAll('.view').forEach(v => v.classList.remove('is-active'));
 
