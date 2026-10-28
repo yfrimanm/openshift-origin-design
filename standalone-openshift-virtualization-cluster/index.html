@@ -162,16 +162,16 @@
       }
     }
 
-    /* Match the provider control-plane chooser without changing wizard screens. */
-    .console.is-control-plane-selection .console__body {
+    /* Shared in-page provider flow: header, felt canvas, and page footer. */
+    .console.is-workflow-shell .console__body {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       padding: 0;
       column-gap: 0;
       background: #e7e7e7;
     }
-    .console.is-control-plane-selection .console__nav { display: none; }
-    .console.is-control-plane-selection .console__content {
+    .console.is-workflow-shell .console__nav { display: none; }
+    .console.is-workflow-shell .console__content {
       display: flex;
       flex-direction: column;
       padding: 0;
@@ -187,12 +187,14 @@
       flex-direction: column;
       flex: 1;
     }
+    .flow-page-head,
     .cp-page-head {
       padding: 20px 32px 18px;
       background: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
       z-index: 1;
     }
+    .flow-page-head .page-header,
     .cp-page-head .page-header { margin-bottom: 0; }
     .cp-page-body {
       flex: 1;
@@ -208,7 +210,7 @@
       z-index: 1;
     }
     @media (max-width: 640px) {
-      .cp-page-head { padding: 16px; }
+      .flow-page-head, .cp-page-head { padding: 16px; }
       .cp-page-body { padding: 20px 16px 32px; }
       #view-cp-type > .footer-actions { padding: 12px 16px; }
     }
@@ -1449,11 +1451,112 @@
     .demo-hint {
       margin-top: 20px; font-size: 13px; color: var(--vmaas-text-subtle);
     }
+
+    /* PF6 Felt glass treatment shared by the wizard and cluster status pages. */
+    .console.is-workflow-shell .console__body { background: var(--pf-t--global--background--color--secondary--default, #ededed); }
+    .flow-page-head {
+      background: var(--pf-t--global--background--color--primary--default, #fff);
+    }
+    .flow-page-head .pf-v6-c-breadcrumb { margin-bottom: 16px; }
+    #view-wizard.is-active,
+    #view-monitor.is-active,
+    #view-hosted.is-active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    #view-wizard .wiz-layout,
+    #view-monitor .monitor-page-body,
+    #view-hosted .hosted-page-body {
+      background-color: var(--pf-t--global--background--color--secondary--default, #ededed);
+      background-image: var(--pf-t--global--background--image--felt--glass, none);
+      background-size: cover;
+    }
+    #view-wizard .wiz-layout {
+      flex: 1;
+      grid-template-columns: 15rem minmax(0, 1fr);
+      min-height: 0;
+    }
+    #view-wizard .wiz-nav {
+      padding: 28px 16px 24px 24px;
+      background: rgba(255, 255, 255, .2);
+      border-inline-end: 1px solid var(--vmaas-border-light);
+    }
+    #view-wizard .wiz-nav-btn { width: 100%; min-height: 40px; }
+    #view-wizard .wiz-main { padding: 30px 32px 0; }
+    #view-wizard .wizard-step:not([hidden]) {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    #view-wizard .wiz-step-title { font-size: 22px; font-weight: 700; }
+    #view-wizard .wiz-step-desc { max-width: 56rem; }
+    #view-wizard .wiz-fields { max-width: none; }
+    #view-wizard .rich-select__control.pf-v6-c-form-control {
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .82);
+    }
+    #view-wizard .rich-select__control:has(.rich-select__toggle-main--stacked) { border-radius: 20px; }
+    #view-wizard .form-field input[type="text"],
+    #view-wizard .form-field input[type="number"],
+    #view-wizard .form-field textarea {
+      background: rgba(255, 255, 255, .82);
+    }
+    #view-wizard .wiz-footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 5;
+      width: calc(100% + 64px);
+      margin: auto -32px 0;
+      padding: 16px 32px;
+      background: rgba(255, 255, 255, .9);
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, .08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    #view-monitor .monitor-page-body,
+    #view-hosted .hosted-page-body { flex: 1; padding: 32px; }
+    #view-hosted .hosted-page-body > .pf-v6-c-alert { max-width: 52rem; }
+    #view-hosted > .footer-actions {
+      position: sticky; bottom: 0; z-index: 2;
+      margin-top: 0; padding: 16px 32px;
+      background: rgba(255, 255, 255, .9);
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, .08);
+    }
+    #view-monitor .status-row,
+    #view-monitor .progress-block,
+    #view-monitor #install-secondary {
+      padding: 24px;
+      border: 1px solid var(--pf-t--global--border--color--glass--default, var(--vmaas-border-light));
+      border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
+      background: rgba(255, 255, 255, .78);
+      box-shadow: var(--pf-t--global--box-shadow--glass--default, 0 1px 3px rgba(0, 0, 0, .06));
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    #view-monitor .status-row { margin-bottom: 24px; }
+    #view-monitor .progress-block { max-width: none; margin-bottom: 24px; }
+    #view-monitor #install-secondary { margin-top: 24px; }
+    @media (max-width: 800px) {
+      #view-wizard .wiz-layout { display: block; }
+      #view-wizard .wiz-nav { display: none; }
+      #view-wizard .wiz-mobile-nav { padding: 16px; margin: 0; background: rgba(255, 255, 255, .45); }
+      #view-wizard .wiz-main { padding: 24px 16px 0; }
+      #view-wizard .wiz-footer { width: calc(100% + 32px); margin-inline: -16px; padding: 12px 16px; }
+      #view-monitor .monitor-page-body,
+      #view-hosted .hosted-page-body { padding: 20px 16px; }
+      #view-hosted > .footer-actions { padding: 12px 16px; }
+      #view-monitor .status-row,
+      #view-monitor .progress-block,
+      #view-monitor #install-secondary { padding: 16px; }
+    }
   </style>
 </head>
 <body>
   <div class="mockup-shell">
-    <div class="console is-control-plane-selection">
+    <div class="console is-workflow-shell is-control-plane-selection">
       <div class="console__masthead">
         <div class="console__masthead-left">
           <span class="console__masthead-title">Standalone OpenShift Virtualization mockup</span>
@@ -1678,16 +1781,21 @@
           </div>
 
           <div class="view" id="view-hosted">
+            <div class="flow-page-head">
             <nav class="pf-v6-c-breadcrumb" aria-label="Breadcrumb">
               <ol class="pf-v6-c-breadcrumb__list"><li class="pf-v6-c-breadcrumb__item"><a class="pf-v6-c-breadcrumb__link" href="#">Clusters</a></li><li class="pf-v6-c-breadcrumb__item"><span class="pf-v6-c-breadcrumb__item-divider" aria-hidden="true"><i class="fas fa-angle-right" aria-hidden="true"></i></span><span class="pf-v6-c-breadcrumb__link pf-m-current">Hosted wizard</span></li></ol>
             </nav>
             <div class="page-header"><div class="page-header__text"><h1 class="page-title">Continue with Hosted</h1><p class="page-desc">Hosted control planes use the existing HCP wizard and its established configuration flow.</p></div></div>
+            </div>
+            <div class="hosted-page-body">
             <div class="pf-v6-c-alert pf-m-info pf-m-inline" role="status"><div class="pf-v6-c-alert__icon"><i class="fas fa-info-circle" aria-hidden="true"></i></div><h4 class="pf-v6-c-alert__title">This mockup does not redesign the Hosted path.</h4><div class="pf-v6-c-alert__description">Continue to the existing Hosted Control Plane wizard to create this cluster.</div></div>
+            </div>
             <div class="footer-actions"><div class="pf-v6-c-action-list"><div class="pf-v6-c-action-list__group"><div class="pf-v6-c-action-list__item"><button type="button" class="pf-v6-c-button pf-m-secondary" data-goto="cp-type">Back</button></div><div class="pf-v6-c-action-list__item"><button type="button" class="pf-v6-c-button pf-m-primary">Open Hosted wizard</button></div></div></div></div>
           </div>
 
           <!-- Wizard views -->
           <div class="view" id="view-wizard">
+            <div class="flow-page-head">
             <nav class="pf-v6-c-breadcrumb" aria-label="Breadcrumb">
               <ol class="pf-v6-c-breadcrumb__list">
                 <li class="pf-v6-c-breadcrumb__item">
@@ -1717,6 +1825,7 @@
               <div class="page-header__text">
                 <h1 class="page-title">Create cluster</h1>
               </div>
+            </div>
             </div>
 
             <div class="wiz-layout">
@@ -2635,6 +2744,7 @@
 
           <!-- Installation / Ready -->
           <div class="view" id="view-monitor">
+            <div class="flow-page-head">
             <nav class="pf-v6-c-breadcrumb" aria-label="Breadcrumb">
               <ol class="pf-v6-c-breadcrumb__list">
                 <li class="pf-v6-c-breadcrumb__item">
@@ -2648,6 +2758,9 @@
                 </li>
               </ol>
             </nav>
+            </div>
+
+            <div class="monitor-page-body">
 
             <div class="post-install-banner" id="post-install-banner">
               <strong>Installation complete</strong>
@@ -2810,6 +2923,7 @@
                   <li><span class="t">11:43</span><span>Cluster resources created</span></li>
                 </ul>
               </div>
+            </div>
             </div>
             </div>
           </div>
