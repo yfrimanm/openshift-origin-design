@@ -1470,8 +1470,9 @@
     #view-monitor .monitor-page-body,
     #view-hosted .hosted-page-body {
       background-color: var(--pf-t--global--background--color--secondary--default, #ededed);
-      background-image: var(--pf-t--global--background--image--felt--glass, none);
-      background-size: cover;
+      background-image: linear-gradient(rgba(237, 237, 237, .72), rgba(237, 237, 237, .72)),
+        var(--pf-t--global--background--image--felt--glass, none);
+      background-size: cover, cover;
     }
     #view-wizard .wiz-layout {
       flex: 1;
@@ -1492,6 +1493,7 @@
       min-width: 0;
     }
     #view-wizard .wiz-step-title { font-size: 22px; font-weight: 700; }
+    #view-wizard .wiz-step-title:focus { outline: none; }
     #view-wizard .wiz-step-desc { max-width: 56rem; }
     #view-wizard .wiz-fields { max-width: none; }
     #view-wizard .rich-select__control.pf-v6-c-form-control {
