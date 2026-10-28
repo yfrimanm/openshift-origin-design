@@ -459,6 +459,7 @@
       margin: 0 0 6px; font-size: 13px; font-weight: 700;
     }
     .help-popover p { margin: 0; color: var(--vmaas-text); }
+    .radio-cards[aria-invalid="true"] { outline: 2px solid #c9190b; outline-offset: 4px; border-radius: 8px; }
     .form-field { position: relative; }
     .adv-disclose__section {
       margin: 0 0 20px; padding-bottom: 4px;
@@ -1788,7 +1789,7 @@
                   <div class="form-field">
                     <label for="domain">Base domain <span class="req">*</span></label>
                     <input class="pf-v6-c-form-control" id="domain" type="text" value="apps.mgmt-cluster.example.com" placeholder="apps.mgmt-cluster.example.com" />
-                    <p class="hint" id="domain-default-hint">Pod networking uses the infrastructure cluster's apps domain. DNS is handled by the infrastructure cluster.</p>
+                    <p class="hint" id="domain-default-hint">The infrastructure cluster's apps domain is suggested. Your networking choice determines whether this value is fixed or editable.</p>
                   </div>
                   <div class="form-field">
                     <label id="pull-label">Pull secret <span class="req">*</span></label>
@@ -2235,27 +2236,26 @@
                   <div class="wiz-fields">
                   <div class="form-field">
                     <div class="label-with-help">
-                      <label id="net-mode-label">Networking mode</label>
+                      <label id="net-mode-label">Networking mode <span class="req">*</span></label>
                       <button type="button" class="help-btn" data-help="net-mode" aria-label="More information about networking mode" aria-expanded="false" aria-controls="help-net-mode">
                         <i class="fas fa-question-circle" aria-hidden="true"></i>
                       </button>
                     </div>
                     <div class="help-popover" id="help-net-mode" role="dialog" aria-labelledby="help-net-mode-title">
                       <p class="help-popover__title" id="help-net-mode-title">Pod networking or bridge networking</p>
-                      <p><strong>Pod networking</strong> (recommended) uses an API Route and the infrastructure cluster’s DNS for ingress. No VIPs or new DNS records are needed. Use <strong>Bridge networking</strong> when API and ingress need dedicated VIPs.</p>
+                      <p><strong>Pod networking</strong> uses an API Route and the infrastructure cluster’s DNS for ingress, without VIPs or new DNS records. <strong>Bridge networking</strong> lets clients reach the cluster API and ingress through dedicated IP addresses on a bridged network, rather than through the infrastructure cluster’s pod network. Choose the mode that fits your network requirements.</p>
                     </div>
                     <div class="radio-cards" id="net-mode-cards" role="radiogroup" aria-labelledby="net-mode-label">
-                      <button type="button" class="radio-card is-selected" id="net-mode-pod" data-val="pod" role="radio" aria-checked="true">
-                        <span class="recommended-badge">Recommended</span>
+                      <button type="button" class="radio-card" id="net-mode-pod" data-val="pod" role="radio" aria-checked="false" tabindex="0">
                         <strong>Pod networking</strong>
-                        <span>Uses the infrastructure pod network. The API uses a Route; ingress uses infrastructure DNS. No VIPs or new DNS records are needed.</span>
+                        <span>Uses the infrastructure pod network. Choose this when an API Route and infrastructure DNS for ingress meet your needs; no VIPs or new DNS records are needed.</span>
                       </button>
-                      <button type="button" class="radio-card" id="net-mode-bridge" data-val="bridge" role="radio" aria-checked="false">
+                      <button type="button" class="radio-card" id="net-mode-bridge" data-val="bridge" role="radio" aria-checked="false" tabindex="-1">
                         <strong>Bridge networking</strong>
-                        <span>Connects VMs to a bridged physical network. Requires dedicated API and Ingress virtual IP addresses (VIPs) and a machine network CIDR.</span>
+                        <span>Connects VMs to a bridged network. Choose this when the API and ingress need dedicated virtual IP addresses (VIPs); a machine network CIDR and DNS records are required.</span>
                       </button>
                     </div>
-                    <input type="hidden" id="net-mode-value" value="pod" />
+                    <input type="hidden" id="net-mode-value" value="" />
                   </div>
                   <details class="adv-disclose" id="net-advanced" data-disclosure-context="networking and cluster services">
                     <summary id="network-options-toggle" aria-controls="network-options-content" aria-expanded="false" aria-label="Customize networking and services">
@@ -2281,19 +2281,19 @@
                             <div class="pf-v6-c-menu rich-select__menu" id="bridge-network-menu" role="listbox" hidden>
                               <div class="rich-select__menu-list">
                                 <button type="button" class="pf-v6-c-menu__item rich-select__option pf-m-selected" data-option="tenant-localnet" role="option" aria-selected="true"><span class="rich-select__option-body"><span class="rich-select__option-title">tenant-localnet</span><span class="rich-select__option-desc">Recommended · VLAN · infrastructure cluster</span></span></button>
-                                <button type="button" class="pf-v6-c-menu__item rich-select__option" data-option="tenant-cudn" role="option" aria-selected="false"><span class="rich-select__option-body"><span class="rich-select__option-title">tenant-cudn</span><span class="rich-select__option-desc">CUDN · infrastructure cluster</span></span></button>
+                                <button type="button" class="pf-v6-c-menu__item rich-select__option" data-option="tenant-vlan-200" role="option" aria-selected="false"><span class="rich-select__option-body"><span class="rich-select__option-title">tenant-vlan-200</span><span class="rich-select__option-desc">VLAN-backed localnet · infrastructure cluster</span></span></button>
                               </div>
                             </div>
                           </div>
-                          <p class="hint">Select the pre-existing VLAN, localnet, or CUDN used by tenant VMs.</p>
+                          <p class="hint">Select a pre-existing bridge network or localnet for cluster VMs. CUDN is not supported in Tech Preview.</p>
                         </div>
                         <div id="bridge-options" hidden>
                           <div class="form-row">
-                            <div class="form-field"><label for="api-vip">API VIP <span class="req">*</span></label><input class="pf-v6-c-form-control api-vip" id="api-vip" type="text" placeholder="192.168.1.100" /><p class="hint" id="api-dns-hint">Create an API DNS record pointing to this VIP.</p></div>
-                            <div class="form-field"><label for="ingress-vip">Ingress VIP <span class="req">*</span></label><input class="pf-v6-c-form-control" id="ingress-vip" type="text" placeholder="192.168.1.101" /><p class="hint" id="ingress-dns-hint">Create a wildcard ingress DNS record pointing to this VIP.</p></div>
+                            <div class="form-field"><label for="api-vip">API VIP <span class="req">*</span></label><input class="pf-v6-c-form-control api-vip" id="api-vip" type="text" placeholder="192.168.1.100" /><p class="hint" id="api-dns-hint">Create a DNS A record for the cluster API pointing to this VIP before installation.</p></div>
+                            <div class="form-field"><label for="ingress-vip">Ingress VIP <span class="req">*</span></label><input class="pf-v6-c-form-control" id="ingress-vip" type="text" placeholder="192.168.1.101" /><p class="hint" id="ingress-dns-hint">Create a wildcard DNS A record for cluster ingress pointing to this VIP before installation.</p></div>
                             <div class="form-field" style="grid-column:1/-1;"><label for="machine-cidr">Machine network CIDR <span class="req">*</span></label><input class="pf-v6-c-form-control" id="machine-cidr" type="text" placeholder="192.168.1.0/24" /></div>
                           </div>
-                          <p class="hint">In bridge mode, create both DNS records before installation. DNS resolution is checked after the VMs boot; the UI cannot verify it before creation.</p>
+                          <p class="hint">In bridge mode, create both DNS A records before installation. DNS resolution is checked after the VMs boot; the UI cannot verify it before creation.</p>
                         </div>
                       </div>
 
@@ -2332,7 +2332,7 @@
                             <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
                             <span class="pf-v6-c-switch__label" id="ccm-switch-label" aria-hidden="true">Install cloud controller manager</span>
                           </label>
-                          <p class="hint" id="ccm-help" aria-live="polite">Recommended for LoadBalancer services with pod networking. Optional.</p>
+                          <p class="hint" id="ccm-help" aria-live="polite">LoadBalancer services are available through the infrastructure cluster. Recommended for pod networking.</p>
                         </div>
                         <div class="form-field">
                           <span class="switch-field-title" id="csi-title">Container storage interface (CSI) driver</span>
@@ -2507,7 +2507,7 @@
                         <div class="review-nebius__row" id="review-bridge-row"><span class="review-nebius__label">Bridge network / localnet</span><span class="review-nebius__value" id="review-bridge">—</span></div>
                         <div class="review-nebius__row" id="review-api-vips-row"><span class="review-nebius__label">API VIP</span><span class="review-nebius__value" id="review-api-vips">—</span></div>
                         <div class="review-nebius__row" id="review-ingress-vip-row"><span class="review-nebius__label">Ingress VIP</span><span class="review-nebius__value" id="review-ingress-vip">—</span></div>
-                        <div class="review-nebius__row" id="review-dns-row"><span class="review-nebius__label">DNS to create</span><span class="review-nebius__value" id="review-dns-records">—</span></div>
+                        <div class="review-nebius__row" id="review-dns-row"><span class="review-nebius__label">DNS A records to create</span><span class="review-nebius__value" id="review-dns-records">—</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Secondary network</span><span class="review-nebius__value" id="review-secondary">None</span></div>
                         <div class="review-nebius__row" id="review-csi-storage-row"><span class="review-nebius__label">Infrastructure storage class for CSI</span><span class="review-nebius__value" id="review-csi-storage">—</span></div>
                       </div>
@@ -3061,7 +3061,7 @@
       const states = {
         waiting: { label: 'Waiting for hosts', pct: '5% — Waiting for hosts', value: 5, text: 'Waiting for virtual machines to register. Review infrastructure resources and events if this state does not advance.' },
         preparing: { label: 'Preparing', pct: '12% — Preparing', value: 12, text: 'Preparing the release image and installation resources.' },
-        action: { label: 'Action required', pct: '63% — Action required', value: 63, text: isBridgeNetworking() ? 'The required DNS records did not resolve after the VMs registered. Check the expected records in installation conditions.' : 'The infrastructure storage class could not provision a control plane volume. Check the selected storage class in installation conditions.' },
+        action: { label: 'Action required', pct: '63% — Action required', value: 63, text: isBridgeNetworking() ? 'The required DNS A records did not resolve after the VMs registered. Check the expected records in installation conditions.' : 'The infrastructure storage class could not provision a control plane volume. Check the selected storage class in installation conditions.' },
         error: { label: 'Error', pct: '63% — Error', value: 63, text: 'Installation stopped. Open the event details to review the reported condition and retry.' },
         installing: { label: 'Installing', pct: '63% — Installing', value: 63, text: '' },
         finalizing: { label: 'Finalizing', pct: '97% — Finalizing', value: 97, text: 'Finishing cluster operators and worker node provisioning.' },
@@ -3093,12 +3093,12 @@
         const title = document.getElementById('install-conditions-title');
         const description = conditions.querySelector('.pf-v6-c-alert__description');
         if (isBridgeNetworking()) {
-          if (title) title.textContent = 'Required DNS records did not resolve';
+          if (title) title.textContent = 'Required DNS A records did not resolve';
           const cluster = valueOf('cname') || 'virt-cluster-01';
           const domain = valueOf('domain') || 'example.com';
           const apiVip = valueOf('api-vip') || '192.168.1.100';
           const ingressVip = valueOf('ingress-vip') || '192.168.1.101';
-          if (description) description.textContent = `Create or correct api.${cluster}.${domain} → ${apiVip} and *.apps.${cluster}.${domain} → ${ingressVip}, then retry installation.`;
+          if (description) description.textContent = `Create or correct the DNS A records api.${cluster}.${domain} → ${apiVip} and *.apps.${cluster}.${domain} → ${ingressVip}, then retry installation.`;
         } else {
           if (title) title.textContent = 'Control plane volume could not be provisioned';
           if (description) description.textContent = 'Check that the selected infrastructure storage class is available and has capacity, then retry installation.';
@@ -3218,6 +3218,7 @@
         if (!storage) issues.push(issue('workers', `${id}-sc-select`, `Select a storage class for the ${name || 'unnamed'} worker group.`));
         else if (storage === 'lvms-vg1') issues.push(issue('workers', `${id}-sc-select`, `${storage} uses local storage and does not support live migration. Choose a storage class that supports RWX.`));
       });
+      if (!netModeValue?.value) issues.push(issue('network', 'net-mode-cards', 'Choose a networking mode that fits your network requirements.'));
       if (isBridgeNetworking()) {
         if (!selectText('bridge-network-select', '')) issues.push(issue('network', 'bridge-network-select', 'Select a Bridge network / localnet.'));
         const cidrValue = valueOf('machine-cidr');
@@ -3235,7 +3236,7 @@
           if (ingressVip === apiVip) issues.push(issue('network', 'ingress-vip', 'Ingress VIP must be different from the API VIP.'));
           if (cidr && !ipInCidr(ingressVip, cidr)) issues.push(issue('network', 'ingress-vip', 'Ingress VIP must be inside the machine network CIDR.'));
         }
-      } else {
+      } else if (netModeValue?.value === 'pod') {
         const mtu = numberValue('mtu');
         const geneve = numberValue('geneve');
         if (!Number.isInteger(mtu) || mtu < 576 || mtu > 9000) issues.push(issue('network', 'mtu', 'OVN MTU must be between 576 and 9000.'));
@@ -3286,7 +3287,8 @@
           toggle.setAttribute('aria-expanded', 'true');
         }
       }
-      const focusable = target.classList?.contains('rich-select') ? target.querySelector('.rich-select__toggle') : target;
+      const focusable = target.classList?.contains('rich-select') ? target.querySelector('.rich-select__toggle')
+        : target.classList?.contains('radio-cards') ? target.querySelector('.radio-card') : target;
       focusable?.focus?.();
       focusable?.scrollIntoView?.({ block: 'nearest' });
     }
@@ -3468,13 +3470,13 @@
         lines.push('  workerNodePools: []');
       }
       lines.push('  networking:');
-      lines.push(`    mode: ${isBridgeNetworking() ? 'bridge' : 'pod'}`);
+      lines.push(`    mode: ${netModeValue?.value || 'not-selected'}`);
       if (isBridgeNetworking()) {
         lines.push(`    bridgeNetwork: ${yamlScalar(selectText('bridge-network-select'))}`);
         lines.push(`    apiVIP: ${yamlScalar(valueOf('api-vip'))}`);
         lines.push(`    ingressVIP: ${yamlScalar(valueOf('ingress-vip'))}`);
         lines.push(`    machineNetworkCIDR: ${yamlScalar(valueOf('machine-cidr'))}`);
-      } else {
+      } else if (netModeValue?.value === 'pod') {
         lines.push(`    mtu: ${numberValue('mtu', 1300)}`);
         lines.push(`    genevePort: ${numberValue('geneve', 9880)}`);
       }
@@ -3539,9 +3541,9 @@
       if (rows) rows.innerHTML = `<tr><td>Control plane</td><td>${cp}</td><td>${cpCores}</td><td>${cpMem} GiB</td><td>${cpDisk} GiB</td></tr>` + pools.map(pool => `<tr><td>Worker — ${pool.name}</td><td>${pool.replicas}</td><td>${pool.cores}</td><td>${pool.memory} GiB</td><td>${pool.disk} GiB</td></tr>`).join('');
       const groups = document.getElementById('review-worker-groups');
       if (groups) groups.innerHTML = pools.length ? pools.map(pool => `<div class="review-nebius__row"><span class="review-nebius__label">${pool.name}</span><span class="review-nebius__value">${pool.replicas} worker nodes · ${pool.cores} cores · ${pool.memory} GiB · ${pool.disk} GiB root · ${pool.storage}</span></div>`).join('') : '<div class="review-nebius__row"><span class="review-nebius__label">Worker groups</span><span class="review-nebius__value">None — workloads run on schedulable control plane nodes</span></div>';
-      set('review-net-mode', isBridgeNetworking() ? 'Bridge networking' : 'Pod networking');
+      set('review-net-mode', isBridgeNetworking() ? 'Bridge networking' : netModeValue?.value === 'pod' ? 'Pod networking' : 'Choose a networking mode');
       set('review-net-ovn', `MTU ${numberValue('mtu', 1300)} · Geneve port ${numberValue('geneve', 9880)}`);
-      set('review-ccm', isBridgeNetworking() ? 'Not installed in bridge mode' : document.getElementById('ccm')?.checked ? 'Enabled' : 'Disabled');
+      set('review-ccm', isBridgeNetworking() ? 'Not installed in bridge mode' : netModeValue?.value === 'pod' ? (document.getElementById('ccm')?.checked ? 'Enabled' : 'Disabled') : 'Depends on networking mode');
       set('review-csi', document.getElementById('csi')?.checked ? 'Enabled' : 'Disabled');
       set('review-bridge', isBridgeNetworking() ? selectText('bridge-network-select') : '—');
       set('review-api-vips', isBridgeNetworking() ? valueOf('api-vip') || '—' : '—');
@@ -3555,7 +3557,7 @@
       const bridgeOnlyRows = ['review-bridge-row', 'review-api-vips-row', 'review-ingress-vip-row', 'review-dns-row'];
       bridgeOnlyRows.forEach(id => { const row = document.getElementById(id); if (row) row.hidden = !isBridgeNetworking(); });
       const ovnRow = document.getElementById('review-ovn-row');
-      if (ovnRow) ovnRow.hidden = isBridgeNetworking();
+      if (ovnRow) ovnRow.hidden = netModeValue?.value !== 'pod';
       set('review-csi-storage', csiToggle?.checked ? selectText('csi-sc-select') : '—');
       syncYamlPreview({ cp, cpCores, cpMem, cpDisk, pools });
       syncDetailsReadiness();
@@ -3582,7 +3584,7 @@
       const selectedOption = id => document.querySelector(`#${id} .rich-select__option.pf-m-selected`)?.dataset.option || '';
       const ccm = document.getElementById('ccm');
       const ccmDefault = ccm?.dataset.smartDefault !== 'false';
-      if (!isBridgeNetworking() && Boolean(ccm?.checked) !== ccmDefault) count += 1;
+      if (netModeValue?.value === 'pod' && Boolean(ccm?.checked) !== ccmDefault) count += 1;
       const csi = document.getElementById('csi');
       const csiDefault = csi?.dataset.smartDefault !== 'false';
       if (Boolean(csi?.checked) !== csiDefault) count += 1;
@@ -3591,7 +3593,7 @@
       if (isBridgeNetworking()) {
         const bridgeNetwork = document.getElementById('bridge-network-select');
         if (selectedOption('bridge-network-select') !== (bridgeNetwork?.dataset.smartDefault || '')) count += 1;
-      } else {
+      } else if (netModeValue?.value === 'pod') {
         ['mtu', 'geneve'].forEach(id => {
           const input = document.getElementById(id);
           if (input && input.value !== input.dataset.smartDefault) count += 1;
@@ -3603,38 +3605,41 @@
     }
     function syncNetMode() {
       const bridge = isBridgeNetworking();
-      const mode = bridge ? 'bridge' : 'pod';
+      const mode = netModeValue?.value || '';
       const domain = document.getElementById('domain');
       const ccm = document.getElementById('ccm');
       if (mode !== lastNetworkingMode) {
         if (bridge && ccm) { podCcmChoice = ccm.checked; ccm.checked = false; }
+        if (bridge && !lastNetworkingMode && domain) bridgeDomain = domain.value;
         if (bridge && domain) domain.value = bridgeDomain;
-        if (!bridge && lastNetworkingMode === 'bridge' && domain) bridgeDomain = domain.value;
-        if (!bridge && ccm && lastNetworkingMode) ccm.checked = podCcmChoice;
-        if (!bridge && domain?.dataset.podDomain) domain.value = domain.dataset.podDomain;
+        if (mode === 'pod' && lastNetworkingMode === 'bridge' && domain) bridgeDomain = domain.value;
+        if (mode === 'pod' && !lastNetworkingMode && domain) bridgeDomain = domain.value;
+        if (mode === 'pod' && ccm && lastNetworkingMode) ccm.checked = podCcmChoice;
+        if (mode === 'pod' && domain?.dataset.podDomain) domain.value = domain.dataset.podDomain;
         lastNetworkingMode = mode;
       }
-      if (domain) domain.readOnly = !bridge;
+      if (domain) domain.readOnly = mode === 'pod';
       const domainHint = document.getElementById('domain-default-hint');
       if (domainHint) domainHint.textContent = bridge
         ? 'Use the domain configured in your DNS records. You can change it for this cluster.'
-        : 'Uses the infrastructure cluster’s apps domain. No DNS records need to be created.';
+        : mode === 'pod' ? 'Uses the infrastructure cluster’s apps domain. No DNS records need to be created.'
+          : 'The infrastructure cluster’s apps domain is suggested. Your networking choice determines whether this value is fixed or editable.';
       const ccmField = document.getElementById('ccm-field');
-      if (ccmField) ccmField.hidden = bridge;
+      if (ccmField) ccmField.hidden = mode !== 'pod';
       const cluster = valueOf('cname') || '<cluster-name>';
       const base = valueOf('domain') || '<base-domain>';
       const apiHint = document.getElementById('api-dns-hint');
       const ingressHint = document.getElementById('ingress-dns-hint');
-      if (apiHint) apiHint.textContent = `Create api.${cluster}.${base} → API VIP before installation.`;
-      if (ingressHint) ingressHint.textContent = `Create *.apps.${cluster}.${base} → Ingress VIP before installation.`;
+      if (apiHint) apiHint.textContent = `Create a DNS A record for api.${cluster}.${base} → API VIP before installation.`;
+      if (ingressHint) ingressHint.textContent = `Create a wildcard DNS A record for *.apps.${cluster}.${base} → Ingress VIP before installation.`;
       if (bridgeOptions) bridgeOptions.hidden = !bridge;
       if (bridgeSection) bridgeSection.hidden = !bridge;
-      if (ovnOptions) ovnOptions.hidden = bridge;
+      if (ovnOptions) ovnOptions.hidden = mode !== 'pod';
       netModeCards?.querySelectorAll('.radio-card').forEach(card => {
-        const selected = card.dataset.val === (bridge ? 'bridge' : 'pod');
+        const selected = card.dataset.val === mode;
         card.classList.toggle('is-selected', selected);
         card.setAttribute('aria-checked', String(selected));
-        card.tabIndex = selected ? 0 : -1;
+        card.tabIndex = selected || (!mode && card.dataset.val === 'pod') ? 0 : -1;
       });
       syncNetworkingCustomizationCount();
     }
@@ -3642,6 +3647,7 @@
       card.addEventListener('click', event => {
         event.stopPropagation();
         netModeValue.value = card.dataset.val;
+        clearFieldErrors();
         if (card.dataset.val === 'bridge' && netAdvanced) {
           netAdvanced.open = true;
           netAdvanced.querySelector('summary')?.setAttribute('aria-expanded', 'true');
@@ -3677,7 +3683,7 @@
       const ccmHelp = document.getElementById('ccm-help');
       const csiHelp = document.getElementById('csi-help');
       if (ccmHelp) ccmHelp.textContent = ccmToggle?.checked
-        ? 'LoadBalancer services can use the infrastructure cluster. Recommended for pod networking.'
+        ? 'LoadBalancer services are available through the infrastructure cluster. Recommended for pod networking.'
         : 'LoadBalancer services will not be provided by the infrastructure cloud controller manager.';
       if (csiHelp && !hasCompatibleCsiStorage) csiHelp.textContent = 'No compatible infrastructure storage class was found, so the CSI driver cannot be enabled.';
       else if (csiHelp) csiHelp.textContent = csiToggle?.checked
@@ -4175,7 +4181,7 @@
         baseDomain: 'apps.ocpvirt-mgmt.example.com',
         pullSecret: 'pull-secret',
         storageClass: 'ocs-storagecluster-ceph-rbd',
-        bridgeNetwork: 'tenant-cudn',
+        bridgeNetwork: 'tenant-vlan-200',
         mtu: 1400,
         geneve: 9881,
       },
