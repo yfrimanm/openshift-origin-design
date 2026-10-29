@@ -256,64 +256,54 @@
     /* —— Control plane cards —— */
     .cp-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
-      width: 100%; max-width: 80rem; margin: 0;
+      width: 100%; max-width: 80rem; margin: 0; padding: 0;
+      list-style: none; align-items: stretch;
     }
     @media (max-width: 960px) {
       .cp-grid { grid-template-columns: 1fr; }
       .cp-grid .cp-card { min-height: 0; }
     }
-    .cp-section {
-      margin-top: 48px;
-    }
+    .cp-grid > li { min-width: 0; display: flex; }
     .cp-card {
-      position: relative; text-align: left; width: 100%; cursor: pointer;
-      padding: 32px 40px;
-      border: 1px solid transparent;
+      display: flex; flex-direction: column;
+      text-align: left; width: 100%; cursor: pointer;
+      padding: 32px 40px; min-height: 360px;
+      border: 1px solid var(--vmaas-border-light);
       border-radius: var(--pf-t--global--border--radius--glass--default, 16px);
-      background: #f7f7f7;
+      background: #fff;
       transition: border-color .15s, box-shadow .15s;
-      color: inherit; font: inherit;
-      min-height: 360px;
     }
-    .cp-card:hover { border-color: var(--vmaas-border); }
-    .cp-card:focus-visible { outline: 2px solid var(--vmaas-blue); outline-offset: 3px; }
-    .cp-card.is-selected {
+    .cp-card:hover {
       border-color: var(--vmaas-blue);
       box-shadow: inset 0 0 0 1px var(--vmaas-blue);
     }
-    .cp-card__radio {
-      position: absolute; left: 18px; top: 24px;
-      width: 16px; height: 16px; border-radius: 50%;
-      border: 2px solid var(--vmaas-border);
-      background: #fff;
+    .cp-card:focus-within { outline: 2px solid var(--vmaas-blue); outline-offset: 3px; }
+    .cp-card__title { font-size: 20px; font-weight: 700; margin: 0 0 16px; }
+    .cp-card__choose {
+      padding: 0; border: 0; background: transparent; color: inherit;
+      font: inherit; text-align: left; cursor: pointer;
     }
-    .cp-card.is-selected .cp-card__radio {
-      border-color: var(--vmaas-blue);
-      box-shadow: inset 0 0 0 3px var(--vmaas-blue);
+    .cp-card__choose:hover { text-decoration: underline; }
+    .cp-card__choose:focus-visible { outline: none; }
+    .cp-card__desc { font-size: 15px; line-height: 1.5; margin: 0 0 24px; color: var(--vmaas-text); }
+    .cp-card__facts { margin: 0 0 24px; font-size: 14px; line-height: 1.45; }
+    .cp-card__fact {
+      display: grid; grid-template-columns: minmax(7rem, 34%) minmax(0, 1fr);
+      gap: 12px; padding: 12px 0; border-top: 1px solid var(--vmaas-border-light);
     }
-    .cp-card__title { font-size: 20px; font-weight: 700; margin: 0 0 24px; }
-    .cp-card__desc {
-      font-size: 15px; line-height: 1.55; margin: 0 0 28px; color: var(--vmaas-text);
+    .cp-card__fact dt { font-weight: 600; }
+    .cp-card__fact dd { margin: 0; }
+    .cp-card__learn-more {
+      position: relative; z-index: 1; align-self: flex-start;
+      margin-top: auto; color: var(--vmaas-blue); font-size: 14px;
+      text-decoration: none;
     }
-    .cp-card__benefits { list-style: none; margin: 0; padding: 0; }
-    .cp-card__benefits > li {
-      display: flex; gap: 10px; align-items: flex-start;
-      font-size: 14px; line-height: 1.45; margin-bottom: 10px;
-    }
-    .cp-card__benefits > li:last-child { margin-bottom: 0; }
-    .cp-card__check {
-      color: var(--pf-t--global--icon--color--status--success--default, #3e8635);
-      flex-shrink: 0; margin-top: 2px;
-    }
-    .cp-card__sub { list-style: none; margin: 6px 0 0; padding: 0 0 0 0; }
-    .cp-card__sub li {
-      font-size: 13px; color: var(--vmaas-text-subtle);
-      margin-bottom: 2px; padding-left: 12px; position: relative;
-    }
-    .cp-card__sub li::before { content: '–'; position: absolute; left: 0; }
+    .cp-card__learn-more:hover { text-decoration: underline; }
+    .cp-card__learn-more:focus-visible { outline: 2px solid var(--vmaas-blue); outline-offset: 3px; }
+    .cp-card__learn-more i { margin-inline-start: 4px; font-size: 12px; }
     @media (max-width: 640px) {
       .cp-card { min-height: 0; padding: 24px; }
-      .cp-card__title { margin-bottom: 16px; }
+      .cp-card__fact { grid-template-columns: 1fr; gap: 4px; }
     }
 
     .section-head {
@@ -1629,143 +1619,32 @@
             </div>
 
             <div class="cp-page-body">
-            <div class="cp-grid">
-              <button type="button" class="cp-card" id="card-hosted" data-goto="hosted" aria-label="Create a Hosted cluster">
-                <h2 class="cp-card__title">Hosted</h2>
-                <p class="cp-card__desc">
-                  Control plane runs as pods on the hosting cluster. Workers run as VMs.
-                </p>
-                <ul class="cp-card__benefits">
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Lower resource footprint</span></li>
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Faster multi-tenant provisioning</span></li>
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Share one hosting cluster across many control planes</span></li>
-                </ul>
-              </button>
-
-              <button type="button" class="cp-card" id="card-standalone" data-goto="details" aria-label="Create a Standalone cluster">
-                <h2 class="cp-card__title">Standalone</h2>
-                <p class="cp-card__desc">
-                  Runs the control plane and worker nodes as virtual machines on the infrastructure cluster.
-                </p>
-                <ul class="cp-card__benefits">
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Fully featured OpenShift cluster with a dedicated control plane</span></li>
-                  <li><i class="fas fa-check cp-card__check" aria-hidden="true"></i><span>Manage the cluster from within the cluster after installation</span></li>
-                  <li>
-                    <i class="fas fa-check cp-card__check" aria-hidden="true"></i>
-                    <span>Flexible topology
-                      <ul class="cp-card__sub">
-                        <li>Single node (1 control plane VM)</li>
-                        <li>Highly available (3 control plane VMs)</li>
-                      </ul>
-                    </span>
-                  </li>
-                </ul>
-              </button>
-            </div>
-
-            <div class="cp-section">
-              <details class="compare-arch">
-                <summary>
-                  <i class="fas fa-angle-right" aria-hidden="true"></i>
-                  Compare control plane types
-                </summary>
-                <div class="compare-arch__body">
-                  <div class="section-head" style="margin-top:16px;">
-                    <p class="section-sub" style="margin:0;">Pick the option that fits isolation and resource needs.</p>
-                    <a class="section-link" href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html-single/hosted_control_planes/hosted-control-planes-overview#hosted-control-planes-overview_hcp-overview" target="_blank" rel="noopener">
-                      Learn more <i class="fas fa-external-link-alt" aria-hidden="true"></i>
-                    </a>
-                  </div>
-
-                  <ul class="compare-grid" aria-label="When to choose each type" style="margin-top:16px;">
-                    <li>
-                      <div class="pf-v6-c-card pf-m-compact">
-                        <div class="pf-v6-c-card__header">
-                          <div class="pf-v6-c-card__title"><h3 class="pf-v6-c-card__title-text">Hosted</h3></div>
-                        </div>
-                        <div class="pf-v6-c-card__body">
-                          <p class="compare-best"><strong>Best for</strong>Many clusters on shared infrastructure; lower resource footprint and faster provisioning.</p>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="pf-v6-c-card pf-m-compact">
-                        <div class="pf-v6-c-card__header">
-                          <div class="pf-v6-c-card__title"><h3 class="pf-v6-c-card__title-text">Standalone</h3></div>
-                        </div>
-                        <div class="pf-v6-c-card__body">
-                          <p class="compare-best"><strong>Best for</strong>Strong isolation, compliance, or a full OpenShift cluster with its own control plane.</p>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-
-                  <div class="compare-table-wrap" style="margin-bottom:16px;">
-                    <table class="compare-table">
-                      <thead>
-                        <tr>
-                          <th scope="col">Compare</th>
-                          <th scope="col">Hosted</th>
-                          <th scope="col">Standalone</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row">Control plane</th>
-                          <td>Pods on the hosting cluster</td>
-                          <td>Dedicated VMs (1 or 3)</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Isolation</th>
-                          <td class="subtle">Shared hosting infrastructure</td>
-                          <td>Dedicated control plane</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Resources</th>
-                          <td>Lower footprint</td>
-                          <td class="subtle">Higher (full CP VMs)</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Provisioning</th>
-                          <td>Faster</td>
-                          <td class="subtle">~30–40 minutes</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">Day-2 / upgrades</th>
-                          <td class="subtle">Managed from hosting side</td>
-                          <td>Standard OpenShift in the tenant</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <details class="compare-arch" style="margin-top:0;border:none;border-radius:0;background:transparent;">
-                    <summary style="padding-inline:0;">
-                      <i class="fas fa-angle-right" aria-hidden="true"></i>
-                      How architecture differs
-                    </summary>
-                    <div class="compare-arch__body" style="border-top:none;padding-inline:0;">
-                      <div class="arch">
-                        <div>
-                          <p class="arch__col-title">Hosted</p>
-                          <p class="arch__col-sub">Multiple control planes as pods; workers as VMs</p>
-                          <div class="arch__panel">
-                            <p class="arch__panel-title">Hosting node · CP namespaces + worker VMs ×N</p>
-                          </div>
-                        </div>
-                        <div>
-                          <p class="arch__col-title">Standalone</p>
-                          <p class="arch__col-sub">One tenant: control plane VMs + worker VMs</p>
-                          <div class="arch__panel">
-                            <p class="arch__panel-title">Control plane VMs ×3 + Worker VMs ×N</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </details>
-                </div>
-              </details>
-            </div>
+            <ul class="cp-grid" aria-label="Control plane types">
+              <li>
+                <article class="cp-card" id="card-hosted" aria-labelledby="cp-hosted-title">
+                  <h2 class="cp-card__title" id="cp-hosted-title"><button type="button" class="cp-card__choose" data-goto="hosted" aria-describedby="cp-hosted-desc">Hosted</button></h2>
+                  <p class="cp-card__desc" id="cp-hosted-desc">Run clusters with control planes as pods on a hosting cluster.</p>
+                  <dl class="cp-card__facts">
+                    <div class="cp-card__fact"><dt>Choose when</dt><dd>You need many clusters with lower resource use and faster provisioning.</dd></div>
+                    <div class="cp-card__fact"><dt>Control plane</dt><dd>Pods on the hosting cluster.</dd></div>
+                    <div class="cp-card__fact"><dt>Worker nodes</dt><dd>Virtual machines.</dd></div>
+                  </dl>
+                  <a class="cp-card__learn-more" href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/hosted_control_planes/hcp-overview" target="_blank" rel="noopener noreferrer">Learn more about Hosted <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+                </article>
+              </li>
+              <li>
+                <article class="cp-card" id="card-standalone" aria-labelledby="cp-standalone-title">
+                  <h2 class="cp-card__title" id="cp-standalone-title"><button type="button" class="cp-card__choose" data-goto="details" aria-describedby="cp-standalone-desc">Standalone</button></h2>
+                  <p class="cp-card__desc" id="cp-standalone-desc">Run a full OpenShift cluster with a dedicated control plane on virtual machines.</p>
+                  <dl class="cp-card__facts">
+                    <div class="cp-card__fact"><dt>Choose when</dt><dd>You need a dedicated control plane and manage the cluster from within it.</dd></div>
+                    <div class="cp-card__fact"><dt>Control plane</dt><dd>One or three virtual machines.</dd></div>
+                    <div class="cp-card__fact"><dt>Worker nodes</dt><dd>Optional virtual machines.</dd></div>
+                  </dl>
+                  <a class="cp-card__learn-more" href="https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/architecture/control-plane" target="_blank" rel="noopener noreferrer">Learn more about Standalone <i class="fas fa-external-link-alt" aria-hidden="true"></i></a>
+                </article>
+              </li>
+            </ul>
             </div>
 
             <div class="footer-actions">
@@ -3505,6 +3384,12 @@
         option.disabled = WIZARD.indexOf(option.value) > highestUnlockedStep;
       });
     }
+    document.querySelectorAll('#view-cp-type .cp-card').forEach(card => {
+      card.addEventListener('click', event => {
+        if (event.target.closest('button, a')) return;
+        card.querySelector('.cp-card__choose')?.click();
+      });
+    });
     document.querySelectorAll('[data-goto]').forEach(btn => {
       btn.addEventListener('click', () => {
         const step = btn.dataset.validateStep;
