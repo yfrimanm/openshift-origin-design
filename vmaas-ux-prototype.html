@@ -14991,8 +14991,6 @@
       const attachedIp = status === 'attached' && vm.externalIp ? String(vm.externalIp) : '';
       const pendingIp = vm.externalIpPending ? String(vm.externalIpPending) : '';
       const safeIp = (attachedIp || pendingIp).replace(/</g, '&lt;');
-      const sshCmd = attachedIp ? `ssh cloud-user@${attachedIp}` : '';
-      const sshCmdSafe = sshCmd.replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
       let hostValue = '—';
       let hostMeta = '';
@@ -15033,24 +15031,10 @@
         </div>
         ${hostMeta}`;
 
-      const sshHtml = status === 'attached' && sshCmd
-        ? `<div class="pf-v6-c-clipboard-copy">
-            <div class="pf-v6-c-clipboard-copy__group">
-              <span class="pf-v6-c-form-control pf-m-readonly">
-                <input type="text" readonly value="${sshCmdSafe}" aria-label="SSH connect command" />
-              </span>
-              <button type="button" class="pf-v6-c-button pf-m-control" aria-label="Copy SSH command" data-copy-text="${sshCmdSafe}">
-                <span class="pf-v6-c-button__icon"><i class="fa-regular fa-copy" aria-hidden="true"></i></span>
-              </button>
-            </div>
-          </div>`
-        : '<span class="muted">—</span>';
-
       return `
         <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
           <h3 class="ethan-detail-col__title" id="vm-access-eip-title">External IP</h3>
           ${itField('Host', hostHtml)}
-          ${itField('SSH command', sshHtml)}
         </section>`;
     }
 
@@ -16747,16 +16731,14 @@
                 </section>
                 <section class="ethan-detail-col" aria-labelledby="vm-access-title">
                   <h3 class="ethan-detail-col__title" id="vm-access-title">Access &amp; Initial run</h3>
+                  ${vmExternalIpPanelHtml(v, { canEdit: canEditConfig })}
                   ${sysprepDisplay != null
                     ? itField('Sysprep (Unattend.xml)', sysprepDisplay)
-                    : `${itField('SSH public key', sshDisplay)}${itField('Cloud-init', cloudInitDisplay)}`}
+                    : `${itField('Cloud-init', cloudInitDisplay)}${itField('SSH public key', sshDisplay)}`}
                 </section>
               </div>
             </section>
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
-            <section class="vm-overview-v2__section" aria-labelledby="vm-access-eip-title">
-              ${vmExternalIpPanelHtml(v, { canEdit: canEditConfig })}
-            </section>
             <section class="vm-overview-v2__section" aria-labelledby="vm-network-title">
               <div class="vm-overview-v2__section-head">
                 <h3 class="ethan-detail-col__title" id="vm-network-title">Networking</h3>
@@ -16955,26 +16937,6 @@
           toggleVmIpAttachment(e.currentTarget.dataset.ipToggle);
               });
             });
-      root.querySelectorAll('[data-copy-text]').forEach(btn => {
-        btn.addEventListener('click', async e => {
-          e.preventDefault();
-          const text = e.currentTarget.getAttribute('data-copy-text') || '';
-          try {
-            if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
-            else {
-              const ta = document.createElement('textarea');
-              ta.value = text;
-              document.body.appendChild(ta);
-              ta.select();
-              document.execCommand('copy');
-              ta.remove();
-            }
-            toast('SSH command copied.', 'success');
-          } catch (_) {
-            toast('Could not copy SSH command.');
-          }
-        });
-      });
       root.querySelectorAll('[data-vm-action]').forEach(b => {
         b.addEventListener('click', () => {
           hidePfTooltip();
