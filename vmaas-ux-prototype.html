@@ -1712,6 +1712,14 @@
     }
     .overview-table tr:last-child > * { border-bottom: none; }
     .overview-table--storage tbody tr > * { border-bottom: none; }
+    .overview-table--storage caption {
+      caption-side: top;
+      padding: 0 0 8px;
+      text-align: left;
+      color: var(--vmaas-text);
+      font-size: var(--pf-t--global--font--size--body--default, 0.875rem);
+      font-weight: var(--pf-t--global--font--weight--heading--bold, 600);
+    }
     .overview-table__name {
       display: inline-flex;
       align-items: center;
@@ -16821,11 +16829,9 @@
                   ? `<button type="button" class="name-link name-link--dotted" data-storage-tier-detail="${escAttr(boot.tierId || boot.tier)}" aria-haspopup="true">${String(boot.tier).replace(/</g, '&lt;')}</button>`
                   : '—';
                 const extraHtml = extras.length ? `
-                  <div class="ethan-detail-field">
-                    <div class="ethan-detail-field__label">Additional disks</div>
-                  </div>
                   <div class="vm-overview__table-wrap">
                     <table class="overview-table overview-table--storage" aria-label="Additional disks">
+                      <caption>Additional disks</caption>
                       <thead><tr><th scope="col">Size</th><th scope="col">Storage tier</th><th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th></tr></thead>
                       <tbody>${extras.map(d => {
                         const menuKey = `disk:${d.diskIdx}`;
