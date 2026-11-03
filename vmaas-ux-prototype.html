@@ -892,6 +892,7 @@
     #create-di-panel .felt-select-boxes,
     #create-ci-panel .name-row,
     #create-ci-panel .tenant-typeahead,
+    #create-ci-panel #ci-provisioning-template-select,
     #create-ci-panel .felt-select-boxes,
     #create-it-panel .name-row,
     #create-it-panel .tenant-typeahead,
@@ -22113,6 +22114,8 @@
           ? 'Assign the VM catalog item to a tenant (or make it global), then enter a name and choose a provisioning template. Names are unique per tenant.'
           : 'Choose a project, then name this VM catalog item and choose a provisioning template.';
         const selectedTemplate = CATALOG_PROVISIONING_TEMPLATES.find(t => t.id === c.provisioningTemplate) || CATALOG_PROVISIONING_TEMPLATES[0];
+        const templateFilter = (c.provisioningTemplateFilter || '').trim().toLowerCase();
+        const templateOptions = CATALOG_PROVISIONING_TEMPLATES.filter(t => !templateFilter || `${t.label} ${t.desc}`.toLowerCase().includes(templateFilter));
         const scopeHtml = providerScope ? renderTenantEditor('ci', c) : '';
         const projectHtml = providerScope ? '' : `
           <div class="form-field">
@@ -22163,16 +22166,22 @@
                 </span>
               </button>
             </div>
-            <div class="pf-v6-c-menu-toggle" id="ci-provisioning-template-select">
-              <button type="button" class="pf-v6-c-menu-toggle__button" id="ci-provisioning-template" aria-haspopup="menu" aria-expanded="false">
-                <span class="pf-v6-c-menu-toggle__text">${selectedTemplate.label}</span>
-                <span class="pf-v6-c-menu-toggle__controls"><span class="pf-v6-c-menu-toggle__toggle-icon">${PF_SELECT_CARET}</span></span>
-              </button>
-              <div class="pf-v6-c-menu pf-m-expanded" id="ci-provisioning-template-menu" role="menu" hidden>
-                <div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list">
-                  ${CATALOG_PROVISIONING_TEMPLATES.map(t => `<li class="pf-v6-c-menu__list-item" role="none"><button type="button" class="pf-v6-c-menu__item" data-ci-provisioning-template="${t.id}" role="menuitem"><span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">${t.label}</span></span><span class="pf-v6-c-menu__item-description">${t.desc}</span></button></li>`).join('')}
-                </ul></div>
+            <div class="tenant-typeahead${c.provisioningTemplateMenuOpen ? ' pf-m-expanded' : ''}" id="ci-provisioning-template-select">
+              <div class="tenant-typeahead__control">
+                <input type="text" id="ci-provisioning-template" class="tenant-typeahead__input"
+                  value="${escAttr(c.provisioningTemplateMenuOpen ? c.provisioningTemplateFilter || '' : selectedTemplate.label)}"
+                  placeholder="Search and select a provisioning template" autocomplete="off"
+                  aria-labelledby="ci-provisioning-template-label" aria-autocomplete="list"
+                  aria-expanded="${c.provisioningTemplateMenuOpen ? 'true' : 'false'}"
+                  aria-controls="ci-provisioning-template-list" />
+                <button type="button" class="tenant-typeahead__toggle" id="ci-provisioning-template-toggle"
+                  aria-label="Toggle provisioning template list" aria-expanded="${c.provisioningTemplateMenuOpen ? 'true' : 'false'}">
+                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </button>
               </div>
+              ${c.provisioningTemplateMenuOpen ? `<ul class="tenant-typeahead__list" role="listbox" id="ci-provisioning-template-list">
+                ${templateOptions.length ? templateOptions.map(t => `<li role="none"><button type="button" class="tenant-typeahead__option" role="option" data-ci-provisioning-template="${t.id}" aria-selected="${c.provisioningTemplate === t.id}"><span class="tenant-typeahead__option-title">${t.label}</span><span class="tenant-typeahead__option-sub">${t.desc}</span></button></li>`).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No provisioning templates found</span></li>'}
+              </ul>` : ''}
             </div>
           </div>
         `;
@@ -22184,18 +22193,63 @@
           if (input) input.value = c.name;
           renderCreateCatalogItemWizard();
         });
-        const templateToggle = panel.querySelector('#ci-provisioning-template');
-        const templateMenu = panel.querySelector('#ci-provisioning-template-menu');
-        templateToggle?.addEventListener('click', () => {
-          const open = templateMenu?.hasAttribute('hidden');
-          if (!templateMenu) return;
-          if (open) templateMenu.removeAttribute('hidden'); else templateMenu.setAttribute('hidden', '');
-          templateToggle.setAttribute('aria-expanded', String(open));
-        });
-        panel.querySelectorAll('[data-ci-provisioning-template]').forEach(option => option.addEventListener('click', () => {
-          c.provisioningTemplate = option.dataset.ciProvisioningTemplate || 'ocp_virt_vm';
+        const refreshTemplate = () => {
+          const name = panel.querySelector('#ci-name');
+          const description = panel.querySelector('#ci-description');
+          if (name) c.name = name.value;
+          if (description) c.description = description.value;
           renderCreateCatalogItemWizard();
+        };
+        const templateInput = panel.querySelector('#ci-provisioning-template');
+        const openTemplate = (clearFilter = false) => {
+          c.provisioningTemplateMenuOpen = true;
+          if (clearFilter) c.provisioningTemplateFilter = '';
+          refreshTemplate();
+          requestAnimationFrame(() => document.getElementById('ci-provisioning-template')?.focus());
+        };
+        templateInput?.addEventListener('focus', () => {
+          if (!c.provisioningTemplateMenuOpen) openTemplate();
+        });
+        templateInput?.addEventListener('input', e => {
+          c.provisioningTemplateFilter = e.target.value;
+          openTemplate();
+        });
+        templateInput?.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            c.provisioningTemplateMenuOpen = false;
+            refreshTemplate();
+          } else if (e.key === 'ArrowDown' && !c.provisioningTemplateMenuOpen) {
+            e.preventDefault();
+            openTemplate();
+          }
+        });
+        panel.querySelector('#ci-provisioning-template-toggle')?.addEventListener('mousedown', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (c.provisioningTemplateMenuOpen) {
+            c.provisioningTemplateMenuOpen = false;
+            refreshTemplate();
+          } else openTemplate(true);
+        });
+        panel.querySelectorAll('[data-ci-provisioning-template]').forEach(option => option.addEventListener('mousedown', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          c.provisioningTemplate = option.dataset.ciProvisioningTemplate || 'ocp_virt_vm';
+          c.provisioningTemplateFilter = '';
+          c.provisioningTemplateMenuOpen = false;
+          refreshTemplate();
         }));
+        if (c.provisioningTemplateMenuOpen) {
+          const onOutside = e => {
+            const root = document.getElementById('ci-provisioning-template-select');
+            if (root && !root.contains(e.target)) {
+              c.provisioningTemplateMenuOpen = false;
+              document.removeEventListener('mousedown', onOutside, true);
+              refreshTemplate();
+            }
+          };
+          setTimeout(() => document.addEventListener('mousedown', onOutside, true), 0);
+        }
         panel.querySelector('#ci-project')?.addEventListener('change', e => {
           c.project = e.target.value || 'project-a';
         });
@@ -22982,7 +23036,7 @@
       const desc = document.getElementById('ci-desc') || document.getElementById('ci-description');
       if (desc) c.description = desc.value.trim();
       const tpl = document.getElementById('ci-provisioning-template');
-      if (tpl) c.provisioningTemplate = tpl.value || 'ocp_virt_vm';
+      if (tpl && tpl.tagName === 'SELECT') c.provisioningTemplate = tpl.value || 'ocp_virt_vm';
       document.querySelectorAll('[data-ci-access-state]').forEach(sel => {
         const key = sel.dataset.ciAccessState;
         c[key] = sel.type === 'checkbox'
