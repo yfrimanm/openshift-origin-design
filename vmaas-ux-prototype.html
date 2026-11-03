@@ -21547,6 +21547,7 @@
         description: '',
         project: state.catalogProjectFilter || 'project-a',
         provisioningTemplate: 'ocp_virt_vm',
+        provisioningTemplateSelectionMade: false,
         guestOsFamily: 'Linux',
         diskImageId: '',
         diskImageAccess: 'editable',
@@ -21919,6 +21920,7 @@
         description: item.description || '',
         project: item.project || state.catalogProjectFilter || 'project-a',
         provisioningTemplate: item.provisioningTemplate || 'ocp_virt_vm',
+        provisioningTemplateSelectionMade: true,
         guestOsFamily: item.guestOsFamily || (disk ? guestOsFamilyFromDiskImage(disk) : 'Linux'),
         diskImageId,
         diskImageAccess,
@@ -22183,7 +22185,7 @@
                 </button>
               </div>
               ${c.provisioningTemplateMenuOpen ? `<ul class="tenant-typeahead__list" role="listbox" id="ci-provisioning-template-list">
-                ${templateOptions.length ? templateOptions.map(t => `<li role="none"><button type="button" class="tenant-typeahead__option" role="option" data-ci-provisioning-template="${t.id}" aria-selected="${c.provisioningTemplate === t.id}"><span class="tenant-typeahead__option-title">${t.label}</span><span class="tenant-typeahead__option-sub">${t.desc}</span></button></li>`).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No provisioning templates found</span></li>'}
+                ${templateOptions.length ? templateOptions.map(t => `<li role="none"><button type="button" class="tenant-typeahead__option" role="option" data-ci-provisioning-template="${t.id}" aria-selected="${!!c.provisioningTemplateSelectionMade && c.provisioningTemplate === t.id}"><span class="tenant-typeahead__option-title">${t.label}</span><span class="tenant-typeahead__option-sub">${t.desc}</span></button></li>`).join('') : '<li><span class="tenant-typeahead__option tenant-typeahead__option--empty">No provisioning templates found</span></li>'}
               </ul>` : ''}
             </div>
           </div>
@@ -22234,14 +22236,19 @@
             refreshTemplate();
           } else openTemplate(true);
         });
-        panel.querySelectorAll('[data-ci-provisioning-template]').forEach(option => option.addEventListener('mousedown', e => {
-          e.preventDefault();
-          e.stopPropagation();
-          c.provisioningTemplate = option.dataset.ciProvisioningTemplate || 'ocp_virt_vm';
-          c.provisioningTemplateFilter = '';
-          c.provisioningTemplateMenuOpen = false;
-          refreshTemplate();
-        }));
+        panel.querySelectorAll('[data-ci-provisioning-template]').forEach(option => {
+          const selectTemplate = e => {
+            e.preventDefault();
+            e.stopPropagation();
+            c.provisioningTemplate = option.dataset.ciProvisioningTemplate || 'ocp_virt_vm';
+            c.provisioningTemplateSelectionMade = true;
+            c.provisioningTemplateFilter = '';
+            c.provisioningTemplateMenuOpen = false;
+            refreshTemplate();
+          };
+          option.addEventListener('mousedown', selectTemplate);
+          option.addEventListener('click', selectTemplate);
+        });
         if (c.provisioningTemplateMenuOpen) {
           const onOutside = e => {
             const root = document.getElementById('ci-provisioning-template-select');
