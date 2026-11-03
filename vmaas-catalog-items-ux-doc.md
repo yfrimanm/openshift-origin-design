@@ -57,7 +57,7 @@ Editable / Locked switches on default fields control whether tenants can change 
 ### Step 1 — Details
 
 - Help: *Set the catalog item identity and optionally a default disk image for tenants.*
-- **Name** (required, DNS-style) + generate
+- **Name** (required, DNS-style) — helper text: *Enter a name or click the generate name one.* The blue generate-name icon fills a valid name when selected.
 - **Description** (optional)
 - **Disk image** — typeahead rich-select; **Not set** lets tenants choose at VM create. Guest OS is derived from the selected disk image.
 - Editable / Locked on Disk image
