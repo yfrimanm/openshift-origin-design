@@ -1601,9 +1601,6 @@
     .vm-access-section {
       max-width: 40rem;
     }
-    .vm-access-section .ethan-detail-col__title {
-      margin-bottom: 16px;
-    }
     .vm-access-section__host-row {
       display: flex;
       flex-wrap: wrap;
@@ -1718,7 +1715,7 @@
       text-align: left;
       color: var(--vmaas-text);
       font-size: var(--pf-t--global--font--size--body--default, 0.875rem);
-      font-weight: var(--pf-t--global--font--weight--heading--bold, 600);
+      font-weight: var(--pf-t--global--font--weight--heading--bold, 700);
     }
     .overview-table__name {
       display: inline-flex;
@@ -15050,7 +15047,7 @@
 
       return `
         <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
-          <h3 class="ethan-detail-col__title" id="vm-access-eip-title">External IP${status === 'attached' && vm.autoAttachExternalIp ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h3>
+          <h4 class="ethan-detail-col__subtitle" id="vm-access-eip-title">External IP${status === 'attached' && vm.autoAttachExternalIp ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h4>
           ${itField('Host', hostHtml)}
         </section>`;
     }
