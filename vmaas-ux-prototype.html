@@ -15033,7 +15033,7 @@
 
       return `
         <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
-          <h3 class="ethan-detail-col__title" id="vm-access-eip-title">External IP</h3>
+          <h3 class="ethan-detail-col__title" id="vm-access-eip-title">External IP${status === 'attached' && vm.autoAttachExternalIp ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h3>
           ${itField('Host', hostHtml)}
         </section>`;
     }
