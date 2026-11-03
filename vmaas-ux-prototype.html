@@ -16802,10 +16802,34 @@
             <hr class="vm-overview-v2__divider" aria-hidden="true" />
             <section class="vm-overview-v2__section" aria-labelledby="vm-storage-title">
               <div class="vm-overview-v2__section-head">
-                <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage (${diskRows.length})</h3>
+                <h3 class="ethan-detail-col__title" id="vm-storage-title">Storage</h3>
                     <button type="button" class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-overview-add-disk"${addDisabledAttrs}>Add disk</button>
                   </div>
-              <div class="vm-overview__table-wrap">
+              ${(() => {
+                const boot = diskRows.find(d => d.bootable);
+                const extras = diskRows.filter(d => !d.bootable);
+                const tier = boot?.tier && boot.tier !== '—'
+                  ? `<button type="button" class="name-link name-link--dotted" data-storage-tier-detail="${escAttr(boot.tierId || boot.tier)}" aria-haspopup="true">${String(boot.tier).replace(/</g, '&lt;')}</button>`
+                  : '—';
+                const extraHtml = extras.length ? `
+                  <div class="ethan-detail-field">
+                    <div class="ethan-detail-field__label">Additional disks</div>
+                  </div>
+                  <div class="vm-overview__table-wrap">
+                    <table class="overview-table overview-table--storage" aria-label="Additional disks">
+                      <thead><tr><th scope="col">Size</th><th scope="col">Storage tier</th><th scope="col" class="overview-table__actions"><span class="pf-v6-screen-reader">Actions</span></th></tr></thead>
+                      <tbody>${extras.map(d => {
+                        const menuKey = `disk:${d.diskIdx}`;
+                        const menuOpen = canEditConfig && state.overviewMenuOpen === menuKey;
+                        const tierCell = d.tier && d.tier !== '—' ? `<button type="button" class="name-link name-link--dotted" data-storage-tier-detail="${escAttr(d.tierId || d.tier)}" aria-haspopup="true">${String(d.tier).replace(/</g, '&lt;')}</button>` : '—';
+                        return `<tr><td>${d.size}</td><td>${tierCell}</td><td class="overview-table__actions"><button type="button" class="kebab${menuOpen ? ' pf-m-expanded' : ''}" data-overview-row-menu="${menuKey}" aria-label="Actions for ${d.detailName}" aria-expanded="${menuOpen}" aria-haspopup="menu" aria-controls="vm-overview-row-menu"${addDisabledAttrs}><i class="fa-solid fa-ellipsis-v" aria-hidden="true"></i></button></td></tr>`;
+                      }).join('')}</tbody>
+                    </table>
+                  </div>` : '';
+                return `${itField('Boot disk size', boot?.size || '—')}${itField('Boot storage tier', tier)}${extraHtml}`;
+              })()}
+              <!-- Additional disks are rendered above without a disk-name column. -->
+              <div class="vm-overview__table-wrap" hidden>
                 <table class="overview-table overview-table--storage" aria-label="Storage disks">
                   <colgroup>
                     <col class="overview-col" /><col class="overview-col" /><col class="overview-col" /><col class="overview-col overview-col--actions" />
