@@ -1039,12 +1039,10 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-    .tenant-typeahead.pf-m-expanded .tenant-typeahead__toggle i {
-      transform: rotate(180deg);
-    }
-    .tenant-typeahead__toggle i {
-      transition: transform 0.15s ease;
-      font-size: 12px;
+    .tenant-typeahead__toggle svg {
+      width: 1em;
+      height: 1em;
+      fill: currentColor;
     }
     .tenant-typeahead__list {
       position: absolute;
@@ -1070,12 +1068,11 @@
       font: inherit;
       cursor: pointer;
     }
-    .tenant-typeahead__option:hover,
     .tenant-typeahead__option[aria-selected="true"] {
       background: #e7f1fa;
     }
-    #ci-provisioning-template-select .tenant-typeahead__option:not([aria-selected="true"]):hover {
-      background: transparent;
+    .tenant-typeahead__option:not([aria-selected="true"]):hover {
+      background: #f5f5f5;
     }
     .tenant-typeahead__option-sub {
       display: block;
@@ -11338,7 +11335,10 @@
           <p class="create-resource-wiz__help">Choose a project, name this secret, and optionally add a description and labels.</p>
           <div class="form-field">
             <label for="sc-project">Project <span class="req">*</span></label>
-            <select id="sc-project">${PROJECTS.map(p => `<option value="${p}" ${p === s.project ? 'selected' : ''}>${p === 'project-a' ? 'Root' : p}</option>`).join('')}</select>
+            ${pfSelect({
+              id: 'sc-project',
+              optionsHtml: PROJECTS.map(p => `<option value="${p}" ${p === s.project ? 'selected' : ''}>${p === 'project-a' ? 'Root' : p}</option>`).join(''),
+            })}
           </div>
           <div class="form-field${nameErr ? ' pf-m-error' : ''}" id="sc-name-field">
             <label for="sc-name">Name <span class="req">*</span></label>
@@ -12829,7 +12829,7 @@
               <button type="button" class="tenant-typeahead__toggle" id="${prefix}-tenant-toggle"
                 aria-label="Toggle tenant list" aria-expanded="${draft.tenantMenuOpen ? 'true' : 'false'}"
                 ${draft.isGlobal ? 'disabled' : ''}>
-                <i class="fas fa-angle-down" aria-hidden="true"></i>
+                ${PF_SELECT_CARET}
               </button>
             </div>
             ${list}
@@ -12902,7 +12902,7 @@
         }
       });
 
-      document.getElementById(`${prefix}-tenant-toggle`)?.addEventListener('mousedown', e => {
+      const toggleTenantMenu = e => {
         e.preventDefault();
         e.stopPropagation();
         if (draft.isGlobal) return;
@@ -12912,10 +12912,13 @@
         } else {
           openMenu(true);
         }
-      });
+      };
+      const tenantToggle = document.getElementById(`${prefix}-tenant-toggle`);
+      tenantToggle?.addEventListener('mousedown', toggleTenantMenu);
+      tenantToggle?.addEventListener('click', toggleTenantMenu);
 
       document.querySelectorAll(`#${prefix}-tenant-list [data-tenant-id]`).forEach(btn => {
-        btn.addEventListener('mousedown', e => {
+        const selectTenant = e => {
           e.preventDefault();
           e.stopPropagation();
           draft.tenantId = btn.dataset.tenantId;
@@ -12923,7 +12926,9 @@
           draft.tenantMenuOpen = false;
           if (draft.fieldErrors) delete draft.fieldErrors.tenant;
           refresh();
-        });
+        };
+        btn.addEventListener('mousedown', selectTenant);
+        btn.addEventListener('click', selectTenant);
       });
 
       if (draft.tenantMenuOpen) {
@@ -22181,7 +22186,7 @@
                   aria-controls="ci-provisioning-template-list" />
                 <button type="button" class="tenant-typeahead__toggle" id="ci-provisioning-template-toggle"
                   aria-label="Toggle provisioning template list" aria-expanded="${c.provisioningTemplateMenuOpen ? 'true' : 'false'}">
-                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                  ${PF_SELECT_CARET}
                 </button>
               </div>
               ${c.provisioningTemplateMenuOpen ? `<ul class="tenant-typeahead__list" role="listbox" id="ci-provisioning-template-list">
@@ -22228,14 +22233,17 @@
             openTemplate();
           }
         });
-        panel.querySelector('#ci-provisioning-template-toggle')?.addEventListener('mousedown', e => {
+        const toggleTemplateMenu = e => {
           e.preventDefault();
           e.stopPropagation();
           if (c.provisioningTemplateMenuOpen) {
             c.provisioningTemplateMenuOpen = false;
             refreshTemplate();
           } else openTemplate(true);
-        });
+        };
+        const templateToggle = panel.querySelector('#ci-provisioning-template-toggle');
+        templateToggle?.addEventListener('mousedown', toggleTemplateMenu);
+        templateToggle?.addEventListener('click', toggleTemplateMenu);
         panel.querySelectorAll('[data-ci-provisioning-template]').forEach(option => {
           const selectTemplate = e => {
             e.preventDefault();
