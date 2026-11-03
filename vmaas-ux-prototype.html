@@ -23738,40 +23738,37 @@
 
     function catalogStorageTableHtml(item) {
       const rows = catalogItemDiskRows(item);
-      const body = rows.length
-        ? rows.map(d => `
+      const boot = rows.find(d => d.bootable);
+      const extras = rows.filter(d => !d.bootable);
+      const bootAccess = catalogItemFieldAccess(item, 'bootDiskAccess');
+      const tierAccess = catalogItemFieldAccess(item, 'bootStorageTierAccess');
+      const extraAccess = catalogItemFieldAccess(item, 'extraDisksAccess');
+      const body = extras.map(d => `
             <tr>
-              <td>
-                <span class="overview-table__name">
-                  ${String(d.label).replace(/</g, '&lt;')}
-                  ${d.bootable ? pfAnnotationLabel('Bootable', 'bootable-label') : ''}
-                </span>
-              </td>
               <td>${String(d.size).replace(/</g, '&lt;')}</td>
               <td>${catalogStorageTierCellHtml(d.tier, d.tierId)}</td>
             </tr>`).join('')
-        : `<tr><td colspan="3"><span class="muted">Not set</span></td></tr>`;
+      const additionalHtml = extras.length ? `
+          <div class="ethan-detail-field">
+            <div class="ethan-detail-field__label">Additional disks ${catalogGovBadge(extraAccess)}</div>
+          </div>
+          <div class="vm-overview__table-wrap">
+            <table class="overview-table overview-table--storage" aria-label="Additional disks">
+              <colgroup>
+                <col class="overview-col" /><col class="overview-col" />
+              </colgroup>
+              <thead><tr><th scope="col">Size</th><th scope="col">Storage tier</th></tr></thead>
+              <tbody>${body}</tbody>
+            </table>
+          </div>` : '';
       return `
         <section class="vm-overview-v2__section" aria-labelledby="ci-storage-title">
           <div class="vm-overview-v2__section-head">
-            <h3 class="ethan-detail-col__title" id="ci-storage-title">Storage (${rows.length})</h3>
-            ${catalogGovBadge(catalogStorageSectionAccess(item))}
+            <h3 class="ethan-detail-col__title" id="ci-storage-title">Storage</h3>
           </div>
-          <div class="vm-overview__table-wrap">
-            <table class="overview-table overview-table--storage" aria-label="Storage disks">
-              <colgroup>
-                <col class="overview-col" /><col class="overview-col" /><col class="overview-col" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th scope="col">Size</th>
-                  <th scope="col">Storage tier</th>
-                </tr>
-              </thead>
-              <tbody>${body}</tbody>
-            </table>
-          </div>
+          ${itField('Boot disk size', catalogGovValueHtml(boot?.size || '—', bootAccess))}
+          ${itField('Boot storage tier', catalogGovValueHtml(catalogStorageTierCellHtml(boot?.tier || '—', boot?.tierId || ''), tierAccess))}
+          ${additionalHtml}
         </section>`;
     }
 
