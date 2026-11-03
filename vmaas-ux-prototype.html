@@ -22112,6 +22112,9 @@
         const detailsHelp = providerScope
           ? 'Assign the VM catalog item to a tenant (or make it global), then enter a name and choose a provisioning template. Names are unique per tenant.'
           : 'Choose a project, then name this VM catalog item and choose a provisioning template.';
+        const templateOptionsHtml = CATALOG_PROVISIONING_TEMPLATES.map(t =>
+          `<option value="${t.id}" ${c.provisioningTemplate === t.id ? 'selected' : ''}>${t.label} — ${t.desc}</option>`
+        ).join('');
         const scopeHtml = providerScope ? renderTenantEditor('ci', c) : '';
         const projectHtml = providerScope ? '' : `
           <div class="form-field">
@@ -22162,18 +22165,11 @@
                 </span>
               </button>
             </div>
-            ${renderTypeaheadRichSelectHtml({
-              rootId: 'ci-provisioning-template-select',
-              toggleId: 'ci-provisioning-template',
-              menuId: 'ci-provisioning-template-menu',
-              searchId: 'ci-provisioning-template-search',
-              labelId: 'ci-provisioning-template-label',
-              selectedId: c.provisioningTemplate || 'ocp_virt_vm',
-              placeholder: 'Select a provisioning template',
-              optionAttr: 'data-ci-provisioning-template',
-              emptyNoun: 'provisioning templates',
-              stacked: true,
-              options: CATALOG_PROVISIONING_TEMPLATES,
+            ${pfSelect({
+              id: 'ci-provisioning-template',
+              required: true,
+              ariaLabel: 'Provisioning template',
+              optionsHtml: templateOptionsHtml,
             })}
           </div>
         `;
@@ -22185,20 +22181,8 @@
           if (input) input.value = c.name;
           renderCreateCatalogItemWizard();
         });
-        wireTypeaheadRichSelect(panel, {
-          toggleId: 'ci-provisioning-template',
-          searchId: 'ci-provisioning-template-search',
-          optionSel: '[data-ci-provisioning-template]',
-          getOptionId: opt => opt.dataset.ciProvisioningTemplate,
-          getOpen: () => !!c.provisioningTemplateMenuOpen,
-          setOpen: value => { c.provisioningTemplateMenuOpen = value; },
-          setFilter: value => { c.provisioningTemplateFilter = value; },
-          onSelectId: value => {
-            c.provisioningTemplate = value || 'ocp_virt_vm';
-            c.provisioningTemplateMenuOpen = false;
-            renderCreateCatalogItemWizard();
-          },
-          rerender: renderCreateCatalogItemWizard,
+        panel.querySelector('#ci-provisioning-template')?.addEventListener('change', e => {
+          c.provisioningTemplate = e.target.value || 'ocp_virt_vm';
         });
         panel.querySelector('#ci-project')?.addEventListener('change', e => {
           c.project = e.target.value || 'project-a';
