@@ -14908,6 +14908,7 @@
       const vm = VMS.find(v => v.name === name);
       if (!vm) return;
       if (kind === 'external' || kind === 'external-retry') {
+        if (vm.autoAttachExternalIp && vmExternalIpStatus(vm) === 'attached') return;
         if (vmExternalIpStatus(vm) === 'attaching') return;
         if (kind === 'external-retry' && vm.externalIpPending) {
           const row = EXTERNAL_IP_POOL.find(ip => ip.address === vm.externalIpPending);
@@ -15003,6 +15004,7 @@
 
     function vmExternalIpPanelHtml(vm, { canEdit = true } = {}) {
       const status = vmExternalIpStatus(vm);
+      const autoAttached = status === 'attached' && !!vm.autoAttachExternalIp;
       const attachedIp = status === 'attached' && vm.externalIp ? String(vm.externalIp) : '';
       const pendingIp = vm.externalIpPending ? String(vm.externalIpPending) : '';
       const safeIp = (attachedIp || pendingIp).replace(/</g, '&lt;');
@@ -15025,7 +15027,7 @@
       }
 
       let actions = '';
-      if (!canEdit) {
+      if (!canEdit || autoAttached) {
         actions = '';
       } else if (status === 'attaching') {
         actions = '';
@@ -15044,11 +15046,12 @@
           <span>${hostValue}</span>
           ${actions}
         </div>
-        ${hostMeta}`;
+        ${hostMeta}
+        ${autoAttached ? '<p class="vm-access-section__meta">Automatically attached and managed with this VM. It cannot be edited or detached here.</p>' : ''}`;
 
       return `
         <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
-          <h4 class="ethan-detail-col__subtitle" id="vm-access-eip-title">External IP${status === 'attached' && vm.autoAttachExternalIp ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h4>
+          <h4 class="ethan-detail-col__subtitle" id="vm-access-eip-title">External IP${autoAttached ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h4>
           ${itField('Host', hostHtml)}
         </section>`;
     }
