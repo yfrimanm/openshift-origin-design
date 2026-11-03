@@ -22169,7 +22169,9 @@
                 <span class="pf-v6-c-menu-toggle__controls"><span class="pf-v6-c-menu-toggle__toggle-icon">${PF_SELECT_CARET}</span></span>
               </button>
               <div class="pf-v6-c-menu pf-m-expanded" id="ci-provisioning-template-menu" role="menu" hidden>
-                ${CATALOG_PROVISIONING_TEMPLATES.map(t => `<button type="button" class="pf-v6-c-menu__item" data-ci-provisioning-template="${t.id}" role="menuitem"><span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">${t.label}</span></span><span class="pf-v6-c-menu__item-description">${t.desc}</span></button>`).join('')}
+                <div class="pf-v6-c-menu__content"><ul class="pf-v6-c-menu__list">
+                  ${CATALOG_PROVISIONING_TEMPLATES.map(t => `<li class="pf-v6-c-menu__list-item" role="none"><button type="button" class="pf-v6-c-menu__item" data-ci-provisioning-template="${t.id}" role="menuitem"><span class="pf-v6-c-menu__item-main"><span class="pf-v6-c-menu__item-text">${t.label}</span></span><span class="pf-v6-c-menu__item-description">${t.desc}</span></button></li>`).join('')}
+                </ul></div>
               </div>
             </div>
           </div>
