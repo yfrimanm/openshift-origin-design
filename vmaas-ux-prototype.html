@@ -12383,7 +12383,10 @@
       const name = state.deleteVmName;
       if (!name) return;
       const idx = VMS.findIndex(v => v.name === name);
-      if (idx >= 0) VMS.splice(idx, 1);
+      if (idx >= 0) {
+        releaseExternalIp(VMS[idx].externalIp);
+        VMS.splice(idx, 1);
+      }
       state.selectedVms.delete(name);
       if (state.selectedVmName === name) {
         state.selectedVmName = null;
@@ -15047,7 +15050,7 @@
           ${actions}
         </div>
         ${hostMeta}
-        ${autoAttached ? '<p class="vm-access-section__meta">Automatically attached and managed with this VM. It cannot be edited or detached here.</p>' : ''}`;
+        ${autoAttached ? '<p class="vm-access-section__meta">This IP is managed with the VM and is detached only when the VM is deleted.</p>' : ''}`;
 
       return `
         <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
