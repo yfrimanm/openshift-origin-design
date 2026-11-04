@@ -1,11 +1,11 @@
 # VMaaS UX mockup — current handoff
 
-Prototype: [VMaaS UX prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=d397584&role=provider)  
+Prototype: [VMaaS UX prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=provider)
 Google UX doc: [Catalog items](https://docs.google.com/document/d/1YTm2X4nUXWVI_Mjq_hXEY4Rj6i9BaOiXjzVeF3jcMA4/edit)
 
 ## Create catalog item
 
-The wizard follows Details → Instance types → Visibility → Storage → Access & Initial run → Review. In Details, the Name helper reads **“Enter a name or click the generate name one.”** The Provisioning template menu uses the same dropdown styling and selection behavior as Tenant; each option has a template name on the first line and its description on the second. A selected template’s name/ID appears on the catalog item details page.
+The wizard follows **Details → Compute configuration → Storage → Access & Initial run → Review**. Scope (Global or Tenant scoped) and tenant selection are within Details, not a separate Visibility step. Disk image and instance type are within Compute configuration. In Details, the Name helper reads **“Enter a name or click the generate name one.”** The Provisioning template menu uses the same dropdown styling and selection behavior as Tenant; each option has a template name on the first line and its description on the second. Only the selected option has a blue background. The chosen template name/ID appears on catalog item details.
 
 Storage treats **Boot disk size**, **Boot storage tier**, and **Additional disks** as separate governance controls. Each can be Editable or Locked. The additional disks group is governed as a whole. Omitted values are not shown as configured defaults.
 
@@ -19,6 +19,8 @@ On VM details, **Access & Initial run** starts with **External IP**, followed by
 
 For automatically attached IPs, show an **Auto attached** label and the explanation **“This IP is managed with the VM and is detached only when the VM is deleted.”** Do not offer Edit or Detach in that state. Manually attached IPs may be detached.
 
-## Screenshots
+## Audit and screenshots
 
-The Google UX doc contains the screenshot gallery. Refresh overview screenshots from the current prototype build when UI changes; avoid relying on older cached `?v=` links.
+The 4 November audit checked the provider catalog wizard, catalog item overview, VM overview, auto-attached and manual External IP states, storage tables, Cloud-init presentation, and dropdown interactions. It found and fixed a double-event toggle that prevented the Tenant and Provisioning template menus from staying open, plus a cramped Auto attached label and stale build tag.
+
+The Google UX doc's screenshot gallery predates the five-step wizard. Until refreshed captures are inserted, treat the existing gallery as historical. The current interactive prototype is the source of truth.

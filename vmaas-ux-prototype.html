@@ -1602,6 +1602,16 @@
       max-width: 40rem;
       margin-bottom: 24px;
     }
+    .vm-access-section__title {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+    .vm-access-section__title .pf-v6-c-label {
+      font-size: 11px;
+      line-height: 1.2;
+    }
     .vm-access-section__host-row {
       display: flex;
       flex-wrap: wrap;
@@ -7195,7 +7205,7 @@
               <span class="pf-v6-c-form-control__toggle-icon"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"/></svg></span>
             </span>
           </span>
-          <span class="prototype-build-tag" id="prototype-build-tag">Build Oct 22 · catalog 7176</span>
+          <span class="prototype-build-tag" id="prototype-build-tag">Build Nov 4 · UX audit</span>
         </div>
       </div>
       <div class="console__body">
@@ -12928,7 +12938,6 @@
         }
       };
       const tenantToggle = document.getElementById(`${prefix}-tenant-toggle`);
-      tenantToggle?.addEventListener('mousedown', toggleTenantMenu);
       tenantToggle?.addEventListener('click', toggleTenantMenu);
 
       document.querySelectorAll(`#${prefix}-tenant-list [data-tenant-id]`).forEach(btn => {
@@ -12941,7 +12950,6 @@
           if (draft.fieldErrors) delete draft.fieldErrors.tenant;
           refresh();
         };
-        btn.addEventListener('mousedown', selectTenant);
         btn.addEventListener('click', selectTenant);
       });
 
@@ -15059,7 +15067,7 @@
 
       return `
         <section class="vm-access-section" aria-labelledby="vm-access-eip-title">
-          <h4 class="ethan-detail-col__subtitle" id="vm-access-eip-title">External IP${autoAttached ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h4>
+          <h4 class="ethan-detail-col__subtitle vm-access-section__title" id="vm-access-eip-title">External IP${autoAttached ? ' <span class="pf-v6-c-label pf-m-blue pf-m-compact">Auto attached</span>' : ''}</h4>
           ${itField('Host', hostHtml)}
         </section>`;
     }
@@ -22257,7 +22265,6 @@
           } else openTemplate(true);
         };
         const templateToggle = panel.querySelector('#ci-provisioning-template-toggle');
-        templateToggle?.addEventListener('mousedown', toggleTemplateMenu);
         templateToggle?.addEventListener('click', toggleTemplateMenu);
         panel.querySelectorAll('[data-ci-provisioning-template]').forEach(option => {
           const selectTemplate = e => {
@@ -22269,7 +22276,6 @@
             c.provisioningTemplateMenuOpen = false;
             refreshTemplate();
           };
-          option.addEventListener('mousedown', selectTemplate);
           option.addEventListener('click', selectTemplate);
         });
         if (c.provisioningTemplateMenuOpen) {
