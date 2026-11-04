@@ -29,8 +29,6 @@ The modal presents a required typeahead Instance type selection and Save/Cancel.
 
 ## Feedback after save
 
-Success produces a toast. If the API reports a restart-required condition after a Running or Paused resize, VM Overview shows an expandable Restart required warning with Detected changes. Multiple pending changes can be listed together; the condition clears after the relevant restart or start. A Stopped VM's new size applies on next start.
+Success produces a toast. If the API reports a restart-required condition after a Running or Paused resize, VM Overview shows an expandable Restart required warning with Detected changes. Multiple pending changes can be listed together; the condition clears after the relevant restart or start. A Stopped VM's new size applies on next start. Backend acceptance of the update depends on OSAC-5328.
 
 ![resize result](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/resize-result.png)
-
-Do not reintroduce the historical pre-submit hot-plug-versus-restart decision table. The API status condition, not UI inference, is the source of truth for restart need. Backend acceptance of instance-type updates depends on OSAC-5328.

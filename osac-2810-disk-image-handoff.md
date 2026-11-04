@@ -42,5 +42,3 @@ Review groups General and Configuration before Create disk image. A successful c
 The detail page separates Overview (lifecycle, visibility, created date) from Image (source type, reference, guest OS, architecture). Available images can be deprecated or made obsolete; deprecated images can be made obsolete or reactivated; obsolete images can be reactivated or deleted. Destructive and transition actions remain conditional on state.
 
 ![disk detail](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/disk-detail.png)
-
-This handoff covers provider Disk images management. Tenant-side image picking and backend enforcement when an image is referenced are separate concerns.
