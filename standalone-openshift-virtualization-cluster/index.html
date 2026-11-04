@@ -2318,11 +2318,11 @@
                     <div class="radio-cards" id="net-mode-cards" role="radiogroup" aria-labelledby="net-mode-label">
                       <button type="button" class="radio-card" id="net-mode-pod" data-val="pod" role="radio" aria-checked="false" tabindex="0">
                         <strong>Pod networking</strong>
-                        <span>Uses the infrastructure cluster network. No new IP addresses or DNS records are needed.</span>
+                        <span>Use the infrastructure cluster network. No additional IP addresses or DNS setup needed.</span>
                       </button>
                       <button type="button" class="radio-card" id="net-mode-bridge" data-val="bridge" role="radio" aria-checked="false" tabindex="-1">
                         <strong>Bridge networking</strong>
-                        <span>Connects the cluster directly to your network. You will need to reserve two IP addresses and create DNS records.</span>
+                        <span>Connect directly to your network. Requires two IP addresses and DNS records.</span>
                       </button>
                     </div>
                     <input type="hidden" id="net-mode-value" value="" />
@@ -2402,7 +2402,7 @@
                             <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
                             <span class="pf-v6-c-switch__label" id="ccm-switch-label" aria-hidden="true">Enable load balancer integration</span>
                           </label>
-                          <p class="hint" id="ccm-help" aria-live="polite">Makes applications in this cluster accessible through load balancers provided by the infrastructure cluster. Provided by the KubeVirt cloud controller manager.</p>
+                          <p class="hint" id="ccm-help" aria-live="polite">Make applications available through infrastructure load balancers. Technical component: KubeVirt cloud controller manager.</p>
                         </div>
                         <div class="form-field">
                           <span class="switch-field-title" id="csi-title">Persistent storage</span>
@@ -2411,7 +2411,7 @@
                             <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
                             <span class="pf-v6-c-switch__label" id="csi-switch-label" aria-hidden="true">Enable persistent storage</span>
                           </label>
-                          <p class="hint" id="csi-help" aria-live="polite">Lets applications create and use persistent storage from the infrastructure cluster. Provided by the KubeVirt CSI driver.</p>
+                          <p class="hint" id="csi-help" aria-live="polite">Keep application data after applications restart. Technical component: KubeVirt CSI driver.</p>
                         </div>
                         <div class="form-field" id="csi-sc-group">
                           <div class="label-with-help">
@@ -2422,7 +2422,7 @@
                           </div>
                           <div class="help-popover" id="help-csi-sc" role="dialog" aria-labelledby="help-csi-sc-title">
                             <p class="help-popover__title" id="help-csi-sc-title">Storage class</p>
-                            <p>Choose where persistent application data will be stored. The KubeVirt CSI driver uses this storage class from the infrastructure cluster.</p>
+                            <p>Choose where persistent application data is stored. Technical component: the KubeVirt CSI driver uses this storage class from the infrastructure cluster.</p>
                           </div>
                           <div class="rich-select rich-select--typeahead" id="csi-sc-select" data-smart-default="ocs-storagecluster-ceph-rbd">
                       <span class="pf-v6-c-form-control rich-select__control ">
@@ -2452,7 +2452,7 @@
                           </div>
                         </div>
                       </div>
-                      <p class="hint">The recommended option is selected automatically. It determines where persistent application data is stored on the infrastructure cluster.</p>
+                      <p class="hint">Choose where persistent application data is stored. The recommended option is selected automatically.</p>
                     </div>
                         <details class="adv-disclose" id="secondary-network-disclosure" data-disclosure-context="secondary network">
                           <summary id="secondary-network-summary" aria-controls="secondary-network-content" aria-expanded="false">
@@ -3773,12 +3773,12 @@
       const ccmHelp = document.getElementById('ccm-help');
       const csiHelp = document.getElementById('csi-help');
       if (ccmHelp) ccmHelp.textContent = ccmToggle?.checked
-        ? 'Makes applications in this cluster accessible through load balancers provided by the infrastructure cluster. Provided by the KubeVirt cloud controller manager.'
-        : 'Applications in this cluster will not use load balancers provided by the infrastructure cluster. This integration is provided by the KubeVirt cloud controller manager.';
-      if (csiHelp && !hasCompatibleCsiStorage) csiHelp.textContent = 'No compatible infrastructure storage class was found, so persistent storage cannot be enabled through the KubeVirt CSI driver.';
+        ? 'Make applications available through infrastructure load balancers. Technical component: KubeVirt cloud controller manager.'
+        : 'Do not use infrastructure load balancers. Technical component: KubeVirt cloud controller manager.';
+      if (csiHelp && !hasCompatibleCsiStorage) csiHelp.textContent = 'Persistent storage is unavailable because no compatible storage class was found. Technical component: KubeVirt CSI driver.';
       else if (csiHelp) csiHelp.textContent = csiToggle?.checked
-        ? 'Lets applications create and use persistent storage from the infrastructure cluster. Provided by the KubeVirt CSI driver.'
-        : 'Applications will not be able to create persistent storage from the infrastructure cluster through the KubeVirt CSI driver.';
+        ? 'Keep application data after applications restart. Technical component: KubeVirt CSI driver.'
+        : 'Application data will not be kept through infrastructure storage. Technical component: KubeVirt CSI driver.';
     }
     ccmToggle?.addEventListener('change', () => { syncClusterServiceHelpers(); syncNetworkingCustomizationCount(); syncReview(); });
     csiToggle?.addEventListener('change', () => { syncCsiSc(); syncClusterServiceHelpers(); syncNetMode(); syncReview(); });
