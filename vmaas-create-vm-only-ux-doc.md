@@ -1,95 +1,78 @@
-# Create Virtual machine
+# Create Virtual machine — UX handoff
 
-### Contact: Yifat Friman Menchik, UXD
-
-## Handoff overview
+Contact: Yifat Friman Menchik, UXD
+Current design: 4 November 2026
 
 | | |
 |---|---|
-| **Scope** | Tenant **Create Virtual machine** wizard (list entry → creation method → steps → Review) |
-| **Handoff Google Doc** | [Create Virtual machine](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
-| **Shared UX tab (pointer)** | [VMaaS prototype — UX documentation → Create Virtual machine](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.9bgpoonlcpfy) |
-| **Windows Sysprep detail** | [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin) |
-| **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [gh-pages/screenshots/create](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
-| **MD handoff** | [vmaas-create-vm-only-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-create-vm-only-ux-doc.md) |
-| **Regenerate** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
+| **Jira** | [HPUX-2031 — Create a VM flow](https://redhat.atlassian.net/browse/HPUX-2031) |
+| **Parent epic** | [HPUX-2031](https://redhat.atlassian.net/browse/HPUX-2031) |
+| **Feature** | Template-first Create virtual machine |
+| **Scope** | Tenant Admin · default template flow |
+| **Role** | Tenant Admin |
+| **Interactive mock** | [Create virtual machine mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=0a622a0&role=admin) |
+| **Handoff Google Doc** | [Create Virtual machine — UX handoff](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
+| **MD handoff** | [This file](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-create-vm-only-ux-doc.md) |
 
-**IA (custom path):** Creation method → Details → Instance type → Storage → Network → Access & Initial run → Review and create
+This handoff covers the default, template-first Create virtual machine flow. Screenshots were captured from the current mockup on 4 November 2026. Custom and clone paths are outside this handoff.
 
----
+## Flow at a glance
 
-## Goal
+Select template → Details → Compute configuration → Storage → Networking → Access & Initial run → Review and create.
 
-Document the tenant Create Virtual machine flow in the shared VMaaS mock: entry from the VM list, creation-method felt cards, wizard steps, Review, and exit confirmation. Windows Sysprep (Access & Initial run) is summarized here and detailed in [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit).
+The wizard keeps template-locked settings visible and identifies editable settings. Back and Next retain entered values.
 
----
 
-## How to review in the mock
+## 1. Select template
 
-1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin) as **Tenant Admin**.
-2. **Virtual machines** (card view is default) → **Create Virtual machine**.
-3. Walk Creation method → Details → Instance type → Storage → Network → Access & Initial run → Review.
-4. For Windows Access: set Guest OS to **Microsoft Windows** on Details (see [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit)).
+The user selects a project and provisioning template. Template settings distinguish Locked values from settings Editable later; Continue requires a template selection.
 
----
+![Select template](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/02-select-template.png)
 
-## Entry — Virtual machines list
+## 2. Details
 
-- Primary CTA: **Create Virtual machine**
-- Filter row: Project · Power state · Operating system · Hardware devices · Search
-- View toggle: **card** (default) · list — aligned to Ethan [Clusters cards](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=services-clusters)
+Project is inherited from template selection. Name is required and can be generated; its helper reads “Enter a name, or click the Generate icon to create one.” Description is optional.
 
-**Card view**
+![Details](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/04-details.png)
 
-| Element | Notes |
-|---|---|
-| Header | Checkbox · server icon · status pill · kebab |
-| Title | Blue name → Overview · subtitle = catalog item |
-| Specs | Instance type · IP address |
-| Footer | Project · Created |
-| Actions | Kebab only: Control ▸ · **Open console** (enabled when Running) · Delete |
+## 3. Compute configuration
 
-**List view:** same filters; row kebab: Control ▸ · Open console · Delete (danger).
+Choose guest OS family and disk image, then review or select instance type. Template policy makes instance type Locked or Editable. Eligible types expose GPU. Disk image belongs here, not in Details.
 
----
+![Compute configuration](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/05-compute.png)
 
-## Creation method (felt cards)
+## 4. Storage
 
-- **Custom configuration**
-- **Create from template**
-- **Clone existing virtual machine**
+Boot disk size and boot storage tier are independent Locked or Editable fields. Additional disks are a group of size and storage tier entries, with no disk-name column. The screenshot shows a locked boot disk.
 
----
+![Storage](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/06-storage.png)
 
-## Wizard steps (summary)
+## 5. Networking
 
-| Step | Notes |
-|---|---|
-| Select template | Template path only; Project typeahead; Locked / Editable drawer |
-| Details | Name · Description · Guest OS felt cards · Disk image |
-| Instance type | Typeahead rich-select (or locked by template) |
-| Storage | Boot disk + tier; Additional disks (inline Add disk) |
-| Network | VN / Subnet / SG; Additional networks (see OSAC-2621) |
-| Access & Initial run | Linux: SSH + Cloud-init · Windows: Sysprep Enter value / Select secret (OSAC-5009) |
-| Review and create | Nebius sections · cost estimate · Start after create (default on) |
+Choose default tenant network or custom network. The default card summarizes virtual network, subnet, and security group. Auto-attach external IP is available where permitted.
 
----
+![Networking](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/07-networking.png)
 
-## Exit confirmation
+## 6. Access & Initial run
 
-| Element | Copy |
-|---|---|
-| Title | Exit Virtual machine creation? |
-| Body | If you leave now, any information you’ve entered won’t be saved. |
-| Primary | Exit without saving |
-| Secondary | Continue creating |
+The Linux path offers an SSH public key and cloud-init as entered multiline text or a selected secret. Windows uses a separate Sysprep/Unattend.xml path; see the linked Windows handoff.
 
----
+![Access & Initial run](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/08-access-linux.png)
 
-## Related
+## 7. Review and create
 
-- Companion Overview Doc: [VM Overview](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit)
-- Networking (Create + day-2 EIP): [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit)
-- Windows Sysprep: [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit)
-- Prototype build: **ethan-cards 7165**
+Review Details, Compute configuration, Storage, Networking, and Access & Initial run, alongside a cost estimate. “Start this virtual machine after creation” is on by default. Final action: “Create virtual machine.”
+
+![Review and create](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/09-review.png)
+
+## Exit behavior
+
+Leaving after entering data asks for confirmation before discarding changes.
+
+![Exit behavior](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/0a622a0/create-vm-current-shots/10-exit-confirmation.png)
+
+## Related handoffs
+
+- [VM Overview](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit)
+- [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit)
+- [Windows Sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit)
