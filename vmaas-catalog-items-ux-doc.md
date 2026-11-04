@@ -7,7 +7,7 @@ Contact: Yifat Friman Menchik, UXD
 - Parent epic: [OSAC-5631](https://redhat.atlassian.net/browse/OSAC-5631)
 - Related field governance: [OSAC-3539](https://redhat.atlassian.net/browse/OSAC-3539)
 - Scope: Cloud provider admin Catalog list, create, details, edit, and delete
-- [Interactive mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=provider)
+- [Interactive mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=provider)
 - [Google UX doc](https://docs.google.com/document/d/1YTm2X4nUXWVI_Mjq_hXEY4Rj6i9BaOiXjzVeF3jcMA4/edit)
 - [Shared UX pointers](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit)
 

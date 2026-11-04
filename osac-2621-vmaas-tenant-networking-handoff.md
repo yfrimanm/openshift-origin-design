@@ -12,7 +12,7 @@
 | **Eng epic** | [HPUX-2249](https://redhat.atlassian.net/browse/HPUX-2249) — *VMaaS Tenant Networking* |
 | **Scope of this handoff** | **VMaaS-only:** how a VM connects to shared virtual networks + **External IP** (create + day-2). Virtual network **list / create / detail** → [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit). External IP **list** page remains OSAC-1433. |
 | **Handoff Google Doc** | [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=admin&vm=indigo-quokka-89) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin&vm=indigo-quokka-89) |
 | **MD handoff** | [osac-2621-vmaas-tenant-networking-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-2621-vmaas-tenant-networking-handoff.md) |
 | **Ethan reference (BMaaS)** | [Launch BM → Networking](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=catalog&action=launch-instance&item=bare-metal-general-purpose-server&step=networking) |
 | **Alignment note** | [OSAC-2616 comment](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987) — Create VM **Networking** matches BMaaS/Cluster attachment patterns; **VM-only** difference = Additional networks (Custom path). |
@@ -47,7 +47,7 @@ Virtual networks are **shared** across clusters, bare metal, and VMs. That manag
 
 ### A. Create VM → Networking (Ethan-aligned attachment)
 
-1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=admin) as **Tenant Admin**.
+1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin) as **Tenant Admin**.
 2. **Create virtual machine** → **Networking**.
 3. **Tenant default** / **Custom network** felt cards.
 4. Tenant default: read-only VN + Subnet + Security groups; External IP switch (**default on**). Additional networks **hidden**.

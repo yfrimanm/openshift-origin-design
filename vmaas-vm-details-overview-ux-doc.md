@@ -5,7 +5,7 @@ Contact: Yifat Friman Menchik, UXD
 ## Handoff
 
 - Scope: Single-VM details Overview (day-2)
-- [Interactive mockup — auto-attached IP](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=admin&vm=indigo-quokka-89)
+- [Interactive mockup — auto-attached IP](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin&vm=indigo-quokka-89)
 - [Google UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit)
 - [Networking handoff](osac-2621-vmaas-tenant-networking-handoff.md)
 
