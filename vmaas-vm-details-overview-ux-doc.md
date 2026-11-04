@@ -2,37 +2,60 @@
 
 Contact: Yifat Friman Menchik, UXD
 
-## Handoff
+| Handoff field | Current reference |
+| --- | --- |
+| Jira | [HPUX-2173 — Design VM Overview page](https://redhat.atlassian.net/browse/HPUX-2173) |
+| Parent epic | [HPUX-2032 — VM Overview page](https://redhat.atlassian.net/browse/HPUX-2032) |
+| Feature | VMaaS virtual machine details and day-2 management |
+| Scope | Single-VM Overview, access, network, storage, utilization, and day-2 actions |
+| Role | Tenant Admin; Tenant User (limited edits) |
+| Interactive mock | [Current VM Overview mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=de6322d&role=admin&vm=indigo-quokka-89) |
+| Handoff Google Doc | [VM Overview UX document](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
+| MD handoff | This file |
 
-- Scope: Single-VM details Overview (day-2)
-- [Interactive mockup — auto-attached IP](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin&vm=indigo-quokka-89)
-- [Google UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit)
-- [Networking handoff](osac-2621-vmaas-tenant-networking-handoff.md)
+This handoff documents the day-2 Virtual machine Overview for Tenant Admins and Tenant Users. The interactive mockup is the visual reference. The page brings together status, configuration, access, networking, storage, and utilization; available actions depend on VM state and role.
 
-## Layout
+## Page structure
 
-The header has the breadcrumb, VM title, Open console, power actions, and Actions. The top columns are Overview, Configuration, and **Access & Initial run**. Networking, Storage, and Utilization follow below; Alerts and Recent activity remain in the sidebar.
+The header shows the VM name, breadcrumb, **Open console**, state-dependent **Start**, **Restart**, **Stop**, and **Pause** buttons, plus an **Actions** menu. The first content row has **Overview**, **Configuration**, and **Access & Initial run** columns. Alerts and Recent activity appear alongside. Networking, Storage, and Utilization follow below.
 
-Access & Initial run is ordered **External IP → Cloud-init or Sysprep → SSH public key**. There is no SSH command in this overview.
+![Current VM Overview with auto-attached IP and secret-backed Cloud-init](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/de6322d/vm-overview-current-shots/01-auto-attached-secret.png)
 
-## External IP
+## Overview and configuration
 
-External IP is the first subsection under Access & Initial run, with the same heading treatment as Instance type and Additional disks. It shows Host and an action button. **Attach external IP** and **Detach external IP** are matching secondary small buttons. Failed attachment offers **Retry** and **Choose another** in the same button style.
+Overview shows Project, Status, Created, and Catalog item. Status opens its detail popover. Configuration shows guest operating system family, disk image, and Instance type with its name, vCPUs, memory, and GPU details when applicable. The Instance type edit control opens the resize flow; availability depends on the VM state and permissions.
 
-An IP attached automatically during VM creation displays an **Auto attached** label beside the heading and the explanation **“This IP is managed with the VM and is detached only when the VM is deleted.”** Edit and Detach are unavailable. A manually attached IP may be detached.
+## Access and initial run
 
-## Cloud-init and SSH public key
+The order is **External IP → Cloud-init or Sysprep → SSH public key** for Linux. Windows shows **Sysprep (Unattend.xml)** instead of Cloud-init and does not show an SSH public key. There is no SSH command in the UI.
 
-Cloud-init or Sysprep is a link to the selected secret, a read-only gray text box for inline content, or Not configured when absent. SSH public key follows it. Spacing between the External IP subsection and Cloud-init matches the rest of the overview fields.
+An **Auto attached** label appears next to External IP when the IP was attached automatically. The host is visible, but Edit and Detach are not offered. The explanation says the IP is managed with the VM and is detached only when the VM is deleted.
 
-## Storage
+![Auto-attached IP state](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/de6322d/vm-overview-current-shots/01-auto-attached-secret-top.png)
 
-Boot disk size and Boot storage tier are separate fields. **Additional disks** is a table heading, with **Size**, **Storage tier**, and day-2 **Actions** columns. There is no disk-name column. Add disk remains a separate action. The boot disk cannot be deleted.
+With no external IP, **Attach external IP** is a secondary button beside the empty Host value. A manually attached IP uses a matching **Detach external IP** button. While attachment is in progress, the page shows an attaching state; on failure it shows the error and matching **Retry** and **Choose another** buttons. The [Tenant Networking UX doc](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit) owns the full IP interaction.
 
-## Other day-2 interactions
+![No external IP or initial-run data configured](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/de6322d/vm-overview-current-shots/03-manual-or-unattached-top.png)
 
-Tenant Admin can edit supported configuration. Tenant User is read-only for most overview configuration, subject to the instance type resize rule. Instance type, SSH public key, network, and disk edits use their corresponding controls and modals.
+Cloud-init and Sysprep display a linked secret name when sourced from a secret, a read-only text box when entered inline, and **Not configured** when absent. The SSH public key displays its linked secret name or **Not configured**. No secret content is exposed on the Overview page.
 
-## Screenshots
+![Inline Cloud-init configuration](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/de6322d/vm-overview-current-shots/02-inline-cloud-init-top.png)
 
-The existing VM Overview screenshot gallery predates the Access & Initial run reorder and storage redesign. Replace **Overview — running** and **External IP (Host + SSH)** with current captures. Add a separate capture for the auto-attached IP state and an inline Cloud-init example. The existing Status popover, Edit instance type, Edit SSH public key, Add network, and Delete VM images are unaffected by the Nov 3 overview changes unless a visual review finds another discrepancy.
+For Windows, Sysprep replaces the Linux Cloud-init and SSH fields.
+
+![Windows Sysprep configuration](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/de6322d/vm-overview-current-shots/04-windows-sysprep-top.png)
+
+## Networking and storage
+
+Networking is a table of Virtual network, Subnet, Security groups, and Internal IP, with an **Add network** button and row actions where editing is allowed. Storage separates **Boot disk size** and **Boot storage tier** from **Additional disks**. The additional-disks table has **Size** and **Storage tier** columns plus row actions; it has no disk-name column. **Add disk** is a button. The boot disk is not offered as a deletable additional-disk row.
+
+![Storage fields and additional disks table](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/de6322d/vm-overview-current-shots/05-storage-detail.png)
+
+## Utilization and permissions
+
+A running VM shows vCPU, memory, storage, and network-transfer utilization with a time-range control. A stopped VM shows that utilization is unavailable. Tenant Admins can edit applicable configuration; Tenant Users see read-only configuration except the permitted Instance type resize path. Power and console controls remain governed by VM state and role.
+
+## Related handoffs
+
+- [Create Virtual machine UX document](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit)
+- [Catalog items UX document](https://docs.google.com/document/d/1YTm2X4nUXWVI_Mjq_hXEY4Rj6i9BaOiXjzVeF3jcMA4/edit)
