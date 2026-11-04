@@ -1,113 +1,40 @@
 # Tenant Networking
 
-### Contact: Yifat Friman Menchik, UXD
+Contact: Yifat Friman Menchik, UXD
 
-## Handoff overview
+Current design: 4 November 2026
 
 | | |
 |---|---|
-| **Jira** | [OSAC-2621](https://redhat.atlassian.net/browse/OSAC-2621) — *UX Design - VMaaS Tenant Networking* |
-| **Parent epic** | [OSAC-5652](https://redhat.atlassian.net/browse/OSAC-5652) — *UIX - VMaaS Networking* |
+| **Jira** | [OSAC-2621](https://redhat.atlassian.net/browse/OSAC-2621) |
+| **Parent epic** | [OSAC-5652](https://redhat.atlassian.net/browse/OSAC-5652) |
 | **Feature** | [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435) |
-| **Eng epic** | [HPUX-2249](https://redhat.atlassian.net/browse/HPUX-2249) — *VMaaS Tenant Networking* |
-| **Scope of this handoff** | **VMaaS-only:** how a VM connects to shared virtual networks + **External IP** (create + day-2). Virtual network **list / create / detail** → [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit). External IP **list** page remains OSAC-1433. |
-| **Handoff Google Doc** | [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit?usp=drivesdk) (shared with @redhat.com) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin&vm=indigo-quokka-89) |
+| **Scope** | Create VM network attachment and VM Overview External IP |
+| **Role** | Tenant Admin; Tenant User where allowed |
+| **Interactive mock** | [Current Tenant Networking mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=02966da&role=admin) |
+| **Handoff Google Doc** | [Tenant Networking UX document](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit) |
 | **MD handoff** | [osac-2621-vmaas-tenant-networking-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-2621-vmaas-tenant-networking-handoff.md) |
-| **Ethan reference (BMaaS)** | [Launch BM → Networking](https://heyethankim.github.io/osac-bmaas/tenant-admin/northsummit/workspace?nav=catalog&action=launch-instance&item=bare-metal-general-purpose-server&step=networking) |
-| **Alignment note** | [OSAC-2616 comment](https://redhat.atlassian.net/browse/OSAC-2616?focusedCommentId=18959987) — Create VM **Networking** matches BMaaS/Cluster attachment patterns; **VM-only** difference = Additional networks (Custom path). |
-| **Status** | Design complete for VM attach + External IP. VN manage → [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit). External IPs list → [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433). |
 
----
+This handoff covers how a VM attaches to shared virtual networks during create and how its External IP appears and is managed on VM Overview. Virtual network management and the External IP inventory have separate handoffs.
 
-## Goal
+## Create VM Networking
 
-VMaaS networking UX is about **connecting a VM** to the shared networking model and **reaching it over SSH**:
+The Networking step offers Tenant default and Custom network. Tenant default summarizes virtual network, subnet, and security groups. Auto-attach external IP is on by default in the shown template.
 
-1. At **Create VM → Networking**, choose how the VM attaches to an existing virtual network (Tenant default / Custom), security groups, optional **auto-attach External IP**, and Additional networks (Custom only).
-2. On **VM Overview**, manage day-2 **External IP** (first item within Access & Initial run; Host and action button, without an SSH command) — with clear **attaching** and **failed** states.
+![network default](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/network-default.png)
 
-Virtual networks are **shared** across clusters, bare metal, and VMs. That management UX is **not** duplicated here.
+Custom network lets the user choose a virtual network, subnet, and security groups. Additional networks are available only on this path; the auto-attach external IP control remains visible.
 
----
+![network custom bottom](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/network-custom-bottom.png)
 
-## Out of scope (unified networking)
+## External IP on VM Overview
 
-| Surface | Owner |
-|---|---|
-| Virtual networks list / create / detail | Dedicated Doc: [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) · feature [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
-| External IPs **list** page (Networking → External IPs) | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
-| Subnets / Security groups / NAT / NetworkClasses admin | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433) |
+External IP is the first item in Access & Initial run, above Cloud-init and SSH public key. It uses a heading aligned with other Overview subsection headings; no SSH command appears. An auto-attached address has an Auto attached label and explanation. It cannot be edited or detached separately: it is released only when the VM is deleted.
 
-**Networking → Virtual networks** manage UX is documented separately: [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) / [vmaas-virtual-networks-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-virtual-networks-ux-doc.md).
+![network auto ip](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/network-auto-ip.png)
 
----
+When no address is attached, Attach external IP is a secondary button, aligned with the manual Detach action. The attach modal selects an available address from the project IP pool. Attaching and failed states provide progress or retry/choose-another feedback; the auto-attached state does not expose those manual controls.
 
-## In scope
+![network attach modal](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/network-attach-modal.png)
 
-### A. Create VM → Networking (Ethan-aligned attachment)
-
-1. Open [the mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=admin) as **Tenant Admin**.
-2. **Create virtual machine** → **Networking**.
-3. **Tenant default** / **Custom network** felt cards.
-4. Tenant default: read-only VN + Subnet + Security groups; External IP switch (**default on**). Additional networks **hidden**.
-5. Custom: VN → Subnet → SG multi-select; External IP; **Additional networks** (Add network).
-6. Review → Networking section.
-
-### B. External IP (day-2)
-
-**External IP** is the first subsection within **Access & Initial run**, followed by Cloud-init and SSH public key. It has the same heading treatment as Instance type and Additional disks. Host and its action button sit together; no SSH command is shown.
-
-| State | UI |
-|---|---|
-| **Not attached** | Host `—` + **Attach external IP** |
-| **Attaching** | Host shows pending IP + “Attaching external IP…” |
-| **Manually attached** | Host `<code>IP</code>` + secondary small **Detach external IP** button |
-| **Auto attached** | Host `<code>IP</code>` + **Auto attached** label; no Edit or Detach. Explanation: “This IP is managed with the VM and is detached only when the VM is deleted.” |
-| **Failed** | Inline error + **Retry** / **Choose another** |
-
-**Demo failure:** attach modal → pick `198.51.100.99` (*Demo: simulate attach failure*).
-
----
-
-## Coverage
-
-| Spec / feedback | Status | Notes |
-|---|---|---|
-| Create VM Networking Ethan-aligned (OSAC-2616) | **Covered** | Attachment UX only |
-| Tenant default + Custom + SG multi + EIP default on | **Covered** | |
-| Additional networks Custom-only | **Covered** | |
-| Day-2 Attach External IP modal | **Covered** | Project pool |
-| External IP prominence (SSH access) | **Covered** | First subsection under Access & Initial run; Host and consistent actions |
-| Attach **in progress** | **Covered** | Attaching state |
-| Attach **failure** | **Covered** | Failed + Retry / Choose another |
-| VN list / create / detail | **Separate Doc** | [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit) |
-| External IPs list page | **Out of scope** | [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433); day-2 attach only here |
-
----
-
-## Decisions (confirmed)
-
-1. **SG cardinality:** Multi-select (`securityGroupRefs[]`).
-2. **Additional networks:** Custom path only.
-3. **External IP default at create:** **On** (auto-attach).
-4. **Step title:** **Networking**.
-5. **Day-2 External IP:** Attach modal for manual attachment; auto-attached IPs detach only when the VM is deleted. No EIP list in VMaaS.
-6. **Virtual networks UX:** Dedicated Doc [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit); feature [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433).
-
----
-
-## Related
-
-- Virtual networks Doc: [Virtual networks](https://docs.google.com/document/d/1ZV8NBeRQzeW8vKeR1D-XlZy-FFFAVDwvKJRkZMOmYwY/edit)
-- Unified networking feature: [OSAC-1433](https://redhat.atlassian.net/browse/OSAC-1433)
-- Ethan sync: [OSAC-2616](https://redhat.atlassian.net/browse/OSAC-2616)
-- VMaaS networking feature: [OSAC-1435](https://redhat.atlassian.net/browse/OSAC-1435)
-- Prototype build: 4 November UX audit
-- Screenshots: [gh-pages/screenshots/osac-2621](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/osac-2621)
-
----
-
-## Screenshots
-
-Local copies: `videos/osac-2621-networking-handoff/`
+This handoff does not own Virtual networks list/create/detail, External IP inventory, or subnet/security-group administration.
