@@ -1802,7 +1802,7 @@
                           </button></div>
                       </div>
                     </div>
-                    <p class="hint" id="credential-default-hint">This secret provides the infrastructure cluster kubeconfig and pull secret. Both are required; the SSH key is optional.</p>
+                    <p class="hint" id="credential-default-hint">Lets ACM connect to the infrastructure cluster and access the image registry. This credential contains the kubeconfig and pull secret; an SSH key is optional.</p>
                   </div>
                   <div class="form-field">
                     <label for="cname">Cluster name <span class="req">*</span></label>
@@ -2031,9 +2031,9 @@
                         </button>
                       </div>
                     </div>
-                    <p class="size-summary" id="cp-size-summary">Control plane VM size: <strong>8 cores · 16 GiB · 100 GiB root</strong> · ocs-storagecluster-ceph-rbd</p>
-                    <p class="hint storage-guidance"><strong>Control plane storage:</strong> Choose a storage class that meets etcd performance and access requirements.</p>
-                    <p class="hint" id="cp-minimum-hint">Minimum per control plane VM: 4 cores, 16 GiB memory, and 100 GiB root storage.</p>
+                    <p class="size-summary" id="cp-size-summary">Control plane VM size: <strong>8 CPU cores · 16 GiB · 100 GiB system disk</strong> · ocs-storagecluster-ceph-rbd</p>
+                    <p class="hint storage-guidance"><strong>Control plane storage:</strong> Choose reliable storage for cluster management data. Technical requirement: it must meet etcd performance and access needs.</p>
+                    <p class="hint" id="cp-minimum-hint">Each control plane VM needs at least 4 CPU cores, 16 GiB memory, and a 100 GiB system disk.</p>
                     <details class="adv-disclose" id="cp-customize" data-disclosure-context="control plane size">
                       <summary id="cp-size-options-toggle" aria-controls="cp-size-options-content" aria-expanded="false" aria-label="Customize control plane size">
                         <i class="fas fa-angle-right" aria-hidden="true"></i>
@@ -2050,11 +2050,11 @@
                             <input class="pf-v6-c-form-control" id="cp-mem" type="number" value="16" min="16" />
                           </div>
                           <div class="form-field">
-                            <label for="cp-disk">Root volume size (GiB) <span class="req">*</span></label>
+                            <label for="cp-disk">System disk size (GiB) <span class="req">*</span></label>
                             <input class="pf-v6-c-form-control" id="cp-disk" type="number" value="100" min="100" />
                           </div>
                           <div class="form-field">
-                            <label id="cp-sc-label" for="cp-sc-toggle">Root volume storage class <span class="req">*</span></label>
+                            <label id="cp-sc-label" for="cp-sc-toggle">System disk storage class <span class="req">*</span></label>
                             <div class="rich-select rich-select--typeahead" id="cp-sc-select">
                               <span class="pf-v6-c-form-control rich-select__control ">
                                 <button type="button" class="rich-select__toggle" id="cp-sc-toggle"
@@ -2116,7 +2116,7 @@
                         <input class="pf-v6-c-form-control" id="pool-compute-replicas" type="number" value="2" min="1" />
                       </div>
                     </div>
-                    <p class="size-summary" id="pool-compute-size-summary">Worker VM size: <strong>4 cores · 8 GiB · 100 GiB root</strong> · ocs-storagecluster-ceph-rbd</p>
+                    <p class="size-summary" id="pool-compute-size-summary">Worker VM size: <strong>4 CPU cores · 8 GiB · 100 GiB system disk</strong> · ocs-storagecluster-ceph-rbd</p>
                     <details class="adv-disclose" id="pool-compute-customize" data-disclosure-context="compute worker group size">
                       <summary id="pool-compute-size-options-toggle" aria-controls="pool-compute-size-options-content" aria-expanded="false" aria-label="Customize worker VM size for compute">
                         <i class="fas fa-angle-right" aria-hidden="true"></i>
@@ -2133,11 +2133,11 @@
                             <input class="pf-v6-c-form-control" id="pool-compute-mem" type="number" value="8" min="8" />
                           </div>
                           <div class="form-field">
-                            <label for="pool-compute-disk">Root volume size (GiB) <span class="req">*</span></label>
+                            <label for="pool-compute-disk">System disk size (GiB) <span class="req">*</span></label>
                             <input class="pf-v6-c-form-control" id="pool-compute-disk" type="number" value="100" min="100" />
                           </div>
                           <div class="form-field">
-                            <label id="pool-compute-sc-label" for="pool-compute-sc-toggle">Root volume storage class <span class="req">*</span></label>
+                            <label id="pool-compute-sc-label" for="pool-compute-sc-toggle">System disk storage class <span class="req">*</span></label>
                             <div class="rich-select rich-select--typeahead" id="pool-compute-sc-select">
                       <span class="pf-v6-c-form-control rich-select__control ">
                         <button type="button" class="rich-select__toggle" id="pool-compute-sc-toggle"
@@ -2174,7 +2174,7 @@
                         </div>
                       </div>
                     </div>
-                            <p class="hint">Must support ReadWriteMany (RWX) for live migration.</p>
+                            <p class="hint">Choose shared storage so running VMs can move between infrastructure hosts. Technical requirement: ReadWriteMany (RWX).</p>
                           </div>
                         </div>
                       </div>
@@ -2199,7 +2199,7 @@
                         <input class="pf-v6-c-form-control" id="pool-extra-replicas" type="number" value="1" min="1" />
                       </div>
                     </div>
-                    <p class="size-summary" id="pool-extra-size-summary">Worker VM size: <strong>4 cores · 32 GiB · 100 GiB root</strong> · ocs-storagecluster-ceph-rbd</p>
+                    <p class="size-summary" id="pool-extra-size-summary">Worker VM size: <strong>4 CPU cores · 32 GiB · 100 GiB system disk</strong> · ocs-storagecluster-ceph-rbd</p>
                     <details class="adv-disclose" id="pool-extra-customize" data-disclosure-context="memory-optimized worker group size">
                       <summary id="pool-extra-size-options-toggle" aria-controls="pool-extra-size-options-content" aria-expanded="false" aria-label="Customize worker VM size for memory-optimized">
                         <i class="fas fa-angle-right" aria-hidden="true"></i>
@@ -2216,11 +2216,11 @@
                             <input class="pf-v6-c-form-control" id="pool-extra-mem" type="number" value="32" min="8" />
                           </div>
                           <div class="form-field">
-                            <label for="pool-extra-disk">Root volume size (GiB) <span class="req">*</span></label>
+                            <label for="pool-extra-disk">System disk size (GiB) <span class="req">*</span></label>
                             <input class="pf-v6-c-form-control" id="pool-extra-disk" type="number" value="100" min="100" />
                           </div>
                           <div class="form-field">
-                            <label id="pool-extra-sc-label" for="pool-extra-sc-toggle">Root volume storage class <span class="req">*</span></label>
+                            <label id="pool-extra-sc-label" for="pool-extra-sc-toggle">System disk storage class <span class="req">*</span></label>
                             <div class="rich-select rich-select--typeahead" id="pool-extra-sc-select">
                       <span class="pf-v6-c-form-control rich-select__control ">
                         <button type="button" class="rich-select__toggle" id="pool-extra-sc-toggle"
@@ -2257,7 +2257,7 @@
                         </div>
                       </div>
                     </div>
-                            <p class="hint">Must support ReadWriteMany (RWX) for live migration.</p>
+                            <p class="hint">Choose shared storage so running VMs can move between infrastructure hosts. Technical requirement: ReadWriteMany (RWX).</p>
                           </div>
                         </div>
                       </div>
@@ -2313,16 +2313,16 @@
                     </div>
                     <div class="help-popover" id="help-net-mode" role="dialog" aria-labelledby="help-net-mode-title">
                       <p class="help-popover__title" id="help-net-mode-title">Pod networking or bridge networking</p>
-                      <p><strong>Pod networking</strong> uses an API Route and the infrastructure cluster’s DNS for ingress, without VIPs or new DNS records. <strong>Bridge networking</strong> lets clients reach the cluster API and ingress through dedicated IP addresses on a bridged network, rather than through the infrastructure cluster’s pod network. Choose the mode that fits your network requirements.</p>
+                      <p><strong>Pod networking</strong> uses the infrastructure cluster network and does not require new IP addresses or DNS records. It uses an API Route and infrastructure DNS passthrough. <strong>Bridge networking</strong> gives the cluster direct network access and requires dedicated IP addresses and DNS records. These are configured as API and Ingress VIPs within a machine network CIDR.</p>
                     </div>
                     <div class="radio-cards" id="net-mode-cards" role="radiogroup" aria-labelledby="net-mode-label">
                       <button type="button" class="radio-card" id="net-mode-pod" data-val="pod" role="radio" aria-checked="false" tabindex="0">
                         <strong>Pod networking</strong>
-                        <span>Uses the infrastructure pod network. Choose this when an API Route and infrastructure DNS for ingress meet your needs; no VIPs or new DNS records are needed.</span>
+                        <span>Uses the infrastructure cluster network. No new IP addresses or DNS records are needed.</span>
                       </button>
                       <button type="button" class="radio-card" id="net-mode-bridge" data-val="bridge" role="radio" aria-checked="false" tabindex="-1">
                         <strong>Bridge networking</strong>
-                        <span>Connects VMs to a bridged network. Choose this when the API and ingress need dedicated virtual IP addresses (VIPs); a machine network CIDR and DNS records are required.</span>
+                        <span>Connects the cluster directly to your network. You will need to reserve two IP addresses and create DNS records.</span>
                       </button>
                     </div>
                     <input type="hidden" id="net-mode-value" value="" />
@@ -2337,7 +2337,7 @@
                       <div class="adv-disclose__section" id="bridge-section">
                         <h3 class="adv-disclose__section-title">Bridge networking (VIPs)</h3>
                         <div class="form-field">
-                          <p class="hint">Requires API VIP, Ingress VIP, and machine network CIDR.</p>
+                          <p class="hint">Provide dedicated IP addresses for the cluster API and applications, plus the IP range used by cluster VMs. Technical terms: API VIP, Ingress VIP, and machine network CIDR.</p>
                         </div>
                         <div class="form-field">
                           <label id="bridge-network-label" for="bridge-network-toggle">Bridge network / localnet</label>
@@ -2368,7 +2368,7 @@
                       </div>
 
                       <div class="adv-disclose__section" id="ovn-options">
-                        <h3 class="adv-disclose__section-title">OVN settings</h3>
+                        <h3 class="adv-disclose__section-title">Advanced network settings</h3>
                         <div class="form-row">
                           <div class="form-field">
                             <label for="mtu">OVN MTU</label>
@@ -2394,35 +2394,35 @@
 
                       <div class="adv-disclose__section">
                         <h3 class="adv-disclose__section-title">Cluster services</h3>
-                        <p class="hint" style="margin-top:0;">Required infrastructure integration is configured automatically. Persistent storage remains optional.</p>
+                        <p class="hint" style="margin-top:0;">Choose how the cluster uses load balancers and persistent storage from the infrastructure cluster.</p>
                         <div class="form-field" id="ccm-field">
-                          <span class="switch-field-title" id="ccm-title">Cloud controller manager (CCM)</span>
+                          <span class="switch-field-title" id="ccm-title">Load balancer integration</span>
                           <label class="pf-v6-c-switch" for="ccm">
                             <input class="pf-v6-c-switch__input" type="checkbox" id="ccm" role="switch" checked data-smart-default="true" aria-labelledby="ccm-title ccm-switch-label" aria-describedby="ccm-help" />
                             <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
-                            <span class="pf-v6-c-switch__label" id="ccm-switch-label" aria-hidden="true">Install cloud controller manager</span>
+                            <span class="pf-v6-c-switch__label" id="ccm-switch-label" aria-hidden="true">Enable load balancer integration</span>
                           </label>
-                          <p class="hint" id="ccm-help" aria-live="polite">LoadBalancer services are available through the infrastructure cluster. Recommended for pod networking.</p>
+                          <p class="hint" id="ccm-help" aria-live="polite">Makes applications in this cluster accessible through load balancers provided by the infrastructure cluster. Provided by the KubeVirt cloud controller manager.</p>
                         </div>
                         <div class="form-field">
-                          <span class="switch-field-title" id="csi-title">Container storage interface (CSI) driver</span>
+                          <span class="switch-field-title" id="csi-title">Persistent storage</span>
                           <label class="pf-v6-c-switch" for="csi">
                             <input class="pf-v6-c-switch__input" type="checkbox" id="csi" role="switch" checked data-smart-default="true" aria-labelledby="csi-title csi-switch-label" aria-describedby="csi-help" />
                             <span class="pf-v6-c-switch__toggle" aria-hidden="true"></span>
-                            <span class="pf-v6-c-switch__label" id="csi-switch-label" aria-hidden="true">Install CSI driver</span>
+                            <span class="pf-v6-c-switch__label" id="csi-switch-label" aria-hidden="true">Enable persistent storage</span>
                           </label>
-                          <p class="hint" id="csi-help" aria-live="polite">Lets workloads in the new cluster create persistent volumes using storage from the infrastructure cluster.</p>
+                          <p class="hint" id="csi-help" aria-live="polite">Lets applications create and use persistent storage from the infrastructure cluster. Provided by the KubeVirt CSI driver.</p>
                         </div>
                         <div class="form-field" id="csi-sc-group">
                           <div class="label-with-help">
-                            <label id="csi-sc-label" for="csi-sc-toggle">Infrastructure storage class for CSI <span class="req">*</span></label>
-                            <button type="button" class="help-btn" data-help="csi-sc" aria-label="More information about the infrastructure storage class for CSI" aria-expanded="false" aria-controls="help-csi-sc">
+                            <label id="csi-sc-label" for="csi-sc-toggle">Storage class <span class="req">*</span></label>
+                            <button type="button" class="help-btn" data-help="csi-sc" aria-label="More information about the storage class" aria-expanded="false" aria-controls="help-csi-sc">
                               <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                             </button>
                           </div>
                           <div class="help-popover" id="help-csi-sc" role="dialog" aria-labelledby="help-csi-sc-title">
-                            <p class="help-popover__title" id="help-csi-sc-title">Infrastructure storage class for CSI</p>
-                            <p>Storage class on the infrastructure cluster used by the KubeVirt CSI driver to provision volumes for the new cluster.</p>
+                            <p class="help-popover__title" id="help-csi-sc-title">Storage class</p>
+                            <p>Choose where persistent application data will be stored. The KubeVirt CSI driver uses this storage class from the infrastructure cluster.</p>
                           </div>
                           <div class="rich-select rich-select--typeahead" id="csi-sc-select" data-smart-default="ocs-storagecluster-ceph-rbd">
                       <span class="pf-v6-c-form-control rich-select__control ">
@@ -2452,7 +2452,7 @@
                           </div>
                         </div>
                       </div>
-                      <p class="hint">The recommended class is selected automatically. It provisions volumes for the new cluster on the infrastructure cluster.</p>
+                      <p class="hint">The recommended option is selected automatically. It determines where persistent application data is stored on the infrastructure cluster.</p>
                     </div>
                         <details class="adv-disclose" id="secondary-network-disclosure" data-disclosure-context="secondary network">
                           <summary id="secondary-network-summary" aria-controls="secondary-network-content" aria-expanded="false">
@@ -2512,15 +2512,15 @@
                     <p class="hint">Requested VM resources on the infrastructure cluster.</p>
                     <ul class="resource-tiles" aria-label="Requested cluster resources">
                       <li class="resource-tile"><div class="resource-tile__label">VMs</div><div class="resource-tile__value" id="review-total-vms">5</div><div class="resource-tile__detail" id="review-total-vms-detail">3 control plane + 2 worker VMs</div></li>
-                      <li class="resource-tile"><div class="resource-tile__label">vCPU cores</div><div class="resource-tile__value" id="review-total-cores">32</div><div class="resource-tile__detail" id="review-total-cores-detail">3×8 + 2×4</div></li>
+                      <li class="resource-tile"><div class="resource-tile__label">CPU cores</div><div class="resource-tile__value" id="review-total-cores">32</div><div class="resource-tile__detail" id="review-total-cores-detail">3×8 + 2×4</div></li>
                       <li class="resource-tile"><div class="resource-tile__label">Memory</div><div class="resource-tile__value" id="review-total-memory">64 GiB</div><div class="resource-tile__detail" id="review-total-memory-detail">3×16 + 2×8</div></li>
-                      <li class="resource-tile"><div class="resource-tile__label">Root storage</div><div class="resource-tile__value" id="review-total-disk">500 GiB</div><div class="resource-tile__detail" id="review-total-disk-detail">5 × 100 GiB</div></li>
+                      <li class="resource-tile"><div class="resource-tile__label">System disk storage</div><div class="resource-tile__value" id="review-total-disk">500 GiB</div><div class="resource-tile__detail" id="review-total-disk-detail">5 × 100 GiB</div></li>
                     </ul>
                     <details class="resource-breakdown-disclosure">
                       <summary><i class="fas fa-angle-right" aria-hidden="true"></i>View resource breakdown</summary>
                       <div class="resource-breakdown">
                         <table>
-                          <thead><tr><th>Role</th><th>VMs</th><th>Cores</th><th>Memory</th><th>Storage</th></tr></thead>
+                          <thead><tr><th>Role</th><th>VMs</th><th>CPU cores</th><th>Memory</th><th>System disk</th></tr></thead>
                           <tbody id="review-resource-rows">
                             <tr><td>Control plane</td><td>3</td><td>8</td><td>16 GiB</td><td>100 GiB</td></tr>
                             <tr><td>Worker — compute</td><td>2</td><td>4</td><td>8 GiB</td><td>100 GiB</td></tr>
@@ -2557,8 +2557,8 @@
                       </div>
                       <div class="review-nebius__card">
                         <div class="review-nebius__row"><span class="review-nebius__label">Control plane configuration</span><span class="review-nebius__value" id="review-cp-replicas">Highly available (3 VMs)</span></div>
-                        <div class="review-nebius__row"><span class="review-nebius__label">Control plane VM size</span><span class="review-nebius__value" id="review-cp-size">8 cores, 16 GiB, 100 GiB root</span></div>
-                        <div class="review-nebius__row"><span class="review-nebius__label">Control plane storage class</span><span class="review-nebius__value" id="review-cp-storage">—</span></div>
+                        <div class="review-nebius__row"><span class="review-nebius__label">Control plane VM size</span><span class="review-nebius__value" id="review-cp-size">8 CPU cores, 16 GiB, 100 GiB system disk</span></div>
+                        <div class="review-nebius__row"><span class="review-nebius__label">Control plane system disk</span><span class="review-nebius__value" id="review-cp-storage">—</span></div>
                         <div id="review-worker-groups"></div>
                       </div>
                     </section>
@@ -2572,14 +2572,14 @@
                       <div class="review-nebius__card">
                         <div class="review-nebius__row"><span class="review-nebius__label">Mode</span><span class="review-nebius__value" id="review-net-mode">Pod networking</span></div>
                         <div class="review-nebius__row" id="review-ovn-row"><span class="review-nebius__label">OVN network settings</span><span class="review-nebius__value" id="review-net-ovn">MTU 1300 · Geneve port 9880</span></div>
-                        <div class="review-nebius__row"><span class="review-nebius__label">Cloud controller manager</span><span class="review-nebius__value" id="review-ccm">Enabled</span></div>
-                        <div class="review-nebius__row"><span class="review-nebius__label">CSI driver</span><span class="review-nebius__value" id="review-csi">Enabled</span></div>
+                        <div class="review-nebius__row"><span class="review-nebius__label">Load balancer integration</span><span class="review-nebius__value" id="review-ccm">Enabled</span></div>
+                        <div class="review-nebius__row"><span class="review-nebius__label">Persistent storage</span><span class="review-nebius__value" id="review-csi">Enabled</span></div>
                         <div class="review-nebius__row" id="review-bridge-row"><span class="review-nebius__label">Bridge network / localnet</span><span class="review-nebius__value" id="review-bridge">—</span></div>
                         <div class="review-nebius__row" id="review-api-vips-row"><span class="review-nebius__label">API VIP</span><span class="review-nebius__value" id="review-api-vips">—</span></div>
                         <div class="review-nebius__row" id="review-ingress-vip-row"><span class="review-nebius__label">Ingress VIP</span><span class="review-nebius__value" id="review-ingress-vip">—</span></div>
                         <div class="review-nebius__row" id="review-dns-row"><span class="review-nebius__label">DNS A records to create</span><span class="review-nebius__value" id="review-dns-records">—</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Secondary network</span><span class="review-nebius__value" id="review-secondary">None</span></div>
-                        <div class="review-nebius__row" id="review-csi-storage-row"><span class="review-nebius__label">Infrastructure storage class for CSI</span><span class="review-nebius__value" id="review-csi-storage">—</span></div>
+                        <div class="review-nebius__row" id="review-csi-storage-row"><span class="review-nebius__label">Storage class</span><span class="review-nebius__value" id="review-csi-storage">—</span></div>
                       </div>
                     </section>
                   </div>
@@ -3276,7 +3276,7 @@
       const version = selectText('ver-select', '4.22.2');
       const singleNodeCpuMinimum = /^4\.(20|21)\./.test(version) ? 8 : 4;
       const cpCpuMinimum = singleNode ? singleNodeCpuMinimum : 4;
-      [['cp-cores', cpCpuMinimum, `Control plane cores must be at least ${cpCpuMinimum} for this topology and version.`], ['cp-mem', 16, 'Control plane memory must be at least 16 GiB.'], ['cp-disk', 100, 'Control plane root storage must be at least 100 GiB.']].forEach(([id, min, message]) => {
+      [['cp-cores', cpCpuMinimum, `Control plane CPU cores must be at least ${cpCpuMinimum} for this configuration and version.`], ['cp-mem', 16, 'Control plane memory must be at least 16 GiB.'], ['cp-disk', 100, 'Control plane system disk must be at least 100 GiB.']].forEach(([id, min, message]) => {
         if (numberValue(id) < min) issues.push(issue('workers', id, message));
       });
       const poolNames = new Map();
@@ -3291,7 +3291,7 @@
           if (poolNames.has(name)) issues.push(issue('workers', nameInput, `Worker group name “${name}” must be unique.`));
           poolNames.set(name, true);
         }
-        [['replicas', 1, 'Enter at least 1 worker node for this group.'], ['cores', 2, 'Worker cores must be at least 2.'], ['mem', 8, 'Worker memory must be at least 8 GiB.'], ['disk', 100, 'Worker root storage must be at least 100 GiB.']].forEach(([suffix, min, message]) => {
+        [['replicas', 1, 'Enter at least 1 worker node for this group.'], ['cores', 2, 'Worker CPU cores must be at least 2.'], ['mem', 8, 'Worker memory must be at least 8 GiB.'], ['disk', 100, 'Worker system disk must be at least 100 GiB.']].forEach(([suffix, min, message]) => {
           const fieldId = `${id}-${suffix}`;
           if (numberValue(fieldId) < min) issues.push(issue('workers', fieldId, message));
         });
@@ -3324,7 +3324,7 @@
         if (!Number.isInteger(geneve) || geneve < 1 || geneve > 65535) issues.push(issue('network', 'geneve', 'Geneve port must be between 1 and 65535.'));
         else if (geneve === 6081) issues.push(issue('network', 'geneve', 'Geneve port must differ from the infrastructure cluster default (6081).'));
       }
-      if (document.getElementById('csi')?.checked && !selectText('csi-sc-select', '')) issues.push(issue('network', 'csi-sc-select', 'Select an infrastructure storage class for CSI or disable the CSI driver.'));
+      if (document.getElementById('csi')?.checked && !selectText('csi-sc-select', '')) issues.push(issue('network', 'csi-sc-select', 'Select a storage class or disable persistent storage.'));
       return issues;
     }
     const getConfigurationErrors = () => getConfigurationIssues().map(item => item.message);
@@ -3586,7 +3586,7 @@
       const cpCoresInput = document.getElementById('cp-cores');
       if (cpCoresInput) cpCoresInput.min = String(cpCpuMinimum);
       const cpMinimumHint = document.getElementById('cp-minimum-hint');
-      if (cpMinimumHint) cpMinimumHint.textContent = `Minimum per control plane VM: ${cpCpuMinimum} cores, 16 GiB memory, and 100 GiB root storage${cp === '1' ? ' for this OpenShift version' : ''}.`;
+      if (cpMinimumHint) cpMinimumHint.textContent = `Each control plane VM needs at least ${cpCpuMinimum} CPU cores, 16 GiB memory, and a 100 GiB system disk${cp === '1' ? ' for this OpenShift version' : ''}.`;
       const cpCores = numberValue('cp-cores', 8);
       const cpMem = numberValue('cp-mem', 16);
       const cpDisk = numberValue('cp-disk', 100);
@@ -3622,7 +3622,7 @@
       syncPullSecretUi();
       set('review-pull-secret', isManualPull() ? (valueOf('pull-new-name') || 'New secret') : selectText('pull-select'));
       set('review-cp-replicas', cp === '1' ? 'Single node (1 VM)' : 'Highly available (3 VMs)');
-      set('review-cp-size', `${cpCores} cores, ${cpMem} GiB, ${cpDisk} GiB root`);
+      set('review-cp-size', `${cpCores} CPU cores, ${cpMem} GiB, ${cpDisk} GiB system disk`);
       set('review-cp-storage', selectText('cp-sc-select'));
       set('review-cluster-set', selectText('cset-select'));
       set('review-ssh', document.getElementById('ssh')?.value.trim() ? 'Provided' : 'Not provided');
@@ -3630,7 +3630,7 @@
       const rows = document.getElementById('review-resource-rows');
       if (rows) rows.innerHTML = `<tr><td>Control plane</td><td>${cp}</td><td>${cpCores}</td><td>${cpMem} GiB</td><td>${cpDisk} GiB</td></tr>` + pools.map(pool => `<tr><td>Worker — ${pool.name}</td><td>${pool.replicas}</td><td>${pool.cores}</td><td>${pool.memory} GiB</td><td>${pool.disk} GiB</td></tr>`).join('');
       const groups = document.getElementById('review-worker-groups');
-      if (groups) groups.innerHTML = pools.length ? pools.map(pool => `<div class="review-nebius__row"><span class="review-nebius__label">${pool.name}</span><span class="review-nebius__value">${pool.replicas} worker nodes · ${pool.cores} cores · ${pool.memory} GiB · ${pool.disk} GiB root · ${pool.storage}</span></div>`).join('') : '<div class="review-nebius__row"><span class="review-nebius__label">Worker groups</span><span class="review-nebius__value">None — workloads run on schedulable control plane nodes</span></div>';
+      if (groups) groups.innerHTML = pools.length ? pools.map(pool => `<div class="review-nebius__row"><span class="review-nebius__label">${pool.name}</span><span class="review-nebius__value">${pool.replicas} worker nodes · ${pool.cores} CPU cores · ${pool.memory} GiB · ${pool.disk} GiB system disk · ${pool.storage}</span></div>`).join('') : '<div class="review-nebius__row"><span class="review-nebius__label">Worker groups</span><span class="review-nebius__value">None — applications run on available control plane nodes</span></div>';
       set('review-net-mode', isBridgeNetworking() ? 'Bridge networking' : netModeValue?.value === 'pod' ? 'Pod networking' : 'Choose a networking mode');
       set('review-net-ovn', `MTU ${numberValue('mtu', 1300)} · Geneve port ${numberValue('geneve', 9880)}`);
       set('review-ccm', isBridgeNetworking() ? 'Not installed in bridge mode' : netModeValue?.value === 'pod' ? (document.getElementById('ccm')?.checked ? 'Enabled' : 'Disabled') : 'Depends on networking mode');
@@ -3773,12 +3773,12 @@
       const ccmHelp = document.getElementById('ccm-help');
       const csiHelp = document.getElementById('csi-help');
       if (ccmHelp) ccmHelp.textContent = ccmToggle?.checked
-        ? 'LoadBalancer services are available through the infrastructure cluster. Recommended for pod networking.'
-        : 'LoadBalancer services will not be provided by the infrastructure cloud controller manager.';
-      if (csiHelp && !hasCompatibleCsiStorage) csiHelp.textContent = 'No compatible infrastructure storage class was found, so the CSI driver cannot be enabled.';
+        ? 'Makes applications in this cluster accessible through load balancers provided by the infrastructure cluster. Provided by the KubeVirt cloud controller manager.'
+        : 'Applications in this cluster will not use load balancers provided by the infrastructure cluster. This integration is provided by the KubeVirt cloud controller manager.';
+      if (csiHelp && !hasCompatibleCsiStorage) csiHelp.textContent = 'No compatible infrastructure storage class was found, so persistent storage cannot be enabled through the KubeVirt CSI driver.';
       else if (csiHelp) csiHelp.textContent = csiToggle?.checked
-        ? 'Lets workloads in the new cluster create persistent volumes using storage from the infrastructure cluster.'
-        : 'The CSI driver will not be installed, so workloads cannot provision persistent volumes from the infrastructure cluster.';
+        ? 'Lets applications create and use persistent storage from the infrastructure cluster. Provided by the KubeVirt CSI driver.'
+        : 'Applications will not be able to create persistent storage from the infrastructure cluster through the KubeVirt CSI driver.';
     }
     ccmToggle?.addEventListener('change', () => { syncClusterServiceHelpers(); syncNetworkingCustomizationCount(); syncReview(); });
     csiToggle?.addEventListener('change', () => { syncCsiSc(); syncClusterServiceHelpers(); syncNetMode(); syncReview(); });
@@ -3954,7 +3954,7 @@
       const sc = selectedText && !selectedText.toLowerCase().includes('select ')
         ? `${selectedText}${selectedDescription.includes('Recommended') ? ' (Recommended)' : ''}`
         : 'Storage class not selected';
-      el.innerHTML = `${opts.prefix}: <strong>${cores} cores · ${mem} GiB · ${disk} GiB root</strong> · ${sc}`;
+      el.innerHTML = `${opts.prefix}: <strong>${cores} CPU cores · ${mem} GiB · ${disk} GiB system disk</strong> · ${sc}`;
     }
     function wireSizeSummary(opts) {
       [opts.coresId, opts.memId, opts.diskId].forEach(id => {
@@ -4329,7 +4329,7 @@
       if (bridgeSelect) bridgeSelect.dataset.smartDefault = defaults.bridgeNetwork;
 
       const setText = (id, text) => { const element = document.getElementById(id); if (element) element.textContent = text; };
-      setText('credential-default-hint', `The ${credentialKey} secret provides the infrastructure kubeconfig and pull secret. Both are required; the SSH key is optional.`);
+      setText('credential-default-hint', `Lets ACM connect to ${credentialKey} and access the image registry. This credential contains the kubeconfig and pull secret; an SSH key is optional.`);
       syncNetMode();
       setText('mtu-default-hint', `Suggested from ${credentialKey} and adjusted for OVN encapsulation.`);
       setText('geneve-default-hint', `Suggested to avoid ${credentialKey}’s Geneve port.`);
@@ -4544,7 +4544,7 @@
       if (groups) {
         groups.innerHTML = '';
         pools.forEach(pool => {
-          groups.insertAdjacentHTML('beforeend', `<div class="scale-group"><div class="scale-group__meta"><p class="name">${escapeHtml(pool.name)}</p><p class="spec">${pool.cores} cores · ${pool.memory} GiB · ${pool.disk} GiB root</p></div><div class="scale-group__field"><label for="scale-${pool.id}">Requested worker nodes</label><input class="pf-v6-c-form-control" id="scale-${pool.id}" type="number" min="0" required value="${pool.replicas}" data-base="${pool.replicas}" data-cores="${pool.cores}" data-mem="${pool.memory}" data-disk="${pool.disk}" data-pool-id="${pool.id}" /></div></div>`);
+          groups.insertAdjacentHTML('beforeend', `<div class="scale-group"><div class="scale-group__meta"><p class="name">${escapeHtml(pool.name)}</p><p class="spec">${pool.cores} CPU cores · ${pool.memory} GiB · ${pool.disk} GiB system disk</p></div><div class="scale-group__field"><label for="scale-${pool.id}">Requested worker nodes</label><input class="pf-v6-c-form-control" id="scale-${pool.id}" type="number" min="0" required value="${pool.replicas}" data-base="${pool.replicas}" data-cores="${pool.cores}" data-mem="${pool.memory}" data-disk="${pool.disk}" data-pool-id="${pool.id}" /></div></div>`);
         });
         scaleInputs = [...groups.querySelectorAll('input')];
         scaleInputs.forEach(input => input.addEventListener('input', () => { scaleDownArmed = false; document.getElementById('scale-warning').hidden = true; document.getElementById('scale-apply').textContent = 'Scale worker groups'; updateScaleDelta(); }));
