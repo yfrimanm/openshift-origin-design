@@ -12883,6 +12883,7 @@
 
       const openMenu = (clearFilter = false) => {
         if (draft.isGlobal) return;
+        if ('provisioningTemplateMenuOpen' in draft) draft.provisioningTemplateMenuOpen = false;
         draft.tenantMenuOpen = true;
         if (clearFilter) draft.tenantFilter = '';
         refresh();
@@ -12959,7 +12960,8 @@
           if (root && !root.contains(e.target)) {
             draft.tenantMenuOpen = false;
             document.removeEventListener('mousedown', onDoc, true);
-            refresh();
+            // Keep the clicked control mounted until its click handler runs.
+            setTimeout(refresh, 0);
           }
         };
         setTimeout(() => document.addEventListener('mousedown', onDoc, true), 0);
@@ -22235,6 +22237,7 @@
         };
         const templateInput = panel.querySelector('#ci-provisioning-template');
         const openTemplate = (clearFilter = false) => {
+          c.tenantMenuOpen = false;
           c.provisioningTemplateMenuOpen = true;
           if (clearFilter) c.provisioningTemplateFilter = '';
           refreshTemplate();
@@ -22284,7 +22287,8 @@
             if (root && !root.contains(e.target)) {
               c.provisioningTemplateMenuOpen = false;
               document.removeEventListener('mousedown', onOutside, true);
-              refreshTemplate();
+              // Let another dropdown receive the click before rebuilding the panel.
+              setTimeout(refreshTemplate, 0);
             }
           };
           setTimeout(() => document.addEventListener('mousedown', onOutside, true), 0);
