@@ -3789,12 +3789,21 @@
     const removeSecondaryNetwork = document.getElementById('remove-secondary-network');
     function syncSecondaryNetworkDisclosure(collapse = false) {
       const selected = selectText('secondary-network-select', '');
-      const summary = document.getElementById('secondary-network-summary-text');
-      if (summary) summary.textContent = selected ? `Secondary network: ${selected}` : 'Add secondary network';
+      const summaryToggle = document.getElementById('secondary-network-summary');
+      const summaryText = document.getElementById('secondary-network-summary-text');
+      const expanded = Boolean(secondaryNetworkDisclosure?.open);
+      const icon = summaryToggle?.querySelector('i');
+      if (summaryToggle) summaryToggle.setAttribute('aria-expanded', String(expanded));
+      if (icon) {
+        icon.classList.toggle('fa-angle-right', !expanded);
+        icon.classList.toggle('fa-angle-down', expanded);
+      }
+      if (summaryText) summaryText.textContent = selected ? `Secondary network: ${selected}` : expanded ? 'Choose secondary network' : 'Add secondary network';
       if (removeSecondaryNetwork) removeSecondaryNetwork.hidden = !selected;
       if (collapse && selected && secondaryNetworkDisclosure) secondaryNetworkDisclosure.open = false;
       syncNetworkingCustomizationCount();
     }
+    secondaryNetworkDisclosure?.addEventListener('toggle', () => syncSecondaryNetworkDisclosure());
     secondaryNetworkSelect?.addEventListener('richselectchange', () => syncSecondaryNetworkDisclosure(true));
     removeSecondaryNetwork?.addEventListener('click', () => {
       const control = secondaryNetworkSelect?.querySelector('.rich-select__control');
