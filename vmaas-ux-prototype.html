@@ -13041,8 +13041,12 @@
     }
 
     function syncGeneralFields(prefix, draft) {
-      draft.name = (document.getElementById(`${prefix}-name`)?.value || '').trim();
-      draft.description = (document.getElementById(`${prefix}-description`)?.value || '').trim();
+      const nameField = document.getElementById(`${prefix}-name`);
+      const descriptionField = document.getElementById(`${prefix}-description`);
+      // A delayed dropdown refresh can run after its wizard panel has changed.
+      // Preserve values when those fields are no longer in the DOM.
+      if (nameField) draft.name = nameField.value.trim();
+      if (descriptionField) draft.description = descriptionField.value.trim();
       draft.labelDraft = document.getElementById(`${prefix}-label-input`)?.value || draft.labelDraft || '';
       const globalEl = document.querySelector(`input[name="${prefix}Scope"]:checked`);
       if (globalEl) draft.isGlobal = globalEl.value === 'global';
