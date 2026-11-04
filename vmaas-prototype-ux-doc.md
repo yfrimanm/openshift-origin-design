@@ -2,7 +2,7 @@
 
 **Source of truth (Google Doc, tabbed):** [VMaaS prototype — UX documentation](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit)
 
-**Mock (aligned):** [vmaas-ux-prototype.html?v=ethan-cards-7165](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165) · Build Oct 21 · **ethan-cards 7165**
+**Mock (aligned):** [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104) · Build Nov 4 · UX audit
 
 | Tab | Contents |
 |---|---|
@@ -20,8 +20,8 @@
 | | |
 |---|---|
 | **Scope** | Full interactive prototype: Virtual machines list + Create wizard + Overview, plus provider Catalog, Instance types, Disk images |
-| **Interactive mock** | https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165 |
-| **Deep links** | [Create](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165&create=1) · [Overview](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165&vm=indigo-quokka-89) · [Virtual networks](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165&nav=networks) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165&role=provider) |
+| **Interactive mock** | https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104 |
+| **Deep links** | [Create](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&create=1) · [Overview](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&vm=indigo-quokka-89) · [Virtual networks](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&nav=networks) · [Catalog](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=provider) |
 | **Google Doc** | [Tabbed source of truth](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit) |
 | **Create screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [gh-pages](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **Regenerate Create screenshots** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
@@ -46,6 +46,8 @@ One coherent product surface for engineering and stakeholders: tenant Create / O
 | **Details** | Name, description, Guest OS felt cards + disk image typeahead. Project context-only. |
 | **Access & Initial run** | Optional. Linux: SSH + Cloud-init. Windows: Sysprep Unattend.xml (Enter value / Select secret felt cards). |
 | **Create dropdowns** | Typeahead rich-select for Project, Instance type, Storage tier, Virtual network, Subnet. Security groups = multi-select chips. |
+| **Provider Catalog create** | Five steps: Details → Compute configuration → Storage → Access & Initial run → Review. Scope lives in Details. Tenant and Provisioning template menus share behavior and styling; template options use name and description lines. |
+| **VM Overview** | Access & Initial run starts with External IP, then Cloud-init, then SSH public key. No SSH command. Auto-attached IPs are read-only and released only with VM deletion. Storage separates boot fields from an Additional disks table. |
 | **Form width** | Wizard fields / cards / uploads / helpers = **40rem** column |
 | **After create** | New VM Overview + success toast |
 | **Start after create** | Checked by default (CNV parity) |

@@ -1,101 +1,38 @@
 # VM Overview
 
-### Contact: Yifat Friman Menchik, UXD
+Contact: Yifat Friman Menchik, UXD
 
-## Handoff overview
+## Handoff
 
-| | |
-|---|---|
-| **Scope of this doc** | Single-VM **details Overview** (day-2) |
-| **Handoff Google Doc** | [VM Overview](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit) |
-| **Shared UX tab (pointer)** | [VMaaS prototype — UX documentation → VM Overview](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.ut299rnpbsxq) |
-| **Companion Create Doc** | [Create Virtual machine](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
-| **External IP / Networking** | [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit) |
-| **Resize (instance type)** | [VM resize via instance type](https://docs.google.com/document/d/1kgln_LzTA3-VSP0SUM0jLce2Nvw0pix3oTYkwZuX-wE/edit) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7162-overview) |
-| **Screenshots** | `videos/vmaas-vm-details-overview-ux-doc/` · [gh-pages/screenshots/details](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/details) |
-| **MD handoff** | [vmaas-vm-details-overview-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-vm-details-overview-ux-doc.md) |
-| **Entry** | List **Name** link, after Create, or `?vm={name}` |
-
----
-
-## Goal
-
-Document OSAC VMaaS **Virtual machine details Overview** (day-2): header power actions, Overview / Configuration / Access & Initial run summary, **External IP**, Networking, Storage, Utilization, and key edit modals.
-
----
-
-## How to review in the mock
-
-1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=7162-overview) as **Tenant Admin**.
-2. Open a Running VM (e.g. `azure-baboon-27`) from the list.
-3. Confirm Overview columns, **External IP** (Host + SSH), Networking, Storage, Utilization.
-4. Try Instance type pencil (resize — OSAC-4281) and External IP attach/detach (OSAC-2621).
-
----
+- Scope: Single-VM details Overview (day-2)
+- [Interactive mockup — auto-attached IP](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=admin&vm=indigo-quokka-89)
+- [Google UX doc](https://docs.google.com/document/d/1Y8hjgE924owve0VXA3rkKqTYuB4sXKif8KhXyFL3hyQ/edit)
+- [Networking handoff](osac-2621-vmaas-tenant-networking-handoff.md)
 
 ## Layout
 
-| Area | Contents |
-|---|---|
-| Header | Breadcrumb · title · **Open console** · Start / Restart / Stop / Pause · Actions |
-| Top columns | **Overview** · **Configuration** · **Access & Initial run** |
-| Below | **External IP** (Host + SSH command) · **Networking** table · **Storage** table · **Utilization** |
-| Sidebar | Alerts · Recent activity |
+The header has the breadcrumb, VM title, Open console, power actions, and Actions. The top columns are Overview, Configuration, and **Access & Initial run**. Networking, Storage, and Utilization follow below; Alerts and Recent activity remain in the sidebar.
 
----
-
-## Top columns
-
-| Column | Fields |
-|---|---|
-| Overview | Project · Status (popover) · Created · Catalog item |
-| Configuration | Guest OS family · Disk image · Instance type (edit pencil) |
-| Access & Initial run | SSH public key · Cloud-init / Sysprep (as configured) |
-
----
+Access & Initial run is ordered **External IP → Cloud-init or Sysprep → SSH public key**. There is no SSH command in this overview.
 
 ## External IP
 
-Section title: **External IP** (not “Access” — avoids colliding with Access & Initial run).
+External IP is the first subsection under Access & Initial run, with the same heading treatment as Instance type and Additional disks. It shows Host and an action button. **Attach external IP** and **Detach external IP** are matching secondary small buttons. Failed attachment offers **Retry** and **Choose another** in the same button style.
 
-- **Host** + Attach / Detach
-- **SSH command** clipboard-copy when attached
-- States: not attached · attaching · attached · failed
+An IP attached automatically during VM creation displays an **Auto attached** label beside the heading and the explanation **“This IP is managed with the VM and is detached only when the VM is deleted.”** Edit and Detach are unavailable. A manually attached IP may be detached.
 
-Full contract: [Tenant Networking](https://docs.google.com/document/d/1Bb-TzaXkhdASe6btymwRk2u0wXycwyqS-I8h637hDGY/edit).
+## Cloud-init and SSH public key
 
----
+Cloud-init or Sysprep is a link to the selected secret, a read-only gray text box for inline content, or Not configured when absent. SSH public key follows it. Spacing between the External IP subsection and Cloud-init matches the rest of the overview fields.
 
-## Networking / Storage
+## Storage
 
-- **Networking:** Virtual network · Subnet · Security groups · Internal IP · Add network
-- **Storage:** disks table · Add disk · boot disk delete protected
+Boot disk size and Boot storage tier are separate fields. **Additional disks** is a table heading, with **Size**, **Storage tier**, and day-2 **Actions** columns. There is no disk-name column. Add disk remains a separate action. The boot disk cannot be deleted.
 
----
+## Other day-2 interactions
 
-## Edit modals (day-2)
+Tenant Admin can edit supported configuration. Tenant User is read-only for most overview configuration, subject to the instance type resize rule. Instance type, SSH public key, network, and disk edits use their corresponding controls and modals.
 
-| Modal | Entry |
-|---|---|
-| Edit instance type | Configuration → Instance type pencil (OSAC-4281) |
-| Edit SSH public key | Access & Initial run → SSH |
-| Add / Edit network | Networking |
-| Add / Edit disk | Storage |
-| Delete Virtual machine | Actions → Delete |
+## Screenshots
 
----
-
-## Roles
-
-| Role | Overview edits |
-|---|---|
-| Tenant Admin | Can edit Overview config |
-| Tenant User | Read-only Overview config **except Instance type resize**; power / console OK |
-
----
-
-## Related
-
-- Create Doc: [Create Virtual machine](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit)
-- Prototype build: **7162**
+The existing VM Overview screenshot gallery predates the Access & Initial run reorder and storage redesign. Replace **Overview — running** and **External IP (Host + SSH)** with current captures. Add a separate capture for the auto-attached IP state and an inline Cloud-init example. The existing Status popover, Edit instance type, Edit SSH public key, Add network, and Delete VM images are unaffected by the Nov 3 overview changes unless a visual review finds another discrepancy.

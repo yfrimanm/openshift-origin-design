@@ -10,7 +10,7 @@
 | **Handoff Google Doc** | [Create Virtual machine](https://docs.google.com/document/d/1LL0iWhIIh3gAhJAsm7MCpnlFxfzaOXkZS_MVI6dSfSo/edit) |
 | **Shared UX tab (pointer)** | [VMaaS prototype — UX documentation → Create Virtual machine](https://docs.google.com/document/d/1Vfn_9cGj92BOaqFKWE64pnL5Mi8WcCGwEllCVlhAWes/edit?tab=t.9bgpoonlcpfy) |
 | **Windows Sysprep detail** | [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit) |
-| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165) |
+| **Interactive mock** | [vmaas-ux-prototype.html](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104) |
 | **Screenshots** | `videos/vmaas-create-vm-only-ux-doc/` · [gh-pages/screenshots/create](https://github.com/yfrimanm/openshift-origin-design/tree/gh-pages/screenshots/create) |
 | **MD handoff** | [vmaas-create-vm-only-ux-doc.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/vmaas-create-vm-only-ux-doc.md) |
 | **Regenerate** | `node scripts/capture-vmaas-create-vm-only-screenshots.mjs` |
@@ -27,7 +27,7 @@ Document the tenant Create Virtual machine flow in the shared VMaaS mock: entry 
 
 ## How to review in the mock
 
-1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ethan-cards-7165) as **Tenant Admin**.
+1. Open the [mock](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104) as **Tenant Admin**.
 2. **Virtual machines** (card view is default) → **Create Virtual machine**.
 3. Walk Creation method → Details → Instance type → Storage → Network → Access & Initial run → Review.
 4. For Windows Access: set Guest OS to **Microsoft Windows** on Details (see [Create Windows VM with sysprep](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit)).
