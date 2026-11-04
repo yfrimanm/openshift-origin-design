@@ -1,6 +1,6 @@
 # VMaaS UX mockup — current handoff
 
-Prototype: [VMaaS UX prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=ux-audit-20261104&role=provider)
+Prototype: [VMaaS UX prototype](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=9e721e2&role=provider)
 Google UX doc: [Catalog items](https://docs.google.com/document/d/1YTm2X4nUXWVI_Mjq_hXEY4Rj6i9BaOiXjzVeF3jcMA4/edit)
 
 ## Create catalog item
