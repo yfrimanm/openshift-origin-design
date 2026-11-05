@@ -33,12 +33,12 @@ External IP is the first item in Access & Initial run, above Cloud-init and SSH 
 
 ![network auto ip](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/network-auto-ip.png)
 
-When no address is attached, Attach external IP is a secondary button, aligned with the manual Detach action. The attach modal selects an available address from the project IP pool. Attaching shows progress. On failure, the message appears below the host, followed by Retry and Choose another. The auto-attached state does not expose those manual controls.
+When no address is attached, Attach external IP is a secondary button, aligned with the manual Detach action. The attach modal selects an available address from the project IP pool. Attaching shows progress. On failure, `Failed to attach [IP].` appears below the host, followed by Retry and Choose another. The auto-attached state does not expose those manual controls.
 
 ![network attach modal](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/network-attach-modal.png)
 
 ![external IP attaching](https://raw.githubusercontent.com/osac-project/osac-ux/2bed4f5/apps/app-frontend/public/screenshots/tenant-networking/attach-loading.jpg)
 
-![external IP attachment failed](https://raw.githubusercontent.com/osac-project/osac-ux/210a46d/apps/app-frontend/public/screenshots/tenant-networking/attach-error.jpg)
+![external IP attachment failed](https://raw.githubusercontent.com/osac-project/osac-ux/1d0b46f/apps/app-frontend/public/screenshots/tenant-networking/attach-error.jpg)
 
 This handoff does not own Virtual networks list/create/detail, External IP inventory, or subnet/security-group administration.
