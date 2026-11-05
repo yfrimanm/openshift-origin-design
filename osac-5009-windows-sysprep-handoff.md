@@ -11,7 +11,7 @@ Current design: 4 November 2026
 | **Feature** | [OSAC-4705](https://redhat.atlassian.net/browse/OSAC-4705) |
 | **Scope** | Windows create VM Access and Initial run Sysprep path |
 | **Role** | Tenant Admin |
-| **Interactive mock** | [Current Create Windows VM with Sysprep mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=02966da&role=admin&create=1) |
+| **Interactive mock** | [Current Create Windows VM with Sysprep mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=1d9b24b&role=admin&create=1) |
 | **Handoff Google Doc** | [Create Windows VM with Sysprep UX document](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit) |
 | **MD handoff** | [osac-5009-windows-sysprep-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-5009-windows-sysprep-handoff.md) |
 
