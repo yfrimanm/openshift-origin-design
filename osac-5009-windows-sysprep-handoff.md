@@ -37,8 +37,8 @@ Select secret instead chooses a saved, project-scoped Sysprep secret. Its conten
 
 ## Review
 
-Review shows the Sysprep method and “Provided (hidden)” for entered XML, rather than echoing the XML body. A selected secret is represented by its name. The Windows path uses Password / RDP after create as its access method.
+Review shows one Sysprep row: “Provided (hidden)” for entered XML, the selected secret name for a secret, or “Not provided” when unset. It never echoes the XML body or adds a separate method row. The Windows path uses Password / RDP after create as its access method.
 
-![windows review access](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/windows-review-access.png)
+![windows review access](https://raw.githubusercontent.com/osac-project/osac-ux/f9ce193/apps/app-frontend/public/screenshots/windows-sysprep/review-no-method.jpg)
 
 This scope is create-time only. Day-2 Sysprep editing and Catalog Provide-default Unattend are separate work.
