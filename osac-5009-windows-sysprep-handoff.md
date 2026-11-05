@@ -11,7 +11,7 @@ Current design: 4 November 2026
 | **Feature** | [OSAC-4705](https://redhat.atlassian.net/browse/OSAC-4705) |
 | **Scope** | Windows create VM Access and Initial run Sysprep path |
 | **Role** | Tenant Admin |
-| **Interactive mock** | [Current Create Windows VM with Sysprep mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=1d9b24b&role=admin&create=1) |
+| **Interactive mock** | [Current Create Windows VM with Sysprep mockup](https://yfrimanm.github.io/openshift-origin-design/vmaas-ux-prototype.html?v=49f624d&role=admin&create=1) |
 | **Handoff Google Doc** | [Create Windows VM with Sysprep UX document](https://docs.google.com/document/d/1NpRGPRKJP-HG769O2Q_7RPagKyfpGTFr_NQkeL1WNWU/edit) |
 | **MD handoff** | [osac-5009-windows-sysprep-handoff.md](https://github.com/yfrimanm/openshift-origin-design/blob/vmaas-create-vm-wizard/osac-5009-windows-sysprep-handoff.md) |
 
@@ -31,7 +31,7 @@ Enter value accepts an upload or pasted Unattend.xml. The UI states a 1 MiB maxi
 
 ![windows enter](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/windows-enter.png)
 
-Select secret instead chooses a saved, project-scoped Sysprep secret. Its contents are never displayed in the UI.
+Select secret instead chooses a saved, project-scoped Sysprep secret. Its contents are never displayed in the UI. The selected secret's ID is used directly for its link in VM details; its name is the link text. The backend validates the reference, so the UI does not fetch the secret again to check that it exists and has no loading or error state for that lookup.
 
 ![windows secret](https://raw.githubusercontent.com/yfrimanm/openshift-origin-design/02966da/handoff-current-shots/windows-secret.png)
 
