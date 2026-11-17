@@ -1857,9 +1857,9 @@
                     </div>
                   </div>
                   <div class="form-field">
-                    <label for="domain">Base domain <span class="req">*</span></label>
-                    <input class="pf-v6-c-form-control" id="domain" type="text" value="apps.mgmt-cluster.example.com" placeholder="apps.mgmt-cluster.example.com" />
-                    <p class="hint" id="domain-default-hint">The infrastructure cluster's apps domain is suggested. Your networking choice determines whether this value is fixed or editable.</p>
+                    <label for="domain">Base DNS domain <span class="req">*</span></label>
+                    <input class="pf-v6-c-form-control" id="domain" type="text" value="" placeholder="Enter base DNS domain" />
+                    <p class="hint" id="domain-default-hint">All DNS records must be subdomains of this base and include the cluster name. This cannot be changed after cluster installation.</p>
                   </div>
                   <div class="form-field">
                     <label id="pull-label">Pull secret <span class="req">*</span></label>
@@ -2541,7 +2541,7 @@
                         <div class="review-nebius__row"><span class="review-nebius__label">Cluster name</span><span class="review-nebius__value" id="review-name">virt-cluster-01</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Infrastructure credential</span><span class="review-nebius__value" id="review-credential">kubevirt-infra-creds</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">OpenShift version</span><span class="review-nebius__value" id="review-version">4.22.2</span></div>
-                        <div class="review-nebius__row"><span class="review-nebius__label">Base domain</span><span class="review-nebius__value" id="review-domain">apps.mgmt-cluster.example.com</span></div>
+                        <div class="review-nebius__row"><span class="review-nebius__label">Base DNS domain</span><span class="review-nebius__value" id="review-domain">—</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Pull secret</span><span class="review-nebius__value" id="review-pull-secret">pull-secret</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">Cluster set</span><span class="review-nebius__value" id="review-cluster-set">—</span></div>
                         <div class="review-nebius__row"><span class="review-nebius__label">SSH public key</span><span class="review-nebius__value" id="review-ssh">Not provided</span></div>
@@ -3246,7 +3246,7 @@
       if (!selectText('cred-select', '')) issues.push(issue('details', 'cred-select', 'Select an infrastructure credential.'));
       if (!clusterName) issues.push(issue('details', 'cname', 'Enter a cluster name.'));
       else if (!/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(clusterName)) issues.push(issue('details', 'cname', 'Use 1–63 lowercase letters, numbers, or hyphens; start and end with a letter or number.'));
-      if (!domain) issues.push(issue('details', 'domain', 'Enter a base domain.'));
+      if (!domain) issues.push(issue('details', 'domain', 'Enter a base DNS domain.'));
       else if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i.test(domain)) issues.push(issue('details', 'domain', 'Enter a valid DNS domain, such as example.com'));
       if (!selectText('ver-select', '')) issues.push(issue('details', 'ver-select', 'Select an OpenShift version.'));
       const usingManualPull = isManualPull();
@@ -3711,9 +3711,9 @@
       if (domain) domain.readOnly = mode === 'pod';
       const domainHint = document.getElementById('domain-default-hint');
       if (domainHint) domainHint.textContent = bridge
-        ? 'Use the domain configured in your DNS records. You can change it for this cluster.'
-        : mode === 'pod' ? 'Uses the infrastructure cluster’s apps domain. No DNS records need to be created.'
-          : 'The infrastructure cluster’s apps domain is suggested. Your networking choice determines whether this value is fixed or editable.';
+        ? 'Use the domain configured in your DNS records. This cannot be changed after cluster installation.'
+        : mode === 'pod' ? 'Uses the infrastructure cluster’s apps domain. This cannot be changed after cluster installation.'
+          : 'All DNS records must be subdomains of this base and include the cluster name. This cannot be changed after cluster installation.';
       const ccmField = document.getElementById('ccm-field');
       if (ccmField) ccmField.hidden = mode !== 'pod';
       const cluster = valueOf('cname') || '<cluster-name>';
