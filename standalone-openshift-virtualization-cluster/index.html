@@ -1865,10 +1865,10 @@
                     <label id="pull-label">Pull secret <span class="req">*</span></label>
                     <div class="pull-secret-summary">
                       <div class="pull-secret-summary__value">
-                        <strong class="pull-secret-summary__name" id="pull-summary-name">pull-secret</strong>
-                        <span class="pull-secret-summary__source" id="pull-summary-source">From kubevirt-infra-creds</span>
+                        <strong class="pull-secret-summary__name" id="pull-summary-name">Not selected</strong>
+                        <span class="pull-secret-summary__source" id="pull-summary-source">Select an infrastructure credential first</span>
                       </div>
-                      <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="pull-change-toggle" aria-expanded="false" aria-controls="pull-change-panel">Change</button>
+                      <button type="button" class="pf-v6-c-button pf-m-link pf-m-inline" id="pull-change-toggle" aria-expanded="false" aria-controls="pull-change-panel" disabled>Change</button>
                     </div>
                     <div class="pull-secret-change" id="pull-change-panel" hidden>
                       <div class="pull-secret-source-options" role="radiogroup" aria-label="Pull secret source">
@@ -3620,7 +3620,7 @@
       set('review-version', selectText('ver-select'));
       set('review-domain', document.getElementById('domain')?.value.trim() || '—');
       syncPullSecretUi();
-      set('review-pull-secret', isManualPull() ? (valueOf('pull-new-name') || 'New secret') : selectText('pull-select'));
+      set('review-pull-secret', selectText('cred-select', '') ? (isManualPull() ? (valueOf('pull-new-name') || 'New secret') : selectText('pull-select')) : '—');
       set('review-cp-replicas', cp === '1' ? 'Single node (1 VM)' : 'Highly available (3 VMs)');
       set('review-cp-size', `${cpCores} CPU cores, ${cpMem} GiB, ${cpDisk} GiB system disk`);
       set('review-cp-storage', selectText('cp-sc-select'));
@@ -3828,11 +3828,15 @@
     function isManualPull() { return Boolean(document.getElementById('pull-source-new')?.checked); }
     function syncPullSecretUi() {
       const addingNew = isManualPull();
+      const hasCredential = Boolean(selectText('cred-select', ''));
       if (pullExistingMode) pullExistingMode.hidden = addingNew;
       if (pullNewMode) pullNewMode.hidden = !addingNew;
       const summaryName = document.getElementById('pull-summary-name');
       const summarySource = document.getElementById('pull-summary-source');
-      if (addingNew) {
+      if (!hasCredential) {
+        if (summaryName) summaryName.textContent = 'Not selected';
+        if (summarySource) summarySource.textContent = 'Select an infrastructure credential first';
+      } else if (addingNew) {
         if (summaryName) summaryName.textContent = valueOf('pull-new-name') || 'New pull secret';
         if (summarySource) summarySource.textContent = 'New secret';
       } else {
@@ -4319,6 +4323,8 @@
       }
 
       setRichSelectValue('pull-select', defaults.pullSecret, `From ${credentialKey}`);
+      const pullChangeToggle = document.getElementById('pull-change-toggle');
+      if (pullChangeToggle) pullChangeToggle.disabled = false;
       setRichSelectValue('cp-sc-select', defaults.storageClass);
       document.querySelectorAll('.worker-group .rich-select[id$="-sc-select"]').forEach(select => {
         setRichSelectValue(select.id, defaults.storageClass);
